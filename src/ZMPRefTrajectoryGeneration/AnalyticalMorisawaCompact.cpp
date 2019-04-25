@@ -731,15 +731,15 @@ computing the analytical trajectories. */
     }
   }
 
-  int AnalyticalMorisawaCompact::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-                                            deque<COMState> & FinalCoMPositions,
-                                            deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-                                            deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
-                                            FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                                            FootAbsolutePosition & InitRightFootAbsolutePosition,
-                                            deque<RelativeFootPosition> &RelativeFootPositions,
-                                            COMState & lStartingCOMState,
-                                            Eigen::Vector3d &)
+  std::size_t AnalyticalMorisawaCompact::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
+						    deque<COMState> & FinalCoMPositions,
+						    deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+						    deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
+						    FootAbsolutePosition & InitLeftFootAbsolutePosition,
+						    FootAbsolutePosition & InitRightFootAbsolutePosition,
+						    deque<RelativeFootPosition> &RelativeFootPositions,
+						    COMState & lStartingCOMState,
+						    Eigen::Vector3d &)
   {
     m_OnLineMode = true;
     m_RelativeFootPositions.clear();

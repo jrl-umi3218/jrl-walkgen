@@ -55,7 +55,8 @@ RigidBodySystem::initialize(  )
   OFTG_->SetDoubleSupportTime( T_ );
   OFTG_->QPSamplingPeriod( T_ );
   OFTG_->NbSamplingsPreviewed( N_ );
-  OFTG_->FeetDistance( 0.2 );
+  OFTG_->FeetDistance( 0.2 ); // HRP-2
+  //OFTG_->FeetDistance( 0.162 );
   OFTG_->SetStepHeight( 0.03 );
 
   // Initialize predetermined trajectories:

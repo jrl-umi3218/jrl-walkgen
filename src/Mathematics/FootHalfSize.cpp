@@ -33,8 +33,8 @@ FootHalfSize::FootHalfSize()
 {
   m_HalfWidth = -1.0;
   m_HalfHeight = -1.0;
-  m_HalfWidthInit = -1.0;
-  m_HalfHeightInit = -1.0;
+  m_Width = -1.0;
+  m_Height = -1.0;
   m_HalfHeightDS = -1.0;
 
   // Variation around X < 1 cm by default.
@@ -48,12 +48,12 @@ FootHalfSize::~FootHalfSize()
 {
 }
 
-void FootHalfSize::setHalfSizeInit(double lHalfWidthInit,
-                                   double lHalfHeightInit,
-                                   double DSFeetDistance)
+void FootHalfSize::setSize(double lWidth,
+			   double lHeight,
+			   double DSFeetDistance)
 {
-  m_HalfHeightInit = lHalfHeightInit;
-  m_HalfWidthInit = lHalfWidthInit;
+  m_Height = lHeight;
+  m_Width = lWidth;
   
   updateHalfSize();
   updateHalfHeightDS(DSFeetDistance);
@@ -61,8 +61,8 @@ void FootHalfSize::setHalfSizeInit(double lHalfWidthInit,
 
 void FootHalfSize::updateHalfSize()
 {
-  m_HalfWidth = 0.5 * m_HalfWidthInit;
-  m_HalfHeight = 0.5 * m_HalfHeightInit;
+  m_HalfWidth = 0.5 * m_Width;
+  m_HalfHeight = 0.5 * m_Height;
 
   m_HalfWidth -= m_ConstraintsOnX;
   m_HalfHeight -= m_ConstraintsOnY;

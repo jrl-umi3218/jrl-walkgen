@@ -127,7 +127,10 @@ void PreviewControl::SetPreviewControlTime(double lPreviewControlTime)
 void PreviewControl::SetHeightOfCoM(double lHeightOfCom)
 {
   if (m_Zc!=lHeightOfCom)
-    m_Coherent = false;
+    {
+      ODEBUG3("m_Zc: " << m_Zc << " lHeightOfCom: "<< lHeightOfCom)
+      m_Coherent = false;
+    }
 
   m_Zc = lHeightOfCom;
 

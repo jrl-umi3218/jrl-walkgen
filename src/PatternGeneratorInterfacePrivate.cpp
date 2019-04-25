@@ -656,8 +656,10 @@ namespace PatternGeneratorJRL {
   }
 
 
-  void PatternGeneratorInterfacePrivate::EvaluateStartingCOM(Eigen::VectorXd &Configuration,
-                                                             Eigen::Vector3d &lStartingCOMState)
+  void PatternGeneratorInterfacePrivate::
+  EvaluateStartingCOM
+  (Eigen::VectorXd &Configuration,
+   Eigen::Vector3d &lStartingCOMState)
   {
     Eigen::VectorXd Velocity;
     Velocity.resize(Configuration.size());
@@ -672,26 +674,32 @@ namespace PatternGeneratorJRL {
   }
 
   void PatternGeneratorInterfacePrivate::
-  EvaluateStartingState(COMState  & lStartingCOMState,
-			Eigen::Vector3d & lStartingZMPPosition,
-			Eigen::Matrix<double, 6, 1> & lStartingWaistPose,
-			FootAbsolutePosition & InitLeftFootAbsPos,
-			FootAbsolutePosition & InitRightFootAbsPos)
+  EvaluateStartingState
+  (COMState  & lStartingCOMState,
+   Eigen::Vector3d & lStartingZMPPosition,
+   Eigen::Matrix<double, 6, 1> & lStartingWaistPose,
+   FootAbsolutePosition & InitLeftFootAbsPos,
+   FootAbsolutePosition & InitRightFootAbsPos)
   {
     Eigen::VectorXd lBodyInit;
     lBodyInit.resize(m_CurrentActuatedJointValues.size());
 
-    for(unsigned int j=0; j<m_CurrentActuatedJointValues.size();j++)
+    for(unsigned int j=0;
+	j<m_CurrentActuatedJointValues.size();
+	j++)
     {
       lBodyInit(j) = m_CurrentActuatedJointValues[j];
     }
 
-    m_GlobalStrategyManager->EvaluateStartingState(lBodyInit,
-                                                   lStartingCOMState,
-                                                   lStartingZMPPosition,
-                                                   lStartingWaistPose,
-                                                   InitLeftFootAbsPos,
-						   InitRightFootAbsPos);
+    m_GlobalStrategyManager->
+      EvaluateStartingState
+      (lBodyInit,
+       lStartingCOMState,
+       lStartingZMPPosition,
+       lStartingWaistPose,
+       InitLeftFootAbsPos,
+       InitRightFootAbsPos);
+    
     ostringstream osscomheightcmd;
     osscomheightcmd << ":comheight "
         << lStartingCOMState.z[0];
@@ -704,10 +712,12 @@ namespace PatternGeneratorJRL {
 
   // This method assumes that we still are using the ZMP
   // someday it should go out.
-  void PatternGeneratorInterfacePrivate::AutomaticallyAddFirstStep(deque<RelativeFootPosition> & lRelativeFootPositions,
-                                                                   FootAbsolutePosition & InitLeftFootAbsPos,
-                                                                   FootAbsolutePosition & InitRightFootAbsPos,
-                                                                   COMState &lStartingCOMState)
+  void PatternGeneratorInterfacePrivate::
+  AutomaticallyAddFirstStep
+  (deque<RelativeFootPosition> & lRelativeFootPositions,
+   FootAbsolutePosition & InitLeftFootAbsPos,
+   FootAbsolutePosition & InitRightFootAbsPos,
+   COMState &lStartingCOMState)
   {
     Eigen::Matrix3d InitPos;
     Eigen::Matrix3d CoMPos;
@@ -1699,7 +1709,8 @@ namespace PatternGeneratorJRL {
     }
   }
 
-  void PatternGeneratorInterfacePrivate::SetCurrentJointValues(Eigen::VectorXd &lCurrentJointValues)
+  void PatternGeneratorInterfacePrivate::
+  SetCurrentJointValues(Eigen::VectorXd &lCurrentJointValues)
   {
     if(lCurrentJointValues.size()!=m_CurrentActuatedJointValues.size())
       m_CurrentActuatedJointValues.resize(lCurrentJointValues.size());

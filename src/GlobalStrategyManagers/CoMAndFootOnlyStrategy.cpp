@@ -35,7 +35,9 @@
 
 using namespace PatternGeneratorJRL;
 
-CoMAndFootOnlyStrategy::CoMAndFootOnlyStrategy(SimplePluginManager * aSimplePluginManager)
+CoMAndFootOnlyStrategy::
+CoMAndFootOnlyStrategy
+(SimplePluginManager * aSimplePluginManager)
   : GlobalStrategyManager(aSimplePluginManager)
 {
   m_BufferSizeLimit = 0;
@@ -45,21 +47,27 @@ CoMAndFootOnlyStrategy::~CoMAndFootOnlyStrategy()
 {
 }
 
-int CoMAndFootOnlyStrategy::InitInterObjects(PinocchioRobot * /* aPR */,
-					     std::vector<ComAndFootRealization *> aCFR,
-					     StepStackHandler * /* aSSH */)
+int
+CoMAndFootOnlyStrategy::
+InitInterObjects
+(PinocchioRobot * /* aPR */,
+ std::vector<ComAndFootRealization *> aCFR,
+ StepStackHandler * /* aSSH */)
 {
   m_ComAndFootRealization = aCFR;
   return 0;
 }
 
-int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
-						   FootAbsolutePosition &RightFootPosition,
-						   Eigen::VectorXd & ZMPRefPos,
-						   COMState & finalCOMPosition,
-						   Eigen::VectorXd & ,//CurrentConfiguration,
-						   Eigen::VectorXd & ,//CurrentVelocity,
-						   Eigen::VectorXd & )//CurrentAcceleration)
+int
+CoMAndFootOnlyStrategy::
+OneGlobalStepOfControl
+(FootAbsolutePosition &LeftFootPosition,
+ FootAbsolutePosition &RightFootPosition,
+ Eigen::VectorXd & ZMPRefPos,
+ COMState & finalCOMPosition,
+ Eigen::VectorXd & ,//CurrentConfiguration,
+ Eigen::VectorXd & ,//CurrentVelocity,
+ Eigen::VectorXd & )//CurrentAcceleration)
 {
   ODEBUG("Begin OneGlobalStepOfControl "
 	  << m_LeftFootPositions->size() << " "
@@ -124,12 +132,14 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
 }
 
 
-int CoMAndFootOnlyStrategy::EvaluateStartingState(Eigen::VectorXd & BodyAngles,
-						  COMState & aStartingCOMState,
-						  Eigen::Vector3d & aStartingZMPPosition,
-						  Eigen::Matrix<double, 6,1> & lStartingWaistPose,
-						  FootAbsolutePosition & InitLeftFootPosition,
-						  FootAbsolutePosition & InitRightFootPosition)
+int CoMAndFootOnlyStrategy::
+EvaluateStartingState
+(Eigen::VectorXd & BodyAngles,
+ COMState & aStartingCOMState,
+ Eigen::Vector3d & aStartingZMPPosition,
+ Eigen::Matrix<double, 6,1> & lStartingWaistPose,
+ FootAbsolutePosition & InitLeftFootPosition,
+ FootAbsolutePosition & InitRightFootPosition)
 {
   Eigen::Vector3d lStartingCOMState;
 
@@ -138,16 +148,21 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(Eigen::VectorXd & BodyAngles,
   lStartingCOMState(2) = aStartingCOMState.z[0];
 
   std::vector<ComAndFootRealization *>::iterator itCFR ;
-  for (itCFR = m_ComAndFootRealization.begin() ; itCFR != m_ComAndFootRealization.end() ; ++itCFR )
+  for (itCFR = m_ComAndFootRealization.begin() ;
+       itCFR != m_ComAndFootRealization.end() ;
+       ++itCFR )
   {
-    // here we use the analytical forward kinematics to initialise the position of the CoM of mass according to
+    // here we use the analytical forward kinematics
+    // to initialise the position of the CoM of mass according to
     // the articular position of the robot.
-    (*itCFR)->InitializationCoM(BodyAngles,lStartingCOMState,
-				lStartingWaistPose,
-				InitLeftFootPosition,
-				InitRightFootPosition);
-
-    ODEBUG("EvaluateStartingCOM: m_StartingCOMState: " << lStartingCOMState);
+    (*itCFR)->InitializationCoM
+      (BodyAngles,lStartingCOMState,
+       lStartingWaistPose,
+       InitLeftFootPosition,
+       InitRightFootPosition);
+    
+    ODEBUG("EvaluateStartingCOM: m_StartingCOMState: "
+	   << lStartingCOMState);
     aStartingCOMState.x[0] = lStartingCOMState(0);
     aStartingCOMState.y[0] = lStartingCOMState(1);
     aStartingCOMState.z[0] = lStartingCOMState(2);
@@ -155,22 +170,23 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(Eigen::VectorXd & BodyAngles,
     aStartingCOMState.pitch[0] = lStartingWaistPose(4);
     aStartingCOMState.roll[0] = lStartingWaistPose(3);
     aStartingZMPPosition= (*itCFR)->GetCOGInitialAnkles();
-
   }
 
-  // We assume that the robot is not moving at the beginning so the zmp is the projection of the com on the ground.
+  // We assume that the robot is not moving
+  // at the beginning so the zmp is the projection of the com on the ground.
   aStartingZMPPosition(0) = aStartingCOMState.x[0] ;
   aStartingZMPPosition(1) = aStartingCOMState.y[0] ;
   // The  altitude of the zmp depend on the altitude of the support foot.
-  aStartingZMPPosition(2) = 0.5 * (InitLeftFootPosition.z + InitRightFootPosition.z) ;
+  aStartingZMPPosition(2) = 0.5 *
+    (InitLeftFootPosition.z + InitRightFootPosition.z) ;
 
   //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in	\
   //  CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
 
-//  cout << "com = " << aStartingCOMState  << endl ;
-//  cout << "zmp = " << aStartingZMPPosition  << endl ;
-//  cout << "lf = " << InitLeftFootPosition  << endl ;
-//  cout << "rf = " << InitRightFootPosition  << endl ;
+  //  cout << "com = " << aStartingCOMState  << endl ;
+  cout << "zmp = " << aStartingZMPPosition  << endl ;
+  //  cout << "lf = " << InitLeftFootPosition  << endl ;
+  //  cout << "rf = " << InitRightFootPosition  << endl ;
   return 0;
 }
 

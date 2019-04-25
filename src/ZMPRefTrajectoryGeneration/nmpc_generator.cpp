@@ -1243,11 +1243,11 @@ void NMPCgenerator::buildConvexHullSystems()
   // RIGHT FOOT
   dummySupp_.Foot = RIGHT ;
   dummySupp_.Phase = SS ;
-  hull5_.X_vec[0] = -0.28 ; hull5_.Y_vec[0] = -0.2 ;
-  hull5_.X_vec[1] = -0.2  ; hull5_.Y_vec[1] = -0.3 ;
-  hull5_.X_vec[2] =  0.0  ; hull5_.Y_vec[2] = -0.4 ;
-  hull5_.X_vec[3] =  0.2  ; hull5_.Y_vec[3] = -0.3 ;
-  hull5_.X_vec[4] =  0.28 ; hull5_.Y_vec[4] = -0.2 ;
+  hull5_.X_vec[0] = -0.28 ; hull5_.Y_vec[0] = -0.162 ; // -0.2
+  hull5_.X_vec[1] = -0.2  ; hull5_.Y_vec[1] = -0.3 ;   // -0.3
+  hull5_.X_vec[2] =  0.0  ; hull5_.Y_vec[2] = -0.4 ;   // -0.4
+  hull5_.X_vec[3] =  0.2  ; hull5_.Y_vec[3] = -0.3 ;   // -0.3
+  hull5_.X_vec[4] =  0.28 ; hull5_.Y_vec[4] = -0.162 ; // -0.162
   RFI_->compute_linear_system( hull5_, dummySupp_ );
   for(unsigned i = 0 ; i < hull5_.A_vec.size() ; ++i)
   {
@@ -1258,11 +1258,11 @@ void NMPCgenerator::buildConvexHullSystems()
   // LEFT FOOT
   dummySupp_.Foot = LEFT ;
   dummySupp_.Phase = SS ;
-  hull5_.X_vec[0] = -0.28 ; hull5_.Y_vec[0] = 0.2 ;
-  hull5_.X_vec[1] = -0.2  ; hull5_.Y_vec[1] = 0.3 ;
-  hull5_.X_vec[2] =  0.0  ; hull5_.Y_vec[2] = 0.4 ;
-  hull5_.X_vec[3] =  0.2  ; hull5_.Y_vec[3] = 0.3 ;
-  hull5_.X_vec[4] =  0.28 ; hull5_.Y_vec[4] = 0.2 ;
+  hull5_.X_vec[0] = -0.28 ; hull5_.Y_vec[0] = 0.162 ; // 0.2
+  hull5_.X_vec[1] = -0.2  ; hull5_.Y_vec[1] = 0.3 ; // 0.3
+  hull5_.X_vec[2] =  0.0  ; hull5_.Y_vec[2] = 0.4 ; // 0.4
+  hull5_.X_vec[3] =  0.2  ; hull5_.Y_vec[3] = 0.3 ; // 0.3 
+  hull5_.X_vec[4] =  0.28 ; hull5_.Y_vec[4] = 0.162 ; // 0.2
   RFI_->compute_linear_system( hull5_, dummySupp_ );
   for(unsigned i = 0 ; i < hull5_.A_vec.size() ; ++i)
   {

@@ -235,15 +235,15 @@ namespace PatternGeneratorJRL
       @param[in] lStartingCOMState: The initial position of the CoM given as a 3D vector.
       @param[in] lStartingZMPPosition: The initial position of the ZMP given as a 3D vector.
     */
-    virtual int InitOnLine(std::deque<ZMPPosition> & ZMPPositions,
-			   std::deque<COMState> & COMStates,
-			   std::deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-			   std::deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
-			   FootAbsolutePosition & InitLeftFootAbsolutePosition,
-			   FootAbsolutePosition & InitRightFootAbsolutePosition,
-			   std::deque<RelativeFootPosition> &RelativeFootPositions,
-			   COMState & lStartingCOMState,
-			   Eigen::Vector3d & lStartingZMPPosition)   = 0;
+    virtual std::size_t InitOnLine(std::deque<ZMPPosition> & ZMPPositions,
+				   std::deque<COMState> & COMStates,
+				   std::deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+				   std::deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
+				   FootAbsolutePosition & InitLeftFootAbsolutePosition,
+				   FootAbsolutePosition & InitRightFootAbsolutePosition,
+				   std::deque<RelativeFootPosition> &RelativeFootPositions,
+				   COMState & lStartingCOMState,
+				   Eigen::Vector3d & lStartingZMPPosition)   = 0;
     
 
 

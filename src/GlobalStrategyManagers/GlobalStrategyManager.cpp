@@ -32,17 +32,21 @@
 
 using namespace PatternGeneratorJRL;
 
-GlobalStrategyManager::GlobalStrategyManager(SimplePluginManager *aPluginManager):
+GlobalStrategyManager::
+GlobalStrategyManager
+(SimplePluginManager *aPluginManager):
   SimplePlugin(aPluginManager)
 {
 }
 
   
   
-void GlobalStrategyManager::SetBufferPositions(deque<ZMPPosition> * aZMPPositions,
-					       deque<COMState> * aCOMBuffer,
-					       deque<FootAbsolutePosition> *aLeftFootAbsolutePositions,
-					       deque<FootAbsolutePosition> *aRightFootAbsolutePositions )
+void GlobalStrategyManager::
+SetBufferPositions
+(deque<ZMPPosition> * aZMPPositions,
+ deque<COMState> * aCOMBuffer,
+ deque<FootAbsolutePosition> *aLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> *aRightFootAbsolutePositions )
 {
   m_ZMPPositions = aZMPPositions;
   m_COMBuffer = aCOMBuffer;

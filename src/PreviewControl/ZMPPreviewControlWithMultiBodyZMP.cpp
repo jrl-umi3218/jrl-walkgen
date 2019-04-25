@@ -107,14 +107,16 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
   m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
  }
 
- void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMState &acomp,
-								     FootAbsolutePosition &aLeftFAP,
-								     FootAbsolutePosition &aRightFAP,
-								     Eigen::VectorXd &CurrentConfiguration,
-								     Eigen::VectorXd &CurrentVelocity,
-								     Eigen::VectorXd &CurrentAcceleration,
-								     int IterationNumber,
-								     int StageOfTheAlgorithm)
+ void ZMPPreviewControlWithMultiBodyZMP::
+ CallToComAndFootRealization
+ (COMState &acomp,
+  FootAbsolutePosition &aLeftFAP,
+  FootAbsolutePosition &aRightFAP,
+  Eigen::VectorXd &CurrentConfiguration,
+  Eigen::VectorXd &CurrentVelocity,
+  Eigen::VectorXd &CurrentAcceleration,
+  int IterationNumber,
+  int StageOfTheAlgorithm)
  {
 
    // New scheme for WPG v3.0
@@ -169,15 +171,17 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    /* Get the current acceleration vector */
    CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
 
-   m_ComAndFootRealization->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
-								    aLeftFootPosition,
-								    aRightFootPosition,
-								    CurrentConfiguration,
-								    CurrentVelocity,
-								    CurrentAcceleration,
-								    IterationNumber,
-								    StageOfTheAlgorithm);
-
+   m_ComAndFootRealization->
+     ComputePostureForGivenCoMAndFeetPosture
+     (aCOMState, aCOMSpeed, aCOMAcc,
+      aLeftFootPosition,
+      aRightFootPosition,
+      CurrentConfiguration,
+      CurrentVelocity,
+      CurrentAcceleration,
+      IterationNumber,
+      StageOfTheAlgorithm);
+   
    if (StageOfTheAlgorithm==0)
      {
        /* Update the current configuration vector */
@@ -446,7 +450,8 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    return 1;
  }
 
- int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int /* StartingIteration */)
+ int ZMPPreviewControlWithMultiBodyZMP::
+ EvaluateMultiBodyZMP(int /* StartingIteration */)
  {
    ODEBUG("Start EvaluateMultiBodyZMP");
    m_PinocchioRobot->computeInverseDynamics();

@@ -512,12 +512,12 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
   Eigen::MatrixXd lterm1;
   lterm1 = m_PPu.transpose();
-  tmp=lterm1+m_PPu;
+  tmp=lterm1*m_PPu;
   lterm1=m_Beta*tmp;
 
   Eigen::MatrixXd lterm2;
   lterm2 = m_VPu.transpose();
-  tmp=lterm2+m_VPu;
+  tmp=lterm2*m_VPu;
   lterm2=m_Alpha*lterm2;
 
   OptA.resize(lterm1.rows(), lterm1.cols());
@@ -1533,15 +1533,15 @@ void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method, std::istr
 }
 
 
-int ZMPConstrainedQPFastFormulation::InitOnLine(deque<ZMPPosition> &,          // FinalZMPPositions,
-						deque<COMState> &,             // FinalCOMStates,
-						deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
-						deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
-						FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
-						FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
-						deque<RelativeFootPosition> &, // RelativeFootPositions,
-						COMState & ,                   // lStartingCOMState,
-						Eigen::Vector3d & )      // lStartingZMPPosition)
+std::size_t ZMPConstrainedQPFastFormulation::InitOnLine(deque<ZMPPosition> &,          // FinalZMPPositions,
+							deque<COMState> &,             // FinalCOMStates,
+							deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
+							deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
+							FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
+							FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
+							deque<RelativeFootPosition> &, // RelativeFootPositions,
+							COMState & ,                   // lStartingCOMState,
+							Eigen::Vector3d & )      // lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
   return 0;

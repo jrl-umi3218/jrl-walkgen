@@ -54,7 +54,7 @@ namespace PatternGeneratorJRL {
       const unsigned int nbMethod = 13 ;
       const char lBuffer[nbMethod][256] =
 	{
-	  ":comheight 0.8078",
+	  ":comheight 0.876681",
 	  ":samplingperiod 0.005",
 	  ":previewcontroltime 1.6",
 	  ":omega 0.0",
@@ -92,6 +92,16 @@ namespace PatternGeneratorJRL {
 	   << lStartingCOMPosition.y[0] << " "
 	   << lStartingCOMPosition.z[0] << endl;
 
+      cout << "Starting Waist Position: "
+	   << lStartingWaistPose[0] << " "
+	   << lStartingWaistPose[1] << " "
+	   << lStartingWaistPose[2] << endl;
+
+      cout << "Starting ZMP Position: "
+	   << lStartingZMPPosition[0] << " "
+	   << lStartingZMPPosition[1] << " "
+	   << lStartingZMPPosition[2] << endl;
+      
       cout << "Starting Left Foot Pos: "
 	   << InitLeftFootAbsPos.x << " "
 	   << InitLeftFootAbsPos.y << " "
@@ -111,7 +121,6 @@ namespace PatternGeneratorJRL {
 	   << endl;
 
     }
-
 
     void getOptions(int argc,
 		    char *argv[],

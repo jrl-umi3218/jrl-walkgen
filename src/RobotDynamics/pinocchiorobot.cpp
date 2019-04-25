@@ -1,3 +1,9 @@
+#include <iostream>
+#include <fstream>
+#include <typeinfo>
+using namespace std;
+
+#include <Debug.hh>
 #include <jrl/walkgen/pinocchiorobot.hh>
 #include "pinocchio/algorithm/rnea.hpp"
 #include "pinocchio/algorithm/kinematics.hpp"
@@ -25,10 +31,11 @@ PinocchioRobot::PinocchioRobot()
   m_robotDataInInitialePose = 0 ;
 
   // init quaternion as unit zero rotation
-  m_quat = Eigen::Quaterniond(
-			      Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ()) *
-			      Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY()) *
-			      Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) ) ;
+  m_quat = Eigen::
+    Quaterniond(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ()) *
+		Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY()) *
+		Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) ) ;
+  
   m_quat.normalize();
   // resize by default
   m_q.resize(50,1);
@@ -59,6 +66,7 @@ PinocchioRobot::PinocchioRobot()
   m_boolLeftFoot  = false ;
   m_boolRightFoot = false ;
   m_isLegInverseKinematic = false ;
+  m_modeLegInverseKinematic = 0;
   m_isArmInverseKinematic = false ;
 
   m_chest = 0 ;
@@ -146,7 +154,8 @@ bool PinocchioRobot::initializeRobotModelAndData(pinocchio::Model * robotModel,
   // initialize the short cut for the joint ids
   pinocchio::FrameIndex chest = m_robotModel->getFrameId("torso");
   m_chest = m_robotModel->frames[chest].parent ;
-  pinocchio::FrameIndex waist = (robotModel->existFrame("BODY"))?m_robotModel->getFrameId("BODY"):m_robotModel->getFrameId("body");
+  pinocchio::FrameIndex waist = (robotModel->existFrame("BODY"))
+    ?m_robotModel->getFrameId("BODY"):m_robotModel->getFrameId("body");
   m_waist = m_robotModel->frames[waist].parent ;
   pinocchio::FrameIndex ra = m_robotModel->getFrameId("r_ankle");
   m_rightFoot.associatedAnkle = m_robotModel->frames[ra].parent ;
@@ -198,8 +207,8 @@ bool PinocchioRobot::initializeRobotModelAndData(pinocchio::Model * robotModel,
   m_robotData->v[0] = pinocchio::Motion::Zero();
   m_robotData->a[0] = -m_robotModel->gravity;
 
-  if(testInverseKinematics())
-    initializeInverseKinematics();
+  if(testLegsInverseKinematics())
+    initializeLegsInverseKinematics();
 
   return true ;
 }
@@ -218,19 +227,40 @@ bool PinocchioRobot::initializeRightFoot(PRFoot rightFoot)
   return true ;
 }
 
-bool PinocchioRobot::testInverseKinematics()
+bool PinocchioRobot::
+testOneModeOfLegsInverseKinematics
+(std::vector<std::string> &leftLegJointName,
+ std::vector<std::string> &rightLegJointName)
 {
   std::vector<pinocchio::JointIndex> leftLeg =
     jointsBetween(m_waist,m_leftFoot.associatedAnkle);
   std::vector<pinocchio::JointIndex> rightLeg =
     jointsBetween(m_waist,m_rightFoot.associatedAnkle);
-  std::vector<pinocchio::JointIndex> leftArm =
-    jointsBetween(m_chest,m_leftWrist);
-  std::vector<pinocchio::JointIndex> rightArm =
-    jointsBetween(m_chest,m_rightWrist);
+				   
+  bool lisLegInverseKinematic = true ;
+  for (unsigned  i=0 ; i<leftLegJointName.size() ; ++i)
+    {
+      std::string shortName =
+	boost::apply_visitor(Joint_shortname(),
+			     m_robotModel->joints[leftLeg[i]]);
+      lisLegInverseKinematic &= (shortName == leftLegJointName[i]);
+    }
+  for (unsigned  i=0 ; i<rightLegJointName.size() ; ++i)
+    {
+      std::string shortName =
+	boost::apply_visitor(Joint_shortname(),
+			     m_robotModel->joints[rightLeg[i]]);
+      lisLegInverseKinematic &= (shortName == rightLegJointName[i]);
+    }
 
-  std::vector<std::string> leftLegJointName,rightLegJointName,
-    leftArmJointName,rightArmJointName;
+  return lisLegInverseKinematic;
+}				   
+bool PinocchioRobot::testLegsInverseKinematics()
+{
+
+  std::vector<std::string> leftLegJointName,rightLegJointName;
+
+  // Test mode 1.
   leftLegJointName.push_back("JointModelFreeFlyer");
   leftLegJointName.push_back("JointModelRZ");
   leftLegJointName.push_back("JointModelRX");
@@ -247,6 +277,44 @@ bool PinocchioRobot::testInverseKinematics()
   rightLegJointName.push_back("JointModelRY");
   rightLegJointName.push_back("JointModelRX");
   
+
+  if (testOneModeOfLegsInverseKinematics(leftLegJointName,
+					 rightLegJointName))
+    {
+      m_isLegInverseKinematic=true;
+      m_modeLegInverseKinematic=0;
+    }
+  else
+    {
+      // Test mode 2.
+      leftLegJointName[1] = "JointModelRX";
+      leftLegJointName[2] = "JointModelRY";
+      leftLegJointName[3] = "JointModelRZ";      
+      
+      rightLegJointName[1] = "JointModelRX";
+      rightLegJointName[2] = "JointModelRY";
+      rightLegJointName[3] = "JointModelRZ";
+      
+      if (testOneModeOfLegsInverseKinematics(leftLegJointName,
+					     rightLegJointName))
+	{
+	  m_isLegInverseKinematic=true;
+	  m_modeLegInverseKinematic=1;
+	}
+    }
+  return m_isLegInverseKinematic;
+}
+
+bool PinocchioRobot::testArmsInverseKinematics()
+{
+
+  std::vector<pinocchio::JointIndex> leftArm =
+    jointsBetween(m_chest,m_leftWrist);
+  std::vector<pinocchio::JointIndex> rightArm =
+    jointsBetween(m_chest,m_rightWrist);
+
+  std::vector<std::string> leftArmJointName,rightArmJointName;
+
   leftArmJointName.push_back("JointModelRY");
   leftArmJointName.push_back("JointModelRX");
   leftArmJointName.push_back("JointModelRZ");
@@ -260,37 +328,25 @@ bool PinocchioRobot::testInverseKinematics()
   rightArmJointName.push_back("JointModelRZ");
   rightArmJointName.push_back("JointModelRY");
 
-  m_isLegInverseKinematic = true ;
-  m_isArmInverseKinematic = true ;
-  for (unsigned  i=0 ; i<leftLegJointName.size() ; ++i)
-    {
-      std::string shortName = boost::apply_visitor(Joint_shortname(),
-						   m_robotModel->joints[leftLeg[i]]);
-      m_isLegInverseKinematic &= (shortName == leftLegJointName[i]);
-    }
-  for (unsigned  i=0 ; i<rightLegJointName.size() ; ++i)
-    {
-      std::string shortName = boost::apply_visitor(Joint_shortname(),
-						   m_robotModel->joints[rightLeg[i]]);
-      m_isLegInverseKinematic &= (shortName == rightLegJointName[i]);
-    }
+  m_isArmInverseKinematic = true;
   for (unsigned  i=0 ; i<leftArmJointName.size() ; ++i)
     {
-      std::string shortName = boost::apply_visitor(Joint_shortname(),
-						   m_robotModel->joints[leftArm[i]]);
+      std::string shortName =
+	boost::apply_visitor(Joint_shortname(),
+			     m_robotModel->joints[leftArm[i]]);
       m_isArmInverseKinematic &= (shortName == leftArmJointName[i]);
     }
   for (unsigned  i=0 ; i<rightArmJointName.size() ; ++i)
     {
-      std::string shortName = boost::apply_visitor(Joint_shortname(),
-						   m_robotModel->joints[rightArm[i]]);
+      std::string shortName =
+	boost::apply_visitor(Joint_shortname(),
+			     m_robotModel->joints[rightArm[i]]);
       m_isArmInverseKinematic &= (shortName == rightArmJointName[i]);
     }
-
-  return m_isLegInverseKinematic & m_isArmInverseKinematic;
+  return m_isArmInverseKinematic;
 }
 
-void PinocchioRobot::initializeInverseKinematics()
+void PinocchioRobot::initializeLegsInverseKinematics()
 {
   std::vector<pinocchio::JointIndex> leftLeg =
     jointsBetween(m_waist,m_leftFoot.associatedAnkle);
@@ -300,14 +356,14 @@ void PinocchioRobot::initializeInverseKinematics()
   m_leftDt.Zero();
   m_rightDt.Zero();
   pinocchio::SE3 waist_M_leftHip , waist_M_rightHip ;
-  waist_M_leftHip = m_robotModel->jointPlacements[leftLeg[0]].act(
-								  m_robotModel->jointPlacements[leftLeg[1]]).act(
-														 m_robotModel->jointPlacements[leftLeg[2]]).act(
-																				m_robotModel->jointPlacements[leftLeg[3]]);
-  waist_M_rightHip = m_robotModel->jointPlacements[rightLeg[0]].act(
-								    m_robotModel->jointPlacements[rightLeg[1]]).act(
-														    m_robotModel->jointPlacements[rightLeg[2]]).act(
-																				    m_robotModel->jointPlacements[rightLeg[3]]);
+  waist_M_leftHip = m_robotModel->jointPlacements[leftLeg[0]].
+    act(m_robotModel->jointPlacements[leftLeg[1]]).
+    act(m_robotModel->jointPlacements[leftLeg[2]]).
+    act(m_robotModel->jointPlacements[leftLeg[3]]);
+  waist_M_rightHip = m_robotModel->jointPlacements[rightLeg[0]].
+    act(m_robotModel->jointPlacements[rightLeg[1]]).
+    act(m_robotModel->jointPlacements[rightLeg[2]]).
+    act(m_robotModel->jointPlacements[rightLeg[3]]);
 
   m_leftDt(0)=waist_M_leftHip.translation()(0);
   m_leftDt(1)=waist_M_leftHip.translation()(1);
@@ -326,21 +382,28 @@ void PinocchioRobot::initializeInverseKinematics()
 
   if(m_femurLength==0 || m_tibiaLengthZ==0)
     m_isLegInverseKinematic=false;
-
+  RESETDEBUG5("DebugDataInitIK.dat");
+  ODEBUG5("waist_M_leftHip " << waist_M_leftHip,"DebugDataInitIK.dat");
+  ODEBUG5("waist_M_rightHip " << waist_M_rightHip,"DebugDataInitIK.dat");
+  ODEBUG5("m_leftDt " << m_leftDt,"DebugDataInitIK.dat");
+  ODEBUG5("m_rightDt " << m_rightDt,"DebugDataInitIK.dat");  
   return ;
 }
 
-void PinocchioRobot::RPYToSpatialFreeFlyer(Eigen::Vector3d & rpy,
-                                           Eigen::Vector3d & drpy,
-                                           Eigen::Vector3d & ddrpy,
-                                           Eigen::Quaterniond & quat,
-                                           Eigen::Vector3d & omega,
-                                           Eigen::Vector3d & domega)
+void PinocchioRobot::
+RPYToSpatialFreeFlyer
+(Eigen::Vector3d & rpy,
+ Eigen::Vector3d & drpy,
+ Eigen::Vector3d & ddrpy,
+ Eigen::Quaterniond & quat,
+ Eigen::Vector3d & omega,
+ Eigen::Vector3d & domega)
 {
-  quat = Eigen::Quaterniond(
-			    Eigen::AngleAxisd(rpy(2), Eigen::Vector3d::UnitZ()) *
-			    Eigen::AngleAxisd(rpy(1), Eigen::Vector3d::UnitY()) *
-			    Eigen::AngleAxisd(rpy(0), Eigen::Vector3d::UnitX()) ) ;
+  quat = Eigen::
+    Quaterniond(Eigen::AngleAxisd(rpy(2), Eigen::Vector3d::UnitZ()) *
+		Eigen::AngleAxisd(rpy(1), Eigen::Vector3d::UnitY()) *
+		Eigen::AngleAxisd(rpy(0), Eigen::Vector3d::UnitX()) ) ;
+  
   quat.normalize();
   double c0,s0; pinocchio::SINCOS (rpy(2), &s0, &c0);
   double c1,s1; pinocchio::SINCOS (rpy(1), &s1, &c1);
@@ -349,8 +412,10 @@ void PinocchioRobot::RPYToSpatialFreeFlyer(Eigen::Vector3d & rpy,
   omega = m_S * drpy ;
   domega = m_S * ddrpy ;
   domega(0) += -c1 * drpy (0) * drpy (1);
-  domega(1) += -s1 * s2 * drpy (0) * drpy (1) + c1 * c2 * drpy (0) * drpy (2) - s2 * drpy (1) * drpy (2);
-  domega(2) += -s1 * c2 * drpy (0) * drpy (1) - c1 * s2 * drpy (0) * drpy (2) - c2 * drpy (1) * drpy (2);
+  domega(1) += -s1 * s2 * drpy (0) * drpy (1) +
+    c1 * c2 * drpy (0) * drpy (2) - s2 * drpy (1) * drpy (2);
+  domega(2) += -s1 * c2 * drpy (0) * drpy (1) -
+    c1 * s2 * drpy (0) * drpy (2) - c2 * drpy (1) * drpy (2);
 }
 
 void PinocchioRobot::computeForwardKinematics()
@@ -361,10 +426,11 @@ void PinocchioRobot::computeForwardKinematics()
 void PinocchioRobot::computeForwardKinematics(Eigen::VectorXd & q)
 {
   // euler to quaternion :
-  m_quat = Eigen::Quaterniond(
-			      Eigen::AngleAxisd(q(5), Eigen::Vector3d::UnitZ()) *
-			      Eigen::AngleAxisd(q(4), Eigen::Vector3d::UnitY()) *
-			      Eigen::AngleAxisd(q(3), Eigen::Vector3d::UnitX()) ) ;
+  m_quat = Eigen::
+    Quaterniond
+    (Eigen::AngleAxisd(q(5), Eigen::Vector3d::UnitZ()) *
+     Eigen::AngleAxisd(q(4), Eigen::Vector3d::UnitY()) *
+     Eigen::AngleAxisd(q(3), Eigen::Vector3d::UnitX()) ) ;
   m_quat.normalize();
   // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
   for(unsigned i=0; i<3 ; ++i)
@@ -388,9 +454,11 @@ void PinocchioRobot::computeInverseDynamics()
   PinocchioRobot::computeInverseDynamics(m_qmal,m_vmal,m_amal);
 }
 
-void PinocchioRobot::computeInverseDynamics(Eigen::VectorXd & q,
-                                            Eigen::VectorXd & v,
-                                            Eigen::VectorXd & a)
+void PinocchioRobot::
+computeInverseDynamics
+(Eigen::VectorXd & q,
+ Eigen::VectorXd & v,
+ Eigen::VectorXd & a)
 {
   //  for(unsigned i=0;i<3;++i)
   //  {
@@ -435,7 +503,8 @@ void PinocchioRobot::computeInverseDynamics(Eigen::VectorXd & q,
   m_tau = pinocchio::rnea(*m_robotModel,*m_robotData,m_q,m_v,m_a);
 }
 
-std::vector<pinocchio::JointIndex> PinocchioRobot::fromRootToIt(pinocchio::JointIndex it)
+std::vector<pinocchio::JointIndex>
+PinocchioRobot::fromRootToIt(pinocchio::JointIndex it)
 {
   std::vector<pinocchio::JointIndex> fromRootToIt ;
   fromRootToIt.clear();
@@ -486,12 +555,12 @@ std::vector<pinocchio::JointIndex> PinocchioRobot::jointsBetween
 
 ///////////////////////////////////////////////////////////////////////////////
 bool PinocchioRobot::
-ComputeSpecializedInverseKinematics(
-				    const pinocchio::JointIndex &jointRoot,
-				    const pinocchio::JointIndex &jointEnd,
-				    const Eigen::Matrix4d & jointRootPosition,
-				    const Eigen::Matrix4d & jointEndPosition,
-				    Eigen::VectorXd &q )
+ComputeSpecializedInverseKinematics
+(const pinocchio::JointIndex &jointRoot,
+ const pinocchio::JointIndex &jointEnd,
+ const Eigen::Matrix4d & jointRootPosition,
+ const Eigen::Matrix4d & jointEndPosition,
+ Eigen::VectorXd &q )
 {
   q.Zero(q.size());
   /*! Try to find out which kinematics chain the user
@@ -541,10 +610,13 @@ ComputeSpecializedInverseKinematics(
   return false;
 }
 
-void PinocchioRobot::getWaistFootKinematics(const Eigen::Matrix4d & jointRootPosition,
-                                            const Eigen::Matrix4d & jointEndPosition,
-                                            Eigen::VectorXd &q,
-                                            Eigen::Vector3d Dt)
+void PinocchioRobot::
+getWaistFootKinematics
+(const Eigen::Matrix4d & jointRootPosition,
+ const Eigen::Matrix4d & jointEndPosition,
+ Eigen::VectorXd &q,
+ Eigen::Vector3d &Dt)
+  const
 {
   double _epsilon=1.0e-6;
   // definition des variables relatif au design du robot
@@ -672,6 +744,14 @@ void PinocchioRobot::getWaistFootKinematics(const Eigen::Matrix4d & jointRootPos
 
   q[1] = atan2(R(2,1), -R(0,1)*sz+R(1,1)*cz);
   q[2] = atan2( -R(2,0), R(2,2));
+
+  if (m_modeLegInverseKinematic==1)
+    {
+      double tmp=q[2];
+      q[2]=q[0];
+      q[0]=q[1];
+      q[1]=tmp;
+    }
 }
 
 double PinocchioRobot::ComputeXmax(double & Z)
@@ -685,10 +765,12 @@ double PinocchioRobot::ComputeXmax(double & Z)
   return Xmax;
 }
 
-void PinocchioRobot::getShoulderWristKinematics(const Eigen::Matrix4d & jointRootPosition,
-                                                const Eigen::Matrix4d & jointEndPosition,
-                                                Eigen::VectorXd &q,
-                                                int side)
+void PinocchioRobot::
+getShoulderWristKinematics
+(const Eigen::Matrix4d & jointRootPosition,
+ const Eigen::Matrix4d & jointEndPosition,
+ Eigen::VectorXd &q,
+ int side)
 {
 
   // Initialisation of q
@@ -731,15 +813,23 @@ void PinocchioRobot::getShoulderWristKinematics(const Eigen::Matrix4d & jointRoo
 
 }
 
+const std::string &
+PinocchioRobot::
+getName() const
+{
+  return m_robotModel->name;
+}
+
 void PinocchioRobot::DetectAutomaticallyShoulders()
 {
   DetectAutomaticallyOneShoulder(m_leftWrist,m_leftShoulder);
   DetectAutomaticallyOneShoulder(m_rightWrist,m_rightShoulder);
 }
 
-void PinocchioRobot::DetectAutomaticallyOneShoulder(
-						    pinocchio::JointIndex aWrist,
-						    pinocchio::JointIndex & aShoulder)
+void PinocchioRobot::
+DetectAutomaticallyOneShoulder
+(pinocchio::JointIndex aWrist,
+ pinocchio::JointIndex & aShoulder)
 {
   std::vector<pinocchio::JointIndex>FromRootToJoint;
 

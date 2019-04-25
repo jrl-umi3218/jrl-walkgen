@@ -15,6 +15,14 @@
 
 INCLUDE(CTest)
 
+ADD_LIBRARY(${PROJECT_NAME}-test SHARED
+  TestObject.cpp
+  CommonTools.cpp
+  ClockCPUTime.cpp
+  ../src/portability/gettimeofday.cc )
+
+PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME}-test pinocchio)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME}-test ${PROJECT_NAME})
 
 # Make sure private headers can be used.
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
@@ -32,9 +40,7 @@ ADD_REQUIRED_DEPENDENCY("simple_humanoid_description >= 1.0.1")
 #SET(GENERIC_TEST)
 IF(GENERIC_TEST)
   ADD_EXECUTABLE(TestFootPrintPGInterface
-    ../src/portability/gettimeofday.cc
     TestFootPrintPGInterfaceData.cpp
-    CommonTools.cpp
     TestFootPrintPGInterface.cpp
     )
 
@@ -99,13 +105,10 @@ MACRO(ADD_JRL_WALKGEN_EXE test_arg test_file_name)
 
   ADD_EXECUTABLE(${test_name}
     ${test_file_name}
-    TestObject.cpp
-    CommonTools.cpp
-    ClockCPUTime.cpp
-    ../src/portability/gettimeofday.cc
   )
 
   TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
+  TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME}-test)
   PKG_CONFIG_USE_DEPENDENCY(${test_name} pinocchio)
 
 ENDMACRO(ADD_JRL_WALKGEN_EXE)
@@ -170,14 +173,18 @@ ENDMACRO(ADD_JRL_WALKGEN_EXE)
 
 ## These test is disabled for now as it fails.
 ## FIXME: fix the test and/or the implementation
-#CONFIG_FILES_CMAKE(TestKajita2003StraightWalking${BITS}TestFGPI.datref)
-#CONFIG_FILES_CMAKE(TestKajita2003Circle${BITS}TestFGPI.datref)
-#CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq1${BITS}TestFGPI.datref)
-#CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq2${BITS}TestFGPI.datref)
-#ADD_JRL_WALKGEN_TEST(TestKajita2003StraightWalking TestKajita2003.cpp)
-#ADD_JRL_WALKGEN_TEST(TestKajita2003Circle          TestKajita2003.cpp)
-#ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
-#ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
+CONFIG_FILES_CMAKE(TestKajita2003StraightWalking${BITS}TestFGPI.datref)
+CONFIG_FILES_CMAKE(TestKajita2003Circle${BITS}TestFGPI.datref)
+CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq1${BITS}TestFGPI.datref)
+CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq2${BITS}TestFGPI.datref)
+ADD_JRL_WALKGEN_EXE(TestKajita2003StraightWalking TestKajita2003.cpp)
+ADD_JRL_WALKGEN_EXE(TestKajita2003Circle          TestKajita2003.cpp)
+ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
+ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
+ADD_JRL_WALKGEN_TEST(TestKajita2003StraightWalking TestKajita2003.cpp)
+ADD_JRL_WALKGEN_TEST(TestKajita2003Circle          TestKajita2003.cpp)
+ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
+ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
 
 ##########################
 ## Read Novela Data 2011 #
@@ -192,7 +199,7 @@ ENDMACRO(ADD_JRL_WALKGEN_EXE)
 
 # Disabled as the test fail : random results oscillating around mean behaviour
 ADD_JRL_WALKGEN_EXE(TestNaveau2015Online TestNaveau2015.cpp)
-#ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
+ADD_JRL_WALKGEN_EXE(TestNaveau2015OnlineSimple TestNaveau2015.cpp)
 
 #####################
 # Add user examples #

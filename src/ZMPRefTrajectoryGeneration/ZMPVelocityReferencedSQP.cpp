@@ -256,15 +256,15 @@ void ZMPVelocityReferencedSQP::CallMethod(std::string & Method, std::istringstre
   }
 }
 
-int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
-                                        deque<COMState> & FinalCoMPositions_deq,
-                                        deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-                                        deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-                                        FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                                        FootAbsolutePosition & InitRightFootAbsolutePosition,
-                                        deque<RelativeFootPosition> &, // RelativeFootPositions,
-                                        COMState & lStartingCOMState,
-                                        Eigen::Vector3d & lStartingZMPPosition)
+std::size_t ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
+						 deque<COMState> & FinalCoMPositions_deq,
+						 deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+						 deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+						 FootAbsolutePosition & InitLeftFootAbsolutePosition,
+						 FootAbsolutePosition & InitRightFootAbsolutePosition,
+						 deque<RelativeFootPosition> &, // RelativeFootPositions,
+						 COMState & lStartingCOMState,
+						 Eigen::Vector3d & lStartingZMPPosition)
 {
 
   // Generator Management

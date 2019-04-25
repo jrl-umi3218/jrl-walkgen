@@ -95,13 +95,35 @@ namespace PatternGeneratorJRL
         Eigen::VectorXd &q);
 
     ///
-    /// \brief testInverseKinematics :
-    /// test if the robot has the good joint
+    /// \brief testArmsInverseKinematics :
+    /// test if the robot arms has the good joint
+    /// configuration to use the analitical inverse geometry
+    /// to be overloaded if the user wants another inverse kinematics
+    /// RY-RX-RZ-RY-RZ-RY
+    /// \return
+    ///
+    virtual bool testArmsInverseKinematics();
+    ///
+    /// \brief testLegsInverseKinematics :
+    /// test if the robot legs has the good joint
+    /// configuration to use the analitical inverse geometry
+    /// to be overloaded if the user wants another inverse kinematics
+    /// Two modes are available:
+    /// FF-RZ-RX-RY-RY-RY-RX
+    /// FF-RX-RZ-RY-RY-RY-RX
+    /// \return
+    ///    
+    virtual bool testLegsInverseKinematics();
+    ///
+    /// \brief testOneModefOfLegInverseKinematics :
+    /// test if the robot legs has one good joint
     /// configuration to use the analitical inverse geometry
     /// to be overloaded if the user wants another inverse kinematics
     /// \return
-    ///
-    virtual bool testInverseKinematics();
+    ///    
+    virtual bool testOneModeOfLegsInverseKinematics
+    (std::vector<std::string> &leftLegJointNames,
+     std::vector<std::string> &rightLegJointNames);
 
     ///
     /// \brief initializeInverseKinematics :
@@ -109,7 +131,7 @@ namespace PatternGeneratorJRL
     /// length
     /// \return
     ///
-    virtual void initializeInverseKinematics();
+    virtual void initializeLegsInverseKinematics();
 
   public :
     /// tools :
@@ -122,7 +144,7 @@ namespace PatternGeneratorJRL
     void getWaistFootKinematics(const Eigen::Matrix4d & jointRootPosition,
                                 const Eigen::Matrix4d & jointEndPosition,
                                 Eigen::VectorXd &q,
-                                Eigen::Vector3d Dt);
+                                Eigen::Vector3d &Dt) const;
     double ComputeXmax(double & Z);
     void getShoulderWristKinematics(const Eigen::Matrix4d & jointRootPosition,
                                     const Eigen::Matrix4d & jointEndPosition,
@@ -232,6 +254,7 @@ namespace PatternGeneratorJRL
     bool initializeLeftFoot(PRFoot leftFoot);
     bool initializeRightFoot(PRFoot rightFoot);
 
+    const std::string & getName() const;
     /// Attributes
     /// //////////
   private :
@@ -263,6 +286,7 @@ namespace PatternGeneratorJRL
     // Variables extracted form the urdf used for the analitycal inverse
     // kinematic
     bool m_isLegInverseKinematic ;
+    unsigned int m_modeLegInverseKinematic;
     bool m_isArmInverseKinematic ;
 
     // length between the waist and the hip

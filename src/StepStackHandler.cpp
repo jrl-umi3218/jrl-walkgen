@@ -170,7 +170,9 @@ void StepStackHandler::ReadStepStairSequenceAccordingToWalkMode(istringstream &s
 	ODEBUG("m_RelativeFootPositions: " << m_RelativeFootPositions.size());
 }
 
-void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
+void StepStackHandler::
+ReadStepSequenceAccordingToWalkMode
+(istringstream &strm)
 {
   m_RelativeFootPositions.clear();
   switch (m_WalkMode)

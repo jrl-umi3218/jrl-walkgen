@@ -37,9 +37,9 @@ namespace PatternGeneratorJRL
     FootHalfSize();
     ~FootHalfSize();
     
-    void setHalfSizeInit(double lHalfWidth,
-                         double lHalfHeight,
-                         double DSFeetDistance);
+    void setSize(double lWidth,
+		 double lHeight,
+		 double DSFeetDistance);
 
     void setConstraints(double OnX,
                         double OnY,
@@ -54,8 +54,8 @@ namespace PatternGeneratorJRL
     double m_HalfHeight;
     double m_HalfWidth;
     double m_HalfHeightDS;
-    double m_HalfHeightInit;
-    double m_HalfWidthInit;
+    double m_Height;
+    double m_Width;
 
     double m_ConstraintsOnX;
     double m_ConstraintsOnY;

@@ -24,13 +24,20 @@
 /* \file Abstract Object test aim at testing various walking algorithms
  * Olivier Stasse
  */
-
+// System include for files
 #include <fstream>
+// System include for floating point errors
+#include <fenv.h>
 
+// Boost includes to parse XML files
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+
+// Internals includes
 #include "Debug.hh"
 #include "TestObject.hh"
+
+// SoT includes: pinocchio
 #include "pinocchio/parsers/urdf.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 using namespace std;
@@ -63,6 +70,9 @@ namespace PatternGeneratorJRL
                            string &aTestName,
                            int lPGIInterface)
     {
+      // Generates a signal when a NaN occurs.
+      feenableexcept(FE_INVALID | FE_OVERFLOW);
+      
       m_TestName = aTestName;
       m_PGIInterface = lPGIInterface;
       m_OuterLoopNbItMax = 1;
@@ -214,7 +224,8 @@ namespace PatternGeneratorJRL
     void TestObject::CreateAndInitializeComAndFootRealization()
     {
       m_ComAndFootRealization =
-          new ComAndFootRealizationByGeometry((PatternGeneratorInterfacePrivate*)m_SPM );
+	new ComAndFootRealizationByGeometry
+	((PatternGeneratorInterfacePrivate*)m_SPM );
       m_ComAndFootRealization->setPinocchioRobot(m_PR);
       m_ComAndFootRealization->SetStepStackHandler(new StepStackHandler(m_SPM));
       m_ComAndFootRealization->SetHeightOfTheCoM(0.814);
@@ -239,11 +250,7 @@ namespace PatternGeneratorJRL
       m_CurrentConfiguration(0) = waist(0);
       m_CurrentConfiguration(1) = waist(1);
       m_CurrentConfiguration(2) = waist(2);
-      //cout << waist << endl ;
 
-      m_conf = m_CurrentConfiguration ;
-      m_vel  = m_CurrentVelocity ;
-      m_acc  = m_CurrentAcceleration ;
     }
     
     void TestObject::InitializeLimbs()
@@ -562,7 +569,7 @@ namespace PatternGeneratorJRL
         aof.open(aFileName.c_str(),ofstream::app);
         aof.precision(8);
         aof.setf(ios::scientific, ios::floatfield);
-        aof << filterprecision(((double)m_OneStep.NbOfIt)*0.005 ) << " "                     // 1
+        aof << filterprecision(((double)m_OneStep.NbOfIt)*0.005 ) << " "           // 1
             << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "            // 2
             << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "            // 3
             << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "            // 4
@@ -599,7 +606,7 @@ namespace PatternGeneratorJRL
             << filterprecision(localZMPx) << " "                                   // 35
             << filterprecision(localZMPy) << " "                                   // 36
             << filterprecision(m_CurrentConfiguration(0) ) << " "                  // 37
-            << filterprecision(m_CurrentConfiguration(1) ) << " "			        ;// 38
+            << filterprecision(m_CurrentConfiguration(1) ) << " "		  ;// 38
         for (unsigned int i = 0 ; i < m_PR->currentConfiguration().size() ; i++)
         {
           aof << filterprecision(m_PR->currentConfiguration()(i)) << " " ;       // 39 - 39+dofs
@@ -614,8 +621,12 @@ namespace PatternGeneratorJRL
     {
       if (m_DebugFGPIFull)
       {
-        analyticalInverseKinematics(m_conf,m_vel,m_acc);
-        m_DebugPR->computeInverseDynamics(m_conf,m_vel,m_acc);
+        analyticalInverseKinematics(m_CurrentConfiguration,
+				    m_CurrentVelocity,
+				    m_CurrentAcceleration);
+        m_DebugPR->computeInverseDynamics(m_CurrentConfiguration,
+					  m_CurrentVelocity,
+					  m_CurrentAcceleration);
         Eigen::Vector3d zmpmb;
         m_DebugPR->zeroMomentumPoint(zmpmb);
 

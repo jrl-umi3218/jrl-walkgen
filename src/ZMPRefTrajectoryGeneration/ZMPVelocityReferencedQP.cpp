@@ -338,15 +338,18 @@ void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstrea
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
 }
 
-int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
-                                        deque<COMState> & FinalCoMPositions_deq,
-                                        deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-                                        deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-                                        FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                                        FootAbsolutePosition & InitRightFootAbsolutePosition,
-                                        deque<RelativeFootPosition> &, // RelativeFootPositions,
-                                        COMState & lStartingCOMState,
-                                        Eigen::Vector3d & lStartingZMPPosition)
+std::size_t
+ZMPVelocityReferencedQP::
+InitOnLine
+(deque<ZMPPosition> & FinalZMPTraj_deq,
+ deque<COMState> & FinalCoMPositions_deq,
+ deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+ deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+ FootAbsolutePosition & InitLeftFootAbsolutePosition,
+ FootAbsolutePosition & InitRightFootAbsolutePosition,
+ deque<RelativeFootPosition> &, // RelativeFootPositions,
+ COMState & lStartingCOMState,
+ Eigen::Vector3d & lStartingZMPPosition)
 {
   UpperTimeLimitToUpdate_ = 0.0;
 

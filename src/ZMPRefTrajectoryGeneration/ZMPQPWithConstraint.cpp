@@ -1398,15 +1398,15 @@ void ZMPQPWithConstraint::CallMethod(std::string & Method, std::istringstream &s
 }
 
 
-int ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> & ,         // FinalZMPPositions,
-				    deque<COMState> & ,            // FinalCOMStates,
-				    deque<FootAbsolutePosition> & ,// FinalLeftFootAbsolutePositions,
-				    deque<FootAbsolutePosition> & ,// FinalRightFootAbsolutePositions,
-				    FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
-				    FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
-				    deque<RelativeFootPosition> &, // RelativeFootPositions,
-				    COMState & ,                   // lStartingCOMState,
-				    Eigen::Vector3d & )      // lStartingZMPPosition)
+std::size_t ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> & ,         // FinalZMPPositions,
+					    deque<COMState> & ,            // FinalCOMStates,
+					    deque<FootAbsolutePosition> & ,// FinalLeftFootAbsolutePositions,
+					    deque<FootAbsolutePosition> & ,// FinalRightFootAbsolutePositions,
+					    FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
+					    FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
+					    deque<RelativeFootPosition> &, // RelativeFootPositions,
+					    COMState & ,                   // lStartingCOMState,
+					    Eigen::Vector3d & )      // lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
   return 0;

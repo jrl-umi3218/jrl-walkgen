@@ -101,7 +101,9 @@ namespace PatternGeneratorJRL
           PinocchioRobot *& aPR,
           PinocchioRobot *& aDebugPR);
       /*! @} */
-      /* !\brief Initialize m_CurrentConfiguration, m_CurrentVelocity, m_CurrentAcceleration */
+      /* !\brief Initialize m_CurrentConfiguration, 
+	 m_CurrentVelocity, 
+	 m_CurrentAcceleration */
       void InitializeStateVectors();
 
       /* !\brief Initialize m_leftLeg, m_rightLeg, m_leftArm, m_rightArm. */

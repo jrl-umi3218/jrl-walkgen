@@ -179,16 +179,16 @@ namespace PatternGeneratorJRL
 	@param[in] lStartingCOMState: The initial position of the CoM given as a 3D vector.
 	@param[in] lStartingZMPPosition: The initial position of the ZMP given as a 3D vector.
       */
-      int InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-		     deque<COMState> & CoMStates,
-		     deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-		     deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
-		     FootAbsolutePosition & InitLeftFootAbsolutePosition,
-		     FootAbsolutePosition & InitRightFootAbsolutePosition,
-		     deque<RelativeFootPosition> &RelativeFootPositions,
-		     COMState &lStartingCOMState,
-		     Eigen::Vector3d & lStartingZMPPosition
-		     );
+      std::size_t InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
+			     deque<COMState> & CoMStates,
+			     deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+			     deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
+			     FootAbsolutePosition & InitLeftFootAbsolutePosition,
+			     FootAbsolutePosition & InitRightFootAbsolutePosition,
+			     deque<RelativeFootPosition> &RelativeFootPositions,
+			     COMState &lStartingCOMState,
+			     Eigen::Vector3d & lStartingZMPPosition
+			     );
 
       /* ! \brief Methods to update the stack on-line by inserting a new foot position.
         The foot is put right at the end of the stack. This method is supposed to be called

@@ -44,32 +44,32 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
   SimplePlugin(aSPM)
 {
 
-  DSFeetDistance_ = 0.2;
+  DSFeetDistance_ = 0.162;
   SecurityMarginX_ = 0.04;
   SecurityMarginY_ = 0.04;
-  
+
   double DefaultFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
   double DefaultFPosEdgesY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
-  
+
   for(int i=0;i<5;i++)
     {
       LeftFPosEdgesX_[i] = DefaultFPosEdgesX[i];
       LeftFPosEdgesY_[i] = DefaultFPosEdgesY[i];
-      
+
       RightFPosEdgesX_[i] =  DefaultFPosEdgesX[i];
       RightFPosEdgesY_[i] = -DefaultFPosEdgesY[i];
     }
-  
+
   set_feet_dimensions( aPR );
 
   init_convex_hulls();
-  
+
   // Register method to handle
   string aMethodName[] =
     {":setfeetconstraint",
      ":setDSFeetDistance",
      ":setFPosEdges"};
-  
+
   for(int i=0;i<1;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
@@ -154,31 +154,45 @@ RelativeFeetInequalities::set_feet_dimensions( PinocchioRobot *aPR )
 {
 
   // Read feet specificities.
-  double HeightHalf,WidthHalf;
+  double Height,Width;
   PRFoot * RightFoot = aPR->rightFoot();
   if (RightFoot->associatedAnkle==0)
     {
       cerr << "Problem with the reading of the right foot"<< endl;
       return 0;
     }
-  WidthHalf  = RightFoot->soleWidth  ;
-  HeightHalf = RightFoot->soleHeight ;
+  Width  = RightFoot->soleWidth  ;
+  Height = RightFoot->soleHeight ;
 
+  ODEBUG3("Right Foot Width: " << Width);
+  ODEBUG3("Right Foot Height: " << Height);
   PRFoot * LeftFoot = aPR->leftFoot();
   if (RightFoot->associatedAnkle==0)
     {
       cerr << "Problem while reading of the left foot"<< endl;
       return 0;
     }
-  WidthHalf =  LeftFoot->soleWidth  ;
-  HeightHalf = LeftFoot->soleHeight ;
+  Width =  LeftFoot->soleWidth  ;
+  Height = LeftFoot->soleHeight ;
+  ODEBUG3("LeftFoot Width: " << Width);
+  ODEBUG3("LeftFoot Height: " << Height);
 
-  assert(WidthHalf > 0);
-  LeftFootSize_.setHalfSizeInit( WidthHalf, HeightHalf, DSFeetDistance_                 );
-  LeftFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_     );
-  RightFootSize_.setHalfSizeInit( WidthHalf, HeightHalf, DSFeetDistance_                );
-  RightFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_    );
+  assert(Width > 0);
+  LeftFootSize_.setSize
+    ( Width, Height, DSFeetDistance_);
+  LeftFootSize_.setConstraints
+    ( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_);
+  RightFootSize_.setSize
+    ( Width, Height, DSFeetDistance_ );
+  RightFootSize_.setConstraints
+    ( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
 
+  ODEBUG3("LeftFootSize.getHalfHeight: " << LeftFootSize_.getHalfHeight());
+  ODEBUG3("LeftFootSize.getHalfWidth: " << LeftFootSize_.getHalfWidth());
+  ODEBUG3("LeftFootSize.getHalfHeightDS: " << LeftFootSize_.getHalfHeightDS());
+  ODEBUG3("RightFootSize.getHalfHeight: " << RightFootSize_.getHalfHeight());
+  ODEBUG3("RightFootSize.getHalfWidth: " << RightFootSize_.getHalfWidth());
+  ODEBUG3("RightFootSize.getHalfHeightDS: " << RightFootSize_.getHalfHeightDS());
   return 0;
 
 }
@@ -334,11 +348,22 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
           Args >> SecurityMarginX_;
           Args >> SecurityMarginY_;
 
-          RightFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_ , DSFeetDistance_ );
-          LeftFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
+          RightFootSize_.setConstraints
+	    ( SecurityMarginX_, SecurityMarginY_ , DSFeetDistance_ );
+          LeftFootSize_.setConstraints
+	    ( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
           init_convex_hulls();
-//          cout << "Security margin On X: " << SecurityMarginX_
-//               << " Security margin On Y: " << SecurityMarginY_ << endl;
+	  ODEBUG3("Security margin On X: "
+		  << SecurityMarginX_
+		  << " Security margin On Y: "
+		  << SecurityMarginY_);
+	  ODEBUG3("LeftFootSize.getHalfHeight: " << LeftFootSize_.getHalfHeight());
+	  ODEBUG3("LeftFootSize.getHalfWidth: " << LeftFootSize_.getHalfWidth());
+	  ODEBUG3("LeftFootSize.getHalfHeightDS: " << LeftFootSize_.getHalfHeightDS());
+	  ODEBUG3("RightFootSize.getHalfHeight: " << RightFootSize_.getHalfHeight());
+	  ODEBUG3("RightFootSize.getHalfWidth: " << RightFootSize_.getHalfWidth());
+	  ODEBUG3("RightFootSize.getHalfHeightDS: " << RightFootSize_.getHalfHeightDS());
+
         }
     }
   else if( Method == ":setDSFeetDistance" )
