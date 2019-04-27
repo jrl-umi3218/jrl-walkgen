@@ -186,11 +186,11 @@ namespace PatternGeneratorJRL
     inline pinocchio::JointModelVector & getActuatedJoints()
     {return m_robotModel->joints;}
 
-    inline Eigen::VectorXd currentConfiguration()
+    inline Eigen::VectorXd & currentConfiguration()
     {return m_qmal;}
-    inline Eigen::VectorXd currentVelocity()
+    inline Eigen::VectorXd & currentVelocity()
     {return m_vmal;}
-    inline Eigen::VectorXd currentAcceleration()
+    inline Eigen::VectorXd & currentAcceleration()
     {return m_amal;}
 
     inline unsigned numberDof()
