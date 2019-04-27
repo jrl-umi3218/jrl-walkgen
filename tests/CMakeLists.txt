@@ -19,6 +19,7 @@ ADD_LIBRARY(${PROJECT_NAME}-test SHARED
   TestObject.cpp
   CommonTools.cpp
   ClockCPUTime.cpp
+  DumpReferencesObjects.cpp
   ../src/portability/gettimeofday.cc )
 
 PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME}-test pinocchio)
@@ -177,14 +178,17 @@ CONFIG_FILES_CMAKE(TestKajita2003StraightWalking${BITS}TestFGPI.datref)
 CONFIG_FILES_CMAKE(TestKajita2003Circle${BITS}TestFGPI.datref)
 CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq1${BITS}TestFGPI.datref)
 CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq2${BITS}TestFGPI.datref)
+CONFIG_FILES_CMAKE(TestKajita2003WalkingOnSpot${BITS}TestFGPI.datref)
 ADD_JRL_WALKGEN_EXE(TestKajita2003StraightWalking TestKajita2003.cpp)
 ADD_JRL_WALKGEN_EXE(TestKajita2003Circle          TestKajita2003.cpp)
 ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
 ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
+ADD_JRL_WALKGEN_EXE(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
 ADD_JRL_WALKGEN_TEST(TestKajita2003StraightWalking TestKajita2003.cpp)
 ADD_JRL_WALKGEN_TEST(TestKajita2003Circle          TestKajita2003.cpp)
 ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
 ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
+ADD_JRL_WALKGEN_TEST(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
 
 ##########################
 ## Read Novela Data 2011 #

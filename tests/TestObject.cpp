@@ -55,15 +55,6 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
-    double filterprecision(double adb)
-    {
-      if (fabs(adb)<1e-7)
-        return 0.0;
-
-      double ladb2 = adb * 1e7;
-      double lintadb2 = trunc(ladb2);
-      return lintadb2/1e7;
-    }
 
 
     TestObject::TestObject(int argc, char *argv[],
@@ -74,6 +65,7 @@ namespace PatternGeneratorJRL
       feenableexcept(FE_INVALID | FE_OVERFLOW);
       
       m_TestName = aTestName;
+      m_OneStep.m_TestName = m_TestName;
       m_PGIInterface = lPGIInterface;
       m_OuterLoopNbItMax = 1;
 
@@ -142,9 +134,9 @@ namespace PatternGeneratorJRL
         checkFiles();
       }catch(std::string e)
       {
-        std::cout << "file problem, existance or extension incorrect"
+        std::cerr << "file problem, existance or extension incorrect"
                   << std::endl ;
-        std::cout << e << std::endl ;
+        std::cerr << e << std::endl ;
         return false;
       }
 
@@ -153,6 +145,7 @@ namespace PatternGeneratorJRL
       CreateAndInitializeHumanoidRobot(m_URDFPath,m_SRDFPath,m_PR,m_DebugPR);
 
       // Create Pattern Generator Interface
+      m_OneStep.m_PR = m_PR;
       m_PGI = patternGeneratorInterfaceFactory(m_PR);
       m_PGI->SetCurrentJointValues(m_HalfSitting);
 
@@ -238,15 +231,15 @@ namespace PatternGeneratorJRL
       }
       Eigen::Vector3d lStartingCOMState;
       
-      lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
-      lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
-      lStartingCOMState(2) = m_OneStep.finalCOMPosition.z[0] ;
+      lStartingCOMState(0) = m_OneStep.m_finalCOMPosition.x[0] ;
+      lStartingCOMState(1) = m_OneStep.m_finalCOMPosition.y[0] ;
+      lStartingCOMState(2) = m_OneStep.m_finalCOMPosition.z[0] ;
       m_ComAndFootRealization->setSamplingPeriod(0.005);
       m_ComAndFootRealization->Initialization();
       m_ComAndFootRealization->InitializationCoM(m_HalfSitting,lStartingCOMState,
                                                  waist,
-                                                 m_OneStep.LeftFootPosition,
-						 m_OneStep.RightFootPosition);
+                                                 m_OneStep.m_LeftFootPosition,
+						 m_OneStep.m_RightFootPosition);
       m_CurrentConfiguration(0) = waist(0);
       m_CurrentConfiguration(1) = waist(1);
       m_CurrentConfiguration(2) = waist(2);
@@ -256,13 +249,17 @@ namespace PatternGeneratorJRL
     void TestObject::InitializeLimbs()
     {
       m_leftLeg =
-          m_PR->jointsBetween(m_PR->waist(),m_PR->leftFoot()->associatedAnkle);
+          m_PR->jointsBetween(m_PR->waist(),
+			      m_PR->leftFoot()->associatedAnkle);
       m_rightLeg =
-          m_PR->jointsBetween(m_PR->waist(),m_PR->rightFoot()->associatedAnkle);
+          m_PR->jointsBetween(m_PR->waist(),
+			      m_PR->rightFoot()->associatedAnkle);
       m_leftArm =
-          m_PR->jointsBetween(m_PR->chest(),m_PR->leftWrist());
+          m_PR->jointsBetween(m_PR->chest(),
+			      m_PR->leftWrist());
       m_rightArm =
-          m_PR->jointsBetween(m_PR->chest(),m_PR->rightWrist());
+          m_PR->jointsBetween(m_PR->chest(),
+			      m_PR->rightWrist());
       
       m_leftLeg.erase( m_leftLeg.begin() );
       m_rightLeg.erase( m_rightLeg.begin() );
@@ -291,11 +288,11 @@ namespace PatternGeneratorJRL
     }
     
     void TestObject::
-    CreateAndInitializeHumanoidRobot(
-				     std::string &URDFFile,
-				     std::string &SRDFFile,
-				     PinocchioRobot *& aPR,
-				     PinocchioRobot *& aDebugPR)
+    CreateAndInitializeHumanoidRobot
+    (std::string &URDFFile,
+     std::string &SRDFFile,
+     PinocchioRobot *& aPR,
+     PinocchioRobot *& aDebugPR)
     {
       // Creating the humanoid robot via the URDF.
       //      try{
@@ -304,12 +301,6 @@ namespace PatternGeneratorJRL
                             m_robotModel);
       m_robotData = new pinocchio::Data(m_robotModel) ;
       m_DebugRobotData = new pinocchio::Data(m_robotModel) ;
-      //      }catch(std::invalid_argument e)
-      //      {
-      //        cout << e.what() ;
-      //        cout << "robot model or robot data not created properly" << endl ;
-      //        return ;
-      //      }
 
       if ((aPR==0) || (aDebugPR==0))
       {
@@ -346,13 +337,16 @@ namespace PatternGeneratorJRL
       // Read xml stream
       using boost::property_tree::ptree;
       ptree pt;
-      try{
-        read_xml(srdf_stream, pt);
-      }catch(...)
-      {
-        cerr << "problem while reading the srdf file. File corrupted?" << endl;
-        return ;
-      }
+      try
+	{
+	  read_xml(srdf_stream, pt);
+	}
+      catch(...)
+	{
+	  cerr << "problem while reading the srdf file.";
+	  cerr << " File corrupted?" << endl;
+	  return ;
+	}
 
       // Get the starting configuration : half sitting
       // Uses the order 
@@ -360,7 +354,8 @@ namespace PatternGeneratorJRL
       m_HalfSitting.setZero();
 
       pinocchio::Model * aModel = aPR.Model();
-      BOOST_FOREACH(const ptree::value_type & v, pt.get_child("robot.group_state"))
+      BOOST_FOREACH(const ptree::value_type & v,
+		    pt.get_child("robot.group_state"))
       {
 	if (v.first=="<xmlattr>")
 	  {
@@ -387,7 +382,7 @@ namespace PatternGeneratorJRL
 	    }
         }
       } // BOOST_FOREACH
-      std::cout << "Half sitting: " << m_HalfSitting <<std::endl;
+      ODEBUG("Half sitting: " << m_HalfSitting);
       bool DebugConfiguration = true;
       if (DebugConfiguration)
       {
@@ -490,131 +485,13 @@ namespace PatternGeneratorJRL
         aofFULL.open(aFileName.c_str(),ofstream::out);
       }
 
-      if (m_DebugFGPI)
-      {
-        ofstream aof;
-        string aFileName = m_TestName;
-        aFileName += "TestFGPI_description.dat";
-
-        aof.open(aFileName.c_str(),ofstream::out);
-
-        string Titles[NB_OF_FIELDS] =
-        { "Time",
-          "Com X",
-          "Com Y" ,
-          "Com Z" ,
-          "Com Yaw",
-          "Com dX" ,
-          "Com dY" ,
-          "Com dZ" ,
-          "ZMP X (world ref.)" ,
-          "ZMP Y (world ref.)" ,
-          "Left Foot X" ,
-          "Left Foot Y" ,
-          "Left Foot Z" ,
-          "Left Foot dX" ,
-          "Left Foot dY" ,
-          "Left Foot dZ" ,
-          "Left Foot ddX" ,
-          "Left Foot ddY" ,
-          "Left Foot ddZ" ,
-          "Left Foot Theta" ,
-          "Left Foot Omega" ,
-          "Left Foot Omega2" ,
-          "Right Foot X" ,
-          "Right Foot Y" ,
-          "Right Foot Z" ,
-          "Right Foot dX" ,
-          "Right Foot dY" ,
-          "Right Foot dZ" ,
-          "Right Foot ddX" ,
-          "Right Foot ddY" ,
-          "Right Foot ddZ" ,
-          "Right Foot Theta" ,
-          "Right Foot Omega" ,
-          "Right Foot Omega2" ,
-          "ZMP X (waist ref.)" ,
-          "ZMP Y (waist ref.)" ,
-          "Waist X (world ref.)" ,
-          "Waist Y (world ref.)" ,
-          "all configuration vector"};
-        for(unsigned int i=0;i<NB_OF_FIELDS;i++)
-          aof << i+1 << ". " <<Titles[i] <<std::endl;
-
-        aof.close();
-
-        aFileName = m_TestName;
-        aFileName += "TestFGPI.dat";
-        aof.open(aFileName.c_str(),ofstream::out);
-        aof.close();
-      }
     }
 
 
     void TestObject::fillInDebugFiles( )
     {
       if (m_DebugFGPI)
-      {
-        double localZMPx = m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
-            m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5)) +
-            m_CurrentConfiguration(0) ;
-        double localZMPy = m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
-            m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5)) +
-            m_CurrentConfiguration(1) ;
-
-        ofstream aof;
-        string aFileName;
-        aFileName = m_TestName;
-        aFileName += "TestFGPI.dat";
-        aof.open(aFileName.c_str(),ofstream::app);
-        aof.precision(8);
-        aof.setf(ios::scientific, ios::floatfield);
-        aof << filterprecision(((double)m_OneStep.NbOfIt)*0.005 ) << " "           // 1
-            << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "            // 2
-            << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "            // 3
-            << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "            // 4
-            << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "          // 5
-            << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "            // 6
-            << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "            // 7
-            << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "            // 8
-            << filterprecision(m_OneStep.ZMPTarget(0) ) << " "                     // 9
-            << filterprecision(m_OneStep.ZMPTarget(1) ) << " "                     // 10
-            << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "              // 11
-            << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "              // 12
-            << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "              // 13
-            << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "             // 14
-            << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "             // 15
-            << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "             // 16
-            << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "            // 17
-            << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "            // 18
-            << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "            // 19
-            << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "  // 20
-            << filterprecision(m_OneStep.LeftFootPosition.omega*M_PI/180 ) << " "  // 21
-            << filterprecision(m_OneStep.LeftFootPosition.omega2*M_PI/180 ) << " " // 22
-            << filterprecision(m_OneStep.RightFootPosition.x ) << " "              // 23
-            << filterprecision(m_OneStep.RightFootPosition.y ) << " "              // 24
-            << filterprecision(m_OneStep.RightFootPosition.z ) << " "              // 25
-            << filterprecision(m_OneStep.RightFootPosition.dx ) << " "             // 26
-            << filterprecision(m_OneStep.RightFootPosition.dy ) << " "             // 27
-            << filterprecision(m_OneStep.RightFootPosition.dz ) << " "             // 28
-            << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "            // 29
-            << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "            // 30
-            << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "            // 31
-            << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " " // 32
-            << filterprecision(m_OneStep.RightFootPosition.omega*M_PI/180 ) << " " // 33
-            << filterprecision(m_OneStep.RightFootPosition.omega2*M_PI/180 ) << " "// 34
-            << filterprecision(localZMPx) << " "                                   // 35
-            << filterprecision(localZMPy) << " "                                   // 36
-            << filterprecision(m_CurrentConfiguration(0) ) << " "                  // 37
-            << filterprecision(m_CurrentConfiguration(1) ) << " "		  ;// 38
-        for (unsigned int i = 0 ; i < m_PR->currentConfiguration().size() ; i++)
-        {
-          aof << filterprecision(m_PR->currentConfiguration()(i)) << " " ;       // 39 - 39+dofs
-        }
-        aof << endl;
-        aof.close();
-      }
-
+	m_OneStep.fillInDebugFile();
     }
 
     void TestObject::fillInDebugFilesFull( )
@@ -637,50 +514,8 @@ namespace PatternGeneratorJRL
         aof.open(aFileName.c_str(),ofstream::app);
         aof.precision(8);
         aof.setf(ios::scientific, ios::floatfield);
-        aof << filterprecision(((double)m_OneStep.NbOfIt)*0.005 ) << " "             // 1
-            << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "    // 2
-            << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "    // 3
-            << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "    // 4
-            << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "  // 5
-            << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "    // 6
-            << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "    // 7
-            << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "    // 8
-            << filterprecision(m_OneStep.finalCOMPosition.yaw[1] ) << " "  // 9
-            << filterprecision(m_OneStep.finalCOMPosition.x[2] ) << " "    // 10
-            << filterprecision(m_OneStep.finalCOMPosition.y[2] ) << " "    // 11
-            << filterprecision(m_OneStep.finalCOMPosition.z[2] ) << " "    // 12
-            << filterprecision(m_OneStep.finalCOMPosition.yaw[2] ) << " "  // 13
-            << filterprecision(m_OneStep.ZMPTarget(0) ) << " "             // 14
-            << filterprecision(m_OneStep.ZMPTarget(1) ) << " "             // 15
-            << filterprecision(m_OneStep.ZMPTarget(2) ) << " "             // 16
-            << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "      // 17
-            << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "      // 18
-            << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "      // 19
-            << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "     // 20
-            << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "     // 21
-            << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "     // 22
-            << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "    // 23
-            << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "    // 24
-            << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "    // 25
-            << filterprecision(m_OneStep.LeftFootPosition.theta ) << " "   // 26
-            << filterprecision(m_OneStep.LeftFootPosition.dtheta ) << " "  // 27
-            << filterprecision(m_OneStep.LeftFootPosition.ddtheta ) << " " // 28
-            << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "  // 29
-            << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " " // 30
-            << filterprecision(m_OneStep.RightFootPosition.x ) << " "      // 31
-            << filterprecision(m_OneStep.RightFootPosition.y ) << " "      // 32
-            << filterprecision(m_OneStep.RightFootPosition.z ) << " "      // 33
-            << filterprecision(m_OneStep.RightFootPosition.dx ) << " "     // 34
-            << filterprecision(m_OneStep.RightFootPosition.dy ) << " "     // 35
-            << filterprecision(m_OneStep.RightFootPosition.dz ) << " "     // 36
-            << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "    // 37
-            << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "    // 38
-            << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "    // 39
-            << filterprecision(m_OneStep.RightFootPosition.theta ) << " "  // 40
-            << filterprecision(m_OneStep.RightFootPosition.dtheta ) << " " // 41
-            << filterprecision(m_OneStep.RightFootPosition.ddtheta ) << " "// 42
-            << filterprecision(m_OneStep.RightFootPosition.omega  ) << " " // 43
-            << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "// 44
+	m_OneStep.fillInDebugFileContent(aof);
+	aof << " "
             << filterprecision(zmpmb(0)) << " "                            // 45
             << filterprecision(zmpmb(1)) << " "                            // 46
             << filterprecision(zmpmb(2)) << " "                           ;// 47
@@ -796,7 +631,6 @@ namespace PatternGeneratorJRL
                         << " " << nb_of_pbs
                         <<std::endl;
               areportof << oss.str();
-              std::cout << oss.str();
               nb_of_pbs++;
               if(nb_of_pbs>max_nb_of_pbs)
               {
@@ -833,7 +667,8 @@ namespace PatternGeneratorJRL
 
       for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
       {
-        os << "<===============================================================>"<<endl;
+        os << "<====================================";
+	os << "===========================>"<<endl;
         os << "Iteration nb: " << lNbIt << endl;
 
         m_clock.startPlanning();
@@ -858,23 +693,27 @@ namespace PatternGeneratorJRL
 
           if (m_PGIInterface==0)
           {
-            ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
-                                                   m_CurrentVelocity,
-                                                   m_CurrentAcceleration,
-                                                   m_OneStep.ZMPTarget,
-                                                   m_OneStep.finalCOMPosition,
-                                                   m_OneStep.LeftFootPosition,
-                                                   m_OneStep.RightFootPosition);
+            ok = m_PGI->
+	      RunOneStepOfTheControlLoop
+	      (m_CurrentConfiguration,
+	       m_CurrentVelocity,
+	       m_CurrentAcceleration,
+	       m_OneStep.m_ZMPTarget,
+	       m_OneStep.m_finalCOMPosition,
+	       m_OneStep.m_LeftFootPosition,
+	       m_OneStep.m_RightFootPosition);
           }
           else if (m_PGIInterface==1)
           {
-            ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
-                                                   m_CurrentVelocity,
-                                                   m_CurrentAcceleration,
-                                                   m_OneStep.ZMPTarget);
+            ok = m_PGI->
+	      RunOneStepOfTheControlLoop
+	      (m_CurrentConfiguration,
+	       m_CurrentVelocity,
+	       m_CurrentAcceleration,
+	       m_OneStep.m_ZMPTarget);
           }
 
-          m_OneStep.NbOfIt++;
+          m_OneStep.m_NbOfIt++;
 
           m_clock.stopOneIteration();
 
@@ -891,19 +730,19 @@ namespace PatternGeneratorJRL
 
             m_clock.fillInStatistics();
 
-
             /*! Fill the debug files with appropriate information. */
             fillInDebugFiles();
           }
           else
           {
-            cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
+            cerr << "Nothing to dump after " << m_OneStep.m_NbOfIt << endl;
           }
 
         }
 
         os << endl << "End of iteration " << lNbIt << endl;
-        os << "<===============================================================>"<<endl;
+        os << "<=============================";
+	os << "==================================>"<<endl;
       }
 
       string lProfileOutput= m_TestName;
@@ -920,9 +759,11 @@ namespace PatternGeneratorJRL
       m_DirectoryName = aDirectory;
     }
 
-    void TestObject::analyticalInverseKinematics(Eigen::VectorXd & conf,
-                                                 Eigen::VectorXd & vel,
-                                                 Eigen::VectorXd & acc)
+    void TestObject::
+    analyticalInverseKinematics
+    (Eigen::VectorXd & conf,
+     Eigen::VectorXd & vel,
+     Eigen::VectorXd & acc)
     {
       /// \brief calculate, from the CoM of computed by the preview control,
       ///    the corresponding articular position, velocity and acceleration
@@ -933,47 +774,48 @@ namespace PatternGeneratorJRL
       Eigen::VectorXd aLeftFootPosition(5);
       Eigen::VectorXd aRightFootPosition(5);
       
-      aCOMState(0) = m_OneStep.finalCOMPosition.x[0];
-      aCOMState(1) = m_OneStep.finalCOMPosition.y[0];
-      aCOMState(2) = m_OneStep.finalCOMPosition.z[0];
-      aCOMState(3) = m_OneStep.finalCOMPosition.roll[0]  * 180/M_PI ;
-      aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0] * 180/M_PI ;
-      aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0]   * 180/M_PI ;
+      aCOMState(0) = m_OneStep.m_finalCOMPosition.x[0];
+      aCOMState(1) = m_OneStep.m_finalCOMPosition.y[0];
+      aCOMState(2) = m_OneStep.m_finalCOMPosition.z[0];
+      aCOMState(3) = m_OneStep.m_finalCOMPosition.roll[0]  * 180/M_PI ;
+      aCOMState(4) = m_OneStep.m_finalCOMPosition.pitch[0] * 180/M_PI ;
+      aCOMState(5) = m_OneStep.m_finalCOMPosition.yaw[0]   * 180/M_PI ;
       
-      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];
-      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];
-      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];
-      aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1] /** * 180/M_PI  */ ;
-      aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]/** * 180/M_PI  */ ;
-      aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]/** * 180/M_PI  */ ;
+      aCOMSpeed(0) = m_OneStep.m_finalCOMPosition.x[1];
+      aCOMSpeed(1) = m_OneStep.m_finalCOMPosition.y[1];
+      aCOMSpeed(2) = m_OneStep.m_finalCOMPosition.z[1];
+      aCOMSpeed(3) = m_OneStep.m_finalCOMPosition.roll[1] /** * 180/M_PI  */ ;
+      aCOMSpeed(4) = m_OneStep.m_finalCOMPosition.pitch[1]/** * 180/M_PI  */ ;
+      aCOMSpeed(5) = m_OneStep.m_finalCOMPosition.yaw[1]/** * 180/M_PI  */ ;
       
-      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
-      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
-      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
-      aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2]/** * 180/M_PI  */ ;
-      aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]/** * 180/M_PI  */ ;
-      aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2] /** * 180/M_PI  */;
+      aCOMAcc(0) = m_OneStep.m_finalCOMPosition.x[2];
+      aCOMAcc(1) = m_OneStep.m_finalCOMPosition.y[2];
+      aCOMAcc(2) = m_OneStep.m_finalCOMPosition.z[2];
+      aCOMAcc(3) = m_OneStep.m_finalCOMPosition.roll[2]/** * 180/M_PI  */ ;
+      aCOMAcc(4) = m_OneStep.m_finalCOMPosition.pitch[2]/** * 180/M_PI  */ ;
+      aCOMAcc(5) = m_OneStep.m_finalCOMPosition.yaw[2] /** * 180/M_PI  */;
       
-      aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;
-      aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;
-      aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;
-      aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;
-      aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;
+      aLeftFootPosition(0) = m_OneStep.m_LeftFootPosition.x;
+      aLeftFootPosition(1) = m_OneStep.m_LeftFootPosition.y;
+      aLeftFootPosition(2) = m_OneStep.m_LeftFootPosition.z;
+      aLeftFootPosition(3) = m_OneStep.m_LeftFootPosition.theta;
+      aLeftFootPosition(4) = m_OneStep.m_LeftFootPosition.omega;
       
-      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
-      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
-      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
-      aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
-      aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
+      aRightFootPosition(0) = m_OneStep.m_RightFootPosition.x;
+      aRightFootPosition(1) = m_OneStep.m_RightFootPosition.y;
+      aRightFootPosition(2) = m_OneStep.m_RightFootPosition.z;
+      aRightFootPosition(3) = m_OneStep.m_RightFootPosition.theta;
+      aRightFootPosition(4) = m_OneStep.m_RightFootPosition.omega;
       m_ComAndFootRealization->setSamplingPeriod(0.005);
       m_ComAndFootRealization->
-          ComputePostureForGivenCoMAndFeetPosture(aCOMState,
-                                                  aCOMSpeed,
-                                                  aCOMAcc,
-                                                  aLeftFootPosition,
-                                                  aRightFootPosition,
-                                                  conf, vel, acc,
-                                                  ((int)m_OneStep.NbOfIt),1);
+          ComputePostureForGivenCoMAndFeetPosture
+	(aCOMState,
+	 aCOMSpeed,
+	 aCOMAcc,
+	 aLeftFootPosition,
+	 aRightFootPosition,
+	 conf, vel, acc,
+	 ((int)m_OneStep.m_NbOfIt),1);
       
       if(m_leftGripper!=0 && m_rightGripper!=0)
       {
@@ -995,8 +837,8 @@ namespace PatternGeneratorJRL
 	  return;
 	}
       
-      std::cout << "conf size():" << conf.size() << std::endl;
-      std::cout << "Current Configuration: "
+      std::cerr << "conf size():" << conf.size() << std::endl;
+      std::cerr << "Current Configuration: "
 		<< m_CurrentConfiguration.size()
 		<< std::endl;
       conf.setZero();
@@ -1020,7 +862,7 @@ namespace PatternGeneratorJRL
 
       ofstream aof;
       string aFileName;
-      long int iteration = m_OneStep.NbOfIt-1 ;
+      long int iteration = m_OneStep.m_NbOfIt-1 ;
       
       if ( iteration == 0 ){
         aFileName = m_DirectoryName;
@@ -1037,7 +879,6 @@ namespace PatternGeneratorJRL
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
-      //std::cout << iteration << " - Going through this step "<< std::endl;
       aof << filterprecision( ((double)iteration) * 0.005 ) << " "  ; // 1
       for(unsigned int i = 6 ; i < conf.size() ; i++){
         aof << filterprecision( conf(i) ) << " "  ; // 2
@@ -1062,9 +903,12 @@ namespace PatternGeneratorJRL
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
       aof << filterprecision( ((double)iteration) * 0.005 ) << " "  ; // 1
-      aof << filterprecision( m_OneStep.finalCOMPosition.roll[0] * M_PI /180) << " "  ; // 2
-      aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0] * M_PI /180 ) << " "  ; // 3
-      aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] * M_PI /180 ) ; // 4
+      aof << filterprecision
+	( m_OneStep.m_finalCOMPosition.roll[0] * M_PI /180) << " "  ; // 2
+      aof << filterprecision
+	( m_OneStep.m_finalCOMPosition.pitch[0] * M_PI /180 ) << " "  ; // 3
+      aof << filterprecision
+	( m_OneStep.m_finalCOMPosition.yaw[0] * M_PI /180 ) ; // 4
       aof << endl ;
       aof.close();
       
@@ -1077,10 +921,10 @@ namespace PatternGeneratorJRL
       }
       
       FootAbsolutePosition aSupportState;
-      if (m_OneStep.LeftFootPosition.stepType < 0 )
-        aSupportState = m_OneStep.LeftFootPosition ;
+      if (m_OneStep.m_LeftFootPosition.stepType < 0 )
+        aSupportState = m_OneStep.m_LeftFootPosition ;
       else
-        aSupportState = m_OneStep.RightFootPosition ;
+        aSupportState = m_OneStep.m_RightFootPosition ;
       
       aFileName = m_DirectoryName;
       aFileName += m_TestName;
@@ -1089,11 +933,16 @@ namespace PatternGeneratorJRL
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
       aof << filterprecision( ((double) iteration) * 0.005 ) << " "  ; // 1
-      aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 2
-      aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ; // 3
-      aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2))  ; // 4
+      aof << filterprecision( m_OneStep.m_ZMPTarget(0)
+			      - m_CurrentConfiguration(0)) << " "  ; // 2
+      aof << filterprecision( m_OneStep.m_ZMPTarget(1)
+			      - m_CurrentConfiguration(1) ) << " "  ; // 3
+      aof << filterprecision( aSupportState.z
+			      - m_CurrentConfiguration(2))  ; // 4
       aof << endl ;
       aof.close();
     }
-  }
-}
+    
+  
+  } // Test Suite namespace
+} // PatternGeneratorJRL namespace

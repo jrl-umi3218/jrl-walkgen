@@ -156,7 +156,7 @@ namespace PatternGeneratorJRL
     {
       
       os << " === " << endl;
-      os << "Number of iterations " << OneStep.NbOfIt << endl
+      os << "Number of iterations " << OneStep.m_NbOfIt << endl
 	 << "Number of iterations above 300 us:" << m_NbOfItToCompute << endl;
       if (m_NbOfItToCompute!=0)
 	os << "Mean time consumption for one iteration above 300 us: " 

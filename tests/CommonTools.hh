@@ -49,31 +49,60 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
+    double filterprecision(double adb);
+    
     void getOptions(int argc,
                     char *argv[],
                     std::string &urdfFullPath,
                     std::string &srdfFullPath,
                     unsigned int &); // TestProfil)
 
-    void CommonInitialization(PatternGeneratorJRL::PatternGeneratorInterface &aPGI);
+    void CommonInitialization
+    (PatternGeneratorJRL::PatternGeneratorInterface &aPGI);
 
-    /*! \brief Structure to handle information related to one step of each algorithm */
-    struct OneStep
+    /*! \brief Structure to handle information related 
+      to one step of each algorithm m_*/
+    class OneStep
     {
-      COMState finalCOMPosition;
-      FootAbsolutePosition LeftFootPosition;
-      FootAbsolutePosition RightFootPosition;
-      Eigen::VectorXd ZMPTarget;
-      unsigned long int NbOfIt;
+    public:
+      COMState m_finalCOMPosition;
+      FootAbsolutePosition m_LeftFootPosition;
+      FootAbsolutePosition m_RightFootPosition;
+      Eigen::VectorXd m_ZMPTarget;
+      unsigned long int m_NbOfIt;
+      
+      /// Vector of data to dump
+      std::vector<double> m_DebugVector;
+      /// Vector of documentation string
+      std::vector<std::string> m_DebugStrings;
+      /// TestName
+      std::string m_TestName;
+      
+      /// Pinocchio Robot
+      PinocchioRobot * m_PR ;
+      
+      OneStep();
+      
+      /// Filling m_DebugVector
+      void fillInDebugVectorFoot
+      (FootAbsolutePosition &aFootAbsolutePosition,
+       size_t &index);
 
-      OneStep()
-      {
-        ZMPTarget.resize(3);
-        NbOfIt = 0;
-        memset(&LeftFootPosition,0,sizeof(LeftFootPosition));
-        memset(&RightFootPosition,0,sizeof(RightFootPosition));
-        memset(&finalCOMPosition,0,sizeof(finalCOMPosition));
-      }
+      /// Filling documentation vector
+      void fillInDebugVectorDoc();
+
+      /// Filling files based on m_DebugVector.
+      void fillInDebugFileContent(std::ofstream &aof);
+
+      /// Creates a file based on filename.
+      void fillInDebugFile();
+
+      /// Fill in the debug vector.
+      void fillInDebugVector();
+
+      /// Writes down the description vector.
+      void writeDescriptionFile();
+      
     };
   } /* end of TestSuite namespace */
 } /* end of PatternGeneratorJRL namespace */

@@ -45,12 +45,12 @@
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 #include <jrl/walkgen/pinocchiorobot.hh>
 #include "MotionGeneration/ComAndFootRealizationByGeometry.hh"
+#include "DumpReferencesObjects.hh"
 
 namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
-    double filterprecision(double adb);
 
     /*! \brief Class running one test per algorithm */
     class TestObject
@@ -206,7 +206,9 @@ namespace PatternGeneratorJRL
 	information */
       virtual void fillInDebugFiles();
       virtual void fillInDebugFilesFull( );
-
+      
+      DumpReferencesObjects m_DumpReferencesObjects;
+      
       /*! \brief Compare debug files with references. */
       bool compareDebugFiles();
 
@@ -227,7 +229,7 @@ namespace PatternGeneratorJRL
       void parseFromURDFtoOpenHRPIndex(Eigen::VectorXd & conf);
 
       /*! \brief Information related to one step of computation. */
-      struct OneStep m_OneStep;
+      OneStep m_OneStep;
 
       /*! \brief Name of the test */
       std::string m_TestName;
@@ -263,7 +265,8 @@ namespace PatternGeneratorJRL
       SimplePluginManager * m_SPM ;
 
       /*! @} */
-    // utilities for Herdt and Naveau
+      // utilities for Herdt and Naveau
+
     public :
 
 
