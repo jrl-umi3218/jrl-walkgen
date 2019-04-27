@@ -107,13 +107,21 @@ namespace PatternGeneratorJRL
     int stepType;     //1:normal walking 2:one step before obstacle
                       //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle 6 :stepping stair
     double DeviationHipHeight;
+    RelativeFootPosition_s();
   };
   typedef struct RelativeFootPosition_s RelativeFootPosition;
 
-  inline std::ostream & operator<<(std::ostream & os, const RelativeFootPosition_s & rfp)
+  inline std::ostream & operator<<
+  (std::ostream & os, const RelativeFootPosition_s & rfp)
   {
-    os << "sx " << rfp.sx << " sy " << rfp.sy << " theta " << rfp.theta << std::endl;
-    os << "SStime " << rfp.SStime << " DStime " << rfp.DStime << " stepType " << rfp.stepType << " DeviationHipHeight " << rfp.DeviationHipHeight;
+    os << "sx " << rfp.sx
+       << " sy "<< rfp.sy
+       << " sz "<< rfp.sz 
+       << " theta " << rfp.theta << std::endl;
+    os << "SStime " << rfp.SStime
+       << " DStime " << rfp.DStime
+       << " stepType " << rfp.stepType
+       << " DeviationHipHeight " << rfp.DeviationHipHeight;
     return os;
   }
 
@@ -125,16 +133,22 @@ namespace PatternGeneratorJRL
     double theta;//For COM
     double time;
     int stepType;     //1:normal walking 2:one step before obstacle
-                      //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
-    //+10 if double support phase
-    //*(-1) if right foot stance else left foot stance
+                      //3:first leg over obstacle 4:second leg over
+    // obstacle 5:one step after obstacle
+    // +10 if double support phase
+    // *(-1) if right foot stance else left foot stance
   };
   typedef struct ZMPPosition_s ZMPPosition;
 
   inline std::ostream & operator<<(std::ostream & os, const ZMPPosition_s & zmp)
   {
-    os << "px " << zmp.px << " py " << zmp.pz << " pz " << zmp.pz << " theta " << zmp.theta << std::endl;
-    os << "time " << zmp.time << " stepType " << zmp.stepType;
+    os << "px " << zmp.px
+       << " py " << zmp.pz
+       << " pz " << zmp.pz
+       << " theta " << zmp.theta
+       << std::endl;
+    os << "time " << zmp.time
+       << " stepType " << zmp.stepType;
     return os;
   }
 
@@ -161,10 +175,26 @@ namespace PatternGeneratorJRL
 
   inline std::ostream & operator<<(std::ostream & os, const FootAbsolutePosition & fap)
   {
-    os << "x " << fap.x << " y " << fap.y << " z " << fap.z << " theta " << fap.theta << " omega " << fap.omega << " omega2 " << fap.omega2 << std::endl;
-    os << "dx " << fap.dx << " dy " << fap.dy << " dz " << fap.dz << " dtheta " << fap.dtheta << " domega " << fap.domega << " domega2 " << fap.domega2 << std::endl;
-    os << "ddx " << fap.ddx << " ddy " << fap.ddy << " ddz " << fap.ddz << " ddtheta " << fap.ddtheta << " ddomega " << fap.ddomega << " ddomega2 " << fap.ddomega2 << std::endl;
-    os << "time " << fap.time << " stepType " << fap.stepType;
+    os << "x " << fap.x
+       << " y " << fap.y
+       << " z " << fap.z
+       << " theta " << fap.theta
+       << " omega " << fap.omega
+       << " omega2 " << fap.omega2 << std::endl;
+    os << "dx " << fap.dx
+       << " dy " << fap.dy
+       << " dz " << fap.dz
+       << " dtheta " << fap.dtheta
+       << " domega " << fap.domega
+       << " domega2 " << fap.domega2 << std::endl;
+    os << "ddx " << fap.ddx
+       << " ddy " << fap.ddy
+       << " ddz " << fap.ddz
+       << " ddtheta " << fap.ddtheta
+       << " ddomega " << fap.ddomega
+       << " ddomega2 " << fap.ddomega2 << std::endl;
+    os << "time " << fap.time
+       << " stepType " << fap.stepType;
     return os;
   }
 
@@ -190,10 +220,28 @@ namespace PatternGeneratorJRL
 
   inline std::ostream & operator<<(std::ostream & os, const HandAbsolutePosition& hap)
   {
-    os << "x " << hap.x << " y " << hap.y << " z " << hap.z << " theta " << hap.theta << " omega " << hap.omega << " omega2 " << hap.omega2 << std::endl;
-    os << "dx " << hap.dx << " dy " << hap.dy << " dz " << hap.dz << " dtheta " << hap.dtheta << " domega " << hap.domega << " domega2 " << hap.domega2 << std::endl;
-    os << "ddx " << hap.ddx << " ddy " << hap.ddy << " ddz " << hap.ddz << " ddtheta " << hap.ddtheta << " ddomega " << hap.ddomega << " ddomega2 " << hap.ddomega2 << std::endl;
-    os << "time " << hap.time << " stepType " << hap.stepType;
+    os << "x " << hap.x
+       << " y " << hap.y
+       << " z " << hap.z
+       << " theta " << hap.theta
+       << " omega " << hap.omega
+       << " omega2 " << hap.omega2
+       << std::endl;
+    os << "dx " << hap.dx
+       << " dy " << hap.dy
+       << " dz " << hap.dz
+       << " dtheta " << hap.dtheta
+       << " domega " << hap.domega
+       << " domega2 " << hap.domega2
+       << std::endl;
+    os << "ddx " << hap.ddx
+       << " ddy " << hap.ddy
+       << " ddz " << hap.ddz
+       << " ddtheta " << hap.ddtheta
+       << " ddomega " << hap.ddomega
+       << " ddomega2 " << hap.ddomega2 << std::endl;
+    os << "time " << hap.time
+       << " stepType " << hap.stepType;
     return os;
   }
 
@@ -248,9 +296,14 @@ namespace PatternGeneratorJRL
   };
   typedef struct ReferenceAbsoluteVelocity_t ReferenceAbsoluteVelocity;
 
-  inline std::ostream & operator<<(std::ostream & os, const ReferenceAbsoluteVelocity_t & rav)
+  inline std::ostream & operator<<
+  (std::ostream & os,
+   const ReferenceAbsoluteVelocity_t & rav)
   {
-    os << "x " << rav.x << " y " << rav.y << " z " << rav.z << " dYaw " << rav.dYaw;
+    os << "x " << rav.x
+       << " y " << rav.y
+       << " z " << rav.z
+       << " dYaw " << rav.dYaw;
     return os;
   }
 
