@@ -669,12 +669,12 @@ double PLDPSolverHerdt::ComputeAlpha(vector<unsigned int> & NewActivatedConstrai
 
 	  if (Alpha>lalpha)
 	    {
-	      ODEBUG3("m_v2[li] : "<< m_v2[li] <<
-		      " m_v1[li] : " << m_v1[li] << " "
-		      " lalpha: "<< lalpha << " "
-		      " Constraint " << li << " of "
-		      << m_NbOfConstraints << " constraints.");
-
+	      ODEBUG("m_v2[li] : "<< m_v2[li] <<
+		     " m_v1[li] : " << m_v1[li] << " "
+		     " lalpha: "<< lalpha << " "
+		     " Constraint " << li << " of "
+		     << m_NbOfConstraints << " constraints.");
+	      
 	      Alpha = lalpha;
 	      if (Alpha<1)
 		{
@@ -872,9 +872,12 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
 	}
       if (alpha<0.0)
 	{
-	  ODEBUG3("Problem with alpha: should be positive");
-	  ODEBUG3("The initial solution is incorrect: "<< m_ItNb << " " << m_InternalTime);
-
+	  std::cerr << "Problem with alpha: should be positive"
+		    << std::endl;
+	  std::cerr << "The initial solution is incorrect: "
+		    << m_ItNb << " "
+		    << m_InternalTime
+		    << std::endl;
 	  exit(0);
 	}
 
@@ -883,8 +886,6 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
 	{
 	  m_Vk[i] = m_Vk[i] + alpha*m_d[i];
 	}
-
-
 
       if (ContinueAlgo)
 	{

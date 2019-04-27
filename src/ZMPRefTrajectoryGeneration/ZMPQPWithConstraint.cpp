@@ -1141,17 +1141,21 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 	  unsigned int pbOnCurrent=0;
 	  if (vnlValConstraint(i,0)<-1e-8)
 	    {
-	      ODEBUG3("Problem during validation of the constraint: ");
-	      ODEBUG3("  constraint " << i << " is not positive");
-	      ODEBUG3(vnlValConstraint(i,0));
+	      std::cerr << "Problem during validation of the constraint: "
+			<< std::endl;
+	      std::cerr << "  constraint " << i << " is not positive"
+			<< std::endl;
+	      std::cerr << vnlValConstraint(i,0)
+			<< std::endl;
 	      pbOnCurrent = 1;
 	    }
 
 	  if (pbOnCurrent)
 	    {
-	      ODEBUG3("PbonCurrent: " << pbOnCurrent << " " << li
-		      << " Contrainte " << i 
-		      << " StartingTime :" << StartingTime);
+	      std::cerr << "PbonCurrent: " << pbOnCurrent << " " << li
+			<< " Contrainte " << i 
+			<< " StartingTime :" << StartingTime
+			<< std::endl;
 	      if (pbOnCurrent)
 		{
 		  return -1;

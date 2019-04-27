@@ -115,11 +115,9 @@ InitializationMaps(std::vector<pinocchio::Index> &FromRootToJoint,
 {
   if (FromRootToJoint.size()!=0)
   {
-    ODEBUG("Enter 6.0 " << this);
     IndexinConfiguration.resize(FromRootToJoint.size());
     IndexinVelocity.resize(FromRootToJoint.size());
 
-    ODEBUG("Enter 6.1 " );
     int lindex =0;
 
     // Here we assume that they are in a decending order.
@@ -201,17 +199,12 @@ void ComAndFootRealizationByGeometry::
     Initialization()
 {
 
-  ODEBUG("Enter 0.0 ");
-
   // Planners for stepping over.
   if (m_WaistPlanner == 0)
     m_WaistPlanner = new WaistHeightVariation();
   if (m_UpBody==0)
     m_UpBody = new UpperBodyMotion();
 
-  ODEBUG("Enter 1.0 ");
-
-  ODEBUG("Enter 2.0 ");
   // Take the right ankle position (should be equivalent)
   Eigen::Vector3d lAnklePositionRight,lAnklePositionLeft;
   PRFoot *LeftFoot, *RightFoot;
@@ -233,16 +226,9 @@ void ComAndFootRealizationByGeometry::
   m_AnklePositionRight[2] = lAnklePositionRight[2];
   m_AnklePositionLeft[2]  = lAnklePositionRight[2];
 
-  ODEBUG5("m_AnklePositionRight: "<< m_AnklePositionRight[0] << " " <<
-          m_AnklePositionRight[1] << " " <<
-          m_AnklePositionRight[2],"DebugDataStartingCOM.dat");
-  ODEBUG5("m_AnklePositionLeft: "<< m_AnklePositionLeft[0] << " " <<
-          m_AnklePositionLeft[1] << " " <<
-          m_AnklePositionLeft[2],"DebugDataStartingCOM.dat");
-  ODEBUG("Enter 3.0 ");
   // Update the index to change the configuration according
   // to the VRML ID.
-  ODEBUG("Enter 5.0 ");
+
   // Extract the indexes of the Right leg.
   pinocchio::JointIndex waist = getPinocchioRobot()->waist();
 
@@ -252,8 +238,6 @@ void ComAndFootRealizationByGeometry::
   // Build global map.
   pinocchio::JointModelVector & ActuatedJoints =
       getPinocchioRobot()->getActuatedJoints();
-  ODEBUG5("Size of ActuatedJoints"<<ActuatedJoints.size(),
-          "DebugDataStartingCOM.dat");
 
   // here we assume all revolute joint
   // -2 : because pinocchio assume a non actuated "universe joint"
@@ -297,23 +281,6 @@ void ComAndFootRealizationByGeometry::
   InitializeMapForChest(ActuatedJoints);
 
   FromRootToJoint.clear();
-
-  ODEBUG("RightLegIndex: "
-         << m_RightLegIndexinConfiguration[0] << " "
-         << m_RightLegIndexinConfiguration[1] << " "
-         << m_RightLegIndexinConfiguration[2] << " "
-         << m_RightLegIndexinConfiguration[3] << " "
-         << m_RightLegIndexinConfiguration[4] << " "
-         << m_RightLegIndexinConfiguration[5] );
-  ODEBUG("LeftLegIndex: "
-         << m_LeftLegIndexinConfiguration[0] << " "
-         << m_LeftLegIndexinConfiguration[1] << " "
-         << m_LeftLegIndexinConfiguration[2] << " "
-         << m_LeftLegIndexinConfiguration[3] << " "
-         << m_LeftLegIndexinConfiguration[4] << " "
-         << m_LeftLegIndexinConfiguration[5] );
-
-  ODEBUG("Enter 12.0 ");
 
   { for(unsigned int i=0;i<m_prev_Configuration.size();m_prev_Configuration[i++]=0.0);};
   { for(unsigned int i=0;i<m_prev_Configuration1.size();m_prev_Configuration1[i++]=0.0);};
@@ -382,7 +349,6 @@ InitializationHumanoid(Eigen::VectorXd &BodyAnglesIni,
   lStartingWaistPose(4) = CurrentConfig(4); //0.0;
   lStartingWaistPose(5) = CurrentConfig(5); //0.0;
 
-  ODEBUG("Current Config: " << CurrentConfig);
   return true;
 
 }
@@ -396,7 +362,8 @@ bool ComAndFootRealizationByGeometry::
   pinocchio::SE3 lAnkleSE3 = getPinocchioRobot()->Data()->oMi[AnkleJoint] ;
   Eigen::Vector3d translation ;
   translation << -m_AnklePosition[0], -m_AnklePosition[1], -m_AnklePosition[2];
-  pinocchio::SE3 FootTranslation = pinocchio::SE3(Eigen::Matrix3d::Identity(),translation);
+  pinocchio::SE3 FootTranslation =
+    pinocchio::SE3(Eigen::Matrix3d::Identity(),translation);
   pinocchio::SE3 lFootSE3 = lAnkleSE3.act(FootTranslation);
 
   InitFootPosition.x = lFootSE3.translation()[0];
@@ -456,16 +423,8 @@ InitializationCoM
 
   // Initialize Feet.
   InitializationFoot(RightFoot, m_AnklePositionRight,InitRightFootPosition);
-  ODEBUG3("InitRightFootPosition : " << InitRightFootPosition.x
-         << " " << InitRightFootPosition.y
-         << " " << InitRightFootPosition.z << std::endl
-         << " Ankle: " << m_AnklePositionRight);
 
   InitializationFoot(LeftFoot,  m_AnklePositionLeft, InitLeftFootPosition);
-  ODEBUG3("InitLeftFootPosition : " << InitLeftFootPosition.x
-         << " " << InitLeftFootPosition.y
-         << " " << InitLeftFootPosition.z << std::endl
-         << " Ankle: " << m_AnklePositionLeft);
 
   // Compute the center of gravity between the ankles.
   m_COGInitialAnkles[0] =
@@ -474,18 +433,17 @@ InitializationCoM
       0.5 * (InitRightFootPosition.y + InitLeftFootPosition.y);
   m_COGInitialAnkles[2] =
       0.5 * (InitRightFootPosition.z + InitLeftFootPosition.z);
-  ODEBUG3("COGInitialAnkle : "<<m_COGInitialAnkles);
 
   // Translate lStartingWaist Pose from ( 0.0 0.0 -lFootPosition[2])
   lStartingWaistPose(2) -= InitRightFootPosition.z;
 
   // CoM position
   getPinocchioRobot()->positionCenterOfMass(lStartingCOMPosition);
-  ODEBUG5( "COM positions: "
+  ODEBUG4( "COM positions: "
 	    << lStartingCOMPosition(0) << " "
 	    << lStartingCOMPosition(1) << " "
 	    << lStartingCOMPosition(2),"DebugDataStartingCOM.dat");
-  ODEBUG3( lStartingCOMPosition[0] << " "
+  ODEBUG( lStartingCOMPosition[0] << " "
 	   << lStartingCOMPosition(1) << " "
 	   << lStartingCOMPosition(2));
   lStartingCOMPosition[2] -= InitRightFootPosition.z;
@@ -494,13 +452,13 @@ InitializationCoM
   m_DiffBetweenComAndWaist[0] =  lStartingWaistPose(0) - lStartingCOMPosition[0];
   m_DiffBetweenComAndWaist[1] =  lStartingWaistPose(1) - lStartingCOMPosition[1];
   m_DiffBetweenComAndWaist[2] =  lStartingWaistPose(2) - lStartingCOMPosition[2];
-  ODEBUG3("lFootPosition[2]: " <<InitRightFootPosition.z);
-  ODEBUG3( "Diff between Com and Waist" << m_DiffBetweenComAndWaist[0] << " "
+  ODEBUG("lFootPosition[2]: " <<InitRightFootPosition.z);
+  ODEBUG( "Diff between Com and Waist" << m_DiffBetweenComAndWaist[0] << " "
           << m_DiffBetweenComAndWaist[1] << " "
           << m_DiffBetweenComAndWaist[2]);
   // This term is usefull if
 
-  ODEBUG5("m_DiffBetweenComAndWaist :" << m_DiffBetweenComAndWaist,"DebugData.txt");
+  ODEBUG4("m_DiffBetweenComAndWaist :" << m_DiffBetweenComAndWaist,"DebugData.txt");
   // the initial position does not put z at Zc
 
   // The most important line of the method...
@@ -559,11 +517,11 @@ InitializationUpperBody
 
   gettimeofday(&begin,0);
 
-  ODEBUG5("FinishAndRealizeStepSequence() - 1","DebugGMFKW.dat");
+  ODEBUG4("FinishAndRealizeStepSequence() - 1","DebugGMFKW.dat");
   cout << __FUNCTION__ << ":"<< __LINE__ << ": You should implement something here"
       << endl;
 
-  ODEBUG5("FinishAndRealizeStepSequence() - 3 ","DebugGMFKW.dat");
+  ODEBUG4("FinishAndRealizeStepSequence() - 3 ","DebugGMFKW.dat");
 
   gettimeofday(&time2,0);
   //this function calculates a buffer with COM values after a first preview round,
@@ -573,12 +531,12 @@ InitializationUpperBody
 
   aZMPBuffer.resize(inCOMBuffer.size());
 
-  ODEBUG5("FinishAndRealizeStepSequence() - 4 ","DebugGMFKW.dat");
+  ODEBUG4("FinishAndRealizeStepSequence() - 4 ","DebugGMFKW.dat");
 
   // read upperbody data which has to be included in the patterngeneration second preview loop stability
   string BodyDat = "UpperBodyDataFile.dat";
 
-  ODEBUG5("FinishAndRealizeStepSequence() - 5 ","DebugGMFKW.dat");
+  ODEBUG4("FinishAndRealizeStepSequence() - 5 ","DebugGMFKW.dat");
   // Link the current trajectory and GenerateMotionFromKineoWorks.
 
   // Specify the buffer.
@@ -588,7 +546,7 @@ InitializationUpperBody
 
   if (GetStepStackHandler()->GetWalkMode()==3)
   {
-    ODEBUG5("Before Starting GMFKW","DebugGMFKW.dat");
+    ODEBUG4("Before Starting GMFKW","DebugGMFKW.dat");
     m_GMFKW->CreateBufferFirstPreview(inZMPPositions);
 
     // Map the path found by KineoWorks onto the ZMP buffer.
@@ -597,7 +555,7 @@ InitializationUpperBody
     m_GMFKW->ComputeUpperBodyPosition
       (m_UpperBodyPositionsBuffer,
        m_ConversionForUpperBodyFromLocalIndexToRobotDOFs);
-    ODEBUG5("After GMFKW","DebugGMFKW.dat");
+    ODEBUG4("After GMFKW","DebugGMFKW.dat");
   }
   else
   {
@@ -638,7 +596,7 @@ InitializationUpperBody
 
   }
 
-  ODEBUG5("FinishAndRealizeStepSequence() - 6 ","DebugCG.ctx");
+  ODEBUG4("FinishAndRealizeStepSequence() - 6 ","DebugCG.ctx");
 
 
   gettimeofday(&time3,0);
@@ -726,7 +684,7 @@ KinematicsForOneLeg
   // Compute the inverse kinematics.
   if ((LeftOrRight==1) && (Stage==0))
   {
-    ODEBUG5SIMPLE(Body_P[0] << " " <<
+    ODEBUG4SIMPLE(Body_P[0] << " " <<
                   Body_P[1] << " " <<
                   Body_P[2] << " " <<
                   Foot_P[0] << " " <<
@@ -735,11 +693,11 @@ KinematicsForOneLeg
                   ,"DebugDataIK.dat");
   }
 
-  ODEBUG5("Body_P " << Body_P,"DebugDataIK.dat");  
-  ODEBUG5("Body_R " << Body_R,"DebugDataIK.dat");
-  ODEBUG5("Foot_P " << Foot_P,"DebugDataIK.dat");
-  ODEBUG5("Foot_R " << Foot_R,"DebugDataIK.dat");
-  ODEBUG5("lDt " << lDt,"DebugDataIK.dat");
+  ODEBUG4("Body_P " << Body_P,"DebugDataIK.dat");  
+  ODEBUG4("Body_R " << Body_R,"DebugDataIK.dat");
+  ODEBUG4("Foot_P " << Foot_P,"DebugDataIK.dat");
+  ODEBUG4("Foot_R " << Foot_R,"DebugDataIK.dat");
+  ODEBUG4("lDt " << lDt,"DebugDataIK.dat");
 
   // Homogeneous matrix
   Eigen::Matrix4d BodyPose,FootPose;
@@ -764,7 +722,7 @@ KinematicsForOneLeg
   // Call specialized dynamics.
   getPinocchioRobot()->ComputeSpecializedInverseKinematics(
         Waist,Ankle,BodyPose,FootPose,lq);
-  ODEBUG5("lq " << lq,"DebugDataIK.dat");
+  ODEBUG4("lq " << lq,"DebugDataIK.dat");
   return true;
 }
 
@@ -851,17 +809,17 @@ KinematicsForTheLegs
     m_FinalDesiredCOMPose(2,3) = aCoMPosition(2);
     m_FinalDesiredCOMPose(3,3) = 1.0;
 
-    ODEBUG5(Body_P ,"DebugDataBodyP1.dat");
+    ODEBUG4(Body_P ,"DebugDataBodyP1.dat");
   }
   else
   {
-    ODEBUG5(Body_P ,"DebugDataBodyP0.dat");
+    ODEBUG4(Body_P ,"DebugDataBodyP0.dat");
   }
 
 
   // Kinematics for the left leg.
-  ODEBUG5("Stage " << Stage,"DebugDataIK.dat");
-  ODEBUG5("* Left Lego *","DebugDataIK.dat");
+  ODEBUG4("Stage " << Stage,"DebugDataIK.dat");
+  ODEBUG4("* Left Lego *","DebugDataIK.dat");
   KinematicsForOneLeg(Body_R,
 		      Body_P,
 		      aLeftFoot,
@@ -875,7 +833,7 @@ KinematicsForTheLegs
   Body_P(1) = aCoMPosition(1) + ToTheHip(1);
   Body_P(2) = aCoMPosition(2) + ToTheHip(2);
 
-  ODEBUG5("* Right Leg *","DebugDataIK.dat");
+  ODEBUG4("* Right Leg *","DebugDataIK.dat");
   KinematicsForOneLeg(Body_R,
 		      Body_P,
 		      aRightFoot,
@@ -883,7 +841,7 @@ KinematicsForTheLegs
 		      aCoMPosition,
 		      ToTheHip,-1,qr,Stage);
 
-  ODEBUG5("**************","DebugDataIK.dat");
+  ODEBUG4("**************","DebugDataIK.dat");
   /* Should compute now the Waist Position */
   m_ComAndWaistInRefFrame=Body_R*m_DiffBetweenComAndWaist;
 
@@ -957,7 +915,7 @@ ComputePostureForGivenCoMAndFeetPosture
     ///  when the waist is rotated during stepover
     double qWaistYaw = -CurrentConfiguration
       (m_ChestIndexinConfiguration[0])*M_PI/180.0;
-    ODEBUG5(qWaistYaw,"DebugDataWaistYaw.dat");
+    ODEBUG4(qWaistYaw,"DebugDataWaistYaw.dat");
     //this is not correct yet since it uses COMPositionFromPC1.
     // theta which also changes when turning....
     // it will be modified in the near future
@@ -1050,7 +1008,7 @@ ComputePostureForGivenCoMAndFeetPosture
       }
     }
 
-    ODEBUG5(CurrentVelocity, "DebugDataVelocity0.dat");
+    ODEBUG4(CurrentVelocity, "DebugDataVelocity0.dat");
     m_prev_Configuration = CurrentConfiguration;
     m_prev_Velocity = CurrentVelocity;
   }
@@ -1081,7 +1039,7 @@ ComputePostureForGivenCoMAndFeetPosture
         /* Keep the new value for the legs. */
       }
     }
-    ODEBUG5(CurrentVelocity, "DebugDataVelocity1.dat");
+    ODEBUG4(CurrentVelocity, "DebugDataVelocity1.dat");
     m_prev_Configuration1 = CurrentConfiguration;
     m_prev_Velocity1 = CurrentVelocity;
   }
@@ -1112,7 +1070,7 @@ ComputePostureForGivenCoMAndFeetPosture
         /* Keep the new value for the legs. */
       }
     }
-    ODEBUG5(CurrentVelocity, "DebugDataVelocity1.dat");
+    ODEBUG4(CurrentVelocity, "DebugDataVelocity1.dat");
     m_prev_Configuration2 = CurrentConfiguration;
     m_prev_Velocity2 = CurrentVelocity;
   }
@@ -1167,20 +1125,20 @@ ComputePostureForGivenCoMAndFeetPosture
 
 
   ODEBUG( "CurrentVelocity :" << endl << CurrentVelocity);
-  ODEBUG5("SamplingPeriod " << getSamplingPeriod(),"LegsSpeed.dat");
+  ODEBUG4("SamplingPeriod " << getSamplingPeriod(),"LegsSpeed.dat");
 
   string aDebugFileName;
 
-  ODEBUG5( (1.0/M_PI)*180.0*lql[0] << " " <<
+  ODEBUG4( (1.0/M_PI)*180.0*lql[0] << " " <<
            (1.0/M_PI)*180.0*lql[1] << " " <<
            (1.0/M_PI)*180.0*lql[2] << " " <<
            (1.0/M_PI)*180.0*lql[3] << " " <<
            (1.0/M_PI)*180.0*lql[4] << " " <<
            (1.0/M_PI)*180.0*lql[5],(char *)aDebugFileName.c_str());
 
-  ODEBUG5(CurrentVelocity,"DebugDataVelocity.dat");
+  ODEBUG4(CurrentVelocity,"DebugDataVelocity.dat");
 
-  ODEBUG5( aCoMPosition[0]
+  ODEBUG4( aCoMPosition[0]
            << " " <<
            aCoMPosition[1],"COMPC1.dat");
 
@@ -1262,11 +1220,11 @@ void ComAndFootRealizationByGeometry::
                                               Eigen::VectorXd & LFP)
 {
 
-  ODEBUG5("aCOMPosition:" << aCOMPosition << endl <<
+  ODEBUG4("aCOMPosition:" << aCOMPosition << endl <<
           "Right Foot Position:" << RFP << endl <<
           "Left Foot Position:" << LFP << endl, "DebugDataIKArms.txt");
 
-  ODEBUG5(m_ZARM << " " << m_Xmax << " " << " " << m_GainFactor,"DebugDataIKArms.txt");
+  ODEBUG4(m_ZARM << " " << m_Xmax << " " << " " << m_GainFactor,"DebugDataIKArms.txt");
   double TempXL,TempXR,TempCos,TempSin,
   TempARight,TempALeft;
 
@@ -1280,14 +1238,14 @@ void ComAndFootRealizationByGeometry::
   TempXL = TempCos * (LFP(0)  +m_AnklePositionRight[0] - aCOMPosition(0) - m_COGInitialAnkles(0)) +
            TempSin * (LFP(1) +m_AnklePositionRight[1] - aCOMPosition(1) - m_COGInitialAnkles(1));
 
-  ODEBUG5(aCOMPosition(0) << " " << aCOMPosition(1) << " " << aCOMPosition(3),"DebugDataIKArms.txt");
-  ODEBUG5(RFP(0) << " " << RFP(1) ,"DebugDataIKArms.txt");
-  ODEBUG5(LFP(0) << " " << LFP(1) ,"DebugDataIKArms.txt");
+  ODEBUG4(aCOMPosition(0) << " " << aCOMPosition(1) << " " << aCOMPosition(3),"DebugDataIKArms.txt");
+  ODEBUG4(RFP(0) << " " << RFP(1) ,"DebugDataIKArms.txt");
+  ODEBUG4(LFP(0) << " " << LFP(1) ,"DebugDataIKArms.txt");
 
   TempARight = TempXR*-1.0;
   TempALeft = TempXL*-1.0;
 
-  ODEBUG5("Values: TL " << TempALeft <<
+  ODEBUG4("Values: TL " << TempALeft <<
           " TR " << TempARight <<
           " "    << m_ZARM <<
           " "    << m_Xmax ,"DebugDataIKArms.txt");
@@ -1311,8 +1269,8 @@ void ComAndFootRealizationByGeometry::
         jointRootPosition,
         jointEndPosition,
         qArml);
-  ODEBUG5("ComputeHeuristicArm: Step 2 ","DebugDataIKArms.txt");
-  ODEBUG5( "IK Left arm p:" << qArml(0)<< " " <<  qArml(1)  << " " << qArml(2)
+  ODEBUG4("ComputeHeuristicArm: Step 2 ","DebugDataIKArms.txt");
+  ODEBUG4( "IK Left arm p:" << qArml(0)<< " " <<  qArml(1)  << " " << qArml(2)
            << " " << qArml(3) << "  " << qArml(4) << " " << qArml(5), "DebugDataIKArms.txt" );
 
   jointEndPosition(0,3) = TempARight;
@@ -1324,10 +1282,10 @@ void ComAndFootRealizationByGeometry::
         jointRootPosition,
         jointEndPosition,
         qArmr);
-  ODEBUG5( "IK Right arm p:" << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2)
+  ODEBUG4( "IK Right arm p:" << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2)
            << " " << qArmr(3) << "  " << qArmr(4) << " " << qArmr(5), "DebugDataIKArms.txt" );
 
-  ODEBUG5( qArml(0)<< " " <<  qArml(1)  << " " << qArml(2) << " "
+  ODEBUG4( qArml(0)<< " " <<  qArml(1)  << " " << qArml(2) << " "
            << qArml(3) << "  " << qArml(4) << " " << qArml(5) << " "
            << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2) << " "
            << qArmr(3) << "  " << qArmr(4) << " " << qArmr(5), "DebugDataqArmsHeuristic.txt");

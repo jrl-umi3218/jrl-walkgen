@@ -244,8 +244,10 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
 
   if ((W(0)<0) || (W(1)<0))
     {
-      ODEBUG3("Linear system ill-computed.");
-      ODEBUG3("Stop.");
+      std::cerr << "Linear system ill-computed."
+		<< std::endl;
+      std::cerr << "Stop."
+		<< std::endl;
       return -1;
     }
   
@@ -495,7 +497,8 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(deque<FootA
 	  aLCI->StartingTime = LeftFootAbsolutePositions[i].time;
 	  if (QueueOfLConstraintInequalities.size()>0)
 	    {
-	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
+	      QueueOfLConstraintInequalities.back()->EndingTime =
+		LeftFootAbsolutePositions[i].time;
 	      ODEBUG4( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
 		       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
 		       prev_xmin << " "  <<

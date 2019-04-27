@@ -34,7 +34,8 @@ namespace PatternGeneratorJRL
         /*! Caculate Degree of Bsplines from m_control_points and m_knot*/
         void GenerateDegree();
 
-        /*! Create a Knot Vector from m_degree and m_control_points with an algo "method" */
+        /*! Create a Knot Vector from m_degree and 
+	  m_control_points with an algo "method" */
         //void GenerateKnotVector(std::string method);
 
         /*! Create a derivative Bsplines*/
@@ -44,7 +45,8 @@ namespace PatternGeneratorJRL
         int ComputeBasisFunctions(double t);
 
         // computes the basis function without the derivatives
-        int ComputeBasisFunctionsRecursively(double t, std::deque<double> &knot, unsigned int degree);
+        int ComputeBasisFunctionsRecursively
+	(double t, std::deque<double> &knot, unsigned int degree);
         double Nij_t(int i, int j, double t, std::deque<double> & knot) ;
 
 
@@ -77,7 +79,7 @@ namespace PatternGeneratorJRL
 
     protected:
 
-        unsigned int m_degree;
+        long int m_degree;
 
         std::vector<double> m_control_points;
         std::vector<double> m_derivative_control_points;

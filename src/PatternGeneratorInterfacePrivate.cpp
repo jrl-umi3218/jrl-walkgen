@@ -501,7 +501,6 @@ namespace PatternGeneratorJRL {
                  if not standard dimensions are used)" );
         m_StOvPl->SetObstacleInformation(m_ObstaclePars);
         m_StOvPl->SetDeltaStepOverCOMHeightMax(m_DeltaFeasibilityLimit);
-        //cout << "I am calculating relative positions to negociate obstacle" << endl;
 
         // Update stack of relative foot by using StpOvPl.
         m_StepStackHandler->ReadStepSequenceAccordingToWalkMode(strm);
@@ -510,10 +509,11 @@ namespace PatternGeneratorJRL {
       }
     default:
       {
-        ODEBUG3( "Please select proper walk mode. \
+	std::cerr<<  "Please select proper walk mode. \
                  (0 for normal walking ; \
                   1 for walking with waistheight variation ; \
-                  2 for walking with obstacle stepover)" );
+                  2 for walking with obstacle stepover)"
+		 << std::endl;
         return;
       }
     }
@@ -706,7 +706,6 @@ namespace PatternGeneratorJRL {
     string atmp = osscomheightcmd.str();
     istringstream isscomheightcmd(atmp);
     ParseCmd(isscomheightcmd);
-    cout << isscomheightcmd.str() <<endl;
 
   }
 
@@ -783,14 +782,16 @@ namespace PatternGeneratorJRL {
 
   }
 
-  void PatternGeneratorInterfacePrivate::CommonInitializationOfWalking(COMState  & lStartingCOMState,
-                                                                       Eigen::Vector3d & lStartingZMPPosition,
-                                                                       Eigen::VectorXd &BodyAnglesIni,
-                                                                       FootAbsolutePosition & InitLeftFootAbsPos,
-                                                                       FootAbsolutePosition & InitRightFootAbsPos,
-                                                                       deque<RelativeFootPosition> & lRelativeFootPositions,
-                                                                       vector<double> & lCurrentJointValues,
-                                                                       bool ClearStepStackHandler)
+  void PatternGeneratorInterfacePrivate::
+  CommonInitializationOfWalking
+  (COMState  & lStartingCOMState,
+   Eigen::Vector3d & lStartingZMPPosition,
+   Eigen::VectorXd &BodyAnglesIni,
+   FootAbsolutePosition & InitLeftFootAbsPos,
+   FootAbsolutePosition & InitRightFootAbsPos,
+   deque<RelativeFootPosition> & lRelativeFootPositions,
+   vector<double> & lCurrentJointValues,
+   bool ClearStepStackHandler)
   {
     m_ZMPPositions.clear();
     m_LeftFootPositions.clear();
@@ -810,7 +811,10 @@ namespace PatternGeneratorJRL {
     }
 
     // Copy the relative foot position from the stack handler to here.
-    m_StepStackHandler->CopyRelativeFootPosition(lRelativeFootPositions,ClearStepStackHandler);
+    m_StepStackHandler->
+      CopyRelativeFootPosition
+      (lRelativeFootPositions,ClearStepStackHandler);
+    
     for(unsigned int i=0;i<lRelativeFootPositions.size();i++)
     {
       ODEBUG(lRelativeFootPositions[i].sx << " " <<
@@ -853,8 +857,8 @@ namespace PatternGeneratorJRL {
            << " "  << lStartingCOMState.z[0]);
     // We also initialize the iteration number inside DMB.
     //std::cerr << "You have to implement a reset iteration number." << endl;
-//    string aProperty("ResetIteration"),aValue("any");
-//    m_HumanoidDynamicRobot->setProperty(aProperty,aValue);
+    //    string aProperty("ResetIteration"),aValue("any");
+    //    m_HumanoidDynamicRobot->setProperty(aProperty,aValue);
     // TODO check if an iteration number is needed in the PinocchioRobot class
     if (0)
     {
@@ -894,11 +898,12 @@ namespace PatternGeneratorJRL {
     m_StepStackHandler->StartOnLineStep();
 
 
-    CommonInitializationOfWalking(lStartingCOMState,
-                                  lStartingZMPPosition,
-                                  BodyAnglesIni,
-                                  InitLeftFootAbsPos, InitRightFootAbsPos,
-                                  lRelativeFootPositions,lCurrentJointValues,false);
+    CommonInitializationOfWalking
+      (lStartingCOMState,
+       lStartingZMPPosition,
+       BodyAnglesIni,
+       InitLeftFootAbsPos, InitRightFootAbsPos,
+       lRelativeFootPositions,lCurrentJointValues,false);
 
 
     if (m_ZMPInitialPointSet)
@@ -916,42 +921,47 @@ namespace PatternGeneratorJRL {
            );
     ODEBUG("ZMPInitialPoint OnLine" << lStartingZMPPosition(0)  << " "
            << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
-    int NbOfStepsToRemoveFromTheStack=0;
+    std::size_t NbOfStepsToRemoveFromTheStack=0;
     if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
     {
       ODEBUG("ZMPCOM KAJITA 2003 - 2 ");
 
-      NbOfStepsToRemoveFromTheStack=m_ZMPD->InitOnLine(m_ZMPPositions,
-                                                       m_COMBuffer,
-                                                       m_LeftFootPositions,
-                                                       m_RightFootPositions,
-                                                       InitLeftFootAbsPos,
-                                                       InitRightFootAbsPos,
-                                                       lRelativeFootPositions,
-                                                       lStartingCOMState,
-                                                       lStartingZMPPosition);
-
+      NbOfStepsToRemoveFromTheStack=
+	m_ZMPD->InitOnLine
+	(m_ZMPPositions,
+	 m_COMBuffer,
+	 m_LeftFootPositions,
+	 m_RightFootPositions,
+	 InitLeftFootAbsPos,
+	 InitRightFootAbsPos,
+	 lRelativeFootPositions,
+	 lStartingCOMState,
+	 lStartingZMPPosition);
+      
     }
     else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
     {
       m_COMBuffer.clear();
       m_ZMPM->SetCurrentTime(m_InternalClock);
 
-      NbOfStepsToRemoveFromTheStack = m_ZMPM->InitOnLine(m_ZMPPositions,
-                                                         m_COMBuffer,
-                                                         m_LeftFootPositions,
-                                                         m_RightFootPositions,
-                                                         InitLeftFootAbsPos,
-                                                         InitRightFootAbsPos,
-                                                         lRelativeFootPositions,
-                                                         lStartingCOMState,
-                                                         lStartingZMPPosition );
+      NbOfStepsToRemoveFromTheStack =
+	m_ZMPM->InitOnLine
+	(m_ZMPPositions,
+	 m_COMBuffer,
+	 m_LeftFootPositions,
+	 m_RightFootPositions,
+	 InitLeftFootAbsPos,
+	 InitRightFootAbsPos,
+	 lRelativeFootPositions,
+	 lStartingCOMState,
+	 lStartingZMPPosition );
 
-      ODEBUG("After Initializing the Analytical Morisawa part. " << m_LeftFootPositions.size()
+      ODEBUG("After Initializing the Analytical Morisawa part. "
+	     << m_LeftFootPositions.size()
              << " " << m_RightFootPositions.size());
     }
     // Keep the last one to be removed at the next insertion.
-    for(int i=0;i<NbOfStepsToRemoveFromTheStack-1;i++)
+    for(std::size_t i=0;i<NbOfStepsToRemoveFromTheStack-1;i++)
       m_StepStackHandler->RemoveFirstStepInTheStack();
 
     // Initialization of the first preview.
@@ -973,12 +983,14 @@ namespace PatternGeneratorJRL {
            << m_RightFootPositions.size() << " ");
   }
 
-  void PatternGeneratorInterfacePrivate::StopOnLineStepSequencing()
+  void PatternGeneratorInterfacePrivate::
+  StopOnLineStepSequencing()
   {
     m_StepStackHandler->StopOnLineStep();
   }
 
-  void PatternGeneratorInterfacePrivate::FinishAndRealizeStepSequence()
+  void PatternGeneratorInterfacePrivate::
+  FinishAndRealizeStepSequence()
   {
     ODEBUG("PGI-Start");
     COMState lStartingCOMState;
@@ -994,20 +1006,17 @@ namespace PatternGeneratorJRL {
     vector<double> lCurrentJointValues;
     m_ZMPD->SetZMPShift(m_ZMPShift);
 
-
-
     Eigen::VectorXd lCurrentConfiguration;
 
     lCurrentConfiguration = m_PinocchioRobot->currentConfiguration();
 
     deque<RelativeFootPosition> lRelativeFootPositions;
-    CommonInitializationOfWalking(lStartingCOMState,
-                                  lStartingZMPPosition,
-                                  BodyAnglesIni,
-                                  InitLeftFootAbsPos, InitRightFootAbsPos,
-                                  lRelativeFootPositions,lCurrentJointValues,true);
-
-
+    CommonInitializationOfWalking
+      (lStartingCOMState,
+       lStartingZMPPosition,
+       BodyAnglesIni,
+       InitLeftFootAbsPos, InitRightFootAbsPos,
+       lRelativeFootPositions,lCurrentJointValues,true);
 
     ODEBUG("lStartingCOMState: "
            << lStartingCOMState.x[0] << " "
@@ -1023,12 +1032,14 @@ namespace PatternGeneratorJRL {
     lCurrentConfiguration(5) = 0.0;
     m_PinocchioRobot->currentConfiguration(lCurrentConfiguration);
 
-    ODEBUG("Size of lRelativeFootPositions :" << lRelativeFootPositions.size());
-    // cout <<"Size of lRelativeFootPositions :" << lRelativeFootPositions.size() << endl;
-    ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
-           << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
-
-
+    ODEBUG("Size of lRelativeFootPositions :"
+	   << lRelativeFootPositions.size());
+    // cout <<"Size of lRelativeFootPositions :"
+    // << lRelativeFootPositions.size() << endl;
+    ODEBUG("ZMPInitialPoint"
+	   << lStartingZMPPosition(0)  << " "
+           << lStartingZMPPosition(1)  << " "
+	   << lStartingZMPPosition(2) );
 
     ODEBUG("COMBuffer: " << m_COMBuffer.size() );
 
@@ -1040,18 +1051,24 @@ namespace PatternGeneratorJRL {
                         InitRightFootAbsPos);
 
 
-    ODEBUG("First m_ZMPPositions" << m_ZMPPositions[0].px << " " << m_ZMPPositions[0].py);
+    ODEBUG("First m_ZMPPositions"
+	   << m_ZMPPositions[0].px << " "
+	   << m_ZMPPositions[0].py);
     deque<ZMPPosition> aZMPBuffer;
 
     // Option : Use Wieber06's algorithm to compute a new ZMP
     // profil. Suppose to preempt the first stage of control.
     aZMPBuffer.resize(m_RightFootPositions.size());
 
-    // this function calculates a buffer with COM values after a first preview round,
-    // currently required to calculate the arm swing before "onglobal step of control"
-    // in order to take the arm swing motion into account in the second preview loop
+    // this function calculates a buffer with COM values
+    // after a first preview round,
+    // currently required to calculate the arm swing
+    // before "onglobal step of control"
+    // in order to take the arm swing motion into
+    // account in the second preview loop
     if (m_StepStackHandler->GetWalkMode()==2)
-      m_StOvPl->CreateBufferFirstPreview(m_COMBuffer,aZMPBuffer,m_ZMPPositions);
+      m_StOvPl->CreateBufferFirstPreview
+	(m_COMBuffer,aZMPBuffer,m_ZMPPositions);
 
 
     if (0)
@@ -1087,15 +1104,16 @@ namespace PatternGeneratorJRL {
       ODEBUG4("FinishAndRealizeStepSequence() - 6.25 ","DebugGMFKW.dat");
       m_StOvPl->TimeDistributeFactor(m_TimeDistrFactor);
       ODEBUG4("FinishAndRealizeStepSequence() - 6.5 ","DebugGMFKW.dat");
-      m_StOvPl->PolyPlanner(m_COMBuffer,m_LeftFootPositions,m_RightFootPositions,m_ZMPPositions);
+      m_StOvPl->PolyPlanner
+	(m_COMBuffer,m_LeftFootPositions,
+	 m_RightFootPositions,m_ZMPPositions);
       ODEBUG4("FinishAndRealizeStepSequence() - 6.75 ","DebugGMFKW.dat");
     }
 
     gettimeofday(&time4,0);
     ODEBUG4("FinishAndRealizeStepSequence() - 7 ","DebugGMFKW.dat");
+
     // Read NL informations from ZMPRefPositions.
-
-
     m_GlobalStrategyManager->Setup(m_ZMPPositions,
                                    m_COMBuffer,
                                    m_LeftFootPositions,
@@ -1105,7 +1123,8 @@ namespace PatternGeneratorJRL {
     gettimeofday(&time5,0);
 
     m_count = 0;
-    ODEBUG("FinishAndRealizeStepSequence() - 8 - COMBuffer: " << m_COMBuffer.size());
+    ODEBUG("FinishAndRealizeStepSequence() - 8 - COMBuffer: "
+	   << m_COMBuffer.size());
 
     m_ShouldBeRunning = true;
 
@@ -1115,7 +1134,8 @@ namespace PatternGeneratorJRL {
   }
 
 
-  void PatternGeneratorInterfacePrivate::m_ReadFileFromKineoWorks(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  m_ReadFileFromKineoWorks(istringstream &strm)
   {
 
     string aPartialModel="PartialModel.dat";
@@ -1124,13 +1144,15 @@ namespace PatternGeneratorJRL {
     strm >> aPartialModel;
     strm >> aKWPath;
 
-    ODEBUG6("Went through m_ReadFileFromKineoWorks(istringstream &strm)","DebugGMFKW.dat");
+    ODEBUG6("Went through m_ReadFileFromKineoWorks"
+	    "istringstream &strm)","DebugGMFKW.dat");
     if (m_GMFKW->ReadPartialModel(aPartialModel)<0)
       cerr<< "Error while reading partial model " << endl;
 
     if (m_GMFKW->ReadKineoWorksPath(aKWPath)<0)
       cerr<< "Error while reading the path " << endl;
-    ODEBUG6("Went before DisplayModel and PAth m_ReadFileFromKineoWorks(istringstream &strm)",
+    ODEBUG6("Went before DisplayModel and PAth "
+	    "m_ReadFileFromKineoWorks(istringstream &strm)",
             "DebugGMFKW.dat");
 
     //    m_GMFKW->DisplayModelAndPath();
@@ -1151,7 +1173,8 @@ namespace PatternGeneratorJRL {
 
     return 0;
   }
-  void PatternGeneratorInterfacePrivate::ChangeOnLineStep(istringstream &strm,double &newtime)
+  void PatternGeneratorInterfacePrivate::
+  ChangeOnLineStep(istringstream &strm,double &newtime)
   {
     if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
     {
@@ -1285,7 +1308,8 @@ namespace PatternGeneratorJRL {
     {
       m_AlgorithmforZMPCOM = ZMPCOM_MORISAWA_2007;
       m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
-      m_CoMAndFootOnlyStrategy->SetTheLimitOfTheBuffer(m_ZMPM->ReturnOptimalTimeToRegenerateAStep());
+      m_CoMAndFootOnlyStrategy->SetTheLimitOfTheBuffer
+	(m_ZMPM->ReturnOptimalTimeToRegenerateAStep());
     }
     else if (ZMPTrajAlgo=="Dimitrov")
     {
@@ -1309,7 +1333,8 @@ namespace PatternGeneratorJRL {
     }
   }
 
-  void PatternGeneratorInterfacePrivate::m_SetUpperBodyMotionParameters(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  m_SetUpperBodyMotionParameters(istringstream &strm)
   {
     ODEBUG("Upper Body Motion Parameters");
     while(!strm.eof())
@@ -1317,12 +1342,12 @@ namespace PatternGeneratorJRL {
     }
   }
 
-
-
-  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
-                                                                    Eigen::VectorXd & CurrentVelocity,
-                                                                    Eigen::VectorXd & CurrentAcceleration,
-                                                                    Eigen::VectorXd &ZMPTarget)
+  bool PatternGeneratorInterfacePrivate::
+  RunOneStepOfTheControlLoop
+  (Eigen::VectorXd & CurrentConfiguration,
+   Eigen::VectorXd & CurrentVelocity,
+   Eigen::VectorXd & CurrentAcceleration,
+   Eigen::VectorXd &ZMPTarget)
   {
     COMState finalCOMState;
     FootAbsolutePosition LeftFootPosition,RightFootPosition;
@@ -1337,10 +1362,12 @@ namespace PatternGeneratorJRL {
     return m_Running;
   }
 
-  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(FootAbsolutePosition &LeftFootPosition,
-                                                                    FootAbsolutePosition &RightFootPosition,
-                                                                    ZMPPosition &ZMPRefPos,
-                                                                    COMPosition &COMRefPos)
+  bool PatternGeneratorInterfacePrivate::
+  RunOneStepOfTheControlLoop
+  (FootAbsolutePosition &LeftFootPosition,
+   FootAbsolutePosition &RightFootPosition,
+   ZMPPosition &ZMPRefPos,
+   COMPosition &COMRefPos)
   {
     Eigen::VectorXd  CurrentConfiguration;
     Eigen::VectorXd  CurrentVelocity;
@@ -1364,13 +1391,15 @@ namespace PatternGeneratorJRL {
   }
 
 
-  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
-                                                                    Eigen::VectorXd & CurrentVelocity,
-                                                                    Eigen::VectorXd & CurrentAcceleration,
-                                                                    Eigen::VectorXd &ZMPTarget,
-                                                                    COMPosition &finalCOMPosition,
-                                                                    FootAbsolutePosition &LeftFootPosition,
-                                                                    FootAbsolutePosition &RightFootPosition )
+  bool PatternGeneratorInterfacePrivate::
+  RunOneStepOfTheControlLoop
+  (Eigen::VectorXd & CurrentConfiguration,
+   Eigen::VectorXd & CurrentVelocity,
+   Eigen::VectorXd & CurrentAcceleration,
+   Eigen::VectorXd &ZMPTarget,
+   COMPosition &finalCOMPosition,
+   FootAbsolutePosition &LeftFootPosition,
+   FootAbsolutePosition &RightFootPosition )
   {
     COMState aCOMState;
     m_Running = RunOneStepOfTheControlLoop(CurrentConfiguration,
@@ -1384,13 +1413,15 @@ namespace PatternGeneratorJRL {
     return m_Running;
   }
 
-  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
-                                                                    Eigen::VectorXd & CurrentVelocity,
-                                                                    Eigen::VectorXd & CurrentAcceleration,
-                                                                    Eigen::VectorXd &ZMPTarget,
-                                                                    COMState &finalCOMState,
-                                                                    FootAbsolutePosition &LeftFootPosition,
-                                                                    FootAbsolutePosition &RightFootPosition )
+  bool PatternGeneratorInterfacePrivate::
+  RunOneStepOfTheControlLoop
+  (Eigen::VectorXd & CurrentConfiguration,
+   Eigen::VectorXd & CurrentVelocity,
+   Eigen::VectorXd & CurrentAcceleration,
+   Eigen::VectorXd &ZMPTarget,
+   COMState &finalCOMState,
+   FootAbsolutePosition &LeftFootPosition,
+   FootAbsolutePosition &RightFootPosition )
   {
     m_InternalClock+=m_SamplingPeriod;
 
@@ -1550,9 +1581,11 @@ namespace PatternGeneratorJRL {
 
     //    if ((u=(m_count - (m_ZMPPositions.size()-2*m_NL)))>=0)
 
-    if (m_GlobalStrategyManager->EndOfMotion()==GlobalStrategyManager::NEW_STEP_NEEDED)
+    if (m_GlobalStrategyManager->EndOfMotion()==
+	GlobalStrategyManager::NEW_STEP_NEEDED)
     {
-      ODEBUG("NEW STEP NEEDED" << m_InternalClock/m_SamplingPeriod << " Internal Clock :" << m_InternalClock);
+      ODEBUG("NEW STEP NEEDED" << m_InternalClock/m_SamplingPeriod
+	     << " Internal Clock :" << m_InternalClock);
       if (m_StepStackHandler->IsOnLineSteppingOn())
       {
         ODEBUG("Add a step");
@@ -1564,20 +1597,28 @@ namespace PatternGeneratorJRL {
         // Add a new step inside the stack.
         if (m_StepStackHandler->ReturnStackSize()<=1)
         {
-          m_StepStackHandler->AddStandardOnLineStep(m_NewStep, m_NewStepX, m_NewStepY, m_NewTheta);
+          m_StepStackHandler->
+	    AddStandardOnLineStep(m_NewStep,
+				  m_NewStepX,
+				  m_NewStepY,
+				  m_NewTheta);
           m_NewStep = false;
         }
 
         // Remove the first step of the queue.
-        bool EndSequence = m_StepStackHandler->RemoveFirstStepInTheStack();
+        bool EndSequence = m_StepStackHandler->
+	  RemoveFirstStepInTheStack();
         ODEBUG("EndSequence:" <<EndSequence);
         // Returns the front foot step in the step stack handler which is not yet
         // in the preview control queue.
-        bool EnoughSteps= m_StepStackHandler->ReturnFrontFootPosition(lRelativeFootPositions);
+        bool EnoughSteps= m_StepStackHandler->
+	  ReturnFrontFootPosition(lRelativeFootPositions);
         if ((!EnoughSteps)&& (!EndSequence))
         {
-          ODEBUG3("You don't have enough steps in the step stack handler.");
-          ODEBUG3("And this is not an end sequence.");
+	  std::cerr << "You don't have enough steps in the step stack handler."
+		    << std::endl;
+	  std::cerr << "And this is not an end sequence."
+		    << std::endl;
         }
 
 

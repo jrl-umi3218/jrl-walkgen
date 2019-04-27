@@ -824,9 +824,12 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 	}
       if (alpha<0.0)
 	{
-	  ODEBUG3("Problem with alpha: should be positive");
-	  ODEBUG3("The initial solution is incorrect: "<< m_ItNb << " " << m_InternalTime);
-
+	  std::cerr << "Problem with alpha: should be positive"
+		    << std::endl;
+	  std::cerr << "The initial solution is incorrect: "
+		    << m_ItNb << " "
+		    << m_InternalTime
+		    << std::endl;
 	  exit(0);
 	}
 

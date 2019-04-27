@@ -89,7 +89,9 @@ void DumpVector(std::string fileName, Eigen::VectorXd & M)
 using namespace std;
 using namespace PatternGeneratorJRL;
 
-NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, PinocchioRobot *aPR)
+NMPCgenerator::
+NMPCgenerator
+(SimplePluginManager * aSPM, PinocchioRobot *aPR)
 {
   time_=0.0;
   T_ = 0.0 ;
@@ -173,11 +175,26 @@ void NMPCgenerator::initNMPCgenerator(
   nf_ = nf ;
   // number of degrees of freedom
   nv_ = 2*N_+3*nf_;
-  Pps_.resize(N_,3);              {for(unsigned int i=0;i<Pps_.rows();i++) for(unsigned int j=0;j<Pps_.cols();j++) Pps_(i,j)=0.0;};
-  Ppu_.resize(N_,N_);             {for(unsigned int i=0;i<Ppu_.rows();i++) for(unsigned int j=0;j<Ppu_.cols();j++) Ppu_(i,j)=0.0;};
-  Pvs_.resize(N_,3);              {for(unsigned int i=0;i<Pvs_.rows();i++) for(unsigned int j=0;j<Pvs_.cols();j++) Pvs_(i,j)=0.0;};
-  Pvu_.resize(N_,N_);             {for(unsigned int i=0;i<Pvu_.rows();i++) for(unsigned int j=0;j<Pvu_.cols();j++) Pvu_(i,j)=0.0;};
-  Pas_.resize(N_,3);              {for(unsigned int i=0;i<Pas_.rows();i++) for(unsigned int j=0;j<Pas_.cols();j++) Pas_(i,j)=0.0;};
+  Pps_.resize(N_,3);
+  {for(unsigned int i=0;i<Pps_.rows();i++)
+      for(unsigned int j=0;j<Pps_.cols();j++)
+	Pps_(i,j)=0.0;};
+  Ppu_.resize(N_,N_);
+  {for(unsigned int i=0;i<Ppu_.rows();i++)
+      for(unsigned int j=0;j<Ppu_.cols();j++)
+	Ppu_(i,j)=0.0;};
+  Pvs_.resize(N_,3);
+  {for(unsigned int i=0;i<Pvs_.rows();i++)
+      for(unsigned int j=0;j<Pvs_.cols();j++)
+	Pvs_(i,j)=0.0;};
+  Pvu_.resize(N_,N_);
+  {for(unsigned int i=0;i<Pvu_.rows();i++)
+      for(unsigned int j=0;j<Pvu_.cols();j++)
+	Pvu_(i,j)=0.0;};
+  Pas_.resize(N_,3);
+  {for(unsigned int i=0;i<Pas_.rows();i++)
+      for(unsigned int j=0;j<Pas_.cols();j++)
+	Pas_(i,j)=0.0;};
   Pau_.resize(N_,N_);             {for(unsigned int i=0;i<Pau_.rows();i++) for(unsigned int j=0;j<Pau_.cols();j++) Pau_(i,j)=0.0;};
   Pzs_.resize(N_,3);              {for(unsigned int i=0;i<Pzs_.rows();i++) for(unsigned int j=0;j<Pzs_.cols();j++) Pzs_(i,j)=0.0;};
   Pzu_.resize(N_,N_);             {for(unsigned int i=0;i<Pzu_.rows();i++) for(unsigned int j=0;j<Pzu_.cols();j++) Pzu_(i,j)=0.0;};
@@ -328,11 +345,16 @@ void NMPCgenerator::initializeConstraint()
   nceq_ = nc_vel_ ;
   nc_ = nceq_ + ncineq_;
 
-  gU_cop_.resize(nc_cop_); { for(unsigned int i=0;i<gU_cop_.size();gU_cop_[i++]=0.0);};
-  gU_foot_.resize(nc_foot_); { for(unsigned int i=0;i<gU_foot_.size();gU_foot_[i++]=0.0);};
-  gU_obs_.resize(nc_obs_); { for(unsigned int i=0;i<gU_obs_.size();gU_obs_[i++]=0.0);};
-  gU_rot_.resize(nc_rot_); { for(unsigned int i=0;i<gU_rot_.size();gU_rot_[i++]=0.0);};
-  gU_stan_.resize(nc_stan_); { for(unsigned int i=0;i<gU_stan_.size();gU_stan_[i++]=0.0);};
+  gU_cop_.resize(nc_cop_);
+  { for(unsigned int i=0;i<gU_cop_.size();gU_cop_[i++]=0.0);};
+  gU_foot_.resize(nc_foot_);
+  { for(unsigned int i=0;i<gU_foot_.size();gU_foot_[i++]=0.0);};
+  gU_obs_.resize(nc_obs_);
+  { for(unsigned int i=0;i<gU_obs_.size();gU_obs_[i++]=0.0);};
+  gU_rot_.resize(nc_rot_);
+  { for(unsigned int i=0;i<gU_rot_.size();gU_rot_[i++]=0.0);};
+  gU_stan_.resize(nc_stan_);
+  { for(unsigned int i=0;i<gU_stan_.size();gU_stan_[i++]=0.0);};
 
   return ;
 }
@@ -366,7 +388,9 @@ void NMPCgenerator::updateConstraint()
 
   unsigned N2nf2 = 2*(N_+nf_) ;
   qp_J_.resize(nc_,nv_);
-  {for(unsigned int i=0;i<qp_J_.rows();i++) for(unsigned int j=0;j<qp_J_.cols();j++) qp_J_(i,j)=0.0;};
+  {for(unsigned int i=0;i<qp_J_.rows();i++)
+      for(unsigned int j=0;j<qp_J_.cols();j++)
+	qp_J_(i,j)=0.0;};
   // Fill up qp_J_
   unsigned index = 0 ;
   for(unsigned i=0 ; i<nc_vel_ ; ++i)
@@ -403,7 +427,8 @@ void NMPCgenerator::updateConstraint()
   {
     for(unsigned n=0 ; n<nf_ ; ++n)
     {
-      qp_J_obs_i_ = 2 * U_xy_.transpose()*Hobs_[obs][n] + Aobs_[obs][n];
+      qp_J_obs_i_ = 2 * U_xy_.transpose()*Hobs_[obs][n]
+	+ Aobs_[obs][n];
       for(unsigned j=0 ; j<N2nf2 ; ++j)
         qp_J_((obs+1)*n,j) = qp_J_obs_i_(j) ;
     }
@@ -784,13 +809,14 @@ void NMPCgenerator::preprocess_solution()
   return ;
 }
 
-void NMPCgenerator::solve_qp(){
+void NMPCgenerator::solve_qp()
+{
   // primal SQP solution
   QP_->solve(QuadProg_H_,QuadProg_g_,
              QuadProg_J_eq_,QuadProg_bJ_eq_,
              QuadProg_J_ineq_,QuadProg_lbJ_ineq_,false);
-//  if(QP_->fail()==0)
-//    cerr << "qp solveur succeded" << endl ;
+  //  if(QP_->fail()==0)
+  //    cerr << "qp solveur succeded" << endl ;
   if(QP_->fail()==1)
     cerr << "qp solveur failed : problem has no solution" << endl ;
   if(QP_->fail()==2)

@@ -164,8 +164,6 @@ RelativeFeetInequalities::set_feet_dimensions( PinocchioRobot *aPR )
   Width  = RightFoot->soleWidth  ;
   Height = RightFoot->soleHeight ;
 
-  ODEBUG3("Right Foot Width: " << Width);
-  ODEBUG3("Right Foot Height: " << Height);
   PRFoot * LeftFoot = aPR->leftFoot();
   if (RightFoot->associatedAnkle==0)
     {
@@ -174,8 +172,6 @@ RelativeFeetInequalities::set_feet_dimensions( PinocchioRobot *aPR )
     }
   Width =  LeftFoot->soleWidth  ;
   Height = LeftFoot->soleHeight ;
-  ODEBUG3("LeftFoot Width: " << Width);
-  ODEBUG3("LeftFoot Height: " << Height);
 
   assert(Width > 0);
   LeftFootSize_.setSize
@@ -187,12 +183,6 @@ RelativeFeetInequalities::set_feet_dimensions( PinocchioRobot *aPR )
   RightFootSize_.setConstraints
     ( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
 
-  ODEBUG3("LeftFootSize.getHalfHeight: " << LeftFootSize_.getHalfHeight());
-  ODEBUG3("LeftFootSize.getHalfWidth: " << LeftFootSize_.getHalfWidth());
-  ODEBUG3("LeftFootSize.getHalfHeightDS: " << LeftFootSize_.getHalfHeightDS());
-  ODEBUG3("RightFootSize.getHalfHeight: " << RightFootSize_.getHalfHeight());
-  ODEBUG3("RightFootSize.getHalfWidth: " << RightFootSize_.getHalfWidth());
-  ODEBUG3("RightFootSize.getHalfHeightDS: " << RightFootSize_.getHalfHeightDS());
   return 0;
 
 }
@@ -353,17 +343,6 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
           LeftFootSize_.setConstraints
 	    ( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
           init_convex_hulls();
-	  ODEBUG3("Security margin On X: "
-		  << SecurityMarginX_
-		  << " Security margin On Y: "
-		  << SecurityMarginY_);
-	  ODEBUG3("LeftFootSize.getHalfHeight: " << LeftFootSize_.getHalfHeight());
-	  ODEBUG3("LeftFootSize.getHalfWidth: " << LeftFootSize_.getHalfWidth());
-	  ODEBUG3("LeftFootSize.getHalfHeightDS: " << LeftFootSize_.getHalfHeightDS());
-	  ODEBUG3("RightFootSize.getHalfHeight: " << RightFootSize_.getHalfHeight());
-	  ODEBUG3("RightFootSize.getHalfWidth: " << RightFootSize_.getHalfWidth());
-	  ODEBUG3("RightFootSize.getHalfHeightDS: " << RightFootSize_.getHalfHeightDS());
-
         }
     }
   else if( Method == ":setDSFeetDistance" )

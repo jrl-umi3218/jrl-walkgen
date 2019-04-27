@@ -489,7 +489,8 @@ computing the analytical trajectories. */
     }
     else
     {
-      ODEBUG3(" Feet Trajectory Generator NOT INITIALIZED");
+      std::cerr << " Feet Trajectory Generator NOT INITIALIZED"
+		<< std::endl;
       return -1;
     }
 
@@ -2350,10 +2351,11 @@ a shift is done to chose the earliest double support interval. */
       /*! Same for the feet trajectories */
       *m_FeetTrajectoryGenerator = *m_BackUpm_FeetTrajectoryGenerator;
 
-      ODEBUG3("Unable to change the step ( " <<
-              aFootAbsolutePosition[0].x << " , " <<
-              aFootAbsolutePosition[0].y << " , " <<
-              aFootAbsolutePosition[0].theta << " ) ");
+      std::cerr << "Unable to change the step ( "
+		<< aFootAbsolutePosition[0].x << " , "
+		<< aFootAbsolutePosition[0].y << " , "
+		<< aFootAbsolutePosition[0].theta << " ) "
+		<< std::endl;
       throw e;
     }
 

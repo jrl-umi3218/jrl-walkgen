@@ -24,11 +24,7 @@
 /*! \file This object filters an analytical ZMP trajectory through preview control. */
 #include <iostream>
 #include <fstream>
-#define ODEBUG(x)
-
-#define ODEBUG3(x) cerr << "FilteringAnalyticalTrajectoryByPreviewControl" << ": " << __FUNCTION__ \
-                       << "(# " << __LINE__ << "): "<< x << endl
-
+#include "Debug.hh"
 #include <ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.hh>
 
 
