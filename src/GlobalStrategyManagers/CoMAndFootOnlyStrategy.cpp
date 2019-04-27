@@ -83,7 +83,8 @@ OneGlobalStepOfControl
     }
   else
     {
-      ODEBUG3("Problem on the left foot position queue: empty");
+      std::cerr << "Problem on the left foot position queue: empty"
+		<< std::endl;
       return -2;
     }
 
@@ -94,7 +95,8 @@ OneGlobalStepOfControl
     }
   else
     {
-      ODEBUG3("Problem on the right foot position queue: empty");
+      std::cerr << "Problem on the right foot position queue: empty"
+		<< std::endl;
       return -3;
     }
 
@@ -105,7 +107,8 @@ OneGlobalStepOfControl
     }
   else
     {
-      ODEBUG("Problem on the COM queue: empty");
+      std::cerr << "Problem on the COM queue: empty"
+	        << std::endl;
       return -4;
     }
 
@@ -180,8 +183,8 @@ EvaluateStartingState
   aStartingZMPPosition(2) = 0.5 *
     (InitLeftFootPosition.z + InitRightFootPosition.z) ;
 
-  //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in	\
-  //  CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
+  ///  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in	\
+  ///  CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
 
   //  cout << "com = " << aStartingCOMState  << endl ;
   cout << "zmp = " << aStartingZMPPosition  << endl ;
