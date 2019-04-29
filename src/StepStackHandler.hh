@@ -160,7 +160,7 @@ namespace PatternGeneratorJRL
     bool ReturnFrontFootPosition(RelativeFootPosition &aRFP);
 
     /*! \brief Returns the size of the stack. */
-    int ReturnStackSize();
+    std::size_t ReturnStackSize();
 
     /*! @} */
 

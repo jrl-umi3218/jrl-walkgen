@@ -664,7 +664,7 @@ void ZMPDiscretization::OnLineAddFoot
   assert(m_SamplingPeriod > 0);
   double dSizeOf1stPhase =TimeFirstPhase/m_SamplingPeriod;
   unsigned int SizeOf1stPhase = (unsigned int)round(dSizeOf1stPhase);
-  ODEBUG3("SizeOf1stPhase:" << SizeOf1stPhase);
+  ODEBUG("SizeOf1stPhase:" << SizeOf1stPhase);
   ODEBUG("m_vdiffsupppre : " << m_vdiffsupppre);
   double px0,py0,theta0, delta_x,delta_y;
 
@@ -778,9 +778,6 @@ void ZMPDiscretization::OnLineAddFoot
 
   // Second Phase of the step cycle aka Single Support Phase.
 
-  // Compute relative feet position for the next step.
-  double lStepHeight=0;
-
   // Next Theta : next relative angle between the current support foot angle
   // and the next support foot angle.
   double NextTheta=0;
@@ -796,9 +793,6 @@ void ZMPDiscretization::OnLineAddFoot
       RelTheta = NextTheta+m_AngleDiffToSupportFootTheta;
       RelZMPTheta = NextTheta+m_AngleDiffFromZMPThetaToSupportFootTheta;
 
-      lStepHeight = m_StepHeight;
-      ODEBUG3("lStepHeight:"<< lStepHeight <<
-	      " m_StepHeight: " << m_StepHeight << " this:" << this);
       double c,s;
       c = cos(NextTheta*M_PI/180.0);
       s = sin(NextTheta*M_PI/180.0);
@@ -825,7 +819,6 @@ void ZMPDiscretization::OnLineAddFoot
       vrel(1,0)= 0.0;
       RelTheta= 0.0;
       NextTheta=0.0;
-      lStepHeight = 1.0;
     }
 
   ODEBUG(cout << "vrel: " << vrel(0,0) << " " << vrel(1,0));
@@ -848,7 +841,6 @@ void ZMPDiscretization::OnLineAddFoot
   //   double ModulationSupportCoefficient = 0.9;
   double ModulatedSingleSupportTime = lTsingle * m_ModulationSupportCoefficient;
   double EndOfLiftOff = (lTsingle-ModulatedSingleSupportTime)*0.5;
-  ODEBUG3("lStepHeight: "<< lStepHeight);
   ODEBUG("ModulatedSingleSupportTime:" << ModulatedSingleSupportTime << " "
           << vrel(0,0) << " "
           << vrel(1,0));
@@ -891,7 +883,7 @@ void ZMPDiscretization::OnLineAddFoot
   px02 = ZMPPositions[CurrentZMPindex-1].px;
   py02 = ZMPPositions[CurrentZMPindex-1].py;
 
-  ODEBUG3("SizeOfSndPhase: " << SizeOfSndPhase);
+  ODEBUG("SizeOfSndPhase: " << SizeOfSndPhase);
   for(unsigned int k=0;k<SizeOfSndPhase;k++)
     {
 
@@ -1153,9 +1145,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   if (m_RelativeFootPositions.size()>0)
     UpdateCurrentSupportFootPosition(m_RelativeFootPositions[0]);
 
-  double TimeForThisFootPosition;
   // Deal with the end phase of the walking.
-  TimeForThisFootPosition = m_Tdble;
   assert(m_SamplingPeriod > 0);
   double dlAddArraySize = m_Tdble/(2*m_SamplingPeriod);
   unsigned int AddArraySize = (unsigned int)round(dlAddArraySize);

@@ -47,7 +47,8 @@
 
 namespace PatternGeneratorJRL {
 
-  PatternGeneratorInterfacePrivate::PatternGeneratorInterfacePrivate(PinocchioRobot *aPinocchioRobotRobot)
+  PatternGeneratorInterfacePrivate::
+  PatternGeneratorInterfacePrivate(PinocchioRobot *aPinocchioRobotRobot)
     : PatternGeneratorInterface(aPinocchioRobotRobot),SimplePlugin(this)
   {
     //AllowFPE();
@@ -141,8 +142,6 @@ namespace PatternGeneratorJRL {
 
     ODEBUG4("Step 2","DebugPGI.txt");
 
-    //  string PCParameters="/home/stasse/OpenHRP/PatternGeneratorJRL/src/PreviewControlParameters.ini";
-
     ofstream DebugFile;
     ofstream DebugFileLong;
     ofstream DebugFileUpperBody;
@@ -234,9 +233,12 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization[0] = new ComAndFootRealizationByGeometry(this);
 
     // Creates the foot trajectory generator.
-    m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,m_PinocchioRobot->leftFoot());
+    m_FeetTrajectoryGenerator = new
+      LeftAndRightFootTrajectoryGenerationMultiple
+      (this,m_PinocchioRobot->leftFoot());
 
-    // ZMP reference and Foot trajectory planner (Preview control method from Kajita2003)
+    // ZMP reference and Foot trajectory planner
+    // (Preview control method from Kajita2003)
     m_ZMPD = new ZMPDiscretization(this,"",m_PinocchioRobot);
 
     // ZMP and CoM generation using the method proposed in Wieber2006.
@@ -254,13 +256,15 @@ namespace PatternGeneratorJRL {
     m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_PinocchioRobot);
     m_ComAndFootRealization[1] = m_ZMPVRQP->getComAndFootRealization();
 
-    // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
+    // ZMP and CoM generation using the analytical method proposed in
+    // Morisawa2007.
     m_ZMPM = new AnalyticalMorisawaCompact(this,m_PinocchioRobot);
     m_ZMPM->SetHumanoidSpecificities(m_PinocchioRobot);
     m_ComAndFootRealization[2] = m_ZMPM->getComAndFootRealization();
 
     // Preview control for a 3D Linear inverse pendulum
-    m_PC = new PreviewControl(this,OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,true);
+    m_PC = new PreviewControl
+      (this,OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,true);
 
     // Object to generate Motion from KineoWorks.
     m_GMFKW = new GenerateMotionFromKineoWorks();
@@ -351,7 +355,8 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization[0]->setSamplingPeriod(m_PC->SamplingPeriod());
     m_ComAndFootRealization[0]->Initialization();
 
-    for(vector<ComAndFootRealization *>::iterator CFR_it = m_ComAndFootRealization.begin() ;
+    for(vector<ComAndFootRealization *>::iterator
+	  CFR_it = m_ComAndFootRealization.begin() ;
         CFR_it!=m_ComAndFootRealization.end() ; ++CFR_it)
       (*CFR_it)->SetStepStackHandler(m_StepStackHandler);
 
@@ -429,7 +434,8 @@ namespace PatternGeneratorJRL {
   }
 
 
-  void PatternGeneratorInterfacePrivate::m_SetZMPShiftParameters(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  m_SetZMPShiftParameters(istringstream &strm)
   {
     ODEBUG("SetZMPShitParameters");
     while(!strm.eof())
@@ -462,7 +468,8 @@ namespace PatternGeneratorJRL {
   }
 
 
-  void PatternGeneratorInterfacePrivate::m_SetLimitsFeasibility(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  m_SetLimitsFeasibility(istringstream &strm)
   {
     while(!strm.eof())
     {
@@ -475,7 +482,8 @@ namespace PatternGeneratorJRL {
     }
   }
 
-  void PatternGeneratorInterfacePrivate::ReadSequenceOfSteps(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  ReadSequenceOfSteps(istringstream &strm)
   {
     // Read the data inside strm.
     switch (m_StepStackHandler->GetWalkMode())
@@ -521,10 +529,12 @@ namespace PatternGeneratorJRL {
 
   }
 
-  void PatternGeneratorInterfacePrivate::setVelReference(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  setVelReference(istringstream &strm)
   {
 #ifdef DEBUG
-    std::cout << __PRETTY_FUNCTION__ << " setVelReference" << strm.str() << std::endl; 
+    std::cout << __PRETTY_FUNCTION__ << " setVelReference"
+	      << strm.str() << std::endl;
 #endif // DEBUG
     // Read the data inside strm.
 #if USE_QUADPROG==1
@@ -534,7 +544,8 @@ namespace PatternGeneratorJRL {
 #endif
   }
 
-  void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  setCoMPerturbationForce(istringstream &strm)
   {
     // Read the data inside strm.
     m_ZMPVRQP->setCoMPerturbationForce(strm);
@@ -632,7 +643,8 @@ namespace PatternGeneratorJRL {
     m_ShouldBeRunning=true;
   }
 
-  void PatternGeneratorInterfacePrivate::m_StepSequence(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  m_StepSequence(istringstream &strm)
   {
 
     ODEBUG("Step Sequence");
@@ -643,7 +655,8 @@ namespace PatternGeneratorJRL {
     ODEBUG("After finish and realize Step Sequence");
   }
 
-  void PatternGeneratorInterfacePrivate::m_StepStairSequence(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  m_StepStairSequence(istringstream &strm)
   {
 
     ODEBUG("Step Sequence");
@@ -699,7 +712,7 @@ namespace PatternGeneratorJRL {
        lStartingWaistPose,
        InitLeftFootAbsPos,
        InitRightFootAbsPos);
-    
+
     ostringstream osscomheightcmd;
     osscomheightcmd << ":comheight "
         << lStartingCOMState.z[0];
@@ -725,9 +738,15 @@ namespace PatternGeneratorJRL {
     coscomyaw = cos(lStartingCOMState.yaw[0]);
     sincomyaw = sin(lStartingCOMState.yaw[0]);
 
-    CoMPos(0,0) = coscomyaw; CoMPos(0,1) = -sincomyaw; CoMPos(0,2) = lStartingCOMState.x[0];
-    CoMPos(1,0) = sincomyaw; CoMPos(1,1) =  coscomyaw; CoMPos(1,2) = lStartingCOMState.y[0];
-    CoMPos(2,0) = 0.0;       CoMPos(2,1) = 0.0;        CoMPos(2,2) = 1.0;
+    CoMPos(0,0) = coscomyaw;
+    CoMPos(0,1) = -sincomyaw;
+    CoMPos(0,2) = lStartingCOMState.x[0];
+
+    CoMPos(1,0) = sincomyaw;
+    CoMPos(1,1) =  coscomyaw;
+    CoMPos(1,2) = lStartingCOMState.y[0];
+
+    CoMPos(2,0) = 0.0;CoMPos(2,1) = 0.0;CoMPos(2,2) = 1.0;
 
     ODEBUG("InitLeftFoot:" <<  InitLeftFootAbsPos.x
            << " " << InitLeftFootAbsPos.y
@@ -742,22 +761,34 @@ namespace PatternGeneratorJRL {
     double lsx,lsy,ltheta;
     if (lRelativeFootPositions[0].sy > 0 )
     {
-      lsx = InitRightFootAbsPos.x; lsy = InitRightFootAbsPos.y; ltheta = InitRightFootAbsPos.theta;
+      lsx = InitRightFootAbsPos.x;
+      lsy = InitRightFootAbsPos.y;
+      ltheta = InitRightFootAbsPos.theta;
     }
     // First step targets the right
     // then the robot should move towards the left.
     else
     {
-      lsx = InitLeftFootAbsPos.x; lsy = InitLeftFootAbsPos.y; ltheta = InitLeftFootAbsPos.theta;
+      lsx = InitLeftFootAbsPos.x;
+      lsy = InitLeftFootAbsPos.y;
+      ltheta = InitLeftFootAbsPos.theta;
     }
 
     double cosinitfoottheta, sininitfoottheta;
     cosinitfoottheta = cos(ltheta);
     sininitfoottheta = sin(ltheta);
 
-    InitPos(0,0) = cosinitfoottheta; InitPos(0,1) = -sininitfoottheta; InitPos(0,2) = lsx;
-    InitPos(1,0) = sininitfoottheta; InitPos(1,1) =  cosinitfoottheta; InitPos(1,2) = lsy;
-    InitPos(2,0) = 0.0;              InitPos(2,1) = 0.0;               InitPos(2,2) = 1.0;
+    InitPos(0,0) = cosinitfoottheta;
+    InitPos(0,1) = -sininitfoottheta;
+    InitPos(0,2) = lsx;
+
+    InitPos(1,0) = sininitfoottheta;
+    InitPos(1,1) =  cosinitfoottheta;
+    InitPos(1,2) = lsy;
+
+    InitPos(2,0) = 0.0;
+    InitPos(2,1) = 0.0;
+    InitPos(2,2) = 1.0;
 
     ODEBUG("InitPos:" << InitPos);
     ODEBUG("CoMPos: " << CoMPos);
@@ -776,7 +807,10 @@ namespace PatternGeneratorJRL {
     aRFP.theta = atan2(InitialMotion(1,0),InitialMotion(0,0));
     ODEBUG("Initial motion: " << InitialMotion);
     ODEBUG("lRelativeFootPositions:"<<lRelativeFootPositions.size());
-    ODEBUG("AutomaticallyAddFirstStep: "<< aRFP.sx << " " << aRFP.sy << " " <<aRFP.theta);
+    ODEBUG("AutomaticallyAddFirstStep: "
+	   << aRFP.sx << " "
+	   << aRFP.sy << " "
+	   <<aRFP.theta);
 
     lRelativeFootPositions.push_front(aRFP);
 
@@ -814,7 +848,7 @@ namespace PatternGeneratorJRL {
     m_StepStackHandler->
       CopyRelativeFootPosition
       (lRelativeFootPositions,ClearStepStackHandler);
-    
+
     for(unsigned int i=0;i<lRelativeFootPositions.size();i++)
     {
       ODEBUG(lRelativeFootPositions[i].sx << " " <<
@@ -834,7 +868,8 @@ namespace PatternGeneratorJRL {
 			    lStartingWaistPose,
 			    InitLeftFootAbsPos, InitRightFootAbsPos);
 
-    // Add the first step automatically when the corresponding option is set on.
+    // Add the first step automatically when the corresponding
+    // option is set on.
     if (m_AutoFirstStep)
     {
       AutomaticallyAddFirstStep(lRelativeFootPositions,
@@ -843,7 +878,9 @@ namespace PatternGeneratorJRL {
                                 lStartingCOMState);
       if (!ClearStepStackHandler)
       {
-        m_StepStackHandler->PushFrontAStepInTheStack(lRelativeFootPositions[0]);
+        m_StepStackHandler->
+	  PushFrontAStepInTheStack
+	  (lRelativeFootPositions[0]);
         ODEBUG("Push a position in stack of steps:"<<
                lRelativeFootPositions[0].sx << " " <<
                lRelativeFootPositions[0].sy << " " <<
@@ -937,7 +974,7 @@ namespace PatternGeneratorJRL {
 	 lRelativeFootPositions,
 	 lStartingCOMState,
 	 lStartingZMPPosition);
-      
+
     }
     else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
     {
@@ -1289,7 +1326,8 @@ namespace PatternGeneratorJRL {
 
   }
 
-  void PatternGeneratorInterfacePrivate::m_SetAlgoForZMPTraj(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  m_SetAlgoForZMPTraj(istringstream &strm)
   {
     string ZMPTrajAlgo;
     strm >> ZMPTrajAlgo;
@@ -1433,7 +1471,8 @@ namespace PatternGeneratorJRL {
              " m_ZMPPositions " << m_ZMPPositions.size() << endl <<
              " 2*m_NL+1 " << 2*m_NL+1 << endl);
       ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
-             "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
+             "m_GlobalStrategyManager: "
+	     << m_GlobalStrategyManager->EndOfMotion());
 
       m_Running = false;
       return m_Running;//Andremize
@@ -1590,7 +1629,8 @@ namespace PatternGeneratorJRL {
       {
         ODEBUG("Add a step");
         // CAREFULL: we assume that this sequence will create a
-        // a new foot steps at the back of the queue handled by the StepStackHandler.
+        // a new foot steps at the back of the queue handled
+	// by the StepStackHandler.
         // Then we have two foot steps: the last one put inside the preview,
         // and the new one.
         RelativeFootPosition lRelativeFootPositions;
@@ -1609,7 +1649,8 @@ namespace PatternGeneratorJRL {
         bool EndSequence = m_StepStackHandler->
 	  RemoveFirstStepInTheStack();
         ODEBUG("EndSequence:" <<EndSequence);
-        // Returns the front foot step in the step stack handler which is not yet
+        // Returns the front foot step in the step stack handler
+	// which is not yet
         // in the preview control queue.
         bool EnoughSteps= m_StepStackHandler->
 	  ReturnFrontFootPosition(lRelativeFootPositions);
@@ -1627,7 +1668,7 @@ namespace PatternGeneratorJRL {
 
         if (!EndSequence)
         {
-          // ********* WARNING THIS IS THE TIME CONSUMING PART *******************
+          // *** WARNING THIS IS THE TIME CONSUMING PART ***
           if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
           {
           }
@@ -1688,7 +1729,7 @@ namespace PatternGeneratorJRL {
                    << m_RightFootPositions.size() );
           }
         }
-        // ************* THIS HAS TO FIT INSIDE THE control step time  ***********
+        // **** THIS HAS TO FIT INSIDE THE control step time  ****
 
       }
       else
@@ -1703,7 +1744,8 @@ namespace PatternGeneratorJRL {
           m_ShouldBeRunning = true;
         }
 
-        ODEBUG("Finished the walking pattern generator ("<<m_InternalClock << ")");
+        ODEBUG("Finished the walking pattern generator ("
+	       <<m_InternalClock << ")");
       }
 
       ODEBUG4("*** TAG *** " , "DebugDataIK.dat");
@@ -1719,7 +1761,8 @@ namespace PatternGeneratorJRL {
 
 
 
-  void PatternGeneratorInterfacePrivate::m_SetTimeDistrParameters(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  m_SetTimeDistrParameters(istringstream &strm)
   {
     ODEBUG("SetTimeDistrParameters");
     while(!strm.eof())
@@ -1753,7 +1796,8 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::
   SetCurrentJointValues(Eigen::VectorXd &lCurrentJointValues)
   {
-    if(lCurrentJointValues.size()!=m_CurrentActuatedJointValues.size())
+    if((std::size_t)lCurrentJointValues.size()!=
+       m_CurrentActuatedJointValues.size())
       m_CurrentActuatedJointValues.resize(lCurrentJointValues.size());
 
     for(unsigned int i=0;i<lCurrentJointValues.size();i++)
@@ -1763,7 +1807,8 @@ namespace PatternGeneratorJRL {
   }
 
 
-  void PatternGeneratorInterfacePrivate::m_FinishAndRealizeStepSequence(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  m_FinishAndRealizeStepSequence(istringstream &strm)
   {
     int Synchronize=1;
 
@@ -1784,14 +1829,17 @@ namespace PatternGeneratorJRL {
   }
 
 
-  void PatternGeneratorInterfacePrivate::m_PartialStepSequence(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::
+  m_PartialStepSequence(istringstream &strm)
   {
     if (m_StepStackHandler!=0)
       m_StepStackHandler->m_PartialStepSequence(strm);
   }
 
-  void PatternGeneratorInterfacePrivate::GetLegJointVelocity(Eigen::VectorXd &dqr,
-                                                             Eigen::VectorXd &dql) const
+  void PatternGeneratorInterfacePrivate::
+  GetLegJointVelocity
+  (Eigen::VectorXd &dqr,
+   Eigen::VectorXd &dql) const
   {
 
     // TO DO: take the joint specific to the legs
@@ -1826,7 +1874,9 @@ namespace PatternGeneratorJRL {
 
 
 
-  void PatternGeneratorInterfacePrivate::AddOnLineStep(double X, double Y, double Theta)
+  void PatternGeneratorInterfacePrivate::
+  AddOnLineStep
+  (double X, double Y, double Theta)
   {
     m_NewStep = true;
     m_NewStepX = X;
@@ -1834,7 +1884,9 @@ namespace PatternGeneratorJRL {
     m_NewTheta = Theta;
   }
 
-  void PatternGeneratorInterfacePrivate::UpdateAbsolutePosition(bool UpdateAbsMotionOrNot)
+  void PatternGeneratorInterfacePrivate::
+  UpdateAbsolutePosition
+  (bool UpdateAbsMotionOrNot)
   {
     // Compute relative, absolution position and speed.
     m_WaistRelativePos(3,0) = 0.0;
@@ -1896,7 +1948,8 @@ namespace PatternGeneratorJRL {
     m_AbsAngularVelocity(1) = 0.0;
 
     if (m_count!=0)
-      m_AbsAngularVelocity(2) = (m_AbsMotionTheta + thetarad - m_AbsTheta )/m_dt;
+      m_AbsAngularVelocity(2) =
+	(m_AbsMotionTheta + thetarad - m_AbsTheta )/m_dt;
     else
       m_AbsAngularVelocity(2) = 0.0;
 
@@ -1914,13 +1967,17 @@ namespace PatternGeneratorJRL {
 
   }
 
-  void PatternGeneratorInterfacePrivate::getWaistPositionMatrix(Eigen::Matrix4d &lWaistAbsPos) const
+  void PatternGeneratorInterfacePrivate::
+  getWaistPositionMatrix
+  (Eigen::Matrix4d &lWaistAbsPos) const
   {
     lWaistAbsPos = m_WaistAbsPos;
   }
 
   //TODO test me
-  void PatternGeneratorInterfacePrivate::getWaistPositionAndOrientation(double aTQ[7], double &Orientation) const
+  void PatternGeneratorInterfacePrivate::
+  getWaistPositionAndOrientation
+  (double aTQ[7], double &Orientation) const
   {
     // Position
     aTQ[0] = m_WaistAbsPos(0,3);
@@ -1939,7 +1996,9 @@ namespace PatternGeneratorJRL {
     Orientation = m_AbsTheta;
   }
 
-  void PatternGeneratorInterfacePrivate::setWaistPositionAndOrientation(double aTQ[7])
+  void PatternGeneratorInterfacePrivate::
+  setWaistPositionAndOrientation
+  (double aTQ[7])
   {
     // Position
     m_WaistAbsPos(0,3) = aTQ[0];
@@ -2003,9 +2062,11 @@ namespace PatternGeneratorJRL {
 #endif
   }
 
-  int PatternGeneratorInterfacePrivate::ChangeOnLineStep(double time,
-                                                         FootAbsolutePosition & aFootAbsolutePosition,
-                                                         double &newtime)
+  int PatternGeneratorInterfacePrivate::
+  ChangeOnLineStep
+  (double time,
+   FootAbsolutePosition & aFootAbsolutePosition,
+   double &newtime)
   {
     /* Compute the index of the interval which will be modified. */
     if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
@@ -2027,11 +2088,13 @@ namespace PatternGeneratorJRL {
     return -1;
   }
 
-  int PatternGeneratorInterfacePrivate::CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
-                                                            COMState &lStartingCOMState,
-                                                            Eigen::Vector3d & lStartingZMPPosition,
-                                                            FootAbsolutePosition &InitLeftFootAbsPos,
-                                                            FootAbsolutePosition &InitRightFootAbsPos)
+  int PatternGeneratorInterfacePrivate::
+  CreateZMPReferences
+  (deque<RelativeFootPosition> &lRelativeFootPositions,
+   COMState &lStartingCOMState,
+   Eigen::Vector3d & lStartingZMPPosition,
+   FootAbsolutePosition &InitLeftFootAbsPos,
+   FootAbsolutePosition &InitRightFootAbsPos)
   {
     if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
     {
@@ -2131,27 +2194,34 @@ namespace PatternGeneratorJRL {
     return 0;
   }
 
-  void PatternGeneratorInterfacePrivate::AddStepInStack(double dx, double dy, double theta)
+  void PatternGeneratorInterfacePrivate::
+  AddStepInStack
+  (double dx, double dy, double theta)
   {
     if (m_StepStackHandler!=0)
     {
-      m_StepStackHandler->AddStepInTheStack(dx,dy,theta,m_TSsupport, m_TDsupport);
+      m_StepStackHandler->AddStepInTheStack
+	(dx,dy,theta,m_TSsupport, m_TDsupport);
     }
   }
 
-  void PatternGeneratorInterfacePrivate::setZMPInitialPoint(Eigen::Vector3d & lZMPInitialPoint)
+  void PatternGeneratorInterfacePrivate::
+  setZMPInitialPoint(Eigen::Vector3d & lZMPInitialPoint)
   {
     m_ZMPInitialPoint = lZMPInitialPoint;
     m_ZMPInitialPointSet = true;
   }
 
-  void PatternGeneratorInterfacePrivate::getZMPInitialPoint(Eigen::Vector3d & lZMPInitialPoint) const
+  void PatternGeneratorInterfacePrivate::
+  getZMPInitialPoint(Eigen::Vector3d & lZMPInitialPoint) const
   {
     lZMPInitialPoint = m_ZMPInitialPoint;
   }
 
 
-  PatternGeneratorInterface * patternGeneratorInterfaceFactory(PinocchioRobot * aRobot)
+  PatternGeneratorInterface *
+  patternGeneratorInterfaceFactory
+  (PinocchioRobot * aRobot)
   {
     return new PatternGeneratorInterfacePrivate(aRobot);
   }
@@ -2159,5 +2229,3 @@ namespace PatternGeneratorJRL {
 
 
 }
-
-

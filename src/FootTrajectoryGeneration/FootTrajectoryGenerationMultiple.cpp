@@ -320,8 +320,8 @@ SetParametersWithInitPosInitSpeed
 
 
 /*! This method specifies the parameters for each of the polynome used by this
-  object. In this case, as it is used for the 3rd order polynome. The polynome to
-  which those parameters are set is specified with PolynomeIndex.
+  object. In this case, as it is used for the 3rd order polynome. The polynome
+  to which those parameters are set is specified with PolynomeIndex.
   @param PolynomeIndex: Set to which axis the parameters will be applied.
   @param TimeInterval: Set the time base of the polynome.
   @param Position: Set the final position of the polynome at TimeInterval.

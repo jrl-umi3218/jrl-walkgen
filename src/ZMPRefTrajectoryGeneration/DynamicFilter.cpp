@@ -507,7 +507,7 @@ int DynamicFilter::OptimalControl(
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   assert(PC_->IsCoherent());
-  int Nctrl = (int)round(controlWindowSize_/controlPeriod_) ;
+  std::size_t Nctrl = (int)round(controlWindowSize_/controlPeriod_) ;
 
   assert(outputDeltaCOMTraj_deq_.size()==Nctrl);
   double deltaZMPx = 0.0 ;
@@ -518,12 +518,13 @@ int DynamicFilter::OptimalControl(
   //    deltax_(i,0)=0.0;
   //    deltay_(i,0)=0.0;
   //  }
-  for (int i = 0 ; i < Nctrl ; ++i )
+  for (std::size_t i = 0 ; i < Nctrl ; ++i )
   {
     PC_->OneIterationOfPreview(deltax_,deltay_,
                                sxzmp_[0],syzmp_[0],
                                inputdeltaZMP_deq,i,
-                               deltaZMPx, deltaZMPy, false);
+                               deltaZMPx, deltaZMPy,
+			       false);
     for(int j=0;j<3;++j)
     {
       outputDeltaCOMTraj_deq_[i].x[j] = deltax_(j,0);
@@ -531,7 +532,7 @@ int DynamicFilter::OptimalControl(
     }
   }
   // test to verify if the Kajita PC diverged
-  for (int i = 0 ; i < Nctrl ; ++i)
+  for (std::size_t i = 0 ; i < Nctrl ; ++i)
     {
       for(int j=0;j<3;++j)
         {

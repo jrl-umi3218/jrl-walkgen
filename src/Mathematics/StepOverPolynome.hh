@@ -140,8 +140,8 @@ namespace PatternGeneratorJRL
     ~StepOverSpline();
 
   protected:
-    unsigned int number;
-    Eigen::MatrixXd Coefficients;
+    unsigned long int m_number;
+    Eigen::MatrixXd m_Coefficients;
   };
 
   /*! @ingroup steppingover
@@ -165,8 +165,8 @@ namespace PatternGeneratorJRL
     ~StepOverClampedCubicSpline();
     
   protected:
-    unsigned int number;
-    Eigen::MatrixXd Coefficients;
+    unsigned long int m_number;
+    Eigen::MatrixXd m_Coefficients;
     
   };
   

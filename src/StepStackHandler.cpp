@@ -37,7 +37,10 @@
 
 using namespace::PatternGeneratorJRL;
 
-StepStackHandler::StepStackHandler(SimplePluginManager *lSPM) : SimplePlugin(lSPM)
+StepStackHandler::
+StepStackHandler
+(SimplePluginManager *lSPM) :
+  SimplePlugin(lSPM)
 {
   m_OnLineSteps = false;
   m_SingleSupportTime = 0.0;
@@ -89,7 +92,7 @@ bool StepStackHandler::ReturnFrontFootPosition(RelativeFootPosition  &aRFP)
   return false;
 }
 
-int StepStackHandler::ReturnStackSize()
+std::size_t StepStackHandler::ReturnStackSize()
 {
   return m_RelativeFootPositions.size();
 }
@@ -178,7 +181,7 @@ void StepStackHandler::
 ReadStepSequenceAccordingToWalkMode
 (istringstream &strm)
 {
-  ODEBUG3("m_WalkMode: " << m_WalkMode);
+  ODEBUG("m_WalkMode: " << m_WalkMode);
   m_RelativeFootPositions.clear();
   switch (m_WalkMode)
     {
@@ -281,7 +284,6 @@ ReadStepSequenceAccordingToWalkMode
 	ODEBUG( "Walk Mode with Obstacle StepOver Selected \
                  (obstacle parameters have to be set first, \
                  if not standard dimensions are used)" );
-	//cout << "I am calculating relative positions to negociate obstacle" << endl;
 	m_StOvPl->CalculateFootHolds(m_RelativeFootPositions);
 
 	break;
@@ -358,8 +360,10 @@ ReadStepSequenceAccordingToWalkMode
 
 }
 
-void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
-					      double arc_deg, int SupportFoot)
+void StepStackHandler::
+CreateArcInStepStack
+(  double x,double y, double R,
+   double arc_deg, int SupportFoot)
 {
   RelativeFootPosition aFootPosition;
   double StepMax = 0.15;
@@ -649,8 +653,8 @@ CreateArcCenteredInStepStack
 	    << MSupportFoot(1,2) << endl;
   DebugFile.close();
 #endif
-  cout << "MSupportFoot  "<< endl << MSupportFoot << endl;
-  cout << "Romegastep " << endl << Romegastep << endl;
+  ODEBUG("MSupportFoot  "<< endl << MSupportFoot );
+  ODEBUG( "Romegastep " << endl << Romegastep );
   for(int i=0;i<NumberOfStep;i++)
     {
       double cosiOmegaStep,siniOmegaStep;
@@ -892,9 +896,9 @@ void StepStackHandler::AddStandardOnLineStep(bool NewStep,
       aFootPosition.SStime = m_SingleSupportTime;
       aFootPosition.DStime = m_DoubleSupportTime;
       aFootPosition.stepType = 0;
-      cout << aFootPosition.sx << " "
-	   << aFootPosition.sy << " "
-	   << aFootPosition.theta << endl;
+      ODEBUG(aFootPosition.sx << " "
+	     << aFootPosition.sy << " "
+	     << aFootPosition.theta );
     }
 
   ODEBUG("m_RelativeFootPositions:" << m_RelativeFootPositions.size());

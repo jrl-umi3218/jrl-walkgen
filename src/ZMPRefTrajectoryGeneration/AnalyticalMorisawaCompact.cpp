@@ -2769,10 +2769,6 @@ new step has to be generate.
       {
         absFootz_2 = m_AbsoluteSupportFootPositions[Index-2].z - corrZ(2);
       }
-    double absFootx_0 = m_AbsoluteSupportFootPositions[Index].x ;
-    double absFootx_1 = m_AbsoluteSupportFootPositions[Index-1].x ;
-    double absFooty_0 = m_AbsoluteSupportFootPositions[Index].y ;
-    double absFooty_1 = m_AbsoluteSupportFootPositions[Index-1].y ;
 
     // climbing
     // put first leg on the stairs with decrease of CoM //up// of stair height

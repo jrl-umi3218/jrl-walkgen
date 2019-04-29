@@ -163,7 +163,7 @@ EvaluateStartingState
        lStartingWaistPose,
        InitLeftFootPosition,
        InitRightFootPosition);
-    
+
     ODEBUG("EvaluateStartingCOM: m_StartingCOMState: "
 	   << lStartingCOMState);
     aStartingCOMState.x[0] = lStartingCOMState(0);
@@ -183,13 +183,13 @@ EvaluateStartingState
   aStartingZMPPosition(2) = 0.5 *
     (InitLeftFootPosition.z + InitRightFootPosition.z) ;
 
-  ///  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in	\
+  ///  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in
   ///  CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
 
-  //  cout << "com = " << aStartingCOMState  << endl ;
-  cout << "zmp = " << aStartingZMPPosition  << endl ;
-  //  cout << "lf = " << InitLeftFootPosition  << endl ;
-  //  cout << "rf = " << InitRightFootPosition  << endl ;
+  ODEBUG("com = " << aStartingCOMState);
+  ODEBUG("zmp = " << aStartingZMPPosition);
+  ODEBUG("lf = " << InitLeftFootPosition);
+  ODEBUG("rf = " << InitRightFootPosition);
   return 0;
 }
 

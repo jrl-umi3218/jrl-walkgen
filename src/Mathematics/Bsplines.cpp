@@ -9,7 +9,7 @@ using namespace::std;
 using namespace::PatternGeneratorJRL;
 
 
-Bsplines::Bsplines(int degree)
+Bsplines::Bsplines(long int degree)
 {
   m_degree = degree;
   m_control_points.clear();
@@ -25,7 +25,10 @@ void Bsplines::GenerateDegree()
   long int degree = (m_knot.size()-1) - (m_control_points.size()-1) -1;
   if (degree < 0)
     {
-      cout << " Carefull !! degree is smaller than 0 " << endl;
+      std::cerr << __FILE__<< ":"
+		<< __FUNCTION__ << "(#"
+		<< __LINE__ << "):" 
+		<< " Carefull !! degree is smaller than 0 " << endl;
     }
   m_degree = (unsigned)degree ;
 }
@@ -193,17 +196,23 @@ int Bsplines::ComputeBasisFunctions(double t)
 
   //compute their time second derivative for the degree p=m_degree : dd Nip(t) /dt
   m_basis_functions_sec_derivative.resize(m_basis_functions[m_degree].size());
-  double factor = m_degree*(m_degree-1) ;
+  double factor = (double)(m_degree*(m_degree-1));
   double den1(0.0),den2(0.0),den3(0.0),den4(0.0);
-  for (unsigned int i = 0 ; i < m_basis_functions_derivative.size() ; ++i)
+  for (unsigned long int i = 0 ;
+       i < m_basis_functions_derivative.size() ;
+       ++i)
     {
       tmp1=0.0;tmp2=0.0;tmp3=0.0;tmp4=0.0;
       den1=0.0;den2=0.0;den3=0.0;den4=0.0;
 
-      den1 = (m_knot[i+m_degree]-m_knot[i]) * (m_knot[i+m_degree-1]-m_knot[i])       ;
-      den2 = (m_knot[i+m_degree]-m_knot[i]) * (m_knot[i+m_degree]-m_knot[i+1])       ;
-      den3 = (m_knot[i+m_degree+1]-m_knot[i+1]) * (m_knot[i+m_degree]-m_knot[i+1])   ;
-      den4 = (m_knot[i+m_degree+1]-m_knot[i+1]) * (m_knot[i+m_degree+1]-m_knot[i+2]) ;
+      den1 = (m_knot[i+m_degree]-m_knot[i]) *
+	(m_knot[i+m_degree-1]-m_knot[i])       ;
+      den2 = (m_knot[i+m_degree]-m_knot[i]) *
+	(m_knot[i+m_degree]-m_knot[i+1])       ;
+      den3 = (m_knot[i+m_degree+1]-m_knot[i+1]) *
+	(m_knot[i+m_degree]-m_knot[i+1])   ;
+      den4 = (m_knot[i+m_degree+1]-m_knot[i+1]) *
+	(m_knot[i+m_degree+1]-m_knot[i+2]) ;
 
       if ( den1 == 0 )
 	tmp1 = 0.0 ;
@@ -280,9 +289,10 @@ double Bsplines::ComputeBsplines(double t)
 {
   ComputeBasisFunctions(t);
   double result = 0.0 ;
-  if (m_degree!= m_knot.size() - m_control_points.size() -1 )
+  if (m_degree!= (long int)m_knot.size() -
+      (long int)m_control_points.size() -1 )
     {
-      cout << "The parameters are not compatibles. Please recheck " << endl;
+      cerr << "The parameters are not compatibles. Please recheck " << endl;
       return result;
     }
   for (unsigned int i=0;i<m_control_points.size();i++)
@@ -305,7 +315,7 @@ Bsplines Bsplines::DerivativeBsplines()
         {
 	  if(m_knot[i+m_degree+1] - m_knot[i+1]==0.0)
             {
-              cout << "Knot no differenciable : result in the zero function\n" ;
+              cerr << "Knot no differenciable : result in the zero function\n" ;
               dB_control_points[i] = 0.0 ;
             }
 	  else
@@ -324,12 +334,12 @@ Bsplines Bsplines::DerivativeBsplines()
     }
   else
     {
-      std::cout << "the function cannot be derivated " << std::endl;
+      std::cerr << "the function cannot be derivated " << std::endl;
       return Bsplines(m_degree);
     }
 }
 
-void Bsplines::SetDegree(int degree)
+void Bsplines::SetDegree(long int degree)
 {
   m_degree = degree;
 }
@@ -342,7 +352,7 @@ void Bsplines::SetControlPoints(std::vector<double> &control_points)
     }
   else
     {
-      std::cout << "You must give at least 2 control points" << std::endl;
+      std::cerr << "You must give at least 2 control points" << std::endl;
     }
 }
 
@@ -351,7 +361,7 @@ void Bsplines::SetKnotVector(std::deque<double> &knot_vector)
   m_knot = knot_vector;
 }
 
-int Bsplines::GetDegree() const
+long int Bsplines::GetDegree() const
 {
   return m_degree;
 }
@@ -474,7 +484,9 @@ void  BSplinesFoot::SetParameters(double FT,
       for (unsigned int i=0 ; i<=m_degree ; i++)
         {knot[i]=0.0;}
 
-      for (long int i=knot.size()-(m_degree+1) ; i<=knot.size() ; i++)
+      for (long int i=knot.size()-(m_degree+1) ;
+	   i<=(long int)knot.size() ;
+	   i++)
         {knot[i]=1.0;}
 
       SetKnotVector(knot);
@@ -487,7 +499,9 @@ void  BSplinesFoot::SetParameters(double FT,
 
       knot[m_degree+1] = m_ToMP[0]/m_FT ;
 
-      for (long int i=knot.size()-(m_degree+1) ; i<=knot.size() ; i++)
+      for (long int i=knot.size()-(m_degree+1) ;
+	   i<=(long int)knot.size() ;
+	   i++)
         {knot[i]=1.0;}
 
       SetKnotVector(knot);
@@ -502,7 +516,9 @@ void  BSplinesFoot::SetParameters(double FT,
       knot[m_degree+1] = m_ToMP[0]/m_FT ;
       knot[m_degree+2] = m_ToMP[1]/m_FT ;
 
-      for (long int i=knot.size()-(m_degree+1) ; i<=knot.size() ; i++)
+      for (long int i=knot.size()-(m_degree+1) ;
+	   i<=(long int)knot.size() ;
+	   i++)
         {knot[i]=1.0;}
 
       SetKnotVector(knot);
@@ -1880,7 +1896,7 @@ void  BSplinesFoot::SetParametersWithInitFinalPose(double FT,
         {knot.push_back(0.0);}
 
       for (unsigned int i=0 ; i<(m_degree-1) ; ++i)
-        {knot.push_back ((double)(i+1) / (m_degree)) ;}
+        {knot.push_back ((double)(i+1) / ((double)m_degree)) ;}
 
       for (unsigned int i =0;i<=m_degree;i++)
         {knot.push_back(1);}

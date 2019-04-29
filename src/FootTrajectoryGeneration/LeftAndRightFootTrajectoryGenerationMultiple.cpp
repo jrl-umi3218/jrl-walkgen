@@ -31,13 +31,14 @@
 
 #include "Debug.hh"
 /*! Walking Pattern Generator inclusion */
-#include "FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.hh"
+#include "LeftAndRightFootTrajectoryGenerationMultiple.hh"
 
 using namespace PatternGeneratorJRL;
 
 LeftAndRightFootTrajectoryGenerationMultiple::
-LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
-                                             PRFoot * lFoot) : SimplePlugin(lSPM)
+LeftAndRightFootTrajectoryGenerationMultiple
+(SimplePluginManager *lSPM,
+ PRFoot * lFoot) : SimplePlugin(lSPM)
 {
   m_Omega = 0.0;
   m_Omega2 = 0.0;
@@ -62,7 +63,10 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
     }
   }
 
-  { for(unsigned int i=0;i<m_MiddleWayPoint.size();m_MiddleWayPoint[i++]=0.0);} ;
+  { for(unsigned int i=0;
+	i<m_MiddleWayPoint.size();
+	m_MiddleWayPoint[i++]=0.0);} ;
+
   wayPoint.resize(2,0.0);
 
 }
@@ -80,8 +84,9 @@ LeftAndRightFootTrajectoryGenerationMultiple
   SimplePlugin(aLRFTGM.getSimplePluginManager())
 
 {
-  LeftAndRightFootTrajectoryGenerationMultiple (aLRFTGM.getSimplePluginManager(),
-                                                aLRFTGM.getFoot());
+  LeftAndRightFootTrajectoryGenerationMultiple
+    (aLRFTGM.getSimplePluginManager(),
+     aLRFTGM.getFoot());
   *this = aLRFTGM;
 }
 

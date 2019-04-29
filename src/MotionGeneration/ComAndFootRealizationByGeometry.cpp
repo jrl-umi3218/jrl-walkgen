@@ -862,7 +862,7 @@ ComputePostureForGivenCoMAndFeetPosture
  Eigen::VectorXd & CurrentConfiguration,
  Eigen::VectorXd & CurrentVelocity,
  Eigen::VectorXd & CurrentAcceleration,
- int IterationNumber,
+ unsigned long int IterationNumber,
  int Stage)
 {
   Eigen::Vector3d AbsoluteWaistPosition;

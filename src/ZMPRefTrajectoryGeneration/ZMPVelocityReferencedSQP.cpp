@@ -608,7 +608,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
 
 void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
 {
-  if(LeftFootTraj_deq_ctrl_.size() < CurrentIndex_ + previewSize_ * NbSampleControl_)
+  if(LeftFootTraj_deq_ctrl_.size() <
+     CurrentIndex_ + previewSize_ * NbSampleControl_)
   {
     COMTraj_deq_ctrl_.resize(CurrentIndex_ + previewSize_ * NbSampleControl_
                              + CurrentIndexUpperBound_,itCOM_);
@@ -620,11 +621,15 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
                              + CurrentIndexUpperBound_,initRightFoot_);
   }
 
-  NMPCgenerator_->getSolution(JerkX_, JerkY_, FootStepX_, FootStepY_, FootStepYaw_);
-  const std::deque<support_state_t> & SupportStates_deq = NMPCgenerator_->SupportStates_deq();
+  NMPCgenerator_->getSolution(JerkX_, JerkY_, FootStepX_,
+			      FootStepY_, FootStepYaw_);
+  const std::deque<support_state_t> & SupportStates_deq =
+    NMPCgenerator_->SupportStates_deq();
   LIPM_.setState(itCOM_);
 
-  CoMZMPInterpolation(JerkX_,JerkY_,&LIPM_,NbSampleControl_,0,CurrentIndex_,SupportStates_deq);
+  CoMZMPInterpolation(JerkX_,JerkY_,&LIPM_,
+		      NbSampleControl_,0,
+		      CurrentIndex_,SupportStates_deq);
   itCOM_ = COMTraj_deq_ctrl_[NbSampleOutput_-1];
 
   support_state_t currentSupport = SupportStates_deq[0] ;
@@ -634,11 +639,14 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
                                   LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_);
 
   double currentTime = time + NMPCgenerator_->Tfirst();
-  double currentIndex = CurrentIndex_ + (int)round(NMPCgenerator_->Tfirst()/m_SamplingPeriod);
+  double currentIndex = CurrentIndex_ +
+    (int)round(NMPCgenerator_->Tfirst()/m_SamplingPeriod);
   for ( unsigned int i = 1 ; i<previewSize_ ; i++ )
   {
     LIPM_.setState(COMTraj_deq_ctrl_[currentIndex-1]);
-    CoMZMPInterpolation(JerkX_,JerkY_,&LIPM_,NbSampleControl_,i,currentIndex,SupportStates_deq);
+    CoMZMPInterpolation(JerkX_,JerkY_,&LIPM_,
+			NbSampleControl_,
+			i,currentIndex,SupportStates_deq);
     OFTG_->interpolate_feet_positions(currentTime, currentIndex,
                                       SupportStates_deq[i],
                                       FootStepX_, FootStepY_, FootStepYaw_,

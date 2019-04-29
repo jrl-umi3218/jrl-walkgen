@@ -1252,12 +1252,14 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);
-      CurrentCPUTime = end.tv_sec - start.tv_sec + 
+      CurrentCPUTime = (double)end.tv_sec - (double)start.tv_sec + 
 	0.000001 * (double)(end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
-      ODEBUG("Current Time : " << StartingTime << " " << 
-	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime << 
-	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
+      ODEBUG("Current Time : " << StartingTime << " "
+	     << " Virtual time to simulate: "
+	     << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime
+	     << "Computation Time " << CurrentCPUTime
+	     << " " << TotalAmountOfCPUTime);
 
     }
 

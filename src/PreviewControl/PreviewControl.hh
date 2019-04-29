@@ -72,7 +72,7 @@ namespace PatternGeneratorJRL
 				Eigen::MatrixXd &y,
 				double & sxzmp, double & syzmp,
 				deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
-				unsigned int lindex,
+				unsigned long int lindex,
 				double & zmpx2, double & zmpy2,
 				bool Simulation);
 
@@ -81,7 +81,7 @@ namespace PatternGeneratorJRL
       int OneIterationOfPreview1D(Eigen::MatrixXd &x, 
 				  double & sxzmp,
 				  deque<double> & ZMPPositions,
-				  unsigned int lindex,
+				  unsigned long int lindex,
 				  double & zmpx2,
 				  bool Simulation);
 
@@ -96,7 +96,7 @@ namespace PatternGeneratorJRL
       int OneIterationOfPreview1D(Eigen::MatrixXd &x, 
 				  double & sxzmp,
 				  vector<double> & ZMPPositions,
-				  unsigned int lindex,
+				  unsigned long int lindex,
 				  double & zmpx2,
 				  bool Simulation);
       

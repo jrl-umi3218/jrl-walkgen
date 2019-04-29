@@ -34,8 +34,8 @@ using namespace::PatternGeneratorJRL::TestSuite;
 using namespace std;
 
 enum Profiles_t {
-  PROFIL_CIRCLE,                 // 1
   PROFIL_STRAIGHT_WALKING,       // 2
+  PROFIL_CIRCLE,                 // 1
   PROFIL_PB_FLORENT_SEQ1,        // 3
   PROFIL_PB_FLORENT_SEQ2,        // 4
   PROFIL_WALKING_ON_SPOT         // 5
@@ -155,22 +155,27 @@ protected:
     }
 
     {
-      istringstream strm2(":stepseq 0.0 -0.105 0.0 0.0\
-                     0.2 0.21 0.0 0.0 \
-                     0.2 -0.21 0.0 0.0 \
-                     0.2 0.21 0.0 0.0 \
-                     0.2 -0.21 0.0 0.0 \
-                     0.2 0.21 0.0 0.0 \
-                     0.2 -0.21 0.0 0.0 \
-                     0.2 0.21 0.0 0.0 \
-                     0.2 -0.21 0.0 0.0 \
-                     0.2 0.21 0.0 0.0 \
-                     0.2 -0.21 0.0 0.0 \
-                     0.2 0.21 0.0 0.0 \
-                     0.2 -0.21 0.0 0.0 \
-                     0.2 0.21 0.0 0.0 \
-                     0.2 -0.21 0.0 0.0\
-                     0.0 0.21 0.0 0.0");
+      istringstream strm2(":stepseq 0.0 -0.09 0.0 0.0 \
+                     0.15 0.18 0.0 0.0 \
+                     0.15 -0.18 0.0 0.0 \
+                     0.15 0.18 0.0 0.0 \
+                     0.15 -0.18 0.0 0.0 \
+                     0.15 0.18 0.0 0.0 \
+                     0.15 -0.18 0.0 0.0 \
+                     0.15 0.18 0.0 0.0 \
+                     0.15 -0.18 0.0 0.0 \
+                     0.15 0.18 0.0 0.0 \
+                     0.15 -0.18 0.0 0.0 \
+                     0.15 0.18 0.0 0.0 \
+                     0.15 -0.18 0.0 0.0 \
+                     0.15 0.18 0.0 0.0 \
+                     0.15 -0.18 0.0 0.0 \
+                     0.0 0.18 0.0 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":useDynamicFilter true");
       aPGI.ParseCmd(strm2);
     }
 
@@ -181,6 +186,15 @@ protected:
     CommonInitialization(aPGI);
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":singlesupporttime 0.78");
+      aPGI.ParseCmd(strm2);
+    }
+    {
+      istringstream strm2(":doublesupporttime 0.1");
       aPGI.ParseCmd(strm2);
     }
 
@@ -319,11 +333,11 @@ protected:
     switch(m_TestProfile)
       {
 
-      case PROFIL_CIRCLE:
-	TurningOnTheCircle(*m_PGI);
-	break;
       case PROFIL_STRAIGHT_WALKING:
 	StraightWalking(*m_PGI);
+	break;
+      case PROFIL_CIRCLE:
+	TurningOnTheCircle(*m_PGI);
 	break;
       case PROFIL_PB_FLORENT_SEQ1:
 	PbFlorentSeq1(*m_PGI);

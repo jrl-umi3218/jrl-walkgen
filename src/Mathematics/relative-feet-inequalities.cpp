@@ -349,7 +349,7 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
     {
       Args >> DSFeetDistance_;
       init_convex_hulls();
-      //cout << "DSFeetDistance = " << DSFeetDistance_ << endl;
+      ODEBUG("DSFeetDistance = " << DSFeetDistance_ );
     }
   else if( Method == ":setFPosEdges" )
     {
@@ -358,26 +358,24 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
 
       if (lCmd == "X")
         {
-          //cout << "LeftFeftFPosEdgesX = ";
+          ODEBUG("LeftFeftFPosEdgesX = ");
           for(int i=0;i<5;i++)
             {
               Args >> LeftFPosEdgesX_[i];
               RightFPosEdgesX_[i] = LeftFPosEdgesX_[i];
-              //cout << LeftFPosEdgesX_[i] << "  ";
+              ODEBUG( LeftFPosEdgesX_[i] << "  ");
             }
-          //cout << endl;
           init_convex_hulls();
         }
       else if (lCmd == "Y")
         {
-          //cout << "LeftFeftFPosEdgesY = ";
+          ODEBUG("LeftFeftFPosEdgesY = ");
           for(int i=0;i<5;i++)
             {
               Args >> LeftFPosEdgesY_[i];
               RightFPosEdgesY_[i] = -LeftFPosEdgesY_[i];
-              //cout << LeftFPosEdgesY_[i] << "  ";
+              ODEBUG(LeftFPosEdgesY_[i] << "  ");
             }
-          //cout << endl;
           init_convex_hulls();
         }
     }

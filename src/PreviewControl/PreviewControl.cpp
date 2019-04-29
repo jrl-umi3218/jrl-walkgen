@@ -327,13 +327,15 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
   m_Coherent = true;
 }
 
-int PreviewControl::OneIterationOfPreview(Eigen::MatrixXd &x,
-					  Eigen::MatrixXd& y,
-					  double & sxzmp, double & syzmp,
-					  deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
-					  unsigned int lindex,
-					  double & zmpx2, double & zmpy2,
-					  bool Simulation)
+int PreviewControl::
+OneIterationOfPreview
+(Eigen::MatrixXd &x,
+ Eigen::MatrixXd& y,
+ double & sxzmp, double & syzmp,
+ deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
+ unsigned long int lindex,
+ double & zmpx2, double & zmpy2,
+ bool Simulation)
 {
 
   double ux=0.0, uy=0.0;
@@ -379,12 +381,14 @@ int PreviewControl::OneIterationOfPreview(Eigen::MatrixXd &x,
   return 0;
 }
 
-int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
-					    double & sxzmp,
-					    deque<double> & ZMPPositions,
-					    unsigned int lindex,
-					    double & zmpx2,
-					    bool Simulation)
+int PreviewControl::
+OneIterationOfPreview1D
+(Eigen::MatrixXd &x,
+ double & sxzmp,
+ deque<double> & ZMPPositions,
+ unsigned long int lindex,
+ double & zmpx2,
+ bool Simulation)
 {
 
   double ux=0.0;
@@ -426,12 +430,14 @@ int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
   return 0;
 }
 
-int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
-					    double & sxzmp,
-					    vector<double> & ZMPPositions,
-					    unsigned int lindex,
-					    double & zmpx2,
-					    bool Simulation)
+int PreviewControl::
+OneIterationOfPreview1D
+(Eigen::MatrixXd &x,
+ double & sxzmp,
+ vector<double> & ZMPPositions,
+ unsigned long int lindex,
+ double & zmpx2,
+ bool Simulation)
 {
 
   double ux=0.0;
@@ -451,7 +457,8 @@ int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
       exit(0);
     }
 
-  int TestSize = (int)ZMPPositions.size()-lindex - (int)m_SizeOfPreviewWindow;
+  long int TestSize = ZMPPositions.size()-lindex -
+    m_SizeOfPreviewWindow;
 
   if (TestSize>=0)
     {
@@ -463,12 +470,17 @@ int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
       ODEBUG("Case where TestSize<0 (lindex:" <<lindex <<
 	      " , ZMPPositions.size(): " << ZMPPositions.size() <<
 	      " , m_SizeOfPreviewWindow: " << m_SizeOfPreviewWindow);
-      for(unsigned int i=lindex;i<ZMPPositions.size();i++)
+      for(unsigned long int i=lindex;
+	  i<ZMPPositions.size();
+	  i++)
 	ux += m_F(i,0)* ZMPPositions[i];
 
-      int StillToRealized = (int)m_SizeOfPreviewWindow - (int)ZMPPositions.size()
+      int StillToRealized = (int)m_SizeOfPreviewWindow
+	- (int)ZMPPositions.size()
 	+ (int)lindex;
-      for(unsigned int i=0;i<(unsigned int)StillToRealized ;i++)
+      for(unsigned int i=0;
+	  i<(unsigned int)StillToRealized ;
+	  i++)
 	ux += m_F(i,0)* ZMPPositions[i];
     }
   ODEBUG(" ux preview window phase: " << ux );
@@ -491,7 +503,8 @@ int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
 }
 
 
-void PreviewControl::print()
+void PreviewControl::
+print()
 {
   cout << "Zc: " <<  m_Zc <<endl;
   cout << "Sampling Period: " << m_SamplingPeriod <<endl;
@@ -508,7 +521,10 @@ void PreviewControl::print()
     cout << m_F(i,0) << endl;
 
 }
-void PreviewControl::CallMethod(std::string & Method, std::istringstream &strm)
+void PreviewControl::
+CallMethod
+(std::string & Method,
+ std::istringstream &strm)
 {
   if (Method==":samplingperiod")
     {
@@ -547,9 +563,11 @@ void PreviewControl::CallMethod(std::string & Method, std::istringstream &strm)
 	  string initialpos;
 	  strm >> initialpos;
 	  if (initialpos=="withinitialpos")
-	    ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
+	    ComputeOptimalWeights
+	      (OptimalControllerSolver::MODE_WITH_INITIALPOS);
 	  else if (initialpos=="withoutinitialpos")
-	    ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
+	    ComputeOptimalWeights
+	      (OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 	}
     }
 }

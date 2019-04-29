@@ -113,16 +113,17 @@ namespace PatternGeneratorJRL
       @param IterationNumber: Number of iteration.
       @param Stage: indicates which stage is reach by the Pattern Generator.
     */
-    virtual bool ComputePostureForGivenCoMAndFeetPosture(Eigen::VectorXd &COMPOSITION,
-                                                         Eigen::VectorXd &CoMSpeed,
-                                                         Eigen::VectorXd &CoMAcc,
-                                                         Eigen::VectorXd &LeftFoot,
-                                                         Eigen::VectorXd &RightFoot,
-                                                         Eigen::VectorXd &CurrentConfiguration,
-                                                         Eigen::VectorXd &CurrentVelocity,
-                                                         Eigen::VectorXd &CurrentAcceleration,
-							 int IterationNumber,
-							 int Stage) =0;
+    virtual bool ComputePostureForGivenCoMAndFeetPosture
+    (Eigen::VectorXd &COMPOSITION,
+     Eigen::VectorXd &CoMSpeed,
+     Eigen::VectorXd &CoMAcc,
+     Eigen::VectorXd &LeftFoot,
+     Eigen::VectorXd &RightFoot,
+     Eigen::VectorXd &CurrentConfiguration,
+     Eigen::VectorXd &CurrentVelocity,
+     Eigen::VectorXd &CurrentAcceleration,
+     unsigned long int IterationNumber,
+     int Stage) =0;
 
     /*! Returns the waist position associate to the current
       @} */
