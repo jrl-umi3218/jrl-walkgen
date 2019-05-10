@@ -168,7 +168,8 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 	      
     }
   else 
-    { ODEBUG3("Problem with the ZMP reference frame set to 0."); }
+    { std::cerr << "Problem with the ZMP reference frame set to 0."
+		<< std::endl;}
 
   ODEBUG4SIMPLE((*m_ZMPPositions)[0].px <<  " " << 
 		(*m_ZMPPositions)[0].py << " " <<
@@ -269,7 +270,8 @@ void DoubleStagePreviewControlStrategy::SetZMPFrame(std::istringstream &astrm)
     { m_ZMPFrame = ZMPFRAME_WORLD; 
     }
   else
-    {ODEBUG3("Mistake wrong keyword" << aZMPFrame);}
+    { std::cerr << "Mistake wrong keyword" << aZMPFrame
+		<< std::endl;}
 }
 
 void DoubleStagePreviewControlStrategy::SetSamplingPeriod(double lSamplingPeriod)

@@ -25,6 +25,15 @@
 
 namespace PatternGeneratorJRL
 {
+  RelativeFootPosition_s::
+  RelativeFootPosition_s()
+  {
+    sx=0.0;sy=0.0;sz=0.0;theta=0.0;
+    SStime = 0.0; DStime=0.0;
+    stepType = 2;
+    DeviationHipHeight=0.0;
+  }
+  
   struct COMPosition_s & COMPosition::operator=(const COMState_s &aCS)
   {
     for(unsigned int i=0;i<3;i++)

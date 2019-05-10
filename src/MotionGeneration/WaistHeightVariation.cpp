@@ -29,16 +29,11 @@
 #define _DEBUG_
 
 #include <fstream>
+#include "Debug.hh"
 #include <MotionGeneration/WaistHeightVariation.hh>
 
 using namespace::PatternGeneratorJRL;
 
-#define ODEBUG3(x) cerr << "WaistHeightVariation :" << x << endl
-#if 0
-#define ODEBUG(x) cerr << "WaistHeightVariation :" <<  x << endl
-#else
-#define ODEBUG(x) 
-#endif
 
 WaistHeightVariation::WaistHeightVariation()
 {

@@ -24,7 +24,8 @@
  */
 
 /*!\file FootTrajectoryGenerationAbstract.h
-   \brief This class determinate how it s generate all the values for the foot trajectories.
+   \brief This class determinate how it s generate all the values
+   for the foot trajectories.
 
    @ingroup foottrajectorygeneration
 */
@@ -33,8 +34,10 @@
 
 using namespace PatternGeneratorJRL;
 
-FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginManager *lSPM,
-                                   PRFoot * aFoot)
+FootTrajectoryGenerationAbstract::
+FootTrajectoryGenerationAbstract
+(SimplePluginManager *lSPM,
+ PRFoot * aFoot)
   : SimplePlugin(lSPM),m_Foot(aFoot)
 {
   m_Omega = 0.0;
@@ -95,26 +98,31 @@ void FootTrajectoryGenerationAbstract::CallMethod(std::string &Method,
     }
 }
 
-void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolutePosition> & , //SupportFootAbsolutePositions,
-							  std::deque<FootAbsolutePosition> &, //NoneSupportFootAbsolutePositions,
-							  int , //CurrentAbsoluteIndex,
-							  int , //IndexInitial,
-							  double , //ModulatedSingleSupportTime,
-							  int , //StepType,
-                              int ) //LeftOrRight)
+void FootTrajectoryGenerationAbstract::
+UpdateFootPosition
+(std::deque<FootAbsolutePosition> & , //SupportFootAbsolutePositions,
+ std::deque<FootAbsolutePosition> &, //NoneSupportFootAbsolutePositions,
+ int , //CurrentAbsoluteIndex,
+ int , //IndexInitial,
+ double , //ModulatedSingleSupportTime,
+ int , //StepType,
+ int ) //LeftOrRight)
 {
-  LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-1: To be implemented ");
+  LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-1: \
+          To be implemented ");
 }
 
-void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolutePosition> & ,//SupportFootAbsolutePositions,
-							  std::deque<FootAbsolutePosition> & ,//NoneSupportFootAbsolutePositions,
-							  int , // StartIndex,
-							  int , //k,
-							  double , //LocalInterpolationStartTime,
-							  double , //ModulatedSingleSupportTime,
-							  int , //StepType,
-							  int ) //LeftOrRight)
+void FootTrajectoryGenerationAbstract::
+UpdateFootPosition
+(std::deque<FootAbsolutePosition> & ,//SupportFootAbsolutePositions,
+ std::deque<FootAbsolutePosition> & ,//NoneSupportFootAbsolutePositions,
+ int , // StartIndex,
+ int , //k,
+ double , //LocalInterpolationStartTime,
+ double , //ModulatedSingleSupportTime,
+ int , //StepType,
+ int ) //LeftOrRight)
 {
-  LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-2: To be implemented ");
+  LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-2: \
+          To be implemented ");
 }
-

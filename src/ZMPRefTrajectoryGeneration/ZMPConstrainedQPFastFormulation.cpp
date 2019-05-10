@@ -315,17 +315,20 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double
       unsigned int pbOnCurrent=0;
       if (vnlValConstraint(i,0)<-1e-8)
 	{
-	  ODEBUG3("Problem during validation of the constraint: ");
-	  ODEBUG3("  constraint " << i << " is not positive");
-	  ODEBUG3(vnlValConstraint(i,0));
+	  std::cerr << "Problem during validation of the constraint: "
+		    << std::endl;
+	  std::cerr << "  constraint " << i << " is not positive"
+		    << std::endl;
+	  std::cerr << vnlValConstraint(i,0) << std::endl;
 	  pbOnCurrent = 1;
 	}
       
       if (pbOnCurrent)
 	{
-	  ODEBUG3("PbonCurrent: " << pbOnCurrent << " " << li
-		  << " Contrainte " << i 
-		  << " StartingTime :" << StartingTime);
+	  std::cerr << "PbonCurrent: " << pbOnCurrent << " " << li
+		    << " Contrainte " << i 
+		    << " StartingTime :" << StartingTime
+		    << std::endl;
 	  if (pbOnCurrent)
 	    {
 	      return -1;
@@ -512,12 +515,12 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
   Eigen::MatrixXd lterm1;
   lterm1 = m_PPu.transpose();
-  tmp=lterm1+m_PPu;
+  tmp=lterm1*m_PPu;
   lterm1=m_Beta*tmp;
 
   Eigen::MatrixXd lterm2;
   lterm2 = m_VPu.transpose();
-  tmp=lterm2+m_VPu;
+  tmp=lterm2*m_VPu;
   lterm2=m_Alpha*lterm2;
 
   OptA.resize(lterm1.rows(), lterm1.cols());
@@ -923,7 +926,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
   //  if (localtime>=1.96)
   if (0)
     {
-      ODEBUG3("localtime: " <<localtime);
+      ODEBUG("localtime: " <<localtime);
       ofstream aof;
 
       char Buffer[1024];
@@ -953,7 +956,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 
       sprintf(Buffer,"lD.dat");
       aof.open(Buffer,ofstream::out);
-      ODEBUG3(lD.rows() << " " << lD.cols() << " " );
+      ODEBUG(lD.rows() << " " << lD.cols() << " " );
       for(unsigned int lj=0;lj<lD.rows();lj++)
 	{
 	  for(unsigned int k=0;k<lD.cols();k++)
@@ -1174,7 +1177,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 
   Eigen::VectorXd xk(6);
 
-  ODEBUG3("0.0 " << QueueOfLConstraintInequalities.back()->EndingTime-	N*T << " " 
+  ODEBUG("0.0 " << QueueOfLConstraintInequalities.back()->EndingTime-	N*T << " " 
 	  << " T: " << T << " N: " << N << " interval " << interval);
   unsigned int NumberOfRemovedConstraints =0,
     NextNumberOfRemovedConstraints =0;
@@ -1480,7 +1483,7 @@ void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & 
 			       InitLeftFootAbsolutePosition,
 			       InitRightFootAbsolutePosition);
 
-  ODEBUG3("Dimitrov algo set on");
+  ODEBUG("Dimitrov algo set on");
 
   BuildZMPTrajectoryFromFootTrajectory(LeftFootAbsolutePositions,
 				       RightFootAbsolutePositions,
@@ -1533,15 +1536,15 @@ void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method, std::istr
 }
 
 
-int ZMPConstrainedQPFastFormulation::InitOnLine(deque<ZMPPosition> &,          // FinalZMPPositions,
-						deque<COMState> &,             // FinalCOMStates,
-						deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
-						deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
-						FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
-						FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
-						deque<RelativeFootPosition> &, // RelativeFootPositions,
-						COMState & ,                   // lStartingCOMState,
-						Eigen::Vector3d & )      // lStartingZMPPosition)
+std::size_t ZMPConstrainedQPFastFormulation::InitOnLine(deque<ZMPPosition> &,          // FinalZMPPositions,
+							deque<COMState> &,             // FinalCOMStates,
+							deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
+							deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
+							FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
+							FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
+							deque<RelativeFootPosition> &, // RelativeFootPositions,
+							COMState & ,                   // lStartingCOMState,
+							Eigen::Vector3d & )      // lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
   return 0;

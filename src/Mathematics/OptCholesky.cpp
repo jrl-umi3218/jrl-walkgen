@@ -103,7 +103,7 @@ int OptCholesky::AddActiveConstraint(unsigned int aConstraint)
   return r;
 }
 
-int OptCholesky::CurrentNumberOfRows()
+std::size_t OptCholesky::CurrentNumberOfRows()
 {
   return m_SetActiveConstraints.size();
 }
@@ -127,7 +127,7 @@ int OptCholesky::UpdateCholeskyMatrixNormal()
     return -1;
 
   double Mij=0.0;
-  unsigned int IndexNewRowAKAi = 0;
+  std::size_t  IndexNewRowAKAi = 0;
   if (m_SetActiveConstraints.size()>0)
     IndexNewRowAKAi = m_SetActiveConstraints.size()-1;
   
@@ -158,7 +158,8 @@ int OptCholesky::UpdateCholeskyMatrixNormal()
 	  r = r - (*ptLik++)  * (*ptLjk++);
 	}
       if (lj!=(int)m_SetActiveConstraints.size()-1)
-	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj]=r/m_L[lj*m_NbMaxOfConstraints+lj];
+	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj]=
+	  r/m_L[lj*m_NbMaxOfConstraints+lj];
       else
 	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj] =  sqrt(r);
       
@@ -175,7 +176,7 @@ int OptCholesky::UpdateCholeskyMatrixFortran()
     return -1;
 
   double Mij=0.0;
-  unsigned int IndexNewRowAKAi = 0;
+  std::size_t IndexNewRowAKAi = 0;
   if (m_SetActiveConstraints.size()>0)
     IndexNewRowAKAi = m_SetActiveConstraints.size()-1;
   
@@ -210,7 +211,8 @@ int OptCholesky::UpdateCholeskyMatrixFortran()
 	  r = r - (*ptLik++)  * (*ptLjk++);
 	}
       if (lj!=(int)m_SetActiveConstraints.size()-1)
-	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj]=r/m_L[lj*m_NbMaxOfConstraints+lj];
+	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj]=
+	  r/m_L[lj*m_NbMaxOfConstraints+lj];
       else
 	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj] = sqrt(r);
       
@@ -262,23 +264,23 @@ int OptCholesky::ComputeInverseCholeskyNormal(int mode)
 {
   if (m_iL==0)
     {
-      cout << "no mem for iL" << endl;
+      std::cerr << "No memory allocated for iL" << endl;
       return -1;
     }
 
-  int LocalSize =0;
+  std::size_t LocalSize =0;
   if (mode==0)
     LocalSize = m_SetActiveConstraints.size();
   else
     LocalSize = m_NbMaxOfConstraints;
     
-  for(int lj=LocalSize-1;lj>=0;lj--)
+  for(long int lj=(long int)LocalSize-1;lj>=0;lj--)
     {
       double iLljlj=0.0;
       m_iL[lj*m_NbMaxOfConstraints+lj] = 
 	iLljlj = 1/m_L[lj*m_NbMaxOfConstraints+lj];
 
-      for(int li=lj+1;li<LocalSize;li++)
+      for(long int li=lj+1;li<(long int)LocalSize;li++)
 	{
 	  
 	  /* Compute Li,j */
@@ -286,7 +288,7 @@ int OptCholesky::ComputeInverseCholeskyNormal(int mode)
 	  double * ptiLik = m_iL + li*m_NbMaxOfConstraints + lj + 1;
 	  double * ptLjk  = m_L  + (lj+1)*m_NbMaxOfConstraints + lj ;
 	  
-	  for(int lk=lj+1;lk<LocalSize;lk++)
+	  for(long int lk=lj+1;lk<(long int)LocalSize;lk++)
 	    {
 	      r = r + (*ptiLik++)  * (*ptLjk);
 	      ptLjk+=m_NbMaxOfConstraints;

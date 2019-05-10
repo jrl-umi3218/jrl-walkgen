@@ -60,7 +60,9 @@ SimplePluginManager::~SimplePluginManager()
 
 void SimplePluginManager::UnregisterPlugin(SimplePlugin* aSimplePlugin)
 {
-  std::multimap<std::string, SimplePlugin * , ltstr>::iterator it_SP, it_ToBeRemoved;
+  std::multimap
+    <std::string, SimplePlugin * , ltstr>::iterator
+    it_SP, it_ToBeRemoved;
 
   it_SP =m_SimplePlugins.begin();
   while(it_SP!=m_SimplePlugins.end())
@@ -102,7 +104,8 @@ bool SimplePluginManager::RegisterMethod(string &MethodName, SimplePlugin *aSP)
 
   m_SimplePlugins.insert(pair < string, SimplePlugin * > (MethodName,aSP));
 
-  ODEBUG5("Registered method " << MethodName << " for plugin " << aSP << endl,"PgDebug.txt");
+  ODEBUG5("Registered method " << MethodName <<
+	  " for plugin " << aSP << endl,"PgDebug.txt");
   //  Print();
   return true;  
 }

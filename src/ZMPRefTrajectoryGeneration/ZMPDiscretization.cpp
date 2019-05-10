@@ -123,7 +123,7 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,
     m_vdiffsupppre(i,0) = 0.0;
 
   RESETDEBUG4("DebugDataRFPos.txt");
-  RESETDEBUG4("DebugZMPRefPos.dat");
+  RESETDEBUG5("DebugZMPRefPos.dat");
   RESETDEBUG4("DebugFinalZMPRefPos.dat");
 
   // Add internal methods specific to this class.
@@ -140,16 +140,18 @@ ZMPDiscretization::~ZMPDiscretization()
 }
 
 
-void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositions,
-					     deque<COMState> & FinalCOMStates,
-					     deque<RelativeFootPosition> &RelativeFootPositions,
-					     deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					     double , //Xmax,
-					     COMState & lStartingCOMState,
-					     Eigen::Vector3d & lStartingZMPPosition,
-					     FootAbsolutePosition & InitLeftFootAbsolutePosition,
-					     FootAbsolutePosition & InitRightFootAbsolutePosition)
+void ZMPDiscretization::
+GetZMPDiscretization
+(deque<ZMPPosition> & FinalZMPPositions,
+ deque<COMState> & FinalCOMStates,
+ deque<RelativeFootPosition> &RelativeFootPositions,
+ deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+ double , //Xmax,
+ COMState & lStartingCOMState,
+ Eigen::Vector3d & lStartingZMPPosition,
+ FootAbsolutePosition & InitLeftFootAbsolutePosition,
+ FootAbsolutePosition & InitRightFootAbsolutePosition)
 {
 
   InitOnLine(FinalZMPPositions,
@@ -316,15 +318,17 @@ void ZMPDiscretization::SetZMPShift(vector<double> &ZMPShift)
 /* Start the online part of ZMP discretization. */
 
 /* Initialiazation of the on-line stacks. */
-int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-				  deque<COMState> & FinalCoMStates,
-				  deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-				  deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-				  FootAbsolutePosition & InitLeftFootAbsolutePosition,
-				  FootAbsolutePosition & InitRightFootAbsolutePosition,
-				  deque<RelativeFootPosition> &RelativeFootPositions,
-				  COMState & lStartingCOMState,
-				  Eigen::Vector3d & lStartingZMPPosition)
+std::size_t ZMPDiscretization::
+InitOnLine
+(deque<ZMPPosition> & FinalZMPPositions,
+ deque<COMState> & FinalCoMStates,
+ deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+ FootAbsolutePosition & InitLeftFootAbsolutePosition,
+ FootAbsolutePosition & InitRightFootAbsolutePosition,
+ deque<RelativeFootPosition> &RelativeFootPositions,
+ COMState & lStartingCOMState,
+ Eigen::Vector3d & lStartingZMPPosition)
 {
   m_RelativeFootPositions.clear();
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
@@ -483,7 +487,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   m_RelativeFootPositions.push_back(RelativeFootPositions[0]);
 
 
-  if (0)
+  if (1)
     {
       ofstream dbg_aof("DebugZMPRefPos.dat",ofstream::out);
       for(unsigned int i=0;i<ZMPPositions.size();i++)
@@ -497,7 +501,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 		  FinalZMPPositions,
 		  true);
 
-  ODEBUG6("InitOnLine","DebugDataRFPos.txt" );
+  ODEBUG5("InitOnLine","DebugDataRFPos.txt" );
   for(unsigned int i=1;i<RelativeFootPositions.size();i++)
     {
       OnLineAddFoot(RelativeFootPositions[i],
@@ -507,7 +511,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 		    RightFootAbsolutePositions,
 		    false);
     }
-  ODEBUG4("ZMP::InitOnLine: End ","ZMDInitOnLine.txt");
+  ODEBUG5("ZMP::InitOnLine: End ","ZMDInitOnLine.txt");
 
   return RelativeFootPositions.size();
 }
@@ -558,11 +562,12 @@ void ZMPDiscretization::UpdateCurrentSupportFootPosition(RelativeFootPosition aR
 }
 
 
-void ZMPDiscretization::OnLine(double, // time,
-			       deque<ZMPPosition> & ,// FinalZMPPositions,
-			       deque<COMState> & , //FinalCOMStates,
-			       deque<FootAbsolutePosition> &,//FinalLeftFootAbsolutePositions,
-			       deque<FootAbsolutePosition> &)//FinalRightFootAbsolutePositions)
+void ZMPDiscretization::OnLine
+(double, // time,
+ deque<ZMPPosition> & ,// FinalZMPPositions,
+ deque<COMState> & , //FinalCOMStates,
+ deque<FootAbsolutePosition> &,//FinalLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &)//FinalRightFootAbsolutePositions)
 {
   /* Does nothing... */
 }
@@ -570,12 +575,13 @@ void ZMPDiscretization::OnLine(double, // time,
 /* The interface method which returns an appropriate update of the
    appropriate stacks (ZMPRef, FootPosition) depending on the
    state of the relative steps stack. */
-void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-				      deque<ZMPPosition> & FinalZMPPositions,
-				      deque<COMState> & FinalCOMStates,
-				      deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-				      deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-				      bool EndSequence)
+void ZMPDiscretization::OnLineAddFoot
+(RelativeFootPosition & NewRelativeFootPosition,
+ deque<ZMPPosition> & FinalZMPPositions,
+ deque<COMState> & FinalCOMStates,
+ deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+ bool EndSequence)
 {
   deque<ZMPPosition> ZMPPositions;
   deque<FootAbsolutePosition> LeftFootAbsolutePositions;
@@ -596,10 +602,11 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 
   double lTdble=m_Tdble, lTsingle=m_Tsingle;
 
-  ODEBUG6(m_RelativeFootPositions[0].sx << " "  <<
+  ODEBUG5(m_RelativeFootPositions[0].sx << " "  <<
 	  m_RelativeFootPositions[0].sy << " " <<
 	  m_RelativeFootPositions[0].theta,"DebugDataRFPos.txt" );
-  ODEBUG(" OnLineAddFoot: m_RelativeFootPositions.size: " <<  m_RelativeFootPositions.size());
+  ODEBUG(" OnLineAddFoot: m_RelativeFootPositions.size: "
+	 <<  m_RelativeFootPositions.size());
   ODEBUG(" OnLineAddFoot: "<< endl <<
 	  " NewRelativeFootPositions.x: " <<  NewRelativeFootPosition.sx <<
 	  " NewRelativeFootPositions.y: " <<  NewRelativeFootPosition.sy <<
@@ -635,7 +642,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 
 
   double TimeForThisFootPosition = TimeFirstPhase+ lTsingle;
-  ODEBUG4("TimeFirstPhase: " << TimeFirstPhase << " lTsingle: " << lTsingle,"DebugData.txt");
+  ODEBUG5("TimeFirstPhase: " << TimeFirstPhase << " lTsingle: " << lTsingle,"DebugData.txt");
   // Compute the size of cells to add inside the array.
   assert(m_SamplingPeriod > 0);
   double l2AddArraySize= TimeForThisFootPosition/m_SamplingPeriod;
@@ -657,6 +664,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   assert(m_SamplingPeriod > 0);
   double dSizeOf1stPhase =TimeFirstPhase/m_SamplingPeriod;
   unsigned int SizeOf1stPhase = (unsigned int)round(dSizeOf1stPhase);
+  ODEBUG("SizeOf1stPhase:" << SizeOf1stPhase);
   ODEBUG("m_vdiffsupppre : " << m_vdiffsupppre);
   double px0,py0,theta0, delta_x,delta_y;
 
@@ -674,17 +682,20 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 
   Eigen::Matrix<double,3,1> ZMPInWorldCoordinates;
 
-  ZMPInWorldCoordinates=m_CurrentSupportFootPosition+ZMPInFootCoordinates;
+  ZMPInWorldCoordinates=m_CurrentSupportFootPosition*ZMPInFootCoordinates;
 
   delta_x = (ZMPInWorldCoordinates(0) - px0)/SizeOf1stPhase;
   delta_y = (ZMPInWorldCoordinates(1) - py0)/SizeOf1stPhase;
 
-  ODEBUG("delta_x :"<< delta_x << " delta_y : " << delta_y << " m_CurrentSFP: " <<
+  ODEBUG("delta_x :"
+	 << delta_x << " delta_y : "
+	 << delta_y << " m_CurrentSFP: " <<
 	 m_CurrentSupportFootPosition << " ZMPInFC : " <<
 	 ZMPInFootCoordinates << " ZMPinWC : " <<
 	 ZMPInWorldCoordinates << " px0: " << px0 << " py0:" << py0
 	  );
-  ODEBUG4("Step 4 TimeForThisFootPosition " << TimeForThisFootPosition,"DebugData.txt");
+  ODEBUG5("Step 4 TimeForThisFootPosition "
+	  << TimeForThisFootPosition,"DebugData.txt");
 
   // ZMP profile is changed if the stepping over is on, and then
   // depends on the phase during stepping over.
@@ -720,7 +731,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 
     }
 
-  ODEBUG4(" GetZMPDiscretization: Step 5 " << AddArraySize << " " ,"DebugData.txt");
+  ODEBUG5(" GetZMPDiscretization: Step 5 " << AddArraySize << " " ,"DebugData.txt");
   ODEBUG("SizeOf1stPhase: " << SizeOf1stPhase << "dx: " << delta_x << " dy: " << delta_y);
 
   // First phase of the cycle aka Double support phase.
@@ -767,9 +778,6 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 
   // Second Phase of the step cycle aka Single Support Phase.
 
-  // Compute relative feet position for the next step.
-  double lStepHeight=0;
-
   // Next Theta : next relative angle between the current support foot angle
   // and the next support foot angle.
   double NextTheta=0;
@@ -785,9 +793,6 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       RelTheta = NextTheta+m_AngleDiffToSupportFootTheta;
       RelZMPTheta = NextTheta+m_AngleDiffFromZMPThetaToSupportFootTheta;
 
-      lStepHeight = m_StepHeight;
-      ODEBUG("lStepHeight:"<< lStepHeight <<
-	      " m_StepHeight: " << m_StepHeight << " this:" << this);
       double c,s;
       c = cos(NextTheta*M_PI/180.0);
       s = sin(NextTheta*M_PI/180.0);
@@ -814,14 +819,15 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       vrel(1,0)= 0.0;
       RelTheta= 0.0;
       NextTheta=0.0;
-      lStepHeight = 1.0;
     }
 
   ODEBUG(cout << "vrel: " << vrel(0,0) << " " << vrel(1,0));
   ODEBUG(cout << "vdiffsupp: " << vdiffsupp(0,0) << " " << vdiffsupp(1,0));
-  ODEBUG( "vdiffsupppre: " << m_vdiffsupppre(0,0) << " " << m_vdiffsupppre(1,0));
+  ODEBUG( "vdiffsupppre: " << m_vdiffsupppre(0,0) << " "
+	  << m_vdiffsupppre(1,0));
 
-  ODEBUG4(" GetZMPDiscretization: Step 6 " << ZMPPositions.size() << " " ,"DebugData.txt");
+  ODEBUG5(" GetZMPDiscretization: Step 6 "
+	  << ZMPPositions.size() << " " ,"DebugData.txt");
 
 
   m_vdiffsupppre = vdiffsupp;
@@ -835,24 +841,27 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   //   double ModulationSupportCoefficient = 0.9;
   double ModulatedSingleSupportTime = lTsingle * m_ModulationSupportCoefficient;
   double EndOfLiftOff = (lTsingle-ModulatedSingleSupportTime)*0.5;
-
   ODEBUG("ModulatedSingleSupportTime:" << ModulatedSingleSupportTime << " "
           << vrel(0,0) << " "
           << vrel(1,0));
-  m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::X_AXIS,
-						    ModulatedSingleSupportTime,vrel(0,0));
-  m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
-						    ModulatedSingleSupportTime,vrel(1,0));
-
-
-  m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
-						    m_Tsingle,lStepHeight);
-  m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::THETA_AXIS,
-						    ModulatedSingleSupportTime,RelTheta);
-  m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::OMEGA_AXIS,
-						    EndOfLiftOff,m_Omega);
-  m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::OMEGA2_AXIS,
-						    ModulatedSingleSupportTime,2*m_Omega);
+  m_FootTrajectoryGenerationStandard->
+    SetParameters(FootTrajectoryGenerationStandard::X_AXIS,
+		  ModulatedSingleSupportTime,vrel(0,0));
+  m_FootTrajectoryGenerationStandard->
+    SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
+		  ModulatedSingleSupportTime,vrel(1,0));
+  m_FootTrajectoryGenerationStandard->
+    SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
+		  m_Tsingle,0);
+  m_FootTrajectoryGenerationStandard->
+    SetParameters(FootTrajectoryGenerationStandard::THETA_AXIS,
+		  ModulatedSingleSupportTime,RelTheta);
+  m_FootTrajectoryGenerationStandard->
+    SetParameters(FootTrajectoryGenerationStandard::OMEGA_AXIS,
+		  EndOfLiftOff,m_Omega);
+  m_FootTrajectoryGenerationStandard->
+    SetParameters(FootTrajectoryGenerationStandard::OMEGA2_AXIS,
+		  ModulatedSingleSupportTime,2*m_Omega);
 
   //  m_FootTrajectoryGenerationStandard->print();
 
@@ -862,7 +871,6 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   double dSizeOfSndPhase = lTsingle/m_SamplingPeriod;
   unsigned int SizeOfSndPhase = (unsigned int)round(dSizeOfSndPhase);
   int indexinitial = CurrentZMPindex-1;
-  int SignRHAND=1, SignLHAND=1;
 
   /*//polynomial planning for the stepover
 
@@ -887,9 +895,9 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 
       Eigen::Matrix<double,3,1> ZMPInWorldCoordinates;
 
-      ZMPInWorldCoordinates=m_CurrentSupportFootPosition+ZMPInFootCoordinates;
+      ZMPInWorldCoordinates=m_CurrentSupportFootPosition*ZMPInFootCoordinates;
 
-      ODEBUG4("CSFP: " << m_CurrentSupportFootPosition << endl <<
+      ODEBUG5("CSFP: " << m_CurrentSupportFootPosition << endl <<
 	      "ZMPiWC"  << ZMPInWorldCoordinates << endl, "DebugData.txt");
 
       ZMPPositions[CurrentZMPindex].px = ZMPInWorldCoordinates(0);
@@ -941,8 +949,6 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 								 ModulatedSingleSupportTime,
 								 m_RelativeFootPositions[1].stepType,
 								 -1);
-	  SignLHAND=1;
-	  SignRHAND=-1;
 	}
       else
 	{
@@ -952,9 +958,6 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 								 ModulatedSingleSupportTime,
 								 m_RelativeFootPositions[1].stepType,
 								 1);
-	  SignLHAND=-1;
-	  SignRHAND=1;
-
 	}
 
 
@@ -1054,7 +1057,7 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
     {
       double ltmp[3]={0,0,0};
 
-      int o= FinalZMPPositions.size()-1-lshift;
+      std::size_t o= FinalZMPPositions.size()-1-lshift;
       for(unsigned int j=0;j<m_ZMPFilterWindow.size();j++)
 	{
 	  int r;
@@ -1070,7 +1073,7 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
 		}
 	      else
 		{
-		  if (-r<o)
+		  if (-r<(int) o)
 		    {
 		      ltmp[0] += m_ZMPFilterWindow[j]*FinalZMPPositions[o+r].px;
 		      ltmp[1] += m_ZMPFilterWindow[j]*FinalZMPPositions[o+r].py;
@@ -1087,7 +1090,7 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
 	  else
 	    {
 	      if (r>=(int)ZMPPositions.size())
-		r = ZMPPositions.size()-1;
+		r = (int)ZMPPositions.size()-1;
 
 	      ltmp[0] += m_ZMPFilterWindow[j]*ZMPPositions[r].px;
 	      ltmp[1] += m_ZMPFilterWindow[j]*ZMPPositions[r].py;
@@ -1142,17 +1145,15 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   if (m_RelativeFootPositions.size()>0)
     UpdateCurrentSupportFootPosition(m_RelativeFootPositions[0]);
 
-  double TimeForThisFootPosition;
   // Deal with the end phase of the walking.
-  TimeForThisFootPosition = m_Tdble;
   assert(m_SamplingPeriod > 0);
   double dlAddArraySize = m_Tdble/(2*m_SamplingPeriod);
   unsigned int AddArraySize = (unsigned int)round(dlAddArraySize);
 
-  unsigned int currentsize = 0;
+  std::size_t currentsize = 0;
   unsigned int CurrentZMPindex = 0;
   ZMPPositions.resize(currentsize+AddArraySize);
-  ODEBUG4(" GetZMPDiscretization: Step 7 " << currentsize << " " << AddArraySize,"DebugData.txt");
+  ODEBUG5(" GetZMPDiscretization: Step 7 " << currentsize << " " << AddArraySize,"DebugData.txt");
 
   double dSizeOfEndPhase = m_Tdble/(2*m_SamplingPeriod);
   unsigned int SizeOfEndPhase = (unsigned int)round(dSizeOfEndPhase);
@@ -1254,7 +1255,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   currentsize = ZMPPositions.size();
   ZMPPositions.resize(currentsize+AddArraySize);
 
-  ODEBUG4(" GetZMPDiscretization: Step 8 ","DebugData.txt");
+  ODEBUG5(" GetZMPDiscretization: Step 8 ","DebugData.txt");
 
   for(unsigned int i=0;i<AddArraySize;i++)
     {
@@ -1296,7 +1297,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
       CurrentZMPindex++;
     }
 
-  ODEBUG4(" GetZMPDiscretization: Step 9 " << ZMPPositions.size(),"DebugData.txt");
+  ODEBUG5(" GetZMPDiscretization: Step 9 " << ZMPPositions.size(),"DebugData.txt");
   FilterOutValues(ZMPPositions,FinalZMPPositions,false);
 
 }

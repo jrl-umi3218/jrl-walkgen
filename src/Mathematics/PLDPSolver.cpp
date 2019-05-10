@@ -622,9 +622,9 @@ double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints,
 
 	  if (m_tmp2[li]>m_tol)
 	    {
-	      cout << "PB ON constraint "<<li<< " at time " << m_InternalTime << endl;
-	      cout << " Check current V k="<<m_ItNb<< endl;
-	      cout << " should be faisable : " << m_tmp2[li]<< " " << -m_v2[li] << endl;
+	      std::cerr << "PB ON constraint "<<li<< " at time " << m_InternalTime << endl;
+	      std::cerr << " Check current V k="<<m_ItNb<< endl;
+	      std::cerr << " should be faisable : " << m_tmp2[li]<< " " << -m_v2[li] << endl;
 	    }
 	  else if (m_tmp2[li]>0.0)
 	    m_tmp2[li] = -m_tol;
@@ -824,9 +824,12 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 	}
       if (alpha<0.0)
 	{
-	  ODEBUG3("Problem with alpha: should be positive");
-	  ODEBUG3("The initial solution is incorrect: "<< m_ItNb << " " << m_InternalTime);
-
+	  std::cerr << "Problem with alpha: should be positive"
+		    << std::endl;
+	  std::cerr << "The initial solution is incorrect: "
+		    << m_ItNb << " "
+		    << m_InternalTime
+		    << std::endl;
 	  exit(0);
 	}
 
@@ -911,20 +914,18 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 
   if (m_HotStart)
     {
-      //cout << "AR (" << lTime <<") :" ;
+      ODEBUG("AR (" << lTime <<") :") ;
       for( unsigned int i=0;i<m_ActivatedConstraints.size();i++)
 	{
-	  //cout << "( " << m_ActivatedConstraints[i] << " , " << m_v2[i] << " ) ";
+	  ODEBUG( "( " << m_ActivatedConstraints[i] << " , " << m_v2[i] << " ) ");
 	  if (m_v2[i]<0.0)
 	    {
 	      m_PreviouslyActivatedConstraints.push_back(m_ActivatedConstraints[i]);
-	      //cout << m_ActivatedConstraints[i] << " " ;
+	      ODEBUG3( m_ActivatedConstraints[i] << " " );
 	    }
 	}
-      /*
-	cout << (int)m_ActivatedConstraints.size() - (int)m_PreviouslyActivatedConstraints.size() <<  " "
-	<< m_PreviouslyActivatedConstraints.size() << endl;
-	cout << endl; */
+      ODEBUG( (int)m_ActivatedConstraints.size() - (int)m_PreviouslyActivatedConstraints.size() <<  " "
+	      << m_PreviouslyActivatedConstraints.size() );
       StoreCurrentZMPSolution(XkYk);
 
     }
@@ -961,8 +962,8 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
       (isinf(X[m_CardV]))
       )
     {
-      cout << "Nan or inf value " << X[0]<< " " << X[m_CardV]
-	   << " at iteration " << m_ItNb -1 <<endl;
+      std::cerr << "Nan or inf value " << X[0]<< " " << X[m_CardV]
+		<< " at iteration " << m_ItNb -1 <<endl;
       return -1;
     }
 

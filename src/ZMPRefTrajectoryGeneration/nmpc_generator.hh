@@ -245,7 +245,8 @@ namespace PatternGeneratorJRL
 
     // Constraint Matrix
     // Center of Pressure constraint
-    unsigned nc_cop_ ;
+    std::size_t nc_cop_ ;
+
     Eigen::MatrixXd Acop_xy_, Acop_theta_ ;
     Eigen::VectorXd UBcop_ ;
     Eigen::MatrixXd D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;

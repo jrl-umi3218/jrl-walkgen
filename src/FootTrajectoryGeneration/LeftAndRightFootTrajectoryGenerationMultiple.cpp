@@ -31,13 +31,14 @@
 
 #include "Debug.hh"
 /*! Walking Pattern Generator inclusion */
-#include "FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.hh"
+#include "LeftAndRightFootTrajectoryGenerationMultiple.hh"
 
 using namespace PatternGeneratorJRL;
 
 LeftAndRightFootTrajectoryGenerationMultiple::
-LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
-                                             PRFoot * lFoot) : SimplePlugin(lSPM)
+LeftAndRightFootTrajectoryGenerationMultiple
+(SimplePluginManager *lSPM,
+ PRFoot * lFoot) : SimplePlugin(lSPM)
 {
   m_Omega = 0.0;
   m_Omega2 = 0.0;
@@ -62,26 +63,35 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
     }
   }
 
-  { for(unsigned int i=0;i<m_MiddleWayPoint.size();m_MiddleWayPoint[i++]=0.0);} ;
+  { for(unsigned int i=0;
+	i<m_MiddleWayPoint.size();
+	m_MiddleWayPoint[i++]=0.0);} ;
+
   wayPoint.resize(2,0.0);
 
 }
 
-PRFoot * LeftAndRightFootTrajectoryGenerationMultiple::getFoot() const
+PRFoot *
+LeftAndRightFootTrajectoryGenerationMultiple::
+getFoot() const
 {
   return m_Foot;
 }
+
 LeftAndRightFootTrajectoryGenerationMultiple::
-LeftAndRightFootTrajectoryGenerationMultiple(const LeftAndRightFootTrajectoryGenerationMultiple & aLRFTGM):
+LeftAndRightFootTrajectoryGenerationMultiple
+(const LeftAndRightFootTrajectoryGenerationMultiple & aLRFTGM):
   SimplePlugin(aLRFTGM.getSimplePluginManager())
 
 {
-  LeftAndRightFootTrajectoryGenerationMultiple (aLRFTGM.getSimplePluginManager(),
-                                                aLRFTGM.getFoot());
+  LeftAndRightFootTrajectoryGenerationMultiple
+    (aLRFTGM.getSimplePluginManager(),
+     aLRFTGM.getFoot());
   *this = aLRFTGM;
 }
 
-LeftAndRightFootTrajectoryGenerationMultiple::~LeftAndRightFootTrajectoryGenerationMultiple()
+LeftAndRightFootTrajectoryGenerationMultiple::
+~LeftAndRightFootTrajectoryGenerationMultiple()
 {
 
   if (m_LeftFootTrajectory!=0)
@@ -93,7 +103,8 @@ LeftAndRightFootTrajectoryGenerationMultiple::~LeftAndRightFootTrajectoryGenerat
 }
 
 /*! Handling methods for the plugin mecanism. */
-void LeftAndRightFootTrajectoryGenerationMultiple::CallMethod(std::string & Method, std::istringstream &strm)
+void LeftAndRightFootTrajectoryGenerationMultiple::
+CallMethod(std::string & Method, std::istringstream &strm)
 {
   if (Method==":omega")
   {
@@ -117,87 +128,106 @@ void LeftAndRightFootTrajectoryGenerationMultiple::CallMethod(std::string & Meth
   }
 }
 
-void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int IntervalIndex,
-                                                                 FootTrajectoryGenerationMultiple * aFTGM,
-                                                                 FootAbsolutePosition &FootInitialPosition,
-                                                                 FootAbsolutePosition &FootFinalPosition,
-                                                                 vector<double> MiddlePos)
+void LeftAndRightFootTrajectoryGenerationMultiple::
+SetAnInterval
+(unsigned int IntervalIndex,
+ FootTrajectoryGenerationMultiple * aFTGM,
+ FootAbsolutePosition &FootInitialPosition,
+ FootAbsolutePosition &FootFinalPosition,
+ vector<double> MiddlePos)
 {
 
-  ODEBUG("Set interval " << IntervalIndex << "/" << m_DeltaTj.size() << " : " << m_DeltaTj[IntervalIndex] << " X: ("
-         << FootFinalPosition.x << "," << FootInitialPosition.x << "," << FootInitialPosition.dx << ")("
-         << FootFinalPosition.y << "," << FootInitialPosition.y << "," << FootInitialPosition.dy << ")("
-         << FootFinalPosition.z << "," << FootInitialPosition.z << "," << FootInitialPosition.dz << ")");
+  ODEBUG("Set interval " << IntervalIndex << "/"
+	 << m_DeltaTj.size() << " : " << m_DeltaTj[IntervalIndex] << " X: ("
+         << FootFinalPosition.x << ","
+	 << FootInitialPosition.x << ","
+	 << FootInitialPosition.dx << ")("
+         << FootFinalPosition.y << ","
+	 << FootInitialPosition.y << ","
+	 << FootInitialPosition.dy << ")("
+         << FootFinalPosition.z << ","
+	 << FootInitialPosition.z << ","
+	 << FootInitialPosition.dz << ")");
   aFTGM->SetNatureInterval(IntervalIndex,FootFinalPosition.stepType);
 
   double ModulationSupportCoefficient = 0.7;
-  double UnlockedSwingPeriod = m_DeltaTj[IntervalIndex] * ModulationSupportCoefficient;
+  double UnlockedSwingPeriod = m_DeltaTj[IntervalIndex] *
+    ModulationSupportCoefficient;
 
   // X axis.
-  aFTGM->SetParametersWithInitPosInitSpeedInitAcc(IntervalIndex,
-                                                  FootTrajectoryGenerationStandard::X_AXIS,
-                                                  UnlockedSwingPeriod,
-                                                  FootFinalPosition.x,
-                                                  FootInitialPosition.x,
-                                                  FootInitialPosition.dx,
-                                                  FootInitialPosition.ddx,
-                                                  MiddlePos);
+  aFTGM->SetParametersWithInitPosInitSpeedInitAcc
+    (IntervalIndex,
+     FootTrajectoryGenerationStandard::X_AXIS,
+     UnlockedSwingPeriod,
+     FootFinalPosition.x,
+     FootInitialPosition.x,
+     FootInitialPosition.dx,
+     FootInitialPosition.ddx,
+     MiddlePos);
 
   // Y axis.
-  aFTGM->SetParametersWithInitPosInitSpeedInitAcc(IntervalIndex,
-                                                  FootTrajectoryGenerationStandard::Y_AXIS,
-                                                  UnlockedSwingPeriod,
-                                                  FootFinalPosition.y,
-                                                  FootInitialPosition.y,
-                                                  FootInitialPosition.dy,
-                                                  FootInitialPosition.ddy,
-                                                  MiddlePos);
+  aFTGM->SetParametersWithInitPosInitSpeedInitAcc
+    (IntervalIndex,
+     FootTrajectoryGenerationStandard::Y_AXIS,
+     UnlockedSwingPeriod,
+     FootFinalPosition.y,
+     FootInitialPosition.y,
+     FootInitialPosition.dy,
+     FootInitialPosition.ddy,
+     MiddlePos);
 
   // Z axis.
-  aFTGM->SetParametersWithInitPosInitSpeedInitAcc(IntervalIndex,
-                                                  FootTrajectoryGenerationStandard::Z_AXIS,
-                                                  m_DeltaTj[IntervalIndex],
-                                                  FootFinalPosition.z,
-                                                  FootInitialPosition.z,
-                                                  FootInitialPosition.dz,
-                                                  FootInitialPosition.ddz,
-                                                  MiddlePos);
+  aFTGM->SetParametersWithInitPosInitSpeedInitAcc
+    (IntervalIndex,
+     FootTrajectoryGenerationStandard::Z_AXIS,
+     m_DeltaTj[IntervalIndex],
+     FootFinalPosition.z,
+     FootInitialPosition.z,
+     FootInitialPosition.dz,
+     FootInitialPosition.ddz,
+     MiddlePos);
 
   // THETA
-  aFTGM->SetParametersWithInitPosInitSpeedInitAcc(IntervalIndex,
-                                                  FootTrajectoryGenerationStandard::THETA_AXIS,
-                                                  UnlockedSwingPeriod,
-                                                  FootFinalPosition.theta,
-                                                  FootInitialPosition.theta,
-                                                  FootInitialPosition.dtheta,
-                                                  FootInitialPosition.ddtheta);
+  aFTGM->SetParametersWithInitPosInitSpeedInitAcc
+    (IntervalIndex,
+     FootTrajectoryGenerationStandard::THETA_AXIS,
+     UnlockedSwingPeriod,
+     FootFinalPosition.theta,
+     FootInitialPosition.theta,
+     FootInitialPosition.dtheta,
+     FootInitialPosition.ddtheta);
 
   // Omega
-  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
-                                           FootTrajectoryGenerationStandard::OMEGA_AXIS,
-                                           UnlockedSwingPeriod,
-                                           FootFinalPosition.omega,
-                                           FootInitialPosition.omega,
-                                           FootInitialPosition.domega);
+  aFTGM->SetParametersWithInitPosInitSpeed
+    (IntervalIndex,
+     FootTrajectoryGenerationStandard::OMEGA_AXIS,
+     UnlockedSwingPeriod,
+     FootFinalPosition.omega,
+     FootInitialPosition.omega,
+     FootInitialPosition.domega);
 
   // Omega 2
-  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
-                                           FootTrajectoryGenerationStandard::OMEGA2_AXIS,
-                                           UnlockedSwingPeriod,
-                                           FootFinalPosition.omega2,
-                                           FootInitialPosition.omega2,
-                                           FootInitialPosition.domega2);
+  aFTGM->SetParametersWithInitPosInitSpeed
+    (IntervalIndex,
+     FootTrajectoryGenerationStandard::OMEGA2_AXIS,
+     UnlockedSwingPeriod,
+     FootFinalPosition.omega2,
+     FootInitialPosition.omega2,
+     FootInitialPosition.domega2);
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::
-InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
-                            FootAbsolutePosition &LeftFootInitialPosition,
-                            FootAbsolutePosition &RightFootInitialPosition,
-                            deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions,
-                            bool IgnoreFirst, bool Continuity)
+InitializeFromRelativeSteps
+(deque<RelativeFootPosition> &RelativeFootPositions,
+ FootAbsolutePosition &LeftFootInitialPosition,
+ FootAbsolutePosition &RightFootInitialPosition,
+ deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions,
+ bool IgnoreFirst, bool Continuity)
 {
-  ODEBUG("LeftFootInitialPosition.stepType: "<< LeftFootInitialPosition.stepType
-         << " RightFootInitialPosition.stepType: "<< RightFootInitialPosition.stepType);
+  ODEBUG("LeftFootInitialPosition.stepType: "
+	 << LeftFootInitialPosition.stepType
+         << " RightFootInitialPosition.stepType: "
+	 << RightFootInitialPosition.stepType);
   /*! Makes sure the size of the SupportFootAbsolutePositions is the same than
    the relative foot positions. */
   if (SupportFootAbsoluteFootPositions.size()!=
@@ -221,8 +251,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
   lNbOfIntervals = 2*lNbOfIntervals+1;
 
   /*! Resize the Left and Right foot trajectories. */
-  m_LeftFootTrajectory->SetNumberOfIntervals(lNbOfIntervals);
-  m_RightFootTrajectory->SetNumberOfIntervals(lNbOfIntervals);
+  m_LeftFootTrajectory->SetNumberOfIntervals((int)lNbOfIntervals);
+  m_RightFootTrajectory->SetNumberOfIntervals((int)lNbOfIntervals);
   ODEBUG("resize left and right foot trajectories: " << lNbOfIntervals);
 
   /*! Compute the absolute coordinates of the steps.  */
@@ -266,7 +296,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
     CurrentSupportFootPosition(2,2) = LeftFootInitialPosition.z;
     //   v2(2,0) = LeftFootInitialPosition.z;
   }
-  ODEBUG("Support Foot : " << v2(0,0) << " " << v2(1,0) << " " << CurrentAbsTheta);
+  ODEBUG("Support Foot : " << v2(0,0) << " "
+	 << v2(1,0) << " " << CurrentAbsTheta);
 
   // Initial Position of the current support foot.
   c = cos(CurrentAbsTheta*M_PI/180.0);
@@ -316,7 +347,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
     {
       /*! At this stage the phase of double support is dealt with */
       ODEBUG("Double support phase");
-      //LeftFootTmpInitPos.z = CurrentSupportFootPosition(2,2);// 0.0;//LeftFootTmpInitPos.z + LeftFootTmpFinalPos.z/1.5;
+      //LeftFootTmpInitPos.z = CurrentSupportFootPosition(2,2);
+      // 0.0;//LeftFootTmpInitPos.z + LeftFootTmpFinalPos.z/1.5;
       LeftFootTmpInitPos.dz = 0;
       LeftFootTmpInitPos.stepType=11;
 
@@ -402,7 +434,10 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
     AbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
     AbsoluteFootPositions[i].theta = CurrentAbsTheta;
 
-    ODEBUG("CSFP:" << CurrentSupportFootPosition(0,2) << " " << CurrentSupportFootPosition(1,2) <<" " << CurrentSupportFootPosition(2,2) << " "<< CurrentAbsTheta);
+    ODEBUG("CSFP:" << CurrentSupportFootPosition(0,2) << " "
+	   << CurrentSupportFootPosition(1,2) << " "
+	   << CurrentSupportFootPosition(2,2) << " "
+	   << CurrentAbsTheta);
 
     /*! We deal with the single support phase,
     i.e. the target of the next single support phase
@@ -514,16 +549,20 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
         dx = InitPos(1) - FinalPos(1) ;
         dy = FinalPos(0) - InitPos(0) ;
         m_MiddleWayPoint.resize(2);
-        { for(unsigned int i=0;i<m_MiddleWayPoint.size();m_MiddleWayPoint[i++]=0.0);};
+        { for(unsigned int i=0;
+	      i<m_MiddleWayPoint.size();
+	      m_MiddleWayPoint[i++]=0.0);};
         if ( dx*dx>=1e-6 || dy*dy>=1e-6 )// not moving implies no collision
         {
           dc = -(dx * InitPos(0) + dy *InitPos(1)) ;
-          distSquareToLine = (dx*currSupp(0)  + dy*currSupp(1) + dc)*(dx*currSupp(0)  + dy*currSupp(1) + dc)/(dx*dx + dy*dy);
+          distSquareToLine = (dx*currSupp(0)  + dy*currSupp(1) + dc)*
+	    (dx*currSupp(0)  + dy*currSupp(1) + dc)/(dx*dx + dy*dy);
           if( distSquareToLine < m_WayPointThreshold )
           {
             double x(currSupp(0)), y(currSupp(1)),
-                x0((FinalPos(0)+InitPos(0))*0.5), y0((FinalPos(1)+InitPos(1))*0.5),
-                R2((dx*dx+dy+dy)*0.5*0.5);
+	      x0((FinalPos(0)+InitPos(0))*0.5),
+	      y0((FinalPos(1)+InitPos(1))*0.5),
+	      R2((dx*dx+dy+dy)*0.5*0.5);
             bool autocollision = (x-x0)*(x-x0)+(y-y0)*(y-y0)<=R2;
             if( autocollision )
             {
@@ -658,13 +697,18 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
   /*! This part initializes correctly the last two intervals
    if the system is in real-time foot modification. In this case,
    the representation of the intervals shift from:
-  ONE DOUBLE SUPPORT STARTING PHASE - 1st foot single support phase - double support phase - 2nd foot single support phase
-  - double support phase - 3rd single support phase - ending double support phase
+  ONE DOUBLE SUPPORT STARTING PHASE - 1st foot single support phase -
+  double support phase - 2nd foot single support phase
+  - double support phase - 3rd single support phase -
+  ending double support phase
   to
-  1st foot single support phase - double support phase - 2nd foot single support phase
+  1st foot single support phase - double support phase -
+  2nd foot single support phase
   - double support phase - 3rd single support phase
-  Two intervals are missing and should be set by default to the end position of the feet
-  if Continuity is set to true, and if the number of intervals so far is the number of
+  Two intervals are missing and should be set by
+  default to the end position of the feet
+  if Continuity is set to true, and if the number of intervals
+  so far is the number of
   intervals minus 2.
   */
   if ((Continuity) && (IntervalIndex==(int)(m_DeltaTj.size()-2)))
@@ -689,10 +733,11 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::
-ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
-                                      FootAbsolutePosition &LeftFootInitialPosition,
-                                      FootAbsolutePosition &RightFootInitialPosition,
-                                      deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions)
+ComputeAbsoluteStepsFromRelativeSteps
+(deque<RelativeFootPosition> &RelativeFootPositions,
+ FootAbsolutePosition &LeftFootInitialPosition,
+ FootAbsolutePosition &RightFootInitialPosition,
+ deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions)
 {
   FootAbsolutePosition aSupportFootAbsolutePosition;
 
@@ -715,9 +760,10 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
 
 }
 void LeftAndRightFootTrajectoryGenerationMultiple::
-ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
-                                      FootAbsolutePosition &SupportFootInitialAbsolutePosition,
-                                      deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions)
+ComputeAbsoluteStepsFromRelativeSteps
+(deque<RelativeFootPosition> &RelativeFootPositions,
+ FootAbsolutePosition &SupportFootInitialAbsolutePosition,
+ deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions)
 {
   /*! Makes sure the size of the SupportFootAbsolutePositions is the same than
    the relative foot positions. */
@@ -815,7 +861,8 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
     AbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
     AbsoluteFootPositions[i].theta = CurrentAbsTheta;
 
-    ODEBUG("CSFP:" << CurrentSupportFootPosition(0,2) << " " << CurrentSupportFootPosition(1,2));
+    ODEBUG("CSFP:" << CurrentSupportFootPosition(0,2) << " "
+	   << CurrentSupportFootPosition(1,2));
 
     /* Populate the set of support foot absolute positions */
     SupportFootAbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
@@ -828,10 +875,11 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::
-ChangeRelStepsFromAbsSteps(deque<RelativeFootPosition> &RelativeFootPositions,
-                           FootAbsolutePosition &SupportFootInitialPosition,
-                           deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions,
-                           unsigned int ChangedInterval)
+ChangeRelStepsFromAbsSteps
+(deque<RelativeFootPosition> &RelativeFootPositions,
+ FootAbsolutePosition &SupportFootInitialPosition,
+ deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions,
+ unsigned int ChangedInterval)
 {
   if (ChangedInterval>=SupportFootAbsoluteFootPositions.size())
   {
@@ -887,7 +935,8 @@ ChangeRelStepsFromAbsSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
   RelativeFootPositions[ChangedInterval].sx = relMotionM1(0,2);
   RelativeFootPositions[ChangedInterval].sy = relMotionM1(1,2);
-  RelativeFootPositions[ChangedInterval].theta = atan2(relMotionM1(1,0),relMotionM1(0,0));
+  RelativeFootPositions[ChangedInterval].theta =
+    atan2(relMotionM1(1,0),relMotionM1(0,0));
 
   double thetakp1,xkp1,ykp1;
 
@@ -911,17 +960,21 @@ ChangeRelStepsFromAbsSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
     RelativeFootPositions[ChangedInterval+1].sx = relMotionP1(0,2);
     RelativeFootPositions[ChangedInterval+1].sy = relMotionP1(1,2);
-    RelativeFootPositions[ChangedInterval+1].theta = atan2(relMotionP1(1,0),relMotionP1(0,0));
+    RelativeFootPositions[ChangedInterval+1].theta =
+      atan2(relMotionP1(1,0),relMotionP1(0,0));
 
   }
 
   ODEBUG("KP1 position: " << xkp1 << " " << ykp1 << " " << thetakp1 );
-  ODEBUG("Changed intervals : " << ChangedInterval-1 << " " << ChangedInterval << " " << ChangedInterval + 1);
+  ODEBUG("Changed intervals : " << ChangedInterval-1 << " "
+	 << ChangedInterval << " " << ChangedInterval + 1);
 }
 
-bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition(int LeftOrRight,
-                                                                                 double time,
-                                                                                 FootAbsolutePosition & aFAP)
+bool LeftAndRightFootTrajectoryGenerationMultiple::
+ComputeAnAbsoluteFootPosition
+(int LeftOrRight,
+ double time,
+ FootAbsolutePosition & aFAP)
 {
 
   ODEBUG("Left (1) or right (-1) : " <<  LeftOrRight);
@@ -932,9 +985,11 @@ bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition
     //aFAP.LeftOrRightFoot = 0; // Left Foot
     bool r = m_LeftFootTrajectory->Compute(time,aFAP);
     if (!r)
-    {ODEBUG3("Unable to compute left foot abs pos at time " <<time);
-      LTHROW("Pb in computing absolute foot position");
-    }
+      {
+	std::cerr << "Unable to compute left foot abs pos at time "
+		  <<time << std::endl;
+	LTHROW("Pb in computing absolute foot position");
+      }
     return r;
   }
   else
@@ -943,22 +998,28 @@ bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition
     //aFAP.LeftOrRightFoot = 1; // Right Foot
     bool r = m_RightFootTrajectory->Compute(time,aFAP);
     if (!r)
-    {ODEBUG3("Unable to compute right foot abs pos at time " <<time);
-      LTHROW("Pb in computing absolute foot position");
-    }
+      {
+	std::cerr
+	  << "Unable to compute right foot abs pos at time " <<time
+	  << std::endl;
+	LTHROW("Pb in computing absolute foot position");
+      }
     return r;
   }
 
   return false;
 }
 
-bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition(int LeftOrRight,
-                                                                                 double time,
-                                                                                 FootAbsolutePosition & aFAP,
-                                                                                 unsigned int IndexInterval)
+bool LeftAndRightFootTrajectoryGenerationMultiple::
+ComputeAnAbsoluteFootPosition
+(int LeftOrRight,
+ double time,
+ FootAbsolutePosition & aFAP,
+ unsigned int IndexInterval)
 {
 
-  ODEBUG(this << " " << m_LeftFootTrajectory << " " << m_RightFootTrajectory);
+  ODEBUG(this << " " << m_LeftFootTrajectory << " "
+	 << m_RightFootTrajectory);
 
   if (LeftOrRight==1)
     return m_LeftFootTrajectory->Compute(time,aFAP,IndexInterval);
@@ -968,10 +1029,12 @@ bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition
   return false;
 }
 /*
-bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition(int LeftOrRight,
-                                         double time,
-                                         deque<FootAbsolutePosition> & adFAP,
-                                         unsigned int IndexInterval)
+bool LeftAndRightFootTrajectoryGenerationMultiple::
+ComputeAnAbsoluteFootPosition
+(int LeftOrRight,
+double time,
+deque<FootAbsolutePosition> & adFAP,
+unsigned int IndexInterval)
 {
 
   ODEBUG(this << " " << m_LeftFootTrajectory << " " << m_RightFootTrajectory);
@@ -984,7 +1047,8 @@ bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition
   return false;
 }*/
 
-void LeftAndRightFootTrajectoryGenerationMultiple::SetDeltaTj(vector<double> &aDeltaTj)
+void LeftAndRightFootTrajectoryGenerationMultiple::
+SetDeltaTj(vector<double> &aDeltaTj)
 {
   ODEBUG("SetDeltaTj :" << aDeltaTj.size() << " " << aDeltaTj[0]);
 
@@ -996,40 +1060,47 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetDeltaTj(vector<double> &aD
 
 }
 
-void LeftAndRightFootTrajectoryGenerationMultiple::DisplayIntervals()
+void LeftAndRightFootTrajectoryGenerationMultiple::
+DisplayIntervals()
 {
-  ODEBUG3("Left intervals");
+  ODEBUG("Left intervals");
   m_LeftFootTrajectory->DisplayIntervals();
-  ODEBUG3("Right intervals");
+  ODEBUG("Right intervals");
   m_RightFootTrajectory->DisplayIntervals();
 }
 
-void LeftAndRightFootTrajectoryGenerationMultiple::GetDeltaTj(vector<double> &aDeltaTj) const
+void LeftAndRightFootTrajectoryGenerationMultiple::
+GetDeltaTj(vector<double> &aDeltaTj) const
 {
   aDeltaTj = m_DeltaTj;
 }
 
-void LeftAndRightFootTrajectoryGenerationMultiple::SetStepHeight(double aStepHeight)
+void LeftAndRightFootTrajectoryGenerationMultiple::
+SetStepHeight(double aStepHeight)
 {
   m_StepHeight = aStepHeight;
 }
 
-double LeftAndRightFootTrajectoryGenerationMultiple::GetStepHeight() const
+double LeftAndRightFootTrajectoryGenerationMultiple::
+GetStepHeight() const
 {
   return m_StepHeight;
 }
 
-void LeftAndRightFootTrajectoryGenerationMultiple::SetStepCurving(double aStepCurving)
+void LeftAndRightFootTrajectoryGenerationMultiple::
+SetStepCurving(double aStepCurving)
 {
   m_StepCurving = aStepCurving;
 }
 
-double LeftAndRightFootTrajectoryGenerationMultiple::GetStepCurving() const
+double LeftAndRightFootTrajectoryGenerationMultiple::
+GetStepCurving() const
 {
   return m_StepCurving;
 }
 
-double LeftAndRightFootTrajectoryGenerationMultiple::GetAbsoluteTimeReference() const
+double LeftAndRightFootTrajectoryGenerationMultiple::
+GetAbsoluteTimeReference() const
 {
   double res=0.0;
   double LeftATR=0.0,RightATR=0.0;
@@ -1045,7 +1116,8 @@ double LeftAndRightFootTrajectoryGenerationMultiple::GetAbsoluteTimeReference() 
   return res;
 }
 
-void LeftAndRightFootTrajectoryGenerationMultiple::SetAbsoluteTimeReference(double anATR)
+void LeftAndRightFootTrajectoryGenerationMultiple::
+SetAbsoluteTimeReference(double anATR)
 {
   if (m_LeftFootTrajectory!=0)
     m_LeftFootTrajectory->SetAbsoluteTimeReference(anATR);
@@ -1075,14 +1147,16 @@ LeftAndRightFootTrajectoryGenerationMultiple::operator=
 
 }
 
-FootTrajectoryGenerationMultiple * LeftAndRightFootTrajectoryGenerationMultiple::getLeftFootTrajectory() const
+FootTrajectoryGenerationMultiple *
+LeftAndRightFootTrajectoryGenerationMultiple::
+getLeftFootTrajectory() const
 {
   return m_LeftFootTrajectory;
 }
 
-FootTrajectoryGenerationMultiple * LeftAndRightFootTrajectoryGenerationMultiple::getRightFootTrajectory() const
+FootTrajectoryGenerationMultiple *
+LeftAndRightFootTrajectoryGenerationMultiple::
+getRightFootTrajectory() const
 {
   return m_RightFootTrajectory;
 }
-
-

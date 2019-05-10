@@ -37,7 +37,8 @@
 #include <sstream>
 #include <fstream>
 
-
+#include "Debug.hh"
+#include "CommonTools.hh"
 
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 
@@ -48,13 +49,23 @@ using namespace std;
 namespace PatternGeneratorJRL {
   namespace TestSuite {
 
+    double filterprecision(double adb)
+    {
+      if (fabs(adb)<1e-7)
+        return 0.0;
 
-    void CommonInitialization(PatternGeneratorInterface &aPGI)
+      double ladb2 = adb * 1e7;
+      double lintadb2 = trunc(ladb2);
+      return lintadb2/1e7;
+    }
+
+    void CommonInitialization
+    (PatternGeneratorInterface &aPGI)
     {
       const unsigned int nbMethod = 13 ;
       const char lBuffer[nbMethod][256] =
 	{
-	  ":comheight 0.8078",
+	  ":comheight 0.876681",
 	  ":samplingperiod 0.005",
 	  ":previewcontroltime 1.6",
 	  ":omega 0.0",
@@ -87,31 +98,38 @@ namespace PatternGeneratorJRL {
 				 InitLeftFootAbsPos,
 				 InitRightFootAbsPos);
 
-      cout << "Starting COM Position: "
-	   << lStartingCOMPosition.x[0] << " "
-	   << lStartingCOMPosition.y[0] << " "
-	   << lStartingCOMPosition.z[0] << endl;
+      ODEBUG("Starting COM Position: "
+	     << lStartingCOMPosition.x[0] << " "
+	     << lStartingCOMPosition.y[0] << " "
+	     << lStartingCOMPosition.z[0]);
 
-      cout << "Starting Left Foot Pos: "
-	   << InitLeftFootAbsPos.x << " "
-	   << InitLeftFootAbsPos.y << " "
-	   << InitLeftFootAbsPos.z << " "
-	   << InitLeftFootAbsPos.theta<< " "
-	   << InitLeftFootAbsPos.omega << " "
-	   << InitLeftFootAbsPos.omega2 << " "
-	   << endl;
+      ODEBUG("Starting Waist Position: "
+	     << lStartingWaistPose[0] << " "
+	     << lStartingWaistPose[1] << " "
+	     << lStartingWaistPose[2]);
+	     
+      ODEBUG("Starting ZMP Position: "
+	     << lStartingZMPPosition[0] << " "
+	     << lStartingZMPPosition[1] << " "
+	     << lStartingZMPPosition[2]);
 
-      cout << "Starting Right Foot Pos: "
-	   << InitRightFootAbsPos.x << " "
-	   << InitRightFootAbsPos.y << " "
-	   << InitRightFootAbsPos.z << " "
-	   << InitRightFootAbsPos.theta<< " "
-	   << InitRightFootAbsPos.omega << " "
-	   << InitRightFootAbsPos.omega2 << " "
-	   << endl;
+      ODEBUG("Starting Left Foot Pos: "
+	     << InitLeftFootAbsPos.x << " "
+	     << InitLeftFootAbsPos.y << " "
+	     << InitLeftFootAbsPos.z << " "
+	     << InitLeftFootAbsPos.theta<< " "
+	     << InitLeftFootAbsPos.omega << " "
+	     << InitLeftFootAbsPos.omega2);
+
+      ODEBUG("Starting Right Foot Pos: "
+	     << InitRightFootAbsPos.x << " "
+	     << InitRightFootAbsPos.y << " "
+	     << InitRightFootAbsPos.z << " "
+	     << InitRightFootAbsPos.theta<< " "
+	     << InitRightFootAbsPos.omega << " "
+	     << InitRightFootAbsPos.omega2 );
 
     }
-
 
     void getOptions(int argc,
 		    char *argv[],
@@ -119,21 +137,207 @@ namespace PatternGeneratorJRL {
 		    string &srdfFullPath,
 		    unsigned int &) // TestProfil)
     {
-      std::cout << "argc:" << argc << std::endl;
+      ODEBUG("argc:" << argc);
       if (argc!=3)
 	{
 	  cerr << " This program takes 2 arguments: " << endl;
-	  cerr << "./TestFootPrintPGInterface PATH_TO_URDF_FILE PATH_TO_SRDF_FILE"
-	       << endl;
+	  cerr
+	    << "./TestFootPrintPGInterface "
+	    << "PATH_TO_URDF_FILE "
+	    << "PATH_TO_SRDF_FILE"
+	    << endl;
 	  exit(-1);
 	}
       else
 	{
 	  urdfFullPath=argv[1];
 	  srdfFullPath=argv[2];
-	  cout << urdfFullPath << endl ;
-	  cout << srdfFullPath << endl ;
+	  ODEBUG(urdfFullPath);
+	  ODEBUG(srdfFullPath);
 	}
+    }
+
+    OneStep::OneStep
+    ()
+    {
+      m_PR = 0;
+      m_ZMPTarget.resize(3);
+      m_NbOfIt = 0;
+      memset(&m_LeftFootPosition,0,sizeof(m_LeftFootPosition));
+      memset(&m_RightFootPosition,0,sizeof(m_RightFootPosition));
+      memset(&m_finalCOMPosition,0,sizeof(m_finalCOMPosition));
+
+      fillInDebugVectorDoc();
+    }
+
+    void OneStep::
+    fillInDebugVectorDoc()
+    {
+      /// Building vector of documentation strings.
+      const char * docInit[10] =
+	{ "Time",
+	  "CoM - X",
+	  "CoM - Y",
+	  "CoM - Z",
+	  "Yaw",
+	  "dCoM - X",
+	  "dCoM - Y",
+	  "dCoM - Z",
+	  "ZMP X in Waist Ref",
+	  "ZMP Y in Waist Ref"};
+
+      for (std::size_t i =0;
+	   i<10;
+	   i++)
+	m_DebugStrings.push_back(docInit[i]);
+
+      const char * footNames[2] =
+	{ "Left Foot","Right Foot"};
+      const char * docFootInit[14] =
+	{ " - Pos X",   " - Pos Y",   " - Pos Z",
+	  " - Vel dX",  " - Vel dY",  " - Vel dZ",
+	  " - Acc ddX", " - Acc ddY", " - Acc ddZ",
+	  " - Yaw",     " - dYaw",    " - ddYaw",
+	  " - Roll",    " - Pitch"
+	};
+      for(std::size_t footId=0;
+	  footId<2;
+	  footId++)
+	{
+	  for(std::size_t docFootId=0;
+	      docFootId<14;
+	      docFootId++)
+	    {
+	      std::string aDoc = footNames[footId];
+	      aDoc = aDoc + " " ;
+	      aDoc = aDoc + std::string(docFootInit[docFootId]);
+	      m_DebugStrings.push_back(aDoc);
+	    }
+	}
+
+    }
+
+    void OneStep::
+    fillInDebugVectorFoot
+    (FootAbsolutePosition &aFootAbsolutePosition,
+     std::size_t &lindex)
+    {
+      m_DebugVector[lindex++] = aFootAbsolutePosition.x;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.y;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.z;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.dx;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.dy;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.dz;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.ddx;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.ddy;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.ddz;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.theta;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.dtheta;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.ddtheta;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.omega;
+      m_DebugVector[lindex++] = aFootAbsolutePosition.omega2;
+    }
+
+    void OneStep::fillInDebugVector()
+    {
+      std::size_t lindex=0;
+      Eigen::VectorXd & currentConfiguration =
+	m_PR->currentConfiguration();
+
+      Eigen::Index nq = currentConfiguration.size();
+      if (m_DebugVector.size()==0)
+	m_DebugVector.resize(17+14*2+nq);
+      
+      /// Time
+      m_DebugVector[lindex++] = ((double)m_NbOfIt)*0.005;
+      /// CoM Position
+      m_DebugVector[lindex++] = m_finalCOMPosition.x[0];
+      m_DebugVector[lindex++] = m_finalCOMPosition.y[0];
+      m_DebugVector[lindex++] = m_finalCOMPosition.z[0];
+      m_DebugVector[lindex++] = m_finalCOMPosition.yaw[0];
+      m_DebugVector[lindex++] = m_finalCOMPosition.x[1];
+      m_DebugVector[lindex++] = m_finalCOMPosition.y[1];
+      m_DebugVector[lindex++] = m_finalCOMPosition.z[1];
+      m_DebugVector[lindex++] = m_finalCOMPosition.yaw[1];
+      m_DebugVector[lindex++] = m_finalCOMPosition.x[2];
+      m_DebugVector[lindex++] = m_finalCOMPosition.y[2];
+      m_DebugVector[lindex++] = m_finalCOMPosition.z[2];
+      m_DebugVector[lindex++] = m_finalCOMPosition.yaw[2];
+
+      /// ZMP Target
+      m_DebugVector[lindex++] = m_ZMPTarget(0);
+      m_DebugVector[lindex++] = m_ZMPTarget(1);
+      /// Left Foot Position
+      fillInDebugVectorFoot(m_LeftFootPosition,lindex);
+      /// Right Foot position
+      fillInDebugVectorFoot(m_RightFootPosition,lindex);
+
+      assert(m_PR!=NULL);
+
+      /// ZMP Target in absolute reference
+      m_DebugVector[lindex++] = m_ZMPTarget(0)*cos(currentConfiguration(5)) -
+	m_ZMPTarget(1)*sin(currentConfiguration(5))
+	+currentConfiguration(0);
+      m_DebugVector[lindex++] = m_ZMPTarget(0)*sin(currentConfiguration(5)) -
+	m_ZMPTarget(1)*cos(currentConfiguration(5))
+	+currentConfiguration(1);
+
+      /// Saving configuration
+      for (unsigned int i = 0 ;
+	   i < currentConfiguration.size() ;
+	   i++)
+	m_DebugVector[i] = currentConfiguration(i);
+
+    }
+
+    void OneStep::fillInDebugFileContent
+    (std::ofstream &aof)
+    {
+      for (std::size_t i=0;
+	   i < m_DebugVector.size();
+	   i++)
+	aof << filterprecision(m_DebugVector[i]) << " ";
+    }
+
+    void OneStep::fillInDebugFile()
+    {
+      /// Store data
+      fillInDebugVector();
+
+      /// Write description file if this is the first iteration
+      if (m_NbOfIt==0)
+	{
+	  writeDescriptionFile();
+	}
+      
+      /// Create file
+      ofstream aof;
+      string aFileName;
+      assert(!m_TestName.empty());
+      aFileName = m_TestName;
+      aFileName += "TestFGPI.dat";
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      /// Write down the file
+      fillInDebugFileContent(aof);
+      aof << endl;
+      aof.close();
+    }
+
+    void OneStep::writeDescriptionFile()
+    {
+      ofstream aof;
+      string aFileName;
+      assert(m_TestName.empty());
+      aFileName = m_TestName;
+      aFileName += "TestFGPI_description.dat";
+      
+      for (std::size_t i =0;
+	   i<m_DebugStrings.size();
+	   i++)
+	aof << m_DebugStrings[i] << std::endl;
+      aof.close();
     }
   } /* End of TestSuite namespace */
 } /* End of PatternGeneratorJRL namespace */

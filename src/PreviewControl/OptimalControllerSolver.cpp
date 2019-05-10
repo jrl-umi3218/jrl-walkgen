@@ -30,7 +30,6 @@
 #include <iostream>
 #include <PreviewControl/OptimalControllerSolver.hh>
 
-#define _DEBUG_MODE_ON_
 #include <Debug.hh>
 
 using namespace PatternGeneratorJRL;
@@ -137,7 +136,8 @@ bool OptimalControllerSolver::GeneralizedSchur(MatrixRXd  &A,
 {
   ODEBUG("A:" << A);
   ODEBUG("B:" << A);
-  int n = A.rows();
+  int n = (int)A.rows();
+
   alphar.resize(n); alphar.setZero();
   alphai.resize(n); alphai.setZero();
   beta.resize(n); beta.setZero();
@@ -145,7 +145,7 @@ bool OptimalControllerSolver::GeneralizedSchur(MatrixRXd  &A,
   R.resize(n,n); R.setZero();
 		    
   int sdim = 0;
-  int lwork = 1000+ (8*n + 16);
+  int lwork = 1000+ (8*(int)n + 16);
   double *work = new double[lwork]; //std::vector<double> work(lwork);
   for(int i=0;i<lwork;i++)
     work[i] = 0.0;
@@ -160,13 +160,9 @@ bool OptimalControllerSolver::GeneralizedSchur(MatrixRXd  &A,
     bwork[i] =0;
   A.transposeInPlace();
   B.transposeInPlace();
-  cout <<"A:" << std::endl;
-  for (int i = 0; i < A.size(); i++)
-    cout << *(A.data() + i) << "  ";
-  cout << endl << endl;
-  for (int i = 0; i < B.size(); i++)
-    cout << *(B.data() + i) << "  ";
-  cout << endl << endl;
+  ODEBUG("A:" << A);
+  ODEBUG("A:" << B);
+
   dgges_ (lV, lV,
           lS,
 	  (logical (*)(...))sb02ox,
@@ -224,7 +220,8 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   H.setIdentity();
   
   // Build the upper left sub-block of H
-  int n = m_A.rows();
+  Eigen::Index n = m_A.rows();
+
   for(int i=0;i< n;i++)
     for(int j=0;j<n;j++)
       H(i,j) = m_A(i,j);
@@ -269,7 +266,8 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
 
   if (!GeneralizedSchur(H,E,WR,WI,GS,ZH,ZE))
     {
-      ODEBUG3("Something is wrong with the weights for the preview control !");
+      std::cerr << "Something is wrong with the weights for the preview control !"
+		<< std::endl;
     }
 
   ODEBUG("Hx:"<<H);

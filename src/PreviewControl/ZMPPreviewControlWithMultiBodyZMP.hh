@@ -469,16 +469,15 @@ namespace PatternGeneratorJRL
 	@param[in] StageOfTheAlgorithm: Indicates if this is the second stage of 
 	the preview control or the first one.
       */
-      void CallToComAndFootRealization(COMState &acomp,
-				       FootAbsolutePosition &aLeftFAP,
-				       FootAbsolutePosition &aRightFAP,
-				       Eigen::VectorXd & CurrentConfiguration,
-				       Eigen::VectorXd & CurrentVelocity,
-				       Eigen::VectorXd & CurrentAcceleration,
-				       int IterationNumber,
-				       int StageOfTheAlgorithm);
-
-
+      void CallToComAndFootRealization
+      (COMState &acomp,
+       FootAbsolutePosition &aLeftFAP,
+       FootAbsolutePosition &aRightFAP,
+       Eigen::VectorXd & CurrentConfiguration,
+       Eigen::VectorXd & CurrentVelocity,
+       Eigen::VectorXd & CurrentAcceleration,
+       unsigned long int IterationNumber,
+       int StageOfTheAlgorithm);
       
       /*! Set the link to the preview control. */
       void SetPreviewControl(PreviewControl *aPC);

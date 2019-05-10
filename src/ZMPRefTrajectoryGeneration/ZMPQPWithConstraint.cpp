@@ -1141,17 +1141,21 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 	  unsigned int pbOnCurrent=0;
 	  if (vnlValConstraint(i,0)<-1e-8)
 	    {
-	      ODEBUG3("Problem during validation of the constraint: ");
-	      ODEBUG3("  constraint " << i << " is not positive");
-	      ODEBUG3(vnlValConstraint(i,0));
+	      std::cerr << "Problem during validation of the constraint: "
+			<< std::endl;
+	      std::cerr << "  constraint " << i << " is not positive"
+			<< std::endl;
+	      std::cerr << vnlValConstraint(i,0)
+			<< std::endl;
 	      pbOnCurrent = 1;
 	    }
 
 	  if (pbOnCurrent)
 	    {
-	      ODEBUG3("PbonCurrent: " << pbOnCurrent << " " << li
-		      << " Contrainte " << i 
-		      << " StartingTime :" << StartingTime);
+	      std::cerr << "PbonCurrent: " << pbOnCurrent << " " << li
+			<< " Contrainte " << i 
+			<< " StartingTime :" << StartingTime
+			<< std::endl;
 	      if (pbOnCurrent)
 		{
 		  return -1;
@@ -1248,12 +1252,14 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);
-      CurrentCPUTime = end.tv_sec - start.tv_sec + 
+      CurrentCPUTime = (double)end.tv_sec - (double)start.tv_sec + 
 	0.000001 * (double)(end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
-      ODEBUG("Current Time : " << StartingTime << " " << 
-	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime << 
-	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
+      ODEBUG("Current Time : " << StartingTime << " "
+	     << " Virtual time to simulate: "
+	     << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime
+	     << "Computation Time " << CurrentCPUTime
+	     << " " << TotalAmountOfCPUTime);
 
     }
 
@@ -1398,15 +1404,15 @@ void ZMPQPWithConstraint::CallMethod(std::string & Method, std::istringstream &s
 }
 
 
-int ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> & ,         // FinalZMPPositions,
-				    deque<COMState> & ,            // FinalCOMStates,
-				    deque<FootAbsolutePosition> & ,// FinalLeftFootAbsolutePositions,
-				    deque<FootAbsolutePosition> & ,// FinalRightFootAbsolutePositions,
-				    FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
-				    FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
-				    deque<RelativeFootPosition> &, // RelativeFootPositions,
-				    COMState & ,                   // lStartingCOMState,
-				    Eigen::Vector3d & )      // lStartingZMPPosition)
+std::size_t ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> & ,         // FinalZMPPositions,
+					    deque<COMState> & ,            // FinalCOMStates,
+					    deque<FootAbsolutePosition> & ,// FinalLeftFootAbsolutePositions,
+					    deque<FootAbsolutePosition> & ,// FinalRightFootAbsolutePositions,
+					    FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
+					    FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
+					    deque<RelativeFootPosition> &, // RelativeFootPositions,
+					    COMState & ,                   // lStartingCOMState,
+					    Eigen::Vector3d & )      // lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
   return 0;

@@ -1,9 +1,9 @@
 /*
- * Copyright 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2006, 2007, 2008, 2009, 2010,
  *
  * Florent    Lamiraux
  * Alireza    Nakhaei
- * Mathieu    Poirier 
+ * Mathieu    Poirier
  * Olivier    Stasse
  *
  * JRL, CNRS/AIST
@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /** \file StepOverPolynome.h
@@ -39,7 +39,7 @@
 
 namespace PatternGeneratorJRL
 {
-  /*! @ingroup steppingover 
+  /*! @ingroup steppingover
     @brief Polynome used for Z trajectory during stepover. */
   class  StepOverPolynomeFoot : public Polynome
   {
@@ -48,9 +48,9 @@ namespace PatternGeneratorJRL
       boundCond: the different boundary conditions begin, intermediate and end of polynomial
       timeDistr: vector with time instants for intermediate boundary conditions and end time */
     StepOverPolynomeFoot();
-  
+
     /*! Set the parameters */
-    void SetParameters(Eigen::VectorXd boundCond, 
+    void SetParameters(Eigen::VectorXd boundCond,
 		       std::vector<double> timeDistr);
 
     /*! Destructor. */
@@ -68,9 +68,9 @@ namespace PatternGeneratorJRL
       Zpos: vector with Zpos
       Xpos: vector Xpos */
     StepOverPolynomeFootZtoX();
-  
+
     /*! Set the parameters */
-    void SetParameters(Eigen::VectorXd Zpos, 
+    void SetParameters(Eigen::VectorXd Zpos,
 		       std::vector<double> Xpos);
 
     /*! Destructor. */
@@ -79,7 +79,7 @@ namespace PatternGeneratorJRL
 
 
   /*! @ingroup stepping over
-    @brief Polynome used for X trajectory in function of time 
+    @brief Polynome used for X trajectory in function of time
     to combine with StepOverPolynomeFootZtoX.*/
   class  StepOverPolynomeFootXtoTime : public Polynome
   {
@@ -87,89 +87,89 @@ namespace PatternGeneratorJRL
     /*! Constructor:
       Zpos: vector with Zpos */
     StepOverPolynomeFootXtoTime();
-  
+
     /*! Set the parameters */
-    void SetParameters(Eigen::VectorXd Xbound, 
+    void SetParameters(Eigen::VectorXd Xbound,
 		       std::vector<double> timedistr);
 
     /*! Destructor. */
     ~StepOverPolynomeFootXtoTime();
   };
 
-  /*! @ingroup steppingover 
-    @brief Polynome for the hip trajectory. 
+  /*! @ingroup steppingover
+    @brief Polynome for the hip trajectory.
   */
   class  StepOverPolynomeHip4 : public Polynome
   {
   public:
     /*! Constructor:
       boundCond: the different boundary conditions begin, intermediate and end of polynomial
-      timeDistr: vector with time instants for intermediate boundary conditions and end time 
+      timeDistr: vector with time instants for intermediate boundary conditions and end time
     */
     StepOverPolynomeHip4();
-    
+
     // Set the parameters
     void SetParameters(Eigen::VectorXd boundCond,
 		       std::vector<double> timeDistr);
-    
+
     /*! Destructor. */
     ~StepOverPolynomeHip4();
   };
-  
 
 
 
-  /*! @ingroup steppingover 
+
+  /*! @ingroup steppingover
     @brief spline function calculation
     class to calculate cubic splines */
-  class  StepOverSpline 
+  class  StepOverSpline
   {
   public:
     /*! Constructor: */
     StepOverSpline();
-    
+
     /*! Set the parameters */
     void SetParameters(Eigen::VectorXd Points);
-    
+
     double GetValueSpline(Eigen::VectorXd TimePoints,
 			  double CurrentLocalTime);
-    
+
     void print();
 
     /*! Destructor. */
     ~StepOverSpline();
 
   protected:
-    unsigned int number;
-    Eigen::MatrixXd Coefficients;
+    unsigned long int m_number;
+    Eigen::MatrixXd m_Coefficients;
   };
 
   /*! @ingroup steppingover
     class to calculate Clamped Cubic splines */
-  class  StepOverClampedCubicSpline 
+  class  StepOverClampedCubicSpline
   {
   public:
     /*! Constructor: */
     StepOverClampedCubicSpline();
-    
+
     /*! Set the parameters */
     void SetParameters(Eigen::VectorXd Points,
 		       Eigen::VectorXd TimePoints,
 		       Eigen::VectorXd DerivativeEndPoints);
-    
-    double GetValueSpline(Eigen::VectorXd TimePoints, 
+
+    double GetValueSpline(Eigen::VectorXd TimePoints,
 			  double CurrentLocalTime);
-    
+
     void print();
     /*! Destructor. */
     ~StepOverClampedCubicSpline();
-    
+
   protected:
-    unsigned int number;
-    Eigen::MatrixXd Coefficients;
-    
+    unsigned long int m_number;
+    Eigen::MatrixXd m_Coefficients;
+
   };
-  
+
 }
 
 #endif /* _STEPOVER_POLYNOME_H_ */

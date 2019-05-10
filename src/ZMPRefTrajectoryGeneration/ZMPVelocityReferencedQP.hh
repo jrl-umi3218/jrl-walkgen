@@ -79,15 +79,15 @@ namespace PatternGeneratorJRL
       Returns the number of steps which has been completely put inside
       the queue of ZMP, and foot positions.
     */
-    int InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-                   deque<COMState> & FinalCoMPositions_deq,
-                   deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-                   deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-                   FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                   FootAbsolutePosition & InitRightFootAbsolutePosition,
-                   deque<RelativeFootPosition> &RelativeFootPositions,
-                   COMState & lStartingCOMState,
-                   Eigen::Vector3d & lStartingZMPPosition);
+    std::size_t InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
+			   deque<COMState> & FinalCoMPositions_deq,
+			   deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+			   deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+			   FootAbsolutePosition & InitLeftFootAbsolutePosition,
+			   FootAbsolutePosition & InitRightFootAbsolutePosition,
+			   deque<RelativeFootPosition> &RelativeFootPositions,
+			   COMState & lStartingCOMState,
+			   Eigen::Vector3d & lStartingZMPPosition);
 
 
     /// \brief Update the stacks on-line

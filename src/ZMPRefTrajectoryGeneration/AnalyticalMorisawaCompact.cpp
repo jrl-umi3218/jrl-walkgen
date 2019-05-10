@@ -489,7 +489,8 @@ computing the analytical trajectories. */
     }
     else
     {
-      ODEBUG3(" Feet Trajectory Generator NOT INITIALIZED");
+      std::cerr << " Feet Trajectory Generator NOT INITIALIZED"
+		<< std::endl;
       return -1;
     }
 
@@ -731,15 +732,15 @@ computing the analytical trajectories. */
     }
   }
 
-  int AnalyticalMorisawaCompact::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-                                            deque<COMState> & FinalCoMPositions,
-                                            deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-                                            deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
-                                            FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                                            FootAbsolutePosition & InitRightFootAbsolutePosition,
-                                            deque<RelativeFootPosition> &RelativeFootPositions,
-                                            COMState & lStartingCOMState,
-                                            Eigen::Vector3d &)
+  std::size_t AnalyticalMorisawaCompact::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
+						    deque<COMState> & FinalCoMPositions,
+						    deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+						    deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
+						    FootAbsolutePosition & InitLeftFootAbsolutePosition,
+						    FootAbsolutePosition & InitRightFootAbsolutePosition,
+						    deque<RelativeFootPosition> &RelativeFootPositions,
+						    COMState & lStartingCOMState,
+						    Eigen::Vector3d &)
   {
     m_OnLineMode = true;
     m_RelativeFootPositions.clear();
@@ -2350,10 +2351,11 @@ a shift is done to chose the earliest double support interval. */
       /*! Same for the feet trajectories */
       *m_FeetTrajectoryGenerator = *m_BackUpm_FeetTrajectoryGenerator;
 
-      ODEBUG3("Unable to change the step ( " <<
-              aFootAbsolutePosition[0].x << " , " <<
-              aFootAbsolutePosition[0].y << " , " <<
-              aFootAbsolutePosition[0].theta << " ) ");
+      std::cerr << "Unable to change the step ( "
+		<< aFootAbsolutePosition[0].x << " , "
+		<< aFootAbsolutePosition[0].y << " , "
+		<< aFootAbsolutePosition[0].theta << " ) "
+		<< std::endl;
       throw e;
     }
 
@@ -2767,10 +2769,6 @@ new step has to be generate.
       {
         absFootz_2 = m_AbsoluteSupportFootPositions[Index-2].z - corrZ(2);
       }
-    double absFootx_0 = m_AbsoluteSupportFootPositions[Index].x ;
-    double absFootx_1 = m_AbsoluteSupportFootPositions[Index-1].x ;
-    double absFooty_0 = m_AbsoluteSupportFootPositions[Index].y ;
-    double absFooty_1 = m_AbsoluteSupportFootPositions[Index-1].y ;
 
     // climbing
     // put first leg on the stairs with decrease of CoM //up// of stair height

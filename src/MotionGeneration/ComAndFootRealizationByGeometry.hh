@@ -92,16 +92,17 @@ namespace PatternGeneratorJRL
       last stage, we store some information.
 
     */
-    bool ComputePostureForGivenCoMAndFeetPosture(Eigen::VectorXd &CoMPosition,
-						 Eigen::VectorXd &aCoMSpeed,
-						 Eigen::VectorXd &aCoMAcc,
-						 Eigen::VectorXd &LeftFoot,
-						 Eigen::VectorXd &RightFoot,
-						 Eigen::VectorXd & CurrentConfiguration,
-						 Eigen::VectorXd & CurrentVelocity,
-						 Eigen::VectorXd & CurrentAcceleration,
-						 int IterationNumber,
-						 int Stage);
+    bool ComputePostureForGivenCoMAndFeetPosture
+    (Eigen::VectorXd &CoMPosition,
+     Eigen::VectorXd &aCoMSpeed,
+     Eigen::VectorXd &aCoMAcc,
+     Eigen::VectorXd &LeftFoot,
+     Eigen::VectorXd &RightFoot,
+     Eigen::VectorXd & CurrentConfiguration,
+     Eigen::VectorXd & CurrentVelocity,
+     Eigen::VectorXd & CurrentAcceleration,
+     unsigned long int IterationNumber,
+     int Stage);
 
     /*! \name Initialization of the walking.
       @{
