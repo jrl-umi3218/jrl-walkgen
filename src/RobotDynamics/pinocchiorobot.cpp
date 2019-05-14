@@ -360,15 +360,6 @@ void PinocchioRobot::initializeLegsInverseKinematics()
   m_rightDt.Zero();
   pinocchio::SE3 waist_M_leftHip , waist_M_rightHip ;
 
-  waist_M_leftHip = m_robotModel->jointPlacements[leftLeg[0]].act(
-								  m_robotModel->jointPlacements[leftLeg[1]]).act(
-														 m_robotModel->jointPlacements[leftLeg[2]]).act(
-																				m_robotModel->jointPlacements[leftLeg[3]]);
-  waist_M_rightHip = m_robotModel->jointPlacements[rightLeg[0]].act(
-								    m_robotModel->jointPlacements[rightLeg[1]]).act(
-														    m_robotModel->jointPlacements[rightLeg[2]]).act(
-																				    m_robotModel->jointPlacements[rightLeg[3]]);
-=======
   waist_M_leftHip = m_robotModel->jointPlacements[leftLeg[0]].
     act(m_robotModel->jointPlacements[leftLeg[1]]).
     act(m_robotModel->jointPlacements[leftLeg[2]]).
@@ -377,7 +368,6 @@ void PinocchioRobot::initializeLegsInverseKinematics()
     act(m_robotModel->jointPlacements[rightLeg[1]]).
     act(m_robotModel->jointPlacements[rightLeg[2]]).
     act(m_robotModel->jointPlacements[rightLeg[3]]);
->>>>>>> devel
 
   m_leftDt(0)=waist_M_leftHip.translation()(0);
   m_leftDt(1)=waist_M_leftHip.translation()(1);

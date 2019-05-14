@@ -1621,13 +1621,15 @@ and we went over half the current interval.
 
   }
 
-  void AnalyticalMorisawaCompact::ConstraintsChange(double ,
-                                                    FluctuationParameters FPX,
-                                                    FluctuationParameters FPY,
-                                                    CompactTrajectoryInstanceParameters &aCTIPX,
-                                                    CompactTrajectoryInstanceParameters &aCTIPY,
-                                                    unsigned int IndexStartingInterval,
-                                                    StepStackHandler *aStepStackHandler)
+  void AnalyticalMorisawaCompact::
+  ConstraintsChange
+  (double ,
+   FluctuationParameters FPX,
+   FluctuationParameters FPY,
+   CompactTrajectoryInstanceParameters &aCTIPX,
+   CompactTrajectoryInstanceParameters &aCTIPY,
+   unsigned int IndexStartingInterval,
+   StepStackHandler *aStepStackHandler)
   {
     if (IndexStartingInterval!=0)
     {
@@ -1642,13 +1644,13 @@ and we went over half the current interval.
       }
 
       /* Add value from the provided steps stack.
-BE CAREFUL: There is a modification on the initial value
-depending if a m_AbsoluteSupportFootPositions has been updated
-or not.
-If m_AbsoluteFootPositions has not been updated then
-a demand for a new step will be triggered.
-*/
-
+	 BE CAREFUL: There is a modification on the initial value
+	 depending if a m_AbsoluteSupportFootPositions has been updated
+	 or not.
+	 If m_AbsoluteFootPositions has not been updated then
+	 a demand for a new step will be triggered.
+      */
+      
       unsigned int k = 0;
       if (m_NewStepInTheStackOfAbsolutePosition)
         k = (i-3)/2;
@@ -1671,18 +1673,19 @@ a demand for a new step will be triggered.
 
       }
       /* Complete the ZMP profil when no other step is available,
-and if there is a StepStack Handler available.
-*/
+	 and if there is a StepStack Handler available.
+      */
       if (aStepStackHandler!=0)
       {
         /* Compute the number of steps needed. */
         int NeededSteps = (int)((aCTIPX.ZMPProfil.size()-j+1)/2);
-        int r;
+        long int r;
 
         /* Test if there is enough step in the stack of.
-We have to remove one, because there is still the last foot added.
-*/
-        if ((r=aStepStackHandler->ReturnStackSize()-1-NeededSteps)<0)
+	   We have to remove one, because there is still the last foot added.
+	*/
+        if ((r=(long int)aStepStackHandler->ReturnStackSize()-1-
+	     (long int)NeededSteps)<0)
         {
           bool lNewStep=false;
           double NewStepX=0.0,NewStepY=0.0,NewStepTheta=0.0;
@@ -1698,19 +1701,24 @@ We have to remove one, because there is still the last foot added.
 
         /* Takes the number of Relative Foot Positions needed. */
         deque<RelativeFootPosition> lRelativeFootPositions;
-        aStepStackHandler->CopyRelativeFootPosition(lRelativeFootPositions,false);
+        aStepStackHandler->CopyRelativeFootPosition
+	  (lRelativeFootPositions,false);
 
         /*! Remove the first step still in the stack. */
         lRelativeFootPositions.pop_front();
 
         deque<FootAbsolutePosition> lAbsoluteSupportFootPositions;
         int lLastIndex = (int)(m_AbsoluteSupportFootPositions.size()-1);
-        m_FeetTrajectoryGenerator->ComputeAbsoluteStepsFromRelativeSteps(lRelativeFootPositions,
-                                                                         m_AbsoluteSupportFootPositions[lLastIndex],
-                                                                         lAbsoluteSupportFootPositions);
-
+        m_FeetTrajectoryGenerator->
+	  ComputeAbsoluteStepsFromRelativeSteps
+	  (lRelativeFootPositions,
+	   m_AbsoluteSupportFootPositions[lLastIndex],
+	   lAbsoluteSupportFootPositions);
+	
         /* Add the necessary absolute support foot positions. */
-        for(int li=0;(li<NeededSteps)&& (j< m_CTIPX.ZMPProfil.size());li++,j+=2)
+        for(int li=0;
+	    (li<NeededSteps)&& (j< m_CTIPX.ZMPProfil.size());
+	    li++,j+=2)
         {
 
           aCTIPX.ZMPProfil[j] = lAbsoluteSupportFootPositions[li].x;

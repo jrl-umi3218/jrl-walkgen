@@ -31,7 +31,7 @@
 
 using namespace std;
 
-int PerformTests(int argc, char *argv[])
+int PerformTests(int , char *[])
 {
     // Test Bspline without way point
     /////////////////////////////////
@@ -230,8 +230,11 @@ int PerformTests(int argc, char *argv[])
     bool testbsplineKnotsControl =
         test_IP && test_IS && test_IA &&
         test_FP && test_FS && test_FA ;
-    std::cout << "testFP : " << testFP << std::endl;
-    std::cout << "MP : [" << TimeInterval << ";" << FinalPosition << "]" << std::endl;
+    std::cout << "testFP : " << testFP
+	      << "testbsplineKnotsControl " << testbsplineKnotsControl
+	      << std::endl;
+    std::cout << "MP : [" << TimeInterval << ";"
+	      << FinalPosition << "]" << std::endl;
 
     for (double i=0 ; i < 1400 ; ++i)
     {
