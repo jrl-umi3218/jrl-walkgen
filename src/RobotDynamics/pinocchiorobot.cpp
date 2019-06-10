@@ -140,8 +140,10 @@ bool PinocchioRobot::checkModel(pinocchio::Model * robotModel)
   return true ;
 }
 
-bool PinocchioRobot::initializeRobotModelAndData(pinocchio::Model * robotModel,
-                                                 pinocchio::Data * robotData)
+bool PinocchioRobot::
+initializeRobotModelAndData
+(pinocchio::Model * robotModel,
+ pinocchio::Data * robotData)
 {
   m_boolModel=checkModel(robotModel);
   if(!m_boolModel)

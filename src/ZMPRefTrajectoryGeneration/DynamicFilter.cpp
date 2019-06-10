@@ -90,10 +90,7 @@ DynamicFilter::~DynamicFilter()
 
 void DynamicFilter::CallMethod(string &Method, istringstream &strm)
 {
-  //#ifdef DEBUG
-  //  std::cout << __PRETTY_FUNCTION__ << " Method:" << Method << std::endl;
-  //#endif
-    if (Method==":useDynamicFilter")
+  if (Method==":useDynamicFilter")
     {
       string useDynamicFilter ;
       strm >> useDynamicFilter;

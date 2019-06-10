@@ -63,7 +63,7 @@ namespace PatternGeneratorJRL
     {
       // Generates a signal when a NaN occurs.
       feenableexcept(FE_INVALID | FE_OVERFLOW);
-      
+
       m_TestName = aTestName;
       m_OneStep.m_TestName = m_TestName;
       m_PGIInterface = lPGIInterface;
@@ -164,7 +164,7 @@ namespace PatternGeneratorJRL
       InitializeLimbs();
       return true ;
     }
-    
+
     TestObject::~TestObject()
     {
 
@@ -182,7 +182,7 @@ namespace PatternGeneratorJRL
 
       if (m_PGI!=0)
         delete m_PGI;
-      
+
       if (m_SPM!=0)
         delete m_SPM;
     }
@@ -230,7 +230,7 @@ namespace PatternGeneratorJRL
         waist(i) = 0;
       }
       Eigen::Vector3d lStartingCOMState;
-      
+
       lStartingCOMState(0) = m_OneStep.m_finalCOMPosition.x[0] ;
       lStartingCOMState(1) = m_OneStep.m_finalCOMPosition.y[0] ;
       lStartingCOMState(2) = m_OneStep.m_finalCOMPosition.z[0] ;
@@ -245,7 +245,7 @@ namespace PatternGeneratorJRL
       m_CurrentConfiguration(2) = waist(2);
 
     }
-    
+
     void TestObject::InitializeLimbs()
     {
       m_leftLeg =
@@ -260,10 +260,10 @@ namespace PatternGeneratorJRL
       m_rightArm =
           m_PR->jointsBetween(m_PR->chest(),
 			      m_PR->rightWrist());
-      
+
       m_leftLeg.erase( m_leftLeg.begin() );
       m_rightLeg.erase( m_rightLeg.begin() );
-      
+
       pinocchio::JointModelVector & ActuatedJoints = m_PR->getActuatedJoints();
       for(unsigned i=0 ; i <m_leftLeg.size() ; ++i)
         m_leftLeg[i] = pinocchio::idx_q(ActuatedJoints[m_leftLeg[i]])-1;
@@ -273,20 +273,20 @@ namespace PatternGeneratorJRL
         m_leftArm[i] = pinocchio::idx_q(ActuatedJoints[m_leftArm[i]])-1;
       for(unsigned i=0 ; i <m_rightArm.size() ; ++i)
         m_rightArm[i] = pinocchio::idx_q(ActuatedJoints[m_rightArm[i]])-1;
-      
+
       if((m_robotModel.parents.size() >= m_rightArm.back()+1) &&
          m_robotModel.parents[m_rightArm.back()+1] == m_rightArm.back())
         m_rightGripper = m_rightArm.back()+1 ;
       else
         m_rightGripper = 0 ;
-      
+
       if((m_robotModel.parents.size() >= m_leftArm.back()+1) &&
          m_robotModel.parents[m_leftArm.back()+1] == m_leftArm.back())
         m_leftGripper = m_leftArm.back()+1 ;
       else
         m_leftGripper = 0 ;
     }
-    
+
     void TestObject::
     CreateAndInitializeHumanoidRobot
     (std::string &URDFFile,
@@ -314,6 +314,8 @@ namespace PatternGeneratorJRL
       // initialize the model and data of the humanoid robot
       aPR->initializeRobotModelAndData(&m_robotModel,m_robotData);
       aDebugPR->initializeRobotModelAndData(&m_robotModel,m_DebugRobotData);
+
+      m_conf.resize(m_robotModel.nq);
 
       // Parsing the SRDF file to initialize
       // the starting configuration and the robot specifities
@@ -349,7 +351,7 @@ namespace PatternGeneratorJRL
 	}
 
       // Get the starting configuration : half sitting
-      // Uses the order 
+      // Uses the order
       m_HalfSitting.resize(aPR.numberDof()-6);
       m_HalfSitting.setZero();
 
@@ -753,7 +755,7 @@ namespace PatternGeneratorJRL
       // Compare debugging files
       return compareDebugFiles();
     }
-    
+
     void TestObject::setDirectorySeqplay(std::string & aDirectory)
     {
       m_DirectoryName = aDirectory;
@@ -773,34 +775,34 @@ namespace PatternGeneratorJRL
       Eigen::VectorXd aCOMAcc(6);
       Eigen::VectorXd aLeftFootPosition(5);
       Eigen::VectorXd aRightFootPosition(5);
-      
+
       aCOMState(0) = m_OneStep.m_finalCOMPosition.x[0];
       aCOMState(1) = m_OneStep.m_finalCOMPosition.y[0];
       aCOMState(2) = m_OneStep.m_finalCOMPosition.z[0];
       aCOMState(3) = m_OneStep.m_finalCOMPosition.roll[0]  * 180/M_PI ;
       aCOMState(4) = m_OneStep.m_finalCOMPosition.pitch[0] * 180/M_PI ;
       aCOMState(5) = m_OneStep.m_finalCOMPosition.yaw[0]   * 180/M_PI ;
-      
+
       aCOMSpeed(0) = m_OneStep.m_finalCOMPosition.x[1];
       aCOMSpeed(1) = m_OneStep.m_finalCOMPosition.y[1];
       aCOMSpeed(2) = m_OneStep.m_finalCOMPosition.z[1];
       aCOMSpeed(3) = m_OneStep.m_finalCOMPosition.roll[1] /** * 180/M_PI  */ ;
       aCOMSpeed(4) = m_OneStep.m_finalCOMPosition.pitch[1]/** * 180/M_PI  */ ;
       aCOMSpeed(5) = m_OneStep.m_finalCOMPosition.yaw[1]/** * 180/M_PI  */ ;
-      
+
       aCOMAcc(0) = m_OneStep.m_finalCOMPosition.x[2];
       aCOMAcc(1) = m_OneStep.m_finalCOMPosition.y[2];
       aCOMAcc(2) = m_OneStep.m_finalCOMPosition.z[2];
       aCOMAcc(3) = m_OneStep.m_finalCOMPosition.roll[2]/** * 180/M_PI  */ ;
       aCOMAcc(4) = m_OneStep.m_finalCOMPosition.pitch[2]/** * 180/M_PI  */ ;
       aCOMAcc(5) = m_OneStep.m_finalCOMPosition.yaw[2] /** * 180/M_PI  */;
-      
+
       aLeftFootPosition(0) = m_OneStep.m_LeftFootPosition.x;
       aLeftFootPosition(1) = m_OneStep.m_LeftFootPosition.y;
       aLeftFootPosition(2) = m_OneStep.m_LeftFootPosition.z;
       aLeftFootPosition(3) = m_OneStep.m_LeftFootPosition.theta;
       aLeftFootPosition(4) = m_OneStep.m_LeftFootPosition.omega;
-      
+
       aRightFootPosition(0) = m_OneStep.m_RightFootPosition.x;
       aRightFootPosition(1) = m_OneStep.m_RightFootPosition.y;
       aRightFootPosition(2) = m_OneStep.m_RightFootPosition.z;
@@ -816,7 +818,7 @@ namespace PatternGeneratorJRL
 	 aRightFootPosition,
 	 conf, vel, acc,
 	 ((int)m_OneStep.m_NbOfIt),1);
-      
+
       if(m_leftGripper!=0 && m_rightGripper!=0)
       {
         conf(m_leftGripper) = 10.0*M_PI/180.0;
@@ -828,7 +830,7 @@ namespace PatternGeneratorJRL
     {
       m_fromURDFToOpenHRP = vfromURDFToOpenHRP;
     }
-    
+
     void TestObject::parseFromURDFtoOpenHRPIndex(Eigen::VectorXd &conf)
     {
       if (((unsigned int)conf.size())!=m_fromURDFToOpenHRP.size())
@@ -836,7 +838,7 @@ namespace PatternGeneratorJRL
 	  std::cerr << "" << std::endl;
 	  return;
 	}
-      
+
       std::cerr << "conf size():" << conf.size() << std::endl;
       std::cerr << "Current Configuration: "
 		<< m_CurrentConfiguration.size()
@@ -849,7 +851,7 @@ namespace PatternGeneratorJRL
 
     void TestObject::generateOpenHRPTrajectories()
     {
-      
+
       analyticalInverseKinematics(m_CurrentConfiguration,
                                   m_CurrentVelocity,
                                   m_CurrentAcceleration);
@@ -863,7 +865,7 @@ namespace PatternGeneratorJRL
       ofstream aof;
       string aFileName;
       long int iteration = m_OneStep.m_NbOfIt-1 ;
-      
+
       if ( iteration == 0 ){
         aFileName = m_DirectoryName;
         aFileName+= m_TestName;
@@ -888,7 +890,7 @@ namespace PatternGeneratorJRL
       }
       aof << 0.0  << endl ;
       aof.close();
-      
+
       if ( iteration == 0 ){
         aFileName = m_DirectoryName;
         aFileName += m_TestName;
@@ -911,7 +913,7 @@ namespace PatternGeneratorJRL
 	( m_OneStep.m_finalCOMPosition.yaw[0] * M_PI /180 ) ; // 4
       aof << endl ;
       aof.close();
-      
+
       if ( iteration == 0 ){
         aFileName = m_DirectoryName;
         aFileName += m_TestName;
@@ -919,13 +921,13 @@ namespace PatternGeneratorJRL
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
-      
+
       FootAbsolutePosition aSupportState;
       if (m_OneStep.m_LeftFootPosition.stepType < 0 )
         aSupportState = m_OneStep.m_LeftFootPosition ;
       else
         aSupportState = m_OneStep.m_RightFootPosition ;
-      
+
       aFileName = m_DirectoryName;
       aFileName += m_TestName;
       aFileName += ".zmp";
@@ -942,7 +944,7 @@ namespace PatternGeneratorJRL
       aof << endl ;
       aof.close();
     }
-    
-  
+
+
   } // Test Suite namespace
 } // PatternGeneratorJRL namespace
