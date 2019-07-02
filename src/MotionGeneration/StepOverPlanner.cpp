@@ -1561,12 +1561,6 @@ void StepOverPlanner::SetZMPDiscretization(ZMPDiscretization *aZMPDiscr)
 void StepOverPlanner::SetDynamicMultiBodyModel(PinocchioRobot *aPR)
 {
   m_PR = aPR;
-  unsigned int NbOfDofs =m_PR->numberDof();
-  Eigen::VectorXd aCurrentVel(NbOfDofs); 
-  for(unsigned int i=0;i<NbOfDofs;i++)
-    aCurrentVel[i]=0.0;
-  m_PR->currentVelocity(aCurrentVel);
-
 }
 
 
