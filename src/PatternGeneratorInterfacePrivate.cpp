@@ -674,10 +674,8 @@ namespace PatternGeneratorJRL {
   (Eigen::VectorXd &Configuration,
    Eigen::Vector3d &lStartingCOMState)
   {
-    Eigen::VectorXd Velocity;
-    Velocity.resize(Configuration.size());
-    for(unsigned int i=0;i<Configuration.size();i++)
-      Velocity[i] = 0.0;
+    Eigen::VectorXd Velocity=    m_PinocchioRobot->currentVelocity();
+    Velocity.setZero();
 
     m_PinocchioRobot->currentConfiguration(Configuration);
     m_PinocchioRobot->currentVelocity(Velocity);
