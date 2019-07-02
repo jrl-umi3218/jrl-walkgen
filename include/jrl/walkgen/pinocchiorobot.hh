@@ -112,7 +112,7 @@ namespace PatternGeneratorJRL
     /// FF-RZ-RX-RY-RY-RY-RX
     /// FF-RX-RZ-RY-RY-RY-RX
     /// \return
-    ///    
+    ///
     virtual bool testLegsInverseKinematics();
     ///
     /// \brief testOneModefOfLegInverseKinematics :
@@ -120,7 +120,7 @@ namespace PatternGeneratorJRL
     /// configuration to use the analitical inverse geometry
     /// to be overloaded if the user wants another inverse kinematics
     /// \return
-    ///    
+    ///
     virtual bool testOneModeOfLegsInverseKinematics
     (std::vector<std::string> &leftLegJointNames,
      std::vector<std::string> &rightLegJointNames);
@@ -154,6 +154,11 @@ namespace PatternGeneratorJRL
     void DetectAutomaticallyOneShoulder(pinocchio::JointIndex aWrist,
                                         pinocchio::JointIndex & aShoulder);
 
+    /*! \brief Computes the size of the free flyer/root robot
+      loads by the urdf.
+      Set the value of m_PinoFreeFlyerSize.
+    */
+    void ComputeRootSize();
 
   public :
     /// Getters
@@ -195,6 +200,9 @@ namespace PatternGeneratorJRL
     {return m_amal;}
 
     inline unsigned numberDof()
+    {return m_robotModel->nq;}
+
+    inline unsigned numberVelDof()
     {return m_robotModel->nv;}
 
     inline void zeroMomentumPoint(Eigen::Vector3d & zmp)
@@ -236,12 +244,18 @@ namespace PatternGeneratorJRL
 
     /// SETTERS
     /// ///////
-    inline void currentConfiguration(Eigen::VectorXd conf)
+    inline void currentConfiguration(Eigen::VectorXd & conf)
     {m_qmal=conf;}
-    inline void currentVelocity(Eigen::VectorXd vel)
+    inline void currentVelocity(Eigen::VectorXd & vel)
     {m_vmal=vel;}
-    inline void currentAcceleration(Eigen::VectorXd acc)
+    inline void currentAcceleration(Eigen::VectorXd & acc)
     {m_amal=acc;}
+
+    inline pinocchio::JointIndex getFreeFlyerSize() const
+    { return m_PinoFreeFlyerSize;}
+
+    inline pinocchio::JointIndex getFreeFlyerVelSize() const
+    { return m_PinoFreeFlyerVelSize;}
 
     /// Initialization functions
     /// ////////////////////////
@@ -270,9 +284,6 @@ namespace PatternGeneratorJRL
     Eigen::VectorXd m_qmal ;
     Eigen::VectorXd m_vmal ;
     Eigen::VectorXd m_amal ;
-    Eigen::VectorXd m_q ;
-    Eigen::VectorXd m_v ;
-    Eigen::VectorXd m_a ;
 
     // tmp variables
     Eigen::Quaterniond m_quat ;
@@ -301,6 +312,12 @@ namespace PatternGeneratorJRL
     bool m_boolData      ;
     bool m_boolLeftFoot  ;
     bool m_boolRightFoot ;
+
+    /// \brief Size of the free flyer configuration space.
+    pinocchio::JointIndex m_PinoFreeFlyerSize;
+
+    /// \brief Size of the free flyer velocity space.
+    pinocchio::JointIndex m_PinoFreeFlyerVelSize;
 
   }; //PinocchioRobot
 }// namespace PatternGeneratorJRL

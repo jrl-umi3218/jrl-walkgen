@@ -38,22 +38,18 @@ PinocchioRobot::PinocchioRobot()
 
   m_quat.normalize();
   // resize by default
-  m_q.resize(50,1);
-  m_q(3)=m_quat.x();
-  m_q(4)=m_quat.y();
-  m_q(5)=m_quat.z();
-  m_q(6)=m_quat.w();
-  m_v.resize(50,1);
-  m_a.resize(50,1);
+  m_qmal.resize(50,1);
+  m_qmal.fill(0.0);
+  m_qmal(3)=m_quat.x();
+  m_qmal(4)=m_quat.y();
+  m_qmal(5)=m_quat.z();
+  m_qmal(6)=m_quat.w();
   m_tau.resize(50,1);
-  m_q.fill(0.0);
-  m_v.fill(0.0);
-  m_a.fill(0.0);
+  m_vmal.fill(0.0);
+  m_amal.fill(0.0);
   m_tau.fill(0.0);
-  m_qmal.resize( 50 );
   m_vmal.resize( 50 );
   m_amal.resize( 50 );
-  m_qmal.Zero(50);
   m_vmal.Zero(50);
   m_amal.Zero(50);
 
@@ -82,7 +78,8 @@ PinocchioRobot::PinocchioRobot()
   m_femurLength = 0.0 ;
   m_tibiaLengthZ = 0.0 ;
   m_tibiaLengthY = 0.0 ;
-
+  m_PinoFreeFlyerSize=0;
+  m_PinoFreeFlyerVelSize=0;
 }
 
 PinocchioRobot::~PinocchioRobot()
@@ -140,6 +137,24 @@ bool PinocchioRobot::checkModel(pinocchio::Model * robotModel)
   return true ;
 }
 
+void PinocchioRobot::ComputeRootSize()
+{
+  // Find root.
+  for(std::size_t i=0;
+      i<m_robotModel->joints.size();
+      i++)
+    {
+      if (0== m_robotModel->parents[i])
+	{
+	  if (m_robotModel->names[i]=="root_joint")
+	    {
+	      m_PinoFreeFlyerSize=pinocchio::nq(m_robotModel->joints[i]);
+	      m_PinoFreeFlyerVelSize=pinocchio::nv(m_robotModel->joints[i]);
+	    }
+	}
+    }
+}
+
 bool PinocchioRobot::
 initializeRobotModelAndData
 (pinocchio::Model * robotModel,
@@ -171,24 +186,23 @@ initializeRobotModelAndData
 
   DetectAutomaticallyShoulders();
 
+  ComputeRootSize();
+
   // intialize the "initial pose" (q=[0]) data
   m_robotDataInInitialePose = new pinocchio::Data(*m_robotModel);
   m_robotDataInInitialePose->v[0] = pinocchio::Motion::Zero();
   m_robotDataInInitialePose->a[0] = -m_robotModel->gravity;
-  m_q.resize(m_robotModel->nq,1);
-  m_q.fill(0.0);
-  m_q[6]= 1.0 ;
-  m_v.resize(m_robotModel->nv,1);
-  m_a.resize(m_robotModel->nv,1);
-  m_tau.resize(m_robotModel->nv,1);
-  pinocchio::forwardKinematics(*m_robotModel,*m_robotDataInInitialePose,m_q);
-
-  m_qmal.resize(m_robotModel->nv);
+  m_qmal.resize(m_robotModel->nq);
+  m_qmal.setZero();
+  m_qmal[6]= 1.0 ;
   m_vmal.resize(m_robotModel->nv);
+  m_vmal.setZero();
   m_amal.resize(m_robotModel->nv);
-  m_qmal.Zero(m_robotModel->nv);
-  m_vmal.Zero(m_robotModel->nv);
-  m_amal.Zero(m_robotModel->nv);
+  m_amal.setZero();
+  m_tau.resize(m_robotModel->nv);
+  m_tau.setZero();
+  pinocchio::forwardKinematics(*m_robotModel,*m_robotDataInInitialePose,m_qmal);
+
 
   // compute the global mass of the robot
   m_mass=0.0;
@@ -381,13 +395,21 @@ void PinocchioRobot::initializeLegsInverseKinematics()
   m_femurLength = m_robotModel->jointPlacements[rightLeg[4]]
     .translation().norm();
 
+  if (m_femurLength==0)
+    {
+      m_femurLength = m_robotModel->jointPlacements[rightLeg[5]]
+	.translation().norm();
+    }
+
   m_tibiaLengthY =
     std::abs(m_robotModel->jointPlacements[rightLeg[5]].translation()[1]);
   m_tibiaLengthZ =
     std::abs(m_robotModel->jointPlacements[rightLeg[5]].translation()[2]);
 
   if(m_femurLength==0 || m_tibiaLengthZ==0)
-    m_isLegInverseKinematic=false;
+    {
+      m_isLegInverseKinematic=false;
+    }
   RESETDEBUG5("DebugDataInitIK.dat");
   ODEBUG5("waist_M_leftHip " << waist_M_leftHip,"DebugDataInitIK.dat");
   ODEBUG5("waist_M_rightHip " << waist_M_rightHip,"DebugDataInitIK.dat");
@@ -441,18 +463,18 @@ void PinocchioRobot::computeForwardKinematics(Eigen::VectorXd & q)
   // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
   for(unsigned i=0; i<3 ; ++i)
     {
-      m_q(i) = q(i);
+      m_qmal(i) = q(i);
     }
-  m_q(3) = m_quat.x() ;
-  m_q(4) = m_quat.y() ;
-  m_q(5) = m_quat.z() ;
-  m_q(6) = m_quat.w() ;
-  for(int i=0; i<m_robotModel->nv-6 ; ++i)
+  m_qmal(3) = m_quat.x() ;
+  m_qmal(4) = m_quat.y() ;
+  m_qmal(5) = m_quat.z() ;
+  m_qmal(6) = m_quat.w() ;
+  for(int i=0; i<m_robotModel->nq-m_PinoFreeFlyerSize ; ++i)
     {
-      m_q(7+i) = q(6+i);
+      m_qmal(m_PinoFreeFlyerSize+i) = q(m_PinoFreeFlyerSize+i);
     }
-  pinocchio::forwardKinematics(*m_robotModel,*m_robotData,m_q);
-  pinocchio::centerOfMass(*m_robotModel,*m_robotData,m_q);
+  pinocchio::forwardKinematics(*m_robotModel,*m_robotData,m_qmal);
+  pinocchio::centerOfMass(*m_robotModel,*m_robotData,m_qmal);
 }
 
 void PinocchioRobot::computeInverseDynamics()
@@ -481,32 +503,27 @@ computeInverseDynamics
 			      Eigen::AngleAxisd(q(3), Eigen::Vector3d::UnitX()) ) ;
   for(unsigned i=0; i<3 ; ++i)
     {
-      m_q(i) = q(i);
-      m_v(i) = v(i);
-      m_a(i) = a(i);
+      m_qmal(i) = q(i);
     }
   m_rot = m_quat.toRotationMatrix().transpose() ;
-  m_v.segment<3>(0) = m_rot * m_v.segment<3>(0) ;
-  m_a.segment<3>(0) = m_rot * m_a.segment<3>(0) ;
+  m_vmal.segment<3>(0) = m_rot * m_vmal.segment<3>(0) ;
+  m_amal.segment<3>(0) = m_rot * m_amal.segment<3>(0) ;
 
   // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
-  m_q(3) = m_quat.x() ;
-  m_q(4) = m_quat.y() ;
-  m_q(5) = m_quat.z() ;
-  m_q(6) = m_quat.w() ;
+  m_qmal(3) = m_quat.x() ;
+  m_qmal(4) = m_quat.y() ;
+  m_qmal(5) = m_quat.z() ;
+  m_qmal(6) = m_quat.w() ;
 
   // fill up the velocity and acceleration vectors
   //m_v.segment<3>(3) = m_omega ;
   //m_a.segment<3>(3) = m_domega ;
 
-  for(int i=6; i<m_robotModel->nv-6 ; ++i)
-    {
-      m_q(1+i) = q(i);
-      m_v(i)   = v(i);
-      m_a(i)   = a(i);
-    }
+  m_vmal = v;
+  m_amal = a;
+
   // performing the inverse dynamics
-  m_tau = pinocchio::rnea(*m_robotModel,*m_robotData,m_q,m_v,m_a);
+  m_tau = pinocchio::rnea(*m_robotModel,*m_robotData,m_qmal,m_vmal,m_amal);
 }
 
 std::vector<pinocchio::JointIndex>
