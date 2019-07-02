@@ -329,7 +329,7 @@ InitializationHumanoid(Eigen::VectorXd &BodyAnglesIni,
   // Initialize the configuration vector.
   for(unsigned int i=0; i<BodyAnglesIni.size(); ++i)
   {
-    CurrentConfig[i+6] = BodyAnglesIni[i];
+    CurrentConfig[i+aPR->getFreeFlyerSize()] = BodyAnglesIni[i];
   }
 
   aPR->currentConfiguration(CurrentConfig);
@@ -411,7 +411,7 @@ InitializationCoM
   memset((char *)&InitLeftFootPosition,0,sizeof(FootAbsolutePosition));
   memset((char *)&InitRightFootPosition,0,sizeof(FootAbsolutePosition));
   lStartingCOMPosition.setZero();
-  { for(unsigned int i=0;i<lStartingWaistPose.size();lStartingWaistPose[i++]=0.0);};
+  lStartingWaistPose.setZero();
 
   // Compute the forward dynamics from the configuration vector provided by the user.
   // Initialize waist pose.
@@ -694,7 +694,7 @@ KinematicsForOneLeg
                   ,"DebugDataIK.dat");
   }
 
-  ODEBUG4("Body_P " << Body_P,"DebugDataIK.dat");  
+  ODEBUG4("Body_P " << Body_P,"DebugDataIK.dat");
   ODEBUG4("Body_R " << Body_R,"DebugDataIK.dat");
   ODEBUG4("Foot_P " << Foot_P,"DebugDataIK.dat");
   ODEBUG4("Foot_R " << Foot_R,"DebugDataIK.dat");
@@ -905,7 +905,7 @@ ComputePostureForGivenCoMAndFeetPosture
        aRightFoot,
        aLeftFoot);
   }
-  
+
   // For stepping over modify the waist position and
   // according to parameters the arms motion.
   if(GetStepStackHandler()->GetWalkMode()==2)
@@ -980,15 +980,18 @@ ComputePostureForGivenCoMAndFeetPosture
 
   double ldt =  getSamplingPeriod();
 
+  pinocchio::JointIndex diffVelSize = getPinocchioRobot()->getFreeFlyerSize()-
+    getPinocchioRobot()->getFreeFlyerVelSize();
+
   if (Stage==0)
   {
     if (IterationNumber>0)
     {
       /* Compute the speed */
-      for(unsigned int i=6;i<m_prev_Configuration.size();i++)
+      for(unsigned int i=6;i<m_prev_Configuration.size()-diffVelSize;i++)
       {
-        CurrentVelocity[i] = (CurrentConfiguration[i]
-			      - m_prev_Configuration[i])/ ldt;
+        CurrentVelocity[i] = (CurrentConfiguration[i+diffVelSize]
+			      - m_prev_Configuration[i+diffVelSize])/ ldt;
         /* Keep the new value for the legs. */
       }
 
@@ -1018,10 +1021,10 @@ ComputePostureForGivenCoMAndFeetPosture
     if (IterationNumber>0)
     {
       /* Compute the speed */
-      for(unsigned int i=6;i<m_prev_Configuration1.size();i++)
+      for(unsigned int i=6;i<m_prev_Configuration1.size()-diffVelSize;i++)
       {
-        CurrentVelocity[i] = (CurrentConfiguration[i] -
-			      m_prev_Configuration1[i])/ ldt;
+        CurrentVelocity[i] = (CurrentConfiguration[i+diffVelSize] -
+			      m_prev_Configuration1[i+diffVelSize])/ ldt;
         /* Keep the new value for the legs. */
       }
       if (IterationNumber>1)
@@ -1032,12 +1035,7 @@ ComputePostureForGivenCoMAndFeetPosture
     }
     else
     {
-      /* Compute the speed */
-      for(unsigned int i=0;i<m_prev_Configuration1.size();i++)
-      {
-        CurrentVelocity[i] = 0.0;
-        /* Keep the new value for the legs. */
-      }
+      CurrentVelocity.setZero();
     }
     ODEBUG5(CurrentVelocity, "DebugDataVelocity1.dat");
     m_prev_Configuration1 = CurrentConfiguration;
@@ -1049,26 +1047,24 @@ ComputePostureForGivenCoMAndFeetPosture
     if (IterationNumber>0)
     {
       /* Compute the speed */
-      for(unsigned int i=6;i<m_prev_Configuration2.size();i++)
+      for(unsigned int i=6;i<m_prev_Configuration2.size()-diffVelSize;i++)
       {
-        CurrentVelocity[i] = (CurrentConfiguration[i]
-			      - m_prev_Configuration2[i])/ getSamplingPeriod();
+        CurrentVelocity[i] = (CurrentConfiguration[i+diffVelSize]
+			      - m_prev_Configuration2[i+diffVelSize])/
+	  getSamplingPeriod();
         /* Keep the new value for the legs. */
       }
       if (IterationNumber>1)
       {
-        for(unsigned int i=6;i<m_prev_Velocity2.size();i++)
-          CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity2[i])/ ldt;
+        for(unsigned int i=6;i<m_prev_Velocity2.size()-diffVelSize;i++)
+          CurrentAcceleration[i] =
+	    (CurrentVelocity[i+diffVelSize]
+	     - m_prev_Velocity2[i+diffVelSize])/ ldt;
       }
     }
     else
     {
-      /* Compute the speed */
-      for(unsigned int i=0;i<m_prev_Configuration2.size();i++)
-      {
-        CurrentVelocity[i] = 0.0;
-        /* Keep the new value for the legs. */
-      }
+      CurrentVelocity.setZero();
     }
     ODEBUG5(CurrentVelocity, "DebugDataVelocity1.dat");
     m_prev_Configuration2 = CurrentConfiguration;
