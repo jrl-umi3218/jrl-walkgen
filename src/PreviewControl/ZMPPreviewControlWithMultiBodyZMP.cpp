@@ -598,11 +598,9 @@ SetPreviewControl(PreviewControl *aPC)
    CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
    CurrentVelocity = m_PinocchioRobot->currentVelocity();
    CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
+   CurrentVelocity.setZero();
+   CurrentAcceleration.setZero();
 
-   for(unsigned int i=0;i<CurrentVelocity.size();i++)
-     {
-       CurrentVelocity[i] = CurrentAcceleration[i] = 0.0;
-     }
    m_PinocchioRobot->currentVelocity(CurrentVelocity);
    m_PinocchioRobot->currentAcceleration(CurrentAcceleration);
 

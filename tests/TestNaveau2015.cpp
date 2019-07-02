@@ -646,13 +646,13 @@ protected:
 
     }
     {
-      //istringstream strm2(":singlesupporttime 1.4");
-      istringstream strm2(":singlesupporttime 0.7");
+      istringstream strm2(":singlesupporttime 1.4");
+      //istringstream strm2(":singlesupporttime 0.7");
       aPGI.ParseCmd(strm2);
     }
     {
-      //istringstream strm2(":doublesupporttime 0.2");
-      istringstream strm2(":doublesupporttime 0.1");
+      istringstream strm2(":doublesupporttime 0.2");
+      //istringstream strm2(":doublesupporttime 0.1");
       aPGI.ParseCmd(strm2);
     }
     {

@@ -86,6 +86,7 @@ namespace PatternGeneratorJRL
       m_DebugPR = 0 ;
       m_DebugRobotData = 0 ;
       m_PGI = 0 ;
+      m_PinoFreeFlyerSize = 7;
     }
 
     bool TestObject::checkFiles()
@@ -144,6 +145,7 @@ namespace PatternGeneratorJRL
       // and SRDF files.
       CreateAndInitializeHumanoidRobot(m_URDFPath,m_SRDFPath,m_PR,m_DebugPR);
 
+
       // Create Pattern Generator Interface
       m_OneStep.m_PR = m_PR;
       m_PGI = patternGeneratorInterfaceFactory(m_PR);
@@ -155,8 +157,14 @@ namespace PatternGeneratorJRL
       istringstream strm2(":walkmode 0");
       m_PGI->ParseCmd(strm2);
 
-      // Initialize m_CurrentConfiguration, m_CurrentVelocity, m_CurrentAcceleration
+      // Initialize m_CurrentConfiguration,
+      // m_CurrentVelocity, m_CurrentAcceleration
       InitializeStateVectors();
+
+      // Set m_CurrentConfiguration to halfSitting
+      for(std::size_t i=0;i<m_HalfSitting.size();i++)
+	m_CurrentConfiguration[i+m_PinoFreeFlyerSize] = m_HalfSitting[i];
+      m_PR->currentConfiguration(m_CurrentConfiguration);
 
       CreateAndInitializeComAndFootRealization();
 
@@ -193,32 +201,38 @@ namespace PatternGeneratorJRL
       // free flyer + actuated DOFS.
       unsigned lNbDofs = m_PR->numberDof();
       m_CurrentConfiguration.resize(lNbDofs);
-      m_CurrentVelocity.resize(lNbDofs);
-      m_CurrentAcceleration.resize(lNbDofs);
+      unsigned lNbVelDofs = m_PR->numberVelDof();
+      m_CurrentVelocity.resize(lNbVelDofs);
+      m_CurrentAcceleration.resize(lNbVelDofs);
       m_PreviousConfiguration.resize(lNbDofs);
-      m_PreviousVelocity.resize(lNbDofs);
-      m_PreviousAcceleration.resize(lNbDofs);
-      for(int i=0;i<6;i++)
+      m_PreviousVelocity.resize(lNbVelDofs);
+      m_PreviousAcceleration.resize(lNbVelDofs);
+      for(int i=0;i<m_PinoFreeFlyerSize;i++)
       {
         m_PreviousConfiguration[i] = 0.0 ;
         m_PreviousVelocity[i] = 0.0 ;
         m_PreviousAcceleration[i] = 0.0;
       }
 
-      for(unsigned int i=6;i<lNbDofs;i++)
+      for(unsigned int i=m_PinoFreeFlyerSize;i<lNbDofs;i++)
       {
-        m_PreviousConfiguration[i] = m_HalfSitting[i-6];
+        m_PreviousConfiguration[i] = m_HalfSitting[i-m_PinoFreeFlyerSize];
+      }
+      for(unsigned int i=m_PinoFreeFlyerSize;i<lNbVelDofs;i++)
+      {
         m_PreviousVelocity[i] = 0.0 ;
         m_PreviousAcceleration[i] = 0.0;
       }
 
     }
 
+
     void TestObject::CreateAndInitializeComAndFootRealization()
     {
       m_ComAndFootRealization =
 	new ComAndFootRealizationByGeometry
 	((PatternGeneratorInterfacePrivate*)m_SPM );
+
       m_ComAndFootRealization->setPinocchioRobot(m_PR);
       m_ComAndFootRealization->SetStepStackHandler(new StepStackHandler(m_SPM));
       m_ComAndFootRealization->SetHeightOfTheCoM(0.814);
@@ -316,7 +330,6 @@ namespace PatternGeneratorJRL
       aDebugPR->initializeRobotModelAndData(&m_robotModel,m_DebugRobotData);
 
       m_conf.resize(m_robotModel.nq);
-
       // Parsing the SRDF file to initialize
       // the starting configuration and the robot specifities
       InitializeRobotWithSRDF(*aPR,SRDFFile);
@@ -352,8 +365,13 @@ namespace PatternGeneratorJRL
 
       // Get the starting configuration : half sitting
       // Uses the order
-      m_HalfSitting.resize(aPR.numberDof()-6);
+      m_HalfSitting.resize(aPR.numberDof()-m_PinoFreeFlyerSize);
       m_HalfSitting.setZero();
+
+      std::vector<bool> setHalfSittingJoint(aPR.numberDof()-m_PinoFreeFlyerSize);
+      for(std::size_t i=0; i < setHalfSittingJoint.size();i++)
+	setHalfSittingJoint[i]=false;
+
 
       pinocchio::Model * aModel = aPR.Model();
       BOOST_FOREACH(const ptree::value_type & v,
@@ -379,11 +397,24 @@ namespace PatternGeneratorJRL
 		  pinocchio::JointIndex id = aModel->getJointId(jointName);
 		  unsigned idq = pinocchio::idx_q(aModel->joints[id]);
 		  // we assume only revolute joint here.
-		  m_HalfSitting(idq-7) = jointValue ;
+		  m_HalfSitting(idq-m_PinoFreeFlyerSize) = jointValue ;
+		  setHalfSittingJoint[idq-m_PinoFreeFlyerSize]=true;
 		}
 	    }
         }
       } // BOOST_FOREACH
+
+      for(std::size_t i=0; i < setHalfSittingJoint.size();i++)
+	{
+	  if (setHalfSittingJoint[i]==false)
+	    {
+	      std::cerr << "Joint number "<< i << " not initialized on "
+			<< setHalfSittingJoint.size()
+			<< " nb of joints" << std::endl;
+	      exit(-1);
+	    }
+	}
+
       ODEBUG("Half sitting: " << m_HalfSitting);
       bool DebugConfiguration = true;
       if (DebugConfiguration)
@@ -715,8 +746,6 @@ namespace PatternGeneratorJRL
 	       m_OneStep.m_ZMPTarget);
           }
 
-          m_OneStep.m_NbOfIt++;
-
           m_clock.stopOneIteration();
 
           m_PreviousConfiguration = m_CurrentConfiguration;
@@ -740,6 +769,7 @@ namespace PatternGeneratorJRL
             cerr << "Nothing to dump after " << m_OneStep.m_NbOfIt << endl;
           }
 
+          m_OneStep.m_NbOfIt++;
         }
 
         os << endl << "End of iteration " << lNbIt << endl;

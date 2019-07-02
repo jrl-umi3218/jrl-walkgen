@@ -174,7 +174,7 @@ namespace PatternGeneratorJRL {
     fillInDebugVectorDoc()
     {
       /// Building vector of documentation strings.
-      const char * docInit[10] =
+      const char * docInit[15] =
 	{ "Time",
 	  "CoM - X",
 	  "CoM - Y",
@@ -183,11 +183,16 @@ namespace PatternGeneratorJRL {
 	  "dCoM - X",
 	  "dCoM - Y",
 	  "dCoM - Z",
+	  "dCoM - Yaw",
+	  "ddCoM - X",
+	  "ddCoM - Y",
+	  "ddCoM - Z",
+	  "ddCoM - Yaw",
 	  "ZMP X in Waist Ref",
 	  "ZMP Y in Waist Ref"};
 
       for (std::size_t i =0;
-	   i<10;
+	   i<15;
 	   i++)
 	m_DebugStrings.push_back(docInit[i]);
 
@@ -195,7 +200,7 @@ namespace PatternGeneratorJRL {
 	{ "Left Foot","Right Foot"};
       const char * docFootInit[14] =
 	{ " - Pos X",   " - Pos Y",   " - Pos Z",
-	  " - Vel dX",  " - Vel dY",  " - Vel dZ",
+	  " - Vel dX",  " - Vel dY",  " - Vel dZ", 
 	  " - Acc ddX", " - Acc ddY", " - Acc ddZ",
 	  " - Yaw",     " - dYaw",    " - ddYaw",
 	  " - Roll",    " - Pitch"
@@ -329,9 +334,10 @@ namespace PatternGeneratorJRL {
     {
       ofstream aof;
       string aFileName;
-      assert(m_TestName.empty());
+      assert(!m_TestName.empty());
       aFileName = m_TestName;
       aFileName += "TestFGPI_description.dat";
+      aof.open(aFileName.c_str(),ofstream::out);
       
       for (std::size_t i =0;
 	   i<m_DebugStrings.size();

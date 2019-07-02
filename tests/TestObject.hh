@@ -101,8 +101,10 @@ namespace PatternGeneratorJRL
           PinocchioRobot *& aPR,
           PinocchioRobot *& aDebugPR);
       /*! @} */
-      /* !\brief Initialize m_CurrentConfiguration, 
-	 m_CurrentVelocity, 
+
+
+      /* !\brief Initialize m_CurrentConfiguration,
+	 m_CurrentVelocity,
 	 m_CurrentAcceleration */
       void InitializeStateVectors();
 
@@ -167,14 +169,14 @@ namespace PatternGeneratorJRL
       std::vector<pinocchio::JointIndex> m_rightLeg ;
       std::vector<pinocchio::JointIndex> m_leftArm  ;
       std::vector<pinocchio::JointIndex> m_rightArm ;
-      
+
       /*! \brief Indexes for left and right grippers. */
       pinocchio::JointIndex m_leftGripper  ;
       pinocchio::JointIndex m_rightGripper ;
 
       /*! \brief From URDF to OpenHRP indexes. */
       std::vector<unsigned int> m_fromURDFToOpenHRP;
-      
+
       /*! \brief Vector of generalized configurations for whole body motion. */
       Eigen::VectorXd m_conf;
       Eigen::VectorXd m_vel ;
@@ -206,19 +208,19 @@ namespace PatternGeneratorJRL
 	information */
       virtual void fillInDebugFiles();
       virtual void fillInDebugFilesFull( );
-      
+
       DumpReferencesObjects m_DumpReferencesObjects;
-      
+
       /*! \brief Compare debug files with references. */
       bool compareDebugFiles();
 
       /*! \brief Set map from URDF joint index to OpenHRP index */
       void setFromURDFToOpenHRP(std::vector<unsigned int> &vfromURDFToOpenHRP);
-      
+
       /*! \brief Generate trajectories files for OpenHRP. */
       void generateOpenHRPTrajectories();
       /*! @} */
-      
+
       /*! \brief Computes a configuration from current m_OneStep
 	specifications */
       void analyticalInverseKinematics(Eigen::VectorXd & conf,
@@ -257,7 +259,7 @@ namespace PatternGeneratorJRL
       std::string m_URDFPath;
       /*! \brief full path of the SRDF. */
       std::string m_SRDFPath;
-      
+
       /*! \brief Object to realize CoM and Foot trajectories*/
       ComAndFootRealizationByGeometry * m_ComAndFootRealization;
 
@@ -267,6 +269,9 @@ namespace PatternGeneratorJRL
       /*! @} */
       // utilities for Herdt and Naveau
 
+    private:
+      /// \brief Size of the free flyer.
+      pinocchio::JointIndex m_PinoFreeFlyerSize;
     public :
 
 
