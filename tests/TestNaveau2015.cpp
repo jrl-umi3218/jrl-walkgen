@@ -147,8 +147,6 @@ public:
     m_CurrentAcceleration.setZero();
     m_setOfLocalEvents = new setOfLocalEvents(m_PGI);
 
-    ODEBUG3("m_vel" << m_CurrentVelocity);
-    ODEBUG3("m_acc" << m_CurrentAcceleration);
     if (m_PR->getName()=="hrp2_14_reduced")
       m_ComAndFootRealization->SetHeightOfTheCoM(0.814);
     else if (m_PR->getName()=="talos")
@@ -275,9 +273,11 @@ protected:
     aRightFootPosition(3) = m_OneStep.m_RightFootPosition.theta;
     aRightFootPosition(4) = m_OneStep.m_RightFootPosition.omega;
     m_ComAndFootRealization->setSamplingPeriod(0.005);
-    m_ComAndFootRealization->ComputePostureForGivenCoMAndFeetPosture(
-								     aCOMState, aCOMSpeed, aCOMAcc, aLeftFootPosition, aRightFootPosition,
-								     conf, vel, acc, iteration, 1);
+    m_ComAndFootRealization->
+      ComputePostureForGivenCoMAndFeetPosture
+      (aCOMState, aCOMSpeed, aCOMAcc,
+       aLeftFootPosition, aRightFootPosition,
+       conf, vel, acc, iteration, 1);
 
     if(m_leftGripper!=0 && m_rightGripper!=0)
       {
@@ -646,7 +646,7 @@ protected:
 
     }
     {
-      istringstream strm2(":singlesupporttime 1.4");
+      istringstream strm2(":singlesupporttime 1.0");
       //istringstream strm2(":singlesupporttime 0.7");
       aPGI.ParseCmd(strm2);
     }
@@ -684,8 +684,8 @@ protected:
     }
 
     {
-      //istringstream strm2(":useDynamicFilter true");
-      istringstream strm2(":useDynamicFilter false");
+      istringstream strm2(":useDynamicFilter true");
+      //istringstream strm2(":useDynamicFilter false");
       m_PGI->ParseCmd(strm2);
     }
 
