@@ -440,11 +440,12 @@ std::size_t ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTr
   return 0;
 }
 
-void ZMPVelocityReferencedSQP::OnLine(double time,
-                                    deque<ZMPPosition> & FinalZMPTraj_deq,
-                                    deque<COMState> & FinalCOMTraj_deq,
-                                    deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-                                    deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
+void ZMPVelocityReferencedSQP::
+OnLine(double time,
+       deque<ZMPPosition> & FinalZMPTraj_deq,
+       deque<COMState> & FinalCOMTraj_deq,
+       deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+       deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
 {
   // If on-line mode not activated we go out.
   if (!m_OnLineMode)

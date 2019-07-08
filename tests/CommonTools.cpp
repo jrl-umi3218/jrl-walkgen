@@ -220,6 +220,29 @@ namespace PatternGeneratorJRL {
 	    }
 	}
 
+      const char * docInit2[2] =
+	{ "ZMP Target X - world ref", " ZMP Target Y - world ref" };
+
+      for (std::size_t i =0;
+	   i<2;
+	   i++)
+	m_DebugStrings.push_back(docInit2[i]);
+
+      if (m_PR!=0)
+	{
+	  Eigen::VectorXd & currentConfiguration =
+	    m_PR->currentConfiguration();
+	  
+	  for (unsigned int i = 0 ;
+	       i < currentConfiguration.size() ;
+	       i++)
+	    {
+	      std::ostringstream aDoc(" conf. ");
+	      aDoc << i;
+	      m_DebugStrings.push_back(aDoc.str());
+	    }
+	}
+
     }
 
     void OneStep::
@@ -291,7 +314,7 @@ namespace PatternGeneratorJRL {
       for (unsigned int i = 0 ;
 	   i < currentConfiguration.size() ;
 	   i++)
-	m_DebugVector[i] = currentConfiguration(i);
+	m_DebugVector[lindex++] = currentConfiguration(i);
 
     }
 
@@ -342,7 +365,7 @@ namespace PatternGeneratorJRL {
       for (std::size_t i =0;
 	   i<m_DebugStrings.size();
 	   i++)
-	aof << m_DebugStrings[i] << std::endl;
+	aof << i << " - " << m_DebugStrings[i] << std::endl;
       aof.close();
     }
   } /* End of TestSuite namespace */

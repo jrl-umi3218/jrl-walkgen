@@ -1,5 +1,5 @@
 #include "DynamicFilter.hh"
-//#include "metapod/algos/rnea.hh"
+#include "Debug.hh"
 #include <iomanip>
 using namespace std;
 using namespace PatternGeneratorJRL;
@@ -8,7 +8,7 @@ using namespace PatternGeneratorJRL;
 DynamicFilter::DynamicFilter(
     SimplePluginManager *SPM,
     PinocchioRobot *aPR):
-  SimplePlugin(SPM),  
+  SimplePlugin(SPM),
   stage0_(0) , stage1_(1),
   MODE_PC_(OptimalControllerSolver::MODE_WITH_INITIALPOS)
 {
@@ -74,6 +74,7 @@ DynamicFilter::DynamicFilter(
       std::cerr << "Unable to register " << aMethodName << std::endl;
     }
   }
+  RESETDEBUG5("/tmp/test_configuration.dat");
 }
 
 DynamicFilter::~DynamicFilter()
@@ -365,7 +366,7 @@ int DynamicFilter::OnLinefilter(
       deltaZMP_deq_[i].py = 0.0 ;
     }
   }
-  
+
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
 
   return 0 ;
@@ -430,7 +431,8 @@ void DynamicFilter::InverseKinematics(
         iteration, stage);
 
   //  std::cout << " configuration:" << configuration << std::endl;
-  
+  ODEBUG5SIMPLE(configuration,"/tmp/test_configuration.dat");
+
   // upper body
   if (walkingHeuristic_)
   {
@@ -440,9 +442,9 @@ void DynamicFilter::InverseKinematics(
       previousUpperPartConfiguration_ = upperPartConfiguration_ ;
       previousUpperPartVelocity_      = upperPartVelocity_      ;
 
-      { for(unsigned int i=0;i<upperPartVelocity_.size();upperPartVelocity_[i++]=0.0);} ;
-      { for(unsigned int i=0;i<upperPartAcceleration_.size();upperPartAcceleration_[i++]=0.0);} ;
-      { for(unsigned int i=0;i<previousUpperPartVelocity_.size();previousUpperPartVelocity_[i++]=0.0);} ;
+      upperPartVelocity_.setZero();
+      upperPartAcceleration_.setZero();
+      previousUpperPartVelocity_.setZero() ;
   }
 
   for ( unsigned int i = 0 ; i < larmIdxq_.size() ; ++i )

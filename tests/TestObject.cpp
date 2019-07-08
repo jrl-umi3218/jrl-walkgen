@@ -755,12 +755,6 @@ namespace PatternGeneratorJRL
           /*! Call the reimplemented method to generate events. */
           if (ok)
           {
-            m_clock.startModification();
-            generateEvent();
-            m_clock.stopModification();
-
-            m_clock.fillInStatistics();
-
             /*! Fill the debug files with appropriate information. */
             fillInDebugFiles();
           }
@@ -770,6 +764,16 @@ namespace PatternGeneratorJRL
           }
 
           m_OneStep.m_NbOfIt++;
+
+	  if (ok)
+	    {
+	      m_clock.startModification();
+	      generateEvent();
+	      m_clock.stopModification();
+	      
+	      m_clock.fillInStatistics();
+	    }
+	    
         }
 
         os << endl << "End of iteration " << lNbIt << endl;
