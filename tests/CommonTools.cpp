@@ -306,7 +306,7 @@ namespace PatternGeneratorJRL {
       m_DebugVector[lindex++] = m_ZMPTarget(0)*cos(currentConfiguration(5)) -
 	m_ZMPTarget(1)*sin(currentConfiguration(5))
 	+currentConfiguration(0);
-      m_DebugVector[lindex++] = m_ZMPTarget(0)*sin(currentConfiguration(5)) -
+      m_DebugVector[lindex++] = m_ZMPTarget(0)*sin(currentConfiguration(5)) +
 	m_ZMPTarget(1)*cos(currentConfiguration(5))
 	+currentConfiguration(1);
 

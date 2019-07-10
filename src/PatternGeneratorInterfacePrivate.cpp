@@ -51,7 +51,7 @@ namespace PatternGeneratorJRL {
   PatternGeneratorInterfacePrivate(PinocchioRobot *aPinocchioRobotRobot)
     : PatternGeneratorInterface(aPinocchioRobotRobot),SimplePlugin(this)
   {
-    //AllowFPE();
+    AllowFPE();
     m_PinocchioRobot = aPinocchioRobotRobot;
 
     ODEBUG4("Step 0","DebugPGI.txt");
