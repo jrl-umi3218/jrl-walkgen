@@ -38,20 +38,20 @@ PinocchioRobot::PinocchioRobot()
 
   m_quat.normalize();
   // resize by default
-  m_qmal.resize(50,1);
-  m_qmal.fill(0.0);
-  m_qmal(3)=m_quat.x();
-  m_qmal(4)=m_quat.y();
-  m_qmal(5)=m_quat.z();
-  m_qmal(6)=m_quat.w();
+  m_qpino.resize(50,1);
+  m_qpino.fill(0.0);
+  m_qpino(3)=m_quat.x();
+  m_qpino(4)=m_quat.y();
+  m_qpino(5)=m_quat.z();
+  m_qpino(6)=m_quat.w();
   m_tau.resize(50,1);
-  m_vmal.fill(0.0);
-  m_amal.fill(0.0);
+  m_vpino.fill(0.0);
+  m_apino.fill(0.0);
   m_tau.fill(0.0);
-  m_vmal.resize( 50 );
-  m_amal.resize( 50 );
-  m_vmal.Zero(50);
-  m_amal.Zero(50);
+  m_vpino.resize( 50 );
+  m_apino.resize( 50 );
+  m_vpino.Zero(50);
+  m_apino.Zero(50);
 
   m_f.fill(0.0);
   m_n.fill(0.0);
@@ -192,16 +192,26 @@ initializeRobotModelAndData
   m_robotDataInInitialePose = new pinocchio::Data(*m_robotModel);
   m_robotDataInInitialePose->v[0] = pinocchio::Motion::Zero();
   m_robotDataInInitialePose->a[0] = -m_robotModel->gravity;
-  m_qmal.resize(m_robotModel->nq);
-  m_qmal.setZero();
-  m_qmal[6]= 1.0 ;
-  m_vmal.resize(m_robotModel->nv);
-  m_vmal.setZero();
-  m_amal.resize(m_robotModel->nv);
-  m_amal.setZero();
+  m_qpino.resize(m_robotModel->nq);
+  m_qpino.setZero();
+  m_qrpy.resize(m_robotModel->nq-1);
+  m_qrpy.setZero();
+  m_qpino[6]= 1.0 ;
+
+  m_vpino.resize(m_robotModel->nv);
+  m_vpino.setZero();
+  m_vrpy.resize(m_robotModel->nv);
+  m_vrpy.setZero();
+  
+  m_apino.resize(m_robotModel->nv);
+  m_apino.setZero();
+  m_arpy.resize(m_robotModel->nv);
+  m_arpy.setZero();
+  
   m_tau.resize(m_robotModel->nv);
   m_tau.setZero();
-  pinocchio::forwardKinematics(*m_robotModel,*m_robotDataInInitialePose,m_qmal);
+  pinocchio::forwardKinematics
+    (*m_robotModel,*m_robotDataInInitialePose,m_qpino);
 
 
   // compute the global mass of the robot
@@ -448,38 +458,48 @@ RPYToSpatialFreeFlyer
 
 void PinocchioRobot::computeForwardKinematics()
 {
-  computeForwardKinematics(m_qmal);
+  pinocchio::forwardKinematics(*m_robotModel,*m_robotData,m_qpino);
+  pinocchio::centerOfMass(*m_robotModel,*m_robotData,m_qpino);
 }
 
-void PinocchioRobot::computeForwardKinematics(Eigen::VectorXd & q)
+void PinocchioRobot::
+currentPinoConfiguration
+(Eigen::VectorXd &conf)
 {
-  // euler to quaternion :
-  m_quat = Eigen::
-    Quaterniond
-    (Eigen::AngleAxisd(q(5), Eigen::Vector3d::UnitZ()) *
-     Eigen::AngleAxisd(q(4), Eigen::Vector3d::UnitY()) *
-     Eigen::AngleAxisd(q(3), Eigen::Vector3d::UnitX()) ) ;
+  m_qpino = conf;
+}
+
+void PinocchioRobot::
+currentRPYConfiguration
+(Eigen::VectorXd &conf)
+{
+  m_qrpy = conf;
+
+  m_quat = Eigen::Quaterniond
+    (Eigen::AngleAxisd(conf(5), Eigen::Vector3d::UnitZ()) *
+     Eigen::AngleAxisd(conf(4), Eigen::Vector3d::UnitY()) *
+     Eigen::AngleAxisd(conf(3), Eigen::Vector3d::UnitX()) ) ;
   m_quat.normalize();
-  // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
+  
   for(unsigned i=0; i<3 ; ++i)
     {
-      m_qmal(i) = q(i);
+      m_qpino(i) = conf(i);
     }
-  m_qmal(3) = m_quat.x() ;
-  m_qmal(4) = m_quat.y() ;
-  m_qmal(5) = m_quat.z() ;
-  m_qmal(6) = m_quat.w() ;
-  for(int i=0; i<m_robotModel->nq-m_PinoFreeFlyerSize ; ++i)
+  // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
+  m_qpino(3) = m_quat.x() ;
+  m_qpino(4) = m_quat.y() ;
+  m_qpino(5) = m_quat.z() ;
+  m_qpino(6) = m_quat.w() ;
+
+  for(unsigned i=6; i<conf.size() ; ++i)
     {
-      m_qmal(m_PinoFreeFlyerSize+i) = q(m_PinoFreeFlyerSize+i);
-    }
-  pinocchio::forwardKinematics(*m_robotModel,*m_robotData,m_qmal);
-  pinocchio::centerOfMass(*m_robotModel,*m_robotData,m_qmal);
+      m_qpino(i+1) = conf(i);
+    }  
 }
 
 void PinocchioRobot::computeInverseDynamics()
 {
-  PinocchioRobot::computeInverseDynamics(m_qmal,m_vmal,m_amal);
+  PinocchioRobot::computeInverseDynamics(m_qrpy,m_vrpy,m_arpy);
 }
 
 void PinocchioRobot::
@@ -497,33 +517,30 @@ computeInverseDynamics
   //  RPYToSpatialFreeFlyer(m_rpy,m_drpy,m_ddrpy,
   //                        m_quat,m_omega,m_domega);
   // euler to quaternion :
-  m_quat = Eigen::Quaterniond(
-			      Eigen::AngleAxisd(q(5), Eigen::Vector3d::UnitZ()) *
-			      Eigen::AngleAxisd(q(4), Eigen::Vector3d::UnitY()) *
-			      Eigen::AngleAxisd(q(3), Eigen::Vector3d::UnitX()) ) ;
+  m_quat = Eigen::Quaterniond
+    (Eigen::AngleAxisd(q(5), Eigen::Vector3d::UnitZ()) *
+     Eigen::AngleAxisd(q(4), Eigen::Vector3d::UnitY()) *
+     Eigen::AngleAxisd(q(3), Eigen::Vector3d::UnitX()) ) ;
   for(unsigned i=0; i<3 ; ++i)
     {
-      m_qmal(i) = q(i);
+      m_qpino(i) = q(i);
     }
   m_rot = m_quat.toRotationMatrix().transpose() ;
-  m_vmal.segment<3>(0) = m_rot * m_vmal.segment<3>(0) ;
-  m_amal.segment<3>(0) = m_rot * m_amal.segment<3>(0) ;
+  m_vpino.segment<3>(0) = m_rot * m_vpino.segment<3>(0) ;
+  m_apino.segment<3>(0) = m_rot * m_apino.segment<3>(0) ;
 
   // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
-  m_qmal(3) = m_quat.x() ;
-  m_qmal(4) = m_quat.y() ;
-  m_qmal(5) = m_quat.z() ;
-  m_qmal(6) = m_quat.w() ;
+  m_qpino(3) = m_quat.x() ;
+  m_qpino(4) = m_quat.y() ;
+  m_qpino(5) = m_quat.z() ;
+  m_qpino(6) = m_quat.w() ;
 
   // fill up the velocity and acceleration vectors
-  //m_v.segment<3>(3) = m_omega ;
-  //m_a.segment<3>(3) = m_domega ;
-
-  m_vmal = v;
-  m_amal = a;
+  m_vpino = v;
+  m_apino = a;
 
   // performing the inverse dynamics
-  m_tau = pinocchio::rnea(*m_robotModel,*m_robotData,m_qmal,m_vmal,m_amal);
+  m_tau = pinocchio::rnea(*m_robotModel,*m_robotData,m_qpino,m_vpino,m_apino);
 }
 
 std::vector<pinocchio::JointIndex>
@@ -550,8 +567,10 @@ std::vector<pinocchio::JointIndex> PinocchioRobot::jointsBetween
   out.clear();
   pinocchio::JointIndex lastCommonRank = 0 ;
   pinocchio::JointIndex minChainLength =
-    fromRootToFirst.size() < fromRootToSecond.size()
-			     ? fromRootToFirst.size() : fromRootToSecond.size() ;
+    fromRootToFirst.size()
+    < fromRootToSecond.size()
+      ? fromRootToFirst.size() :
+    fromRootToSecond.size() ;
 
   for(unsigned k=1 ; k<minChainLength ; ++k)
     {
@@ -559,7 +578,8 @@ std::vector<pinocchio::JointIndex> PinocchioRobot::jointsBetween
 	++lastCommonRank;
     }
 
-  for(std::vector<pinocchio::JointIndex>::size_type k=fromRootToFirst.size()-1;
+  for(std::vector<pinocchio::JointIndex>::size_type
+	k=fromRootToFirst.size()-1;
       k>lastCommonRank ; --k)
     {
       out.push_back(fromRootToFirst[k]);
@@ -568,7 +588,8 @@ std::vector<pinocchio::JointIndex> PinocchioRobot::jointsBetween
     {
       out.push_back(fromRootToSecond[0]);
     }
-  for(pinocchio::JointIndex k=lastCommonRank+1 ; k<fromRootToSecond.size() ; ++k)
+  for(pinocchio::JointIndex k=lastCommonRank+1 ;
+      k<fromRootToSecond.size() ; ++k)
     {
       out.push_back(fromRootToSecond[k]);
     }
@@ -859,11 +880,13 @@ DetectAutomaticallyOneShoulder
   FromRootToJoint.clear();
   FromRootToJoint = fromRootToIt(aWrist);
 
-  std::vector<pinocchio::JointIndex>::iterator itJoint = FromRootToJoint.begin();
+  std::vector<pinocchio::JointIndex>::iterator itJoint =
+    FromRootToJoint.begin();
   bool found=false;
   while(itJoint!=FromRootToJoint.end())
     {
-      std::vector<pinocchio::JointIndex>::iterator current = itJoint;
+      std::vector<pinocchio::JointIndex>::iterator
+	current = itJoint;
       if (*current==m_chest)
 	found=true;
       else

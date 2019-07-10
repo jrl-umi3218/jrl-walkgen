@@ -421,9 +421,9 @@ std::size_t ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTr
                        previewDuration_-outputPreviewDuration_,
                        lStartingCOMState);
 
-  m_CurrentConfiguration_ = PR_->currentConfiguration() ;
-  m_CurrentVelocity_      = PR_->currentVelocity() ;
-  m_CurrentAcceleration_  = PR_->currentAcceleration() ;
+  m_CurrentConfiguration_ = PR_->currentRPYConfiguration() ;
+  m_CurrentVelocity_      = PR_->currentRPYVelocity() ;
+  m_CurrentAcceleration_  = PR_->currentRPYAcceleration() ;
 
   initZMP_       = FinalZMPTraj_deq      [0] ;
   initCOM_       = FinalCoMPositions_deq [0] ;

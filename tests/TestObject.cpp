@@ -162,9 +162,9 @@ namespace PatternGeneratorJRL
       InitializeStateVectors();
 
       // Set m_CurrentConfiguration to halfSitting
-      for(std::size_t i=0;i<m_HalfSitting.size();i++)
+      for(Eigen::Index i=0;i<m_HalfSitting.size();i++)
 	m_CurrentConfiguration[i+m_PinoFreeFlyerSize] = m_HalfSitting[i];
-      m_PR->currentConfiguration(m_CurrentConfiguration);
+      m_PR->currentPinoConfiguration(m_CurrentConfiguration);
 
       CreateAndInitializeComAndFootRealization();
 
@@ -207,18 +207,18 @@ namespace PatternGeneratorJRL
       m_PreviousConfiguration.resize(lNbDofs);
       m_PreviousVelocity.resize(lNbVelDofs);
       m_PreviousAcceleration.resize(lNbVelDofs);
-      for(int i=0;i<m_PinoFreeFlyerSize;i++)
+      for(pinocchio::JointIndex i=0;i<m_PinoFreeFlyerSize;i++)
       {
         m_PreviousConfiguration[i] = 0.0 ;
         m_PreviousVelocity[i] = 0.0 ;
         m_PreviousAcceleration[i] = 0.0;
       }
 
-      for(unsigned int i=m_PinoFreeFlyerSize;i<lNbDofs;i++)
+      for(Eigen::Index i=m_PinoFreeFlyerSize;i<lNbDofs;i++)
       {
         m_PreviousConfiguration[i] = m_HalfSitting[i-m_PinoFreeFlyerSize];
       }
-      for(unsigned int i=m_PinoFreeFlyerSize;i<lNbVelDofs;i++)
+      for(Eigen::Index i=m_PinoFreeFlyerSize;i<lNbVelDofs;i++)
       {
         m_PreviousVelocity[i] = 0.0 ;
         m_PreviousAcceleration[i] = 0.0;
@@ -250,7 +250,8 @@ namespace PatternGeneratorJRL
       lStartingCOMState(2) = m_OneStep.m_finalCOMPosition.z[0] ;
       m_ComAndFootRealization->setSamplingPeriod(0.005);
       m_ComAndFootRealization->Initialization();
-      m_ComAndFootRealization->InitializationCoM(m_HalfSitting,lStartingCOMState,
+      m_ComAndFootRealization->InitializationCoM(m_HalfSitting,
+						 lStartingCOMState,
                                                  waist,
                                                  m_OneStep.m_LeftFootPosition,
 						 m_OneStep.m_RightFootPosition);
@@ -311,8 +312,8 @@ namespace PatternGeneratorJRL
       // Creating the humanoid robot via the URDF.
       //      try{
       pinocchio::urdf::buildModel(URDFFile,
-                            pinocchio::JointModelFreeFlyer(),
-                            m_robotModel);
+				  pinocchio::JointModelFreeFlyer(),
+				  m_robotModel);
       m_robotData = new pinocchio::Data(m_robotModel) ;
       m_DebugRobotData = new pinocchio::Data(m_robotModel) ;
 
@@ -713,9 +714,9 @@ namespace PatternGeneratorJRL
 
         if (m_DebugPR!=0)
         {
-          m_DebugPR->currentConfiguration(m_PreviousConfiguration);
-          m_DebugPR->currentVelocity(m_PreviousVelocity);
-          m_DebugPR->currentAcceleration(m_PreviousAcceleration);
+          m_DebugPR->currentPinoConfiguration(m_PreviousConfiguration);
+          m_DebugPR->currentRPYVelocity(m_PreviousVelocity);
+          m_DebugPR->currentRPYAcceleration(m_PreviousAcceleration);
           m_DebugPR->computeForwardKinematics();
         }
 

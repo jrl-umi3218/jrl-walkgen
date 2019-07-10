@@ -42,9 +42,9 @@ DynamicFilter::DynamicFilter(
   deltay_.resize(3,1);
 
   comAndFootRealization_->SetPreviousConfigurationStage0(
-        PR_->currentConfiguration());
+        PR_->currentRPYConfiguration());
   comAndFootRealization_->SetPreviousVelocityStage0(
-        PR_->currentVelocity());
+        PR_->currentRPYVelocity());
 
 
   sxzmp_.clear();
@@ -161,6 +161,7 @@ void DynamicFilter::init(
   zmpmb_i_.resize( (ZMPMB_vec_.size()-1)*inc +1);
   deltaZMP_deq_.resize( (int)round( previewWindowSize_ / controlPeriod_ ));
 
+  /// Set CoM/LeftFoot/RightFoot/deltax/deltay sizes  
   aCoMState_.resize(6);
   aCoMSpeed_.resize(6);
   aCoMAcc_.resize(6);
@@ -169,25 +170,27 @@ void DynamicFilter::init(
   deltax_.resize(3,1);
   deltay_.resize(3,1);
 
-  { for(unsigned int i=0;i<aCoMState_.size();aCoMState_[i++]=0.0);};
-  { for(unsigned int i=0;i<aCoMSpeed_.size();aCoMSpeed_[i++]=0.0);};
-  { for(unsigned int i=0;i<aCoMAcc_.size();aCoMAcc_[i++]=0.0);};
-  { for(unsigned int i=0;i<aLeftFootPosition_.size();aLeftFootPosition_[i++]=0.0);};
-  { for(unsigned int i=0;i<aRightFootPosition_.size();aRightFootPosition_[i++]=0.0);};
-  {for(unsigned int i=0;i<deltax_.rows();i++) for(unsigned int j=0;j<deltax_.cols();j++) deltax_(i,j)=0.0;};
-  {for(unsigned int i=0;i<deltay_.rows();i++) for(unsigned int j=0;j<deltay_.cols();j++) deltay_(i,j)=0.0;};
+  /// Set CoM/LeftFoot/RightFoot/deltax/deltay to Zero
+  aCoMState_.setZero();
+  aCoMSpeed_.setZero();
+  aCoMAcc_.setZero();
+  aLeftFootPosition_.setZero();
+  aRightFootPosition_.setZero();
+  deltax_.setZero();
+  deltay_.setZero();
 
-  upperPartConfiguration_ = PR_->currentConfiguration() ;
-  previousUpperPartConfiguration_ = PR_->currentConfiguration() ;
-  upperPartVelocity_ = PR_->currentVelocity() ;
-  previousUpperPartVelocity_ = PR_->currentVelocity() ;
-  upperPartAcceleration_ = PR_->currentAcceleration() ;
+  /// Update previous values
+  upperPartConfiguration_ = PR_->currentRPYConfiguration() ;
+  previousUpperPartConfiguration_ = PR_->currentRPYConfiguration() ;
+  upperPartVelocity_ = PR_->currentRPYVelocity() ;
+  previousUpperPartVelocity_ = PR_->currentRPYVelocity() ;
+  upperPartAcceleration_ = PR_->currentRPYAcceleration() ;
 
-  ZMPMBConfiguration_ = PR_->currentConfiguration() ;
-  ZMPMBVelocity_      = PR_->currentVelocity() ;
-  ZMPMBAcceleration_  = PR_->currentAcceleration() ;
-  previousZMPMBConfiguration_ = PR_->currentConfiguration() ;
-  previousZMPMBVelocity_      = PR_->currentVelocity() ;
+  ZMPMBConfiguration_ = PR_->currentRPYConfiguration() ;
+  ZMPMBVelocity_      = PR_->currentRPYVelocity() ;
+  ZMPMBAcceleration_  = PR_->currentRPYAcceleration() ;
+  previousZMPMBConfiguration_ = PR_->currentRPYConfiguration() ;
+  previousZMPMBVelocity_      = PR_->currentRPYVelocity() ;
 
   comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
   comAndFootRealization_->ShiftFoot(true);

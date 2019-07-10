@@ -674,11 +674,11 @@ namespace PatternGeneratorJRL {
   (Eigen::VectorXd &Configuration,
    Eigen::Vector3d &lStartingCOMState)
   {
-    Eigen::VectorXd Velocity=    m_PinocchioRobot->currentVelocity();
+    Eigen::VectorXd Velocity=    m_PinocchioRobot->currentRPYVelocity();
     Velocity.setZero();
 
-    m_PinocchioRobot->currentConfiguration(Configuration);
-    m_PinocchioRobot->currentVelocity(Velocity);
+    m_PinocchioRobot->currentRPYConfiguration(Configuration);
+    m_PinocchioRobot->currentRPYVelocity(Velocity);
     m_PinocchioRobot->computeForwardKinematics();
     m_PinocchioRobot->positionCenterOfMass(lStartingCOMState);
 
@@ -1043,7 +1043,7 @@ namespace PatternGeneratorJRL {
 
     Eigen::VectorXd lCurrentConfiguration;
 
-    lCurrentConfiguration = m_PinocchioRobot->currentConfiguration();
+    lCurrentConfiguration = m_PinocchioRobot->currentRPYConfiguration();
 
     deque<RelativeFootPosition> lRelativeFootPositions;
     CommonInitializationOfWalking
@@ -1065,7 +1065,7 @@ namespace PatternGeneratorJRL {
     lCurrentConfiguration(3) = 0.0;
     lCurrentConfiguration(4) = 0.0;
     lCurrentConfiguration(5) = 0.0;
-    m_PinocchioRobot->currentConfiguration(lCurrentConfiguration);
+    m_PinocchioRobot->currentRPYConfiguration(lCurrentConfiguration);
 
     ODEBUG("Size of lRelativeFootPositions :"
 	   << lRelativeFootPositions.size());

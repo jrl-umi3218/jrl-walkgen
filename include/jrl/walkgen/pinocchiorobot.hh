@@ -46,6 +46,12 @@ namespace PatternGeneratorJRL
   };
   typedef PinocchioRobotFoot_t PRFoot ;
 
+  namespace pinocchio_robot
+  {
+    const int RPY_SIZE=6;
+    const int QUATERNION_SIZE=7;
+  }
+  
   class PinocchioRobot
   {
   public:
@@ -63,7 +69,8 @@ namespace PatternGeneratorJRL
                                 Eigen::VectorXd & a);
 
     void computeForwardKinematics();
-    void computeForwardKinematics(Eigen::VectorXd & q);
+    /// q should be given in RPY convention.
+    //    void computeForwardKinematics(Eigen::VectorXd & q);
 
     void RPYToSpatialFreeFlyer(Eigen::Vector3d & rpy,
                                Eigen::Vector3d & drpy,
@@ -191,13 +198,18 @@ namespace PatternGeneratorJRL
     inline pinocchio::JointModelVector & getActuatedJoints()
     {return m_robotModel->joints;}
 
-    inline Eigen::VectorXd & currentConfiguration()
-    {return m_qmal;}
-    inline Eigen::VectorXd & currentVelocity()
-    {return m_vmal;}
-    inline Eigen::VectorXd & currentAcceleration()
-
-    {return m_amal;}
+    inline Eigen::VectorXd & currentPinoConfiguration()
+    {return m_qpino;}
+    inline Eigen::VectorXd & currentRPYConfiguration()
+    {return m_qrpy;}    
+    inline Eigen::VectorXd & currentPinoVelocity()
+    {return m_vpino;}
+    inline Eigen::VectorXd & currentPinoAcceleration()
+    {return m_apino;}
+    inline Eigen::VectorXd & currentRPYVelocity()
+    {return m_vrpy;}
+    inline Eigen::VectorXd & currentRPYAcceleration()
+    {return m_arpy;}
 
     inline unsigned numberDof()
     {return m_robotModel->nq;}
@@ -244,12 +256,16 @@ namespace PatternGeneratorJRL
 
     /// SETTERS
     /// ///////
-    inline void currentConfiguration(Eigen::VectorXd & conf)
-    {m_qmal=conf;}
-    inline void currentVelocity(Eigen::VectorXd & vel)
-    {m_vmal=vel;}
-    inline void currentAcceleration(Eigen::VectorXd & acc)
-    {m_amal=acc;}
+    void currentPinoConfiguration(Eigen::VectorXd & conf);
+    void currentRPYConfiguration(Eigen::VectorXd &);
+    inline void currentPinoVelocity(Eigen::VectorXd & vel)
+    {m_vpino=vel;}
+    inline void currentPinoAcceleration(Eigen::VectorXd & acc)
+    {m_apino=acc;}
+    inline void currentRPYVelocity(Eigen::VectorXd & vel)
+    {m_vrpy=vel;}
+    inline void currentRPYAcceleration(Eigen::VectorXd & acc)
+    {m_arpy=acc;}
 
     inline pinocchio::JointIndex getFreeFlyerSize() const
     { return m_PinoFreeFlyerSize;}
@@ -281,10 +297,22 @@ namespace PatternGeneratorJRL
     pinocchio::JointIndex m_chest, m_waist, m_leftShoulder, m_rightShoulder ;
     pinocchio::JointIndex m_leftWrist , m_rightWrist ;
 
-    Eigen::VectorXd m_qmal ;
-    Eigen::VectorXd m_vmal ;
-    Eigen::VectorXd m_amal ;
+    /// Fields member to store  configurations, velocity and acceleration
+    /// @{
+    /// Configuration SE(3) position + quaternion + NbDofs
+    Eigen::VectorXd m_qpino ;
+    /// Configuration SE(3) position + RPY + NbDofs    
+    Eigen::VectorXd m_qrpy ;
+    /// Velocity se(3) + NbDofs
+    Eigen::VectorXd m_vpino ;
+    /// Velocity se(3) + NbDofs
+    Eigen::VectorXd m_vrpy ;
+    /// Acceleration acc + NbDofs
+    Eigen::VectorXd m_apino ;
+    Eigen::VectorXd m_arpy ;
+    // @}
 
+    
     // tmp variables
     Eigen::Quaterniond m_quat ;
     Eigen::Matrix3d m_rot ;

@@ -614,9 +614,9 @@ computing the analytical trajectories. */
                                      KajitaPCpreviewWindow,
                                      lStartingCOMState );
         /*! Set the upper body trajectory */
-        Eigen::VectorXd UpperConfig = m_PR->currentConfiguration() ;
-        Eigen::VectorXd UpperVel    = m_PR->currentVelocity() ;
-        Eigen::VectorXd UpperAcc    = m_PR->currentAcceleration() ;
+        Eigen::VectorXd UpperConfig = m_PR->currentRPYConfiguration() ;
+        Eigen::VectorXd UpperVel    = m_PR->currentRPYVelocity() ;
+        Eigen::VectorXd UpperAcc    = m_PR->currentRPYAcceleration() ;
         // carry the weight in front of him
 //        UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
 //        UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
@@ -658,7 +658,7 @@ computing the analytical trajectories. */
     //    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
         for(unsigned int i = 18 ; i < 35 ; ++i){
-          UpperConfig(i)=m_PR->currentConfiguration()(i);
+          UpperConfig(i)=m_PR->currentRPYConfiguration()(i);
           UpperVel(i)=0.0;
           UpperAcc(i)=0.0;
         }

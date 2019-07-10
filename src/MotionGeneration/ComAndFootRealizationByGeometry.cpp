@@ -309,7 +309,7 @@ InitializationHumanoid(Eigen::VectorXd &BodyAnglesIni,
   // the model. But we do not use it.
   // it is used to resize the temporary vector
   PinocchioRobot *aPR =  getPinocchioRobot();
-  Eigen::VectorXd CurrentConfig = aPR->currentConfiguration();
+  Eigen::VectorXd CurrentConfig = aPR->currentRPYConfiguration();
 
   // Set to zero the free floating root.
   if(lStartingWaistPose.size())
@@ -329,17 +329,17 @@ InitializationHumanoid(Eigen::VectorXd &BodyAnglesIni,
   // Initialize the configuration vector.
   for(unsigned int i=0; i<BodyAnglesIni.size(); ++i)
   {
-    CurrentConfig[i+aPR->getFreeFlyerSize()] = BodyAnglesIni[i];
+    CurrentConfig[i+pinocchio_robot::RPY_SIZE] =
+      BodyAnglesIni[i];
   }
 
-  aPR->currentConfiguration(CurrentConfig);
+  aPR->currentRPYConfiguration(CurrentConfig);
 
   // Compensate for the static translation, not the WAIST position
   // but it is the body position which start on the ground.
   aPR->computeForwardKinematics();
 
-  CurrentConfig = aPR->currentConfiguration();
-
+  CurrentConfig = aPR->currentRPYConfiguration();
 
   // Set the waist position.
   lStartingWaistPose(0) = CurrentConfig(0); // 0.0
@@ -471,12 +471,12 @@ InitializationCoM
   }
 
   // Initialize previous configuration vector
-  { for(unsigned int i=0;i<m_prev_Configuration.size();m_prev_Configuration[i++]=0.0);};
-  { for(unsigned int i=0;i<m_prev_Configuration1.size();m_prev_Configuration1[i++]=0.0);};
-  { for(unsigned int i=0;i<m_prev_Configuration2.size();m_prev_Configuration2[i++]=0.0);};
-  { for(unsigned int i=0;i<m_prev_Velocity.size();m_prev_Velocity[i++]=0.0);};
-  { for(unsigned int i=0;i<m_prev_Velocity1.size();m_prev_Velocity1[i++]=0.0);};
-  { for(unsigned int i=0;i<m_prev_Velocity2.size();m_prev_Velocity2[i++]=0.0);};
+  m_prev_Configuration.setZero();
+  m_prev_Configuration1.setZero();
+  m_prev_Configuration2.setZero();
+  m_prev_Velocity.setZero();
+  m_prev_Velocity1.setZero();
+  m_prev_Velocity2.setZero();
 
 
   for(unsigned int i = 0 ; i < BodyAnglesIni.size() ; ++i)
@@ -1285,7 +1285,8 @@ void ComAndFootRealizationByGeometry::
   ODEBUG5( qArml(0)<< " " <<  qArml(1)  << " " << qArml(2) << " "
            << qArml(3) << "  " << qArml(4) << " " << qArml(5) << " "
            << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2) << " "
-           << qArmr(3) << "  " << qArmr(4) << " " << qArmr(5), "DebugDataqArmsHeuristic.txt");
+           << qArmr(3) << "  " << qArmr(4) << " " << qArmr(5),
+	   "DebugDataqArmsHeuristic.txt");
 }
 
 bool ComAndFootRealizationByGeometry::

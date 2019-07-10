@@ -169,13 +169,13 @@ SetPreviewControl(PreviewControl *aPC)
    aRightFootPosition(4) = aRightFAP.omega;
 
    /* Get the current configuration vector */
-   CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
+   CurrentConfiguration = m_PinocchioRobot->currentRPYConfiguration();
 
    /* Get the current velocity vector */
-   CurrentVelocity = m_PinocchioRobot->currentVelocity();
+   CurrentVelocity = m_PinocchioRobot->currentRPYVelocity();
 
    /* Get the current acceleration vector */
-   CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
+   CurrentAcceleration = m_PinocchioRobot->currentRPYAcceleration();
 
    m_ComAndFootRealization->
      ComputePostureForGivenCoMAndFeetPosture
@@ -191,13 +191,13 @@ SetPreviewControl(PreviewControl *aPC)
    if (StageOfTheAlgorithm==0)
      {
        /* Update the current configuration vector */
-       m_PinocchioRobot->currentConfiguration(CurrentConfiguration);
+       m_PinocchioRobot->currentRPYConfiguration(CurrentConfiguration);
 
        /* Update the current velocity vector */
-       m_PinocchioRobot->currentVelocity(CurrentVelocity);
+       m_PinocchioRobot->currentRPYVelocity(CurrentVelocity);
 
        /* Update the current acceleration vector */
-       m_PinocchioRobot->currentAcceleration(CurrentAcceleration);
+       m_PinocchioRobot->currentRPYAcceleration(CurrentAcceleration);
      }
  }
 
@@ -492,7 +492,7 @@ SetPreviewControl(PreviewControl *aPC)
    ODEBUG("Stage 3");
    Eigen::VectorXd CurrentConfiguration;
    /* Get the current configuration vector */
-   CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
+   CurrentConfiguration = m_PinocchioRobot->currentRPYConfiguration();
 
    ODEBUG("Stage 4");
    m_FIFODeltaZMPPositions.push_back(aZMPpos);
@@ -511,9 +511,12 @@ SetPreviewControl(PreviewControl *aPC)
   deque<FootAbsolutePosition> &RightFootPositions)
  {
    m_NumberOfIterations = 0;
-   Eigen::VectorXd CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
-   Eigen::VectorXd CurrentVelocity = m_PinocchioRobot->currentVelocity();
-   Eigen::VectorXd CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
+   Eigen::VectorXd CurrentConfiguration =
+     m_PinocchioRobot->currentRPYConfiguration();
+   Eigen::VectorXd CurrentVelocity =
+     m_PinocchioRobot->currentRPYVelocity();
+   Eigen::VectorXd CurrentAcceleration =
+     m_PinocchioRobot->currentRPYAcceleration();
 
    m_PC->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
@@ -595,14 +598,14 @@ SetPreviewControl(PreviewControl *aPC)
    Eigen::VectorXd CurrentVelocity;
    Eigen::VectorXd CurrentAcceleration;
    /* Get the current configuration vector */
-   CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
-   CurrentVelocity = m_PinocchioRobot->currentVelocity();
-   CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
+   CurrentConfiguration = m_PinocchioRobot->currentRPYConfiguration();
+   CurrentVelocity = m_PinocchioRobot->currentRPYVelocity();
+   CurrentAcceleration = m_PinocchioRobot->currentRPYAcceleration();
    CurrentVelocity.setZero();
    CurrentAcceleration.setZero();
 
-   m_PinocchioRobot->currentVelocity(CurrentVelocity);
-   m_PinocchioRobot->currentAcceleration(CurrentAcceleration);
+   m_PinocchioRobot->currentRPYVelocity(CurrentVelocity);
+   m_PinocchioRobot->currentRPYAcceleration(CurrentAcceleration);
 
  #ifdef _DEBUG_MODE_ON_
    m_FIFOTmpZMPPosition.clear();

@@ -231,7 +231,7 @@ namespace PatternGeneratorJRL {
       if (m_PR!=0)
 	{
 	  Eigen::VectorXd & currentConfiguration =
-	    m_PR->currentConfiguration();
+	    m_PR->currentRPYConfiguration();
 	  
 	  for (unsigned int i = 0 ;
 	       i < currentConfiguration.size() ;
@@ -270,7 +270,7 @@ namespace PatternGeneratorJRL {
     {
       std::size_t lindex=0;
       Eigen::VectorXd & currentConfiguration =
-	m_PR->currentConfiguration();
+	m_PR->currentRPYConfiguration();
 
       Eigen::Index nq = currentConfiguration.size();
       if (m_DebugVector.size()==0)
