@@ -51,7 +51,7 @@ namespace PatternGeneratorJRL
     const int RPY_SIZE=6;
     const int QUATERNION_SIZE=7;
   }
-  
+
   class PinocchioRobot
   {
   public:
@@ -62,15 +62,20 @@ namespace PatternGeneratorJRL
     PinocchioRobot();
     virtual ~PinocchioRobot();
 
-    /// Functions computing kinematics and dynamics
+    /// Compute RNEA algorithm
+    /// This is a front end for computeInverseDynamics(q,v,a).
     void computeInverseDynamics();
+
+    /// Compute RNEA algorithm from
+    /// \param[in] q: \f$q=[r,\theta,\hat{q}]\f$ with \f$r\f$ the position
+    /// of the free floating base (usually the waist), \f$theta\f$ the free floating
+    /// orientation in RPY format, $\hat{q}$ the motor angles position.
     void computeInverseDynamics(Eigen::VectorXd & q,
                                 Eigen::VectorXd & v,
                                 Eigen::VectorXd & a);
 
+    /// Compute the geometry of the robot.
     void computeForwardKinematics();
-    /// q should be given in RPY convention.
-    //    void computeForwardKinematics(Eigen::VectorXd & q);
 
     void RPYToSpatialFreeFlyer(Eigen::Vector3d & rpy,
                                Eigen::Vector3d & drpy,
@@ -201,7 +206,7 @@ namespace PatternGeneratorJRL
     inline Eigen::VectorXd & currentPinoConfiguration()
     {return m_qpino;}
     inline Eigen::VectorXd & currentRPYConfiguration()
-    {return m_qrpy;}    
+    {return m_qrpy;}
     inline Eigen::VectorXd & currentPinoVelocity()
     {return m_vpino;}
     inline Eigen::VectorXd & currentPinoAcceleration()
@@ -301,7 +306,7 @@ namespace PatternGeneratorJRL
     /// @{
     /// Configuration SE(3) position + quaternion + NbDofs
     Eigen::VectorXd m_qpino ;
-    /// Configuration SE(3) position + RPY + NbDofs    
+    /// Configuration SE(3) position + RPY + NbDofs
     Eigen::VectorXd m_qrpy ;
     /// Velocity se(3) + NbDofs
     Eigen::VectorXd m_vpino ;
@@ -312,7 +317,7 @@ namespace PatternGeneratorJRL
     Eigen::VectorXd m_arpy ;
     // @}
 
-    
+
     // tmp variables
     Eigen::Quaterniond m_quat ;
     Eigen::Matrix3d m_rot ;
