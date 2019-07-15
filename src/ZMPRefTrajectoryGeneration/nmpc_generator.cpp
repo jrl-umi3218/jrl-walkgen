@@ -1779,8 +1779,8 @@ void NMPCgenerator::initializeFootVelIneqConstraint()
   Bvel_.resize(nc_vel_)  ;
   gU_vel_.resize(nc_vel_);
 
-  {for(unsigned int i=0;i<Avel_.rows();i++) for(unsigned int j=0;j<Avel_.cols();j++) Avel_(i,j)=0.0;}  ;
-  { for(unsigned int i=0;i<Bvel_.size();Bvel_[i++]=0.0);}  ;
+  Avel_.setZero();
+  Bvel_.setZero();
 
   for(unsigned i=0 ; i<nf_ ; ++i)
   {
