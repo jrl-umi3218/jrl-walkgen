@@ -25,10 +25,17 @@ namespace PatternGeneratorJRL
       virtual void prepareFile(std::ofstream &aof,
 			       std::string &prefix,
 			       struct OneStep &anOneStep);
+      /// Fill-in tests
+      /// \param[in] aTestName: Prefix of the test (typically algorithm name)
+      /// \param[in] anOneStep: One iteration of the algorithm
+      /// \param[in] aCurrentConfiguration: A configuration vector in
+      /// RPY + motor angle format.
+      /// This method is a front end for fillInTestFormat1 and fillInTestFormat2
       virtual void fillInTests(std::string &aTestName,
 			       struct OneStep &anOneStep,
 			       Eigen::VectorXd &aCurrentConfiguration);
 
+      ///
       virtual void fillInTestsFormat1
       (std::string &aTestName,
        struct OneStep &anOneStep,
