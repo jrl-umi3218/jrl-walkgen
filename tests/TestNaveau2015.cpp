@@ -482,12 +482,15 @@ protected:
   {
     TestObject::fillInDebugFiles();
 
+    Eigen::VectorXd & currentConfiguration =
+      m_PR->currentRPYConfiguration();
+
     m_DumpReferencesObjects.fillInTests(m_TestName,
 					m_OneStep,
-					m_CurrentConfiguration);
+					currentConfiguration);
     if(m_DebugFGPIFull)
       {
-	analyticalInverseKinematics(m_CurrentConfiguration,
+	analyticalInverseKinematics(currentConfiguration,
 				    m_CurrentVelocity,
 				    m_CurrentAcceleration);
 	if(iteration==0)
@@ -500,7 +503,7 @@ protected:
 	    //        assert(isHalfsitting);
 	  }
 
-	m_DebugPR->computeInverseDynamics(m_CurrentConfiguration,
+	m_DebugPR->computeInverseDynamics(currentConfiguration,
 					  m_CurrentVelocity,
 					  m_CurrentAcceleration);
 	Eigen::Vector3d com, dcom, ddcom;
@@ -567,7 +570,7 @@ protected:
     localEvent events[2] =
       {
 	{1*200,&TestObject::walkOnSpot},
-	{10*200,&TestObject::stop},
+	{5*200,&TestObject::stop},
       };
 
     if (m_setOfLocalEvents!=0)

@@ -861,12 +861,15 @@ namespace PatternGeneratorJRL
       }
     }
 
-    void TestObject::setFromURDFToOpenHRP(std::vector<unsigned int> &vfromURDFToOpenHRP)
+    void TestObject::setFromURDFToOpenHRP
+    (std::vector<unsigned int> &vfromURDFToOpenHRP)
     {
       m_fromURDFToOpenHRP = vfromURDFToOpenHRP;
     }
 
-    void TestObject::parseFromURDFtoOpenHRPIndex(Eigen::VectorXd &conf)
+    void TestObject::
+    parseFromURDFtoOpenHRPIndex
+    (Eigen::VectorXd &conf)
     {
       if (((unsigned int)conf.size())!=m_fromURDFToOpenHRP.size())
 	{
@@ -943,7 +946,7 @@ namespace PatternGeneratorJRL
       aof << filterprecision
 	( m_OneStep.m_finalCOMPosition.roll[0] * M_PI /180) << " "  ; // 2
       aof << filterprecision
-	( m_OneStep.m_finalCOMPosition.pitch[0] * M_PI /180 ) << " "  ; // 3
+	( m_OneStep.m_finalCOMPosition.pitch[0] * M_PI /180 ) << " " ; // 3
       aof << filterprecision
 	( m_OneStep.m_finalCOMPosition.yaw[0] * M_PI /180 ) ; // 4
       aof << endl ;
