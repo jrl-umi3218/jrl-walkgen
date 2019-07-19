@@ -381,9 +381,9 @@ void Bsplines::PrintKnotVector() const
   ODEBUG( "Knot Vector (" << m_knot.size() << ") : ");
   for (unsigned int i = 0;i<m_knot.size();i++)
     {
-      std::cout << m_knot[i] << " , ";
+      ODEBUG(m_knot[i] << " , ");
     }
-  std::cout <<" " <<std::endl;
+  ODEBUG(" ");
 }
 
 void Bsplines::PrintControlPoints() const
