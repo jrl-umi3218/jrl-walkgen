@@ -35,7 +35,9 @@ using namespace std;
 #include <GlobalStrategyManagers/DoubleStagePreviewControlStrategy.hh>
 using namespace PatternGeneratorJRL;
 
-DoubleStagePreviewControlStrategy::DoubleStagePreviewControlStrategy(SimplePluginManager * aSPM)
+DoubleStagePreviewControlStrategy::
+DoubleStagePreviewControlStrategy
+(SimplePluginManager * aSPM)
   :GlobalStrategyManager(aSPM)
 {
   m_ZMPFrame = ZMPFRAME_WAIST;
@@ -62,16 +64,19 @@ DoubleStagePreviewControlStrategy::DoubleStagePreviewControlStrategy(SimplePlugi
   RESETDEBUG4("ZMPRef.dat");
 }
 
-DoubleStagePreviewControlStrategy::~DoubleStagePreviewControlStrategy()
+DoubleStagePreviewControlStrategy::
+~DoubleStagePreviewControlStrategy()
 {
   if (m_ZMPpcwmbz!=0)
     delete m_ZMPpcwmbz;
 }
 
 
-int DoubleStagePreviewControlStrategy::InitInterObjects(PinocchioRobot *aPR,
-                            ComAndFootRealization * aCFR,
-                            StepStackHandler * aSSH)
+int DoubleStagePreviewControlStrategy::
+InitInterObjects
+(PinocchioRobot *aPR,
+ ComAndFootRealization * aCFR,
+ StepStackHandler * aSSH)
 {
   setHumanoidDynamicRobot(aPR);
   m_ZMPpcwmbz->setPinocchioRobot(m_PinocchioRobot);
@@ -80,13 +85,15 @@ int DoubleStagePreviewControlStrategy::InitInterObjects(PinocchioRobot *aPR,
   return 1;
 }
 
-int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
-							      FootAbsolutePosition &RightFootPosition,
-							      Eigen::VectorXd & ZMPRefPos,
-							      COMState & finalCOMState,
-							      Eigen::VectorXd & CurrentConfiguration,
-							      Eigen::VectorXd & CurrentVelocity,
-							      Eigen::VectorXd & CurrentAcceleration)
+int DoubleStagePreviewControlStrategy::
+OneGlobalStepOfControl
+(FootAbsolutePosition &LeftFootPosition,
+ FootAbsolutePosition &RightFootPosition,
+ Eigen::VectorXd & ZMPRefPos,
+ COMState & finalCOMState,
+ Eigen::VectorXd & CurrentConfiguration,
+ Eigen::VectorXd & CurrentVelocity,
+ Eigen::VectorXd & CurrentAcceleration)
 {
   // New scheme:
   // Update the queue of ZMP ref
@@ -112,13 +119,14 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   ODEBUG("m_RightFootPositions: "<<m_RightFootPositions->size());
   ODEBUG("m_ZMPPositions: "<<m_ZMPPositions->size());
 
-  m_ZMPpcwmbz->OneGlobalStepOfControl((*m_LeftFootPositions)[2*m_NL],
-				      (*m_RightFootPositions)[2*m_NL],
-				      (*m_ZMPPositions)[2*m_NL],
-				      finalCOMState,
-				      CurrentConfiguration,
-				      CurrentVelocity,
-				      CurrentAcceleration);
+  m_ZMPpcwmbz->OneGlobalStepOfControl
+    ((*m_LeftFootPositions)[2*m_NL],
+     (*m_RightFootPositions)[2*m_NL],
+     (*m_ZMPPositions)[2*m_NL],
+     finalCOMState,
+     CurrentConfiguration,
+     CurrentVelocity,
+     CurrentAcceleration);
   ODEBUG4("finalCOMState:" <<finalCOMState.x[0] << " " 
 	  << finalCOMState.y[0] ,"DebugData.txt");
   
@@ -154,7 +162,8 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
       
       ZMPRefPos(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
       ZMPRefPos(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
-      ZMPRefPos(2) = -finalCOMState.z[0] - PosOfWaistInCOMF(2,3) - (*m_ZMPPositions)[0].pz;
+      ZMPRefPos(2) = -finalCOMState.z[0] - PosOfWaistInCOMF(2,3) -
+	(*m_ZMPPositions)[0].pz;
     }
   else if (m_ZMPFrame==ZMPFRAME_WORLD)
     {
@@ -175,7 +184,9 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 		(*m_ZMPPositions)[0].py << " " <<
 		outWaistPosition.x[0] << " " <<
 		outWaistPosition.y[0] << " " <<
-		ZMPRefPos(0) << " " << ZMPRefPos(1) << " " << ZMPRefPos(2) <<
+		ZMPRefPos(0) << " " <<
+		ZMPRefPos(1) << " " <<
+		ZMPRefPos(2) <<
 		LeftFootPosition.stepType << " " <<
 		RightFootPosition.stepType, 
 		"ZMPRefAndWaist.dat");
@@ -231,24 +242,28 @@ int DoubleStagePreviewControlStrategy::EndOfMotion()
 
 }
 
-void DoubleStagePreviewControlStrategy::SetAlgoForZMPTraj(istringstream &strm)
+void DoubleStagePreviewControlStrategy::
+SetAlgoForZMPTraj(istringstream &strm)
 {
   string ZMPTrajAlgo;
   strm >> ZMPTrajAlgo;
   if (ZMPTrajAlgo=="PBW")
     {
-      m_ZMPpcwmbz->SetStrategyForStageActivation(ZMPPreviewControlWithMultiBodyZMP::
-						 ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY);
+      m_ZMPpcwmbz->SetStrategyForStageActivation
+	(ZMPPreviewControlWithMultiBodyZMP::
+	 ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY);
     }
   else if (ZMPTrajAlgo=="Kajita")
     {
-      m_ZMPpcwmbz->SetStrategyForStageActivation(ZMPPreviewControlWithMultiBodyZMP::
-						 ZMPCOM_TRAJECTORY_FULL);
+      m_ZMPpcwmbz->SetStrategyForStageActivation
+	(ZMPPreviewControlWithMultiBodyZMP::
+	 ZMPCOM_TRAJECTORY_FULL);
     }
   else if (ZMPTrajAlgo=="KajitaOneStage")
     {
-      m_ZMPpcwmbz->SetStrategyForStageActivation(ZMPPreviewControlWithMultiBodyZMP::
-						 ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY);
+      m_ZMPpcwmbz->SetStrategyForStageActivation
+	(ZMPPreviewControlWithMultiBodyZMP::
+	 ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY);
     }
   else if (ZMPTrajAlgo=="Morisawa")
     {
@@ -257,7 +272,9 @@ void DoubleStagePreviewControlStrategy::SetAlgoForZMPTraj(istringstream &strm)
   
 }
 
-void DoubleStagePreviewControlStrategy::SetZMPFrame(std::istringstream &astrm)
+void DoubleStagePreviewControlStrategy::
+SetZMPFrame
+(std::istringstream &astrm)
 {
   string aZMPFrame;
   astrm >> aZMPFrame;
@@ -274,7 +291,9 @@ void DoubleStagePreviewControlStrategy::SetZMPFrame(std::istringstream &astrm)
 		<< std::endl;}
 }
 
-void DoubleStagePreviewControlStrategy::SetSamplingPeriod(double lSamplingPeriod)
+void DoubleStagePreviewControlStrategy::
+SetSamplingPeriod
+(double lSamplingPeriod)
 {
   m_SamplingPeriod = lSamplingPeriod;
 
@@ -284,7 +303,9 @@ void DoubleStagePreviewControlStrategy::SetSamplingPeriod(double lSamplingPeriod
   
 }
 
-void DoubleStagePreviewControlStrategy::SetPreviewControlTime(double lPreviewControlTime)
+void DoubleStagePreviewControlStrategy::
+SetPreviewControlTime
+(double lPreviewControlTime)
 {
   m_PreviewControlTime = lPreviewControlTime;
 
@@ -294,7 +315,9 @@ void DoubleStagePreviewControlStrategy::SetPreviewControlTime(double lPreviewCon
 
 }
 
-void DoubleStagePreviewControlStrategy::CallMethod(std::string &Method, std::istringstream &astrm)
+void DoubleStagePreviewControlStrategy::
+CallMethod
+(std::string &Method, std::istringstream &astrm)
 {
   ODEBUG("Method: " << Method);
 
@@ -328,10 +351,12 @@ void DoubleStagePreviewControlStrategy::CallMethod(std::string &Method, std::ist
     }
 }
 
-void DoubleStagePreviewControlStrategy::Setup(deque<ZMPPosition> & aZMPPositions,
-					      deque<COMState> & aCOMBuffer,
-					      deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
-					      deque<FootAbsolutePosition> & aRightFootAbsolutePositions)
+void DoubleStagePreviewControlStrategy::
+Setup
+(deque<ZMPPosition> & aZMPPositions,
+ deque<COMState> & aCOMBuffer,
+ deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> & aRightFootAbsolutePositions)
 {
   m_ZMPpcwmbz->Setup(aZMPPositions,
 		     aCOMBuffer,
