@@ -485,6 +485,13 @@ protected:
     Eigen::VectorXd & currentConfiguration =
       m_PR->currentRPYConfiguration();
 
+    if ( iteration == 0 ){
+      m_DumpReferencesObjects.
+	setAnklePositions
+	(m_PR->rightFoot()->anklePosition,
+	 m_PR->leftFoot()->anklePosition);
+    }
+
     m_DumpReferencesObjects.fillInTests(m_TestName,
 					m_OneStep,
 					currentConfiguration);
@@ -548,7 +555,7 @@ protected:
 
   void createFullEventsForHRP2()
   {
-    ODEBUG3("createFullEventsForHRP2");
+    ODEBUG("createFullEventsForHRP2");
     localEvent events[8] =
       {
 	{1*200,&TestObject::walkForwardSlow},
@@ -697,7 +704,7 @@ protected:
 
   void chooseTestProfile()
   {
-    ODEBUG3("ROBOT:" << m_PR->getName() <<
+    ODEBUG("ROBOT:" << m_PR->getName() <<
 	    " Profile: " << m_TestProfile);
     switch(m_TestProfile)
       {
@@ -779,7 +786,7 @@ int PerformTests(int argc, char *argv[])
       exit(-1);
     }
   else
-    { ODEBUG3("Index detected: " << indexProfile);}
+    { ODEBUG("Index detected: " << indexProfile);}
 
   TestNaveau2015 aTN2015(argc,argv,TestName,TestProfiles[indexProfile]);
   if(!aTN2015.init())
