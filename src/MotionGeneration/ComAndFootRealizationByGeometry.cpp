@@ -381,7 +381,7 @@ bool ComAndFootRealizationByGeometry::
   // coct    -st    -soct
   // cost     ct    -sost
   // so        0    co
-  std::cout << normalizedRotation(2,1) << std::endl;
+  ODEBUG(normalizedRotation(2,1));
   assert((fabs(normalizedRotation(2,1))<2e-3) &&
          "Error in the walk pattern generator initialization:" &&
          " Initial foot position is not flat");
