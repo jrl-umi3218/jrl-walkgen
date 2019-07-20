@@ -425,7 +425,7 @@ void NMPCgenerator::updateConstraint()
   nc_ = ncineq_ + nceq_ ;
 
   unsigned N2nf2 = 2*(N_+nf_) ;
-  qp_J_.resize(nc_,nv_); qp_J_(i,j).setZero();
+  qp_J_.resize(nc_,nv_); qp_J_.setZero();
 
   // Fill up qp_J_
   unsigned index = 0 ;
@@ -1364,10 +1364,10 @@ void NMPCgenerator::buildConvexHullSystems()
 #endif
 
   Eigen::Matrix<double,5,2> tmp52d; ;
-  {for(unsigned int i=0;i<tmp52d.rows();i++) for(unsigned int j=0;j<tmp52d.cols();j++) tmp52d(i,j)=0.0;} ;
+  tmp52d.setZero();
 
   Eigen::Matrix<double,5,1> tmp5d ;
-  { for(unsigned int i=0;i<tmp5d.size();tmp5d[i++]=0.0);} ;
+  tmp5d.setZero();
 
   A0f_xy_.resize(nf_,tmp52d);
   A0f_theta_.resize(nf_,tmp52d);
@@ -1582,7 +1582,7 @@ void NMPCgenerator::initializeFootPoseConstraint()
   for(unsigned n=0 ; n < nf_ ; ++n)
   {
     Afoot_xy_   [n].setZero();
-    {for(unsigned int i=0;i<Afoot_theta_[n].rows();i++) for(unsigned int j=0;j<Afoot_theta_[n].cols();j++) Afoot_theta_[n](i,j)=0.0;};
+    Afoot_theta_[n].setZero();
     UBfoot_     [n].setZero();
     SelecMat_   [n].setZero();
     deltaF_     [n].setZero();
@@ -1594,9 +1594,9 @@ void NMPCgenerator::initializeFootPoseConstraint()
       SelecMat_[n](1,2*N_+nf_+n-1) = -1 ;
     }
   }
-  {for(unsigned int i=0;i<Afoot_xy_full_.rows();i++) for(unsigned int j=0;j<Afoot_xy_full_.cols();j++) Afoot_xy_full_(i,j)=0.0;};
-  {for(unsigned int i=0;i<Afoot_theta_full_.rows();i++) for(unsigned int j=0;j<Afoot_theta_full_.cols();j++) Afoot_theta_full_(i,j)=0.0;};
-  { for(unsigned int i=0;i<UBfoot_full_.size();UBfoot_full_[i++]=0.0);};
+  Afoot_xy_full_.setZero();
+  Afoot_theta_full_.setZero();
+  UBfoot_full_.setZero();
   return ;
 }
 
@@ -2283,8 +2283,10 @@ void NMPCgenerator::setLocalVelocityReference(reference_t local_vel_ref)
   cout << vel_ref_.Global.X << " "  ;
   cout << vel_ref_.Global.Y << endl ;
 #endif
-  { for(unsigned int i=0;i<vel_ref_.Global.X_vec.size();vel_ref_.Global.X_vec[i++]=vel_ref_.Global.X);} ;
-  { for(unsigned int i=0;i<vel_ref_.Global.Y_vec.size();vel_ref_.Global.Y_vec[i++]=vel_ref_.Global.Y);} ;
+  vel_ref_.Global.X_vec =
+    Eigen::VectorXd::Constant(vel_ref_.Global.X_vec.size(),vel_ref_.Global.X);
+  vel_ref_.Global.Y_vec =
+    Eigen::VectorXd::Constant(vel_ref_.Global.Y_vec.size(),vel_ref_.Global.Y);
 #ifdef DEBUG
   DumpVector("RefVectorX"    ,vel_ref_.Global.X_vec  );
   DumpVector("RefVectorY"    ,vel_ref_.Global.Y_vec  );
@@ -2327,11 +2329,11 @@ void NMPCgenerator::setGlobalVelocityReference(reference_t global_vel_ref)
 
 void NMPCgenerator::initializeLineSearch()
 {
-  HUn_.resize(nv_); { for(unsigned int i=0;i<HUn_.size();HUn_[i++]=0.0);};
-  U_n_.resize(nv_); { for(unsigned int i=0;i<U_n_.size();U_n_[i++]=0.0);};
-  JdU_.resize(nc_); { for(unsigned int i=0;i<JdU_.size();JdU_[i++]=0.0);};
+  HUn_.resize(nv_); HUn_.setZero();
+  U_n_.resize(nv_); U_n_.setZero();
+  JdU_.resize(nc_); JdU_.setZero();
   selectActiveConstraint.resize(nc_);
-  { for(unsigned int i=0;i<selectActiveConstraint.size();selectActiveConstraint[i++]=0.0);};
+  selectActiveConstraint.setZero();
   lineStep_=1.0; lineStep0_=1.0 ; // step searched
   cm_=0.0; c_=1.0 ; // Merit Function Jacobian
   mu_ = 1.0 ;
