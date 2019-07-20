@@ -650,6 +650,7 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
 
   NMPCgenerator_->getSolution(JerkX_, JerkY_, FootStepX_,
 			      FootStepY_, FootStepYaw_);
+
   const std::deque<support_state_t> & SupportStates_deq =
     NMPCgenerator_->SupportStates_deq();
   LIPM_.setState(itCOM_);
@@ -722,6 +723,7 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   unsigned int IndexMax = (int)round((previewDuration_)/
 				     InterpolationPeriod_ );
   int inc =  (int)round(InterpolationPeriod_ / m_SamplingPeriod) ;
+
   for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
   {
     ZMPTraj_deq_[j] = ZMPTraj_deq_ctrl_[i] ;

@@ -647,8 +647,10 @@ void NMPCgenerator::guessWarmStart()
 
     if(nf_==1)
     {
-      F_kp1_x_[0] = currentSupport_.X  + sign*sin(currentSupport_.Yaw)*1.2*FeetDistance_ ;
-      F_kp1_y_[0] = currentSupport_.Y  - sign*cos(currentSupport_.Yaw)*1.2*FeetDistance_ ;
+      F_kp1_x_[0] = currentSupport_.X  +
+	sign*sin(currentSupport_.Yaw)*1.2*FeetDistance_ ;
+      F_kp1_y_[0] = currentSupport_.Y  -
+	sign*cos(currentSupport_.Yaw)*1.2*FeetDistance_ ;
     }
     else
     {
@@ -658,8 +660,10 @@ void NMPCgenerator::guessWarmStart()
         F_kp1_y_[i-1] = F_kp1_y_[i] ;
         F_kp1_theta_[i-1] = F_kp1_theta_[i] ;
       }
-      F_kp1_x_[nf_-1] = F_kp1_x_[nf_-2] + sign*sin(F_kp1_theta_[nf_-2])*1.2*FeetDistance_ ;
-      F_kp1_y_[nf_-1] = F_kp1_y_[nf_-2] - sign*cos(F_kp1_theta_[nf_-2])*1.2*FeetDistance_ ;
+      F_kp1_x_[nf_-1] = F_kp1_x_[nf_-2] +
+	sign*sin(F_kp1_theta_[nf_-2])*1.2*FeetDistance_ ;
+      F_kp1_y_[nf_-1] = F_kp1_y_[nf_-2] -
+	sign*cos(F_kp1_theta_[nf_-2])*1.2*FeetDistance_ ;
     }
     for(unsigned i=1 ; i<N_ ; ++i)
     {
@@ -720,10 +724,12 @@ void NMPCgenerator::updateInitialConditionDependentMatrices()
       }else
       {
         v_kp1f_x_(i) = v_kp1_(i) *
-            (SupportStates_deq_[i+1].X - sin(SupportStates_deq_[i+1].Yaw)
+            (SupportStates_deq_[i+1].X -
+	     sin(SupportStates_deq_[i+1].Yaw)
 	     *FeetDistance_*0.5);
         v_kp1f_y_(i) = v_kp1_(i) *
-            (SupportStates_deq_[i+1].Y + cos(SupportStates_deq_[i+1].Yaw)
+            (SupportStates_deq_[i+1].Y +
+	     cos(SupportStates_deq_[i+1].Yaw)
 	     *FeetDistance_*0.5);
       }
     }
@@ -987,7 +993,8 @@ getSolution
   cout << currentSupport_.NbStepsLeft << " "
         << SupportStates_deq_.back().StepNumber << endl;
 #endif //DEBUG_COUT
-  if(currentSupport_.NbStepsLeft <= 0 && SupportStates_deq_.back().StepNumber <= 0)
+  if(currentSupport_.NbStepsLeft <= 0 &&
+     SupportStates_deq_.back().StepNumber <= 0)
   {
     FootStepX  [0] = currentSupport_.X  + sign*sin(currentSupport_.Yaw)
       *FeetDistance_ ;
@@ -2239,8 +2246,10 @@ void NMPCgenerator::updateCostFunction()
 void NMPCgenerator::setLocalVelocityReference(reference_t local_vel_ref)
 {
   vel_ref_.Local = local_vel_ref.Local ;
-  vel_ref_.Global.X   = vel_ref_.Local.X * cos(currentSupport_.Yaw) - vel_ref_.Local.Y * sin(currentSupport_.Yaw) ;
-  vel_ref_.Global.Y   = vel_ref_.Local.X * sin(currentSupport_.Yaw) + vel_ref_.Local.Y * cos(currentSupport_.Yaw) ;
+  vel_ref_.Global.X   = vel_ref_.Local.X * cos(currentSupport_.Yaw) -
+    vel_ref_.Local.Y * sin(currentSupport_.Yaw) ;
+  vel_ref_.Global.Y   = vel_ref_.Local.X * sin(currentSupport_.Yaw) +
+    vel_ref_.Local.Y * cos(currentSupport_.Yaw) ;
   vel_ref_.Global.Yaw = vel_ref_.Local.Yaw ;
 
   if(vel_ref_.Global.X>0.4)
@@ -2337,8 +2346,8 @@ double NMPCgenerator::evalMeritFunctionJacobian()
   //constraintJacobian = mu*sum((sign(qp_J_*deltaU_)*qp_J_*deltaU_)
   //                       *selecActiveConstraint);
   double constrValue = 0.0 ;
-  JdU_.resize(nc_);
-  { for(unsigned int i=0;i<JdU_.size();JdU_[i++]=0.0);};
+  JdU_.resize(nc_); JdU_.setZero();
+
   for (unsigned i=0; i<nc_ ; ++i)
   {
     if(selectActiveConstraint(i)!=0.0)

@@ -477,8 +477,7 @@ interpolate_feet_positions
       SetParameters(FootTrajectoryGenerationStandard::X_AXIS,
 		    TimeInterval,FootStepX[CurrentSupport.StepNumber],
 		    LastSFP->x, LastSFP->dx, LastSFP->ddx);
-      SetParameters(
-		    FootTrajectoryGenerationStandard::Y_AXIS,
+      SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
 		    TimeInterval,FootStepY[CurrentSupport.StepNumber],
 		    LastSFP->y, LastSFP->dy, LastSFP->ddy);
       if(LocalInterpolationStartTime<0.001)

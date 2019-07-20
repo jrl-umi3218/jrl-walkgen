@@ -191,7 +191,11 @@ namespace PatternGeneratorJRL
    /// \param[in] InitSpeed
    /// \param[in] InitAcc
    int SetParameters(int PolynomeIndex, double TimeInterval,
-       double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, double InitJerk);
+		     double FinalPosition,
+		     double InitPosition,
+		     double InitSpeed,
+		     double InitAcc,
+		     double InitJerk);
 
    /// \brief Set parameters considering initial position, speed, acceleration.
    ///
