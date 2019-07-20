@@ -263,7 +263,7 @@ namespace PatternGeneratorJRL
     // Foot position constraint
     unsigned nc_foot_ ;
     unsigned n_vertices_ ;
-    unsigned itBeforeLanding_ ;
+    unsigned int itBeforeLanding_ ;
     bool useItBeforeLanding_ ;
     int itMax_;
     std::vector<Eigen::MatrixXd> Afoot_xy_, Afoot_theta_  ;
@@ -457,6 +457,9 @@ namespace PatternGeneratorJRL
     Eigen::MatrixXd QuadProg_H_, QuadProg_J_eq_, QuadProg_J_ineq_;
     Eigen::VectorXd QuadProg_g_, QuadProg_bJ_eq_, QuadProg_lbJ_ineq_, deltaU_;
     Eigen::VectorXd deltaU_thresh_ ;
+
+    /// Exit on error.
+    bool exit_on_error_;
   };
 
 
