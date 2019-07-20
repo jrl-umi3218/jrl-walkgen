@@ -354,7 +354,7 @@ fillInTestsFormat2
   /// Waist Orientation
   prefix= aTestName + "WaistOrientation";
   prepareFile(aof,prefix,anOneStep);
-  vec_db[0] = filterprecision(anOneStep.m_finalCOMPosition.yaw[0] );
+  vec_db[0] = filterprecision(anOneStep.m_finalCOMPosition.yaw[0]*M_PI/180.0 );
   vec_db[1] = 0.0; vec_db[2] = 0.0;
   vec_db[3] = filterprecision(anOneStep.m_finalCOMPosition.yaw[1] );
   vec_db[4] = 0.0; vec_db[5] = 0.0;
@@ -384,7 +384,7 @@ fillInTestsFormat2
 			      m_AnklePositionLeft[1] );
   vec_db[2]  = filterprecision(anOneStep.m_LeftFootPosition.z +
 			      m_AnklePositionLeft[2] );
-  vec_db[3]  = filterprecision(anOneStep.m_LeftFootPosition.theta );
+  vec_db[3]  = filterprecision(anOneStep.m_LeftFootPosition.theta*M_PI/180.0 );
   vec_db[4]  = filterprecision(anOneStep.m_LeftFootPosition.omega  );
   vec_db[5]  = filterprecision(anOneStep.m_LeftFootPosition.omega2  );
   vec_db[6]  = filterprecision(anOneStep.m_LeftFootPosition.dx  );
@@ -412,7 +412,7 @@ fillInTestsFormat2
 			      m_AnklePositionRight[1] );
   vec_db[2]  = filterprecision(anOneStep.m_RightFootPosition.z +
 			      m_AnklePositionRight[2] );
-  vec_db[3]  = filterprecision(anOneStep.m_RightFootPosition.theta );
+  vec_db[3]  = filterprecision(anOneStep.m_RightFootPosition.theta*M_PI/180.0 );
   vec_db[4]  = filterprecision(anOneStep.m_RightFootPosition.omega  );
   vec_db[5]  = filterprecision(anOneStep.m_RightFootPosition.omega2  );
   vec_db[6]  = filterprecision(anOneStep.m_RightFootPosition.dx  );
