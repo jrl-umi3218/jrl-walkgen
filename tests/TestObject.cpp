@@ -701,9 +701,9 @@ namespace PatternGeneratorJRL
 
       for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
       {
-        os << "<====================================";
-	os << "===========================>"<<endl;
-        os << "Iteration nb: " << lNbIt << endl;
+        //os << "<====================================";
+        //os << "===========================>"<<endl;
+        //os << "Iteration nb: " << lNbIt << endl;
 
         m_clock.startPlanning();
 
