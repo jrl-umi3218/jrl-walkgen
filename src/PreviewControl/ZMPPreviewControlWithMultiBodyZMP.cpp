@@ -232,7 +232,7 @@ SetPreviewControl(PreviewControl *aPC)
 		 aRightFAP.x << " " <<
 		 aRightFAP.y << " " <<
 		 aRightFAP.z,
-		 "ZMPPCWMZOGSOC.dat");
+		 "1ststage.dat");
 
    CallToComAndFootRealization
      (acompos,aLeftFAP,aRightFAP,
@@ -462,7 +462,6 @@ SetPreviewControl(PreviewControl *aPC)
 	  " RF: "<< m_FIFORightFootPosition.size() <<
 	  " LF: "<< m_FIFOLeftFootPosition.size());
    m_FIFOZMPRefPositions.pop_front();
-
    return 1;
  }
 
@@ -476,7 +475,10 @@ SetPreviewControl(PreviewControl *aPC)
    // compute the ZMP related to the motion found by CoMAndZMPRealization.
    Eigen::Vector3d ZMPmultibody;
    m_PinocchioRobot->zeroMomentumPoint(ZMPmultibody);
-   ODEBUG5(ZMPmultibody[0] << " " << ZMPmultibody[1], "DebugDataCheckZMP1.txt");
+   ODEBUG4(ZMPmultibody[0] << " " << ZMPmultibody[1]
+	   << " " << m_FIFOZMPRefPositions[0].px
+	   << " " << m_FIFOZMPRefPositions[0].py,
+	   "DebugDataCheckZMP1.txt");
 
    Eigen::Vector3d CoMmultibody;
    m_PinocchioRobot->positionCenterOfMass(CoMmultibody);
