@@ -178,39 +178,18 @@ void NMPCgenerator::initNMPCgenerator(
   nf_ = nf ;
   // number of degrees of freedom
   nv_ = 2*N_+3*nf_;
-  Pps_.resize(N_,3);
-  {for(unsigned int i=0;i<Pps_.rows();i++)
-      for(unsigned int j=0;j<Pps_.cols();j++)
-	Pps_(i,j)=0.0;};
-  Ppu_.resize(N_,N_);
-  {for(unsigned int i=0;i<Ppu_.rows();i++)
-      for(unsigned int j=0;j<Ppu_.cols();j++)
-	Ppu_(i,j)=0.0;};
-  Pvs_.resize(N_,3);
-  {for(unsigned int i=0;i<Pvs_.rows();i++)
-      for(unsigned int j=0;j<Pvs_.cols();j++)
-	Pvs_(i,j)=0.0;};
-  Pvu_.resize(N_,N_);
-  {for(unsigned int i=0;i<Pvu_.rows();i++)
-      for(unsigned int j=0;j<Pvu_.cols();j++)
-	Pvu_(i,j)=0.0;};
-  Pas_.resize(N_,3);
-  {for(unsigned int i=0;i<Pas_.rows();i++)
-      for(unsigned int j=0;j<Pas_.cols();j++)
-	Pas_(i,j)=0.0;};
+  Pps_.resize(N_,3);  Pps_.setZero();
+  Ppu_.resize(N_,N_); Ppu_.setZero();
+  Pvs_.resize(N_,3);  Pvs_.setZero();
+  Pvu_.resize(N_,N_); Pvu_.setZero();
+  Pas_.resize(N_,3);  Pas_.setZero();
 
-  Pau_.resize(N_,N_);
-  Pau_.setZero();
-  Pzs_.resize(N_,3);
-  Pzs_.setZero();
-  Pzu_.resize(N_,N_);
-  Pzu_.setZero();
-  v_kp1_.resize(N_) ;
-  v_kp1_.setZero();
-  V_kp1_.resize(N_,nf_) ;
-  V_kp1_.setZero();
-  U_.resize(2*N_+3*nf_);
-  U_.setZero();
+  Pau_.resize(N_,N_); Pau_.setZero();
+  Pzs_.resize(N_,3);  Pzs_.setZero();
+  Pzu_.resize(N_,N_); Pzu_.setZero();
+  v_kp1_.resize(N_) ; v_kp1_.setZero();
+  V_kp1_.resize(N_,nf_) ; V_kp1_.setZero();
+  U_.resize(2*N_+3*nf_);  U_.setZero();
   deltaU_thresh_.resize(2*N_+3*nf_);
   deltaU_thresh_.setZero();
   U_xy_ .resize(2*(N_+nf_));
