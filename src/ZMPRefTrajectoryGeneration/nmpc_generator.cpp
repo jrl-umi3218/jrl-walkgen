@@ -388,16 +388,11 @@ void NMPCgenerator::initializeConstraint()
   nceq_ = nc_vel_ ;
   nc_ = nceq_ + ncineq_;
 
-  gU_cop_.resize(nc_cop_);
-  { for(unsigned int i=0;i<gU_cop_.size();gU_cop_[i++]=0.0);};
-  gU_foot_.resize(nc_foot_);
-  { for(unsigned int i=0;i<gU_foot_.size();gU_foot_[i++]=0.0);};
-  gU_obs_.resize(nc_obs_);
-  { for(unsigned int i=0;i<gU_obs_.size();gU_obs_[i++]=0.0);};
-  gU_rot_.resize(nc_rot_);
-  { for(unsigned int i=0;i<gU_rot_.size();gU_rot_[i++]=0.0);};
-  gU_stan_.resize(nc_stan_);
-  { for(unsigned int i=0;i<gU_stan_.size();gU_stan_[i++]=0.0);};
+  gU_cop_.resize(nc_cop_);   gU_cop_.setZero();
+  gU_foot_.resize(nc_foot_); gU_foot_.setZero();
+  gU_obs_.resize(nc_obs_);   gU_obs_.setZero();
+  gU_rot_.resize(nc_rot_);   gU_rot_.setZero();
+  gU_stan_.resize(nc_stan_); gU_stan_.setZero();
 
   return ;
 }
@@ -430,10 +425,7 @@ void NMPCgenerator::updateConstraint()
   nc_ = ncineq_ + nceq_ ;
 
   unsigned N2nf2 = 2*(N_+nf_) ;
-  qp_J_.resize(nc_,nv_);
-  {for(unsigned int i=0;i<qp_J_.rows();i++)
-      for(unsigned int j=0;j<qp_J_.cols();j++)
-	qp_J_(i,j)=0.0;};
+  qp_J_.resize(nc_,nv_); qp_J_(i,j).setZero();
 
   // Fill up qp_J_
   unsigned index = 0 ;
