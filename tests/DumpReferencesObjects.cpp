@@ -384,18 +384,19 @@ fillInTestsFormat2
 			      m_AnklePositionLeft[1] );
   vec_db[2]  = filterprecision(anOneStep.m_LeftFootPosition.z +
 			      m_AnklePositionLeft[2] );
-  vec_db[3]  = filterprecision(anOneStep.m_LeftFootPosition.dx  );
-  vec_db[4]  = filterprecision(anOneStep.m_LeftFootPosition.dy  );
-  vec_db[5]  = filterprecision(anOneStep.m_LeftFootPosition.dz  );
-  vec_db[6]  = filterprecision(anOneStep.m_LeftFootPosition.ddx  );
-  vec_db[7]  = filterprecision(anOneStep.m_LeftFootPosition.ddy  );
-  vec_db[8]  = filterprecision(anOneStep.m_LeftFootPosition.ddz  );
-  vec_db[9]  = filterprecision(anOneStep.m_LeftFootPosition.theta );
-  vec_db[10] = filterprecision(anOneStep.m_LeftFootPosition.dtheta);
-  vec_db[11] = filterprecision(anOneStep.m_LeftFootPosition.ddtheta);
-  vec_db[12] = filterprecision(anOneStep.m_LeftFootPosition.omega  );
-  vec_db[13] = 0.0; vec_db[14] = 0.0;
-  vec_db[15] = filterprecision(anOneStep.m_LeftFootPosition.omega2  );
+  vec_db[3]  = filterprecision(anOneStep.m_LeftFootPosition.theta );
+  vec_db[4]  = filterprecision(anOneStep.m_LeftFootPosition.omega  );
+  vec_db[5]  = filterprecision(anOneStep.m_LeftFootPosition.omega2  );
+  vec_db[6]  = filterprecision(anOneStep.m_LeftFootPosition.dx  );
+  vec_db[7]  = filterprecision(anOneStep.m_LeftFootPosition.dy  );
+  vec_db[8]  = filterprecision(anOneStep.m_LeftFootPosition.dz  );
+  vec_db[9]  = filterprecision(anOneStep.m_LeftFootPosition.dtheta);
+  vec_db[10] = 0;
+  vec_db[11] = 0;
+  vec_db[12] = filterprecision(anOneStep.m_LeftFootPosition.ddx  );
+  vec_db[13] = filterprecision(anOneStep.m_LeftFootPosition.ddy  );
+  vec_db[14] = filterprecision(anOneStep.m_LeftFootPosition.ddz  );
+  vec_db[15] = filterprecision(anOneStep.m_LeftFootPosition.ddtheta);
   vec_db[16] = 0.0; vec_db[17] = 0.0;
   fillFileWithSubsamplingAndClose
     (aof,m_prevLeftAnklePos,
@@ -405,24 +406,25 @@ fillInTestsFormat2
   prefix= aTestName + "RightFoot";
   prepareFile(aof,prefix,anOneStep);
   vec_db.resize(18);
-  vec_db[0] = filterprecision(anOneStep.m_RightFootPosition.x +
-			      m_AnklePositionRight[0] );
-  vec_db[1] = filterprecision(anOneStep.m_RightFootPosition.y +
-			      m_AnklePositionRight[1]  );
-  vec_db[2] = filterprecision(anOneStep.m_RightFootPosition.z +
-			      m_AnklePositionRight[2]  );
-  vec_db[3] = filterprecision(anOneStep.m_RightFootPosition.dx  );
-  vec_db[4] = filterprecision(anOneStep.m_RightFootPosition.dy  );
-  vec_db[5] = filterprecision(anOneStep.m_RightFootPosition.dz  );
-  vec_db[6] = filterprecision(anOneStep.m_RightFootPosition.ddx  );
-  vec_db[7] = filterprecision(anOneStep.m_RightFootPosition.ddy  );
-  vec_db[8] = filterprecision(anOneStep.m_RightFootPosition.ddz  );
-  vec_db[9] = filterprecision(anOneStep.m_RightFootPosition.theta );
-  vec_db[10] = filterprecision(anOneStep.m_RightFootPosition.dtheta );
-  vec_db[11] = filterprecision(anOneStep.m_RightFootPosition.ddtheta );
-  vec_db[12] = filterprecision(anOneStep.m_RightFootPosition.omega  );
-  vec_db[13] = 0.0; vec_db[14] = 0.0;
-  vec_db[15] = filterprecision(anOneStep.m_RightFootPosition.omega2  );
+  vec_db[0]  = filterprecision(anOneStep.m_RightFootPosition.x +
+			      m_AnklePositionRight[0]);
+  vec_db[1]  = filterprecision(anOneStep.m_RightFootPosition.y +
+			      m_AnklePositionRight[1] );
+  vec_db[2]  = filterprecision(anOneStep.m_RightFootPosition.z +
+			      m_AnklePositionRight[2] );
+  vec_db[3]  = filterprecision(anOneStep.m_RightFootPosition.theta );
+  vec_db[4]  = filterprecision(anOneStep.m_RightFootPosition.omega  );
+  vec_db[5]  = filterprecision(anOneStep.m_RightFootPosition.omega2  );
+  vec_db[6]  = filterprecision(anOneStep.m_RightFootPosition.dx  );
+  vec_db[7]  = filterprecision(anOneStep.m_RightFootPosition.dy  );
+  vec_db[8]  = filterprecision(anOneStep.m_RightFootPosition.dz  );
+  vec_db[9]  = filterprecision(anOneStep.m_RightFootPosition.dtheta);
+  vec_db[10] = 0;
+  vec_db[11] = 0;
+  vec_db[12] = filterprecision(anOneStep.m_RightFootPosition.ddx  );
+  vec_db[13] = filterprecision(anOneStep.m_RightFootPosition.ddy  );
+  vec_db[14] = filterprecision(anOneStep.m_RightFootPosition.ddz  );
+  vec_db[15] = filterprecision(anOneStep.m_RightFootPosition.ddtheta);
   vec_db[16] = 0.0; vec_db[17] = 0.0;
   fillFileWithSubsamplingAndClose
     (aof,m_prevRightAnklePos,
