@@ -290,7 +290,7 @@ namespace PatternGeneratorJRL
 
       void startTurningRight2(PatternGeneratorInterface &aPGI)
       {
-        std::istringstream strm2(":setVelReference  0.2 0.0 -0.17");
+        std::istringstream strm2(":setVelReference  0.2 0.0 -0.14");
         aPGI.ParseCmd(strm2);
       }
 
