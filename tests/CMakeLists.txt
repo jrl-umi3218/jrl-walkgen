@@ -185,13 +185,13 @@ ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
 ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
 ADD_JRL_WALKGEN_EXE(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
 
-IF(NOT DISABLE_TESTS)
+IF(BUILD_TESTING)
   ADD_JRL_WALKGEN_TEST(TestKajita2003StraightWalking TestKajita2003.cpp)
   ADD_JRL_WALKGEN_TEST(TestKajita2003Circle          TestKajita2003.cpp)
   ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
   ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
   ADD_JRL_WALKGEN_TEST(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
-ENDIF(NOT DISABLE_TESTS)
+ENDIF(BUILD_TESTING)
 
 ##########################
 ## Read Novela Data 2011 #
