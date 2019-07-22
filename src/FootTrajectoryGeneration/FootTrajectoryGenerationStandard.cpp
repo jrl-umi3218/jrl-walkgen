@@ -100,7 +100,7 @@ FootTrajectoryGenerationStandard
   m_AnklePositionLeft[1] = -lWidth*0.5 + AnklePosition(1);
   m_AnklePositionLeft[2] = AnklePosition(2);
 
-  RESETDEBUG5("GeneratedFoot.dat");
+  RESETDEBUG4("GeneratedFoot.dat");
 }
 
 FootTrajectoryGenerationStandard::

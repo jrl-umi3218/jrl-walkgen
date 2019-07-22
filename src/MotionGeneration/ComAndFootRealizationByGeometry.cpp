@@ -63,24 +63,24 @@ ComAndFootRealizationByGeometry::
   { for(unsigned int i=0;i<m_prev_Velocity1.size();m_prev_Velocity1[i++]=0.0);};
   { for(unsigned int i=0;i<m_prev_Velocity2.size();m_prev_Velocity2[i++]=0.0);};
 
-  RESETDEBUG5("DebugDataVelocity.dat");
+  RESETDEBUG4("DebugDataVelocity.dat");
 
-  RESETDEBUG5("LegsSpeed.dat");
-  RESETDEBUG5("COMPC1.dat");
-  RESETDEBUG5("DebugDataIK.dat");
-  RESETDEBUG5("DebugDatamDtL.dat");
-  RESETDEBUG5("DebugDataStartingCOM.dat");
+  RESETDEBUG4("LegsSpeed.dat");
+  RESETDEBUG4("COMPC1.dat");
+  RESETDEBUG4("DebugDataIK.dat");
+  RESETDEBUG4("DebugDatamDtL.dat");
+  RESETDEBUG4("DebugDataStartingCOM.dat");
 
-  RESETDEBUG5("DebugDataCOMForHeuristic.txt");
-  RESETDEBUG5("DebugDataIKArms.txt");
-  RESETDEBUG5("DebugDataqArmsHeuristic.txt");
-  RESETDEBUG5("DebugDataVelocity0.dat");
-  RESETDEBUG5("DebugDataVelocity1.dat");
+  RESETDEBUG4("DebugDataCOMForHeuristic.txt");
+  RESETDEBUG4("DebugDataIKArms.txt");
+  RESETDEBUG4("DebugDataqArmsHeuristic.txt");
+  RESETDEBUG4("DebugDataVelocity0.dat");
+  RESETDEBUG4("DebugDataVelocity1.dat");
 
-  RESETDEBUG5("DebugDataBodyP0.dat");
-  RESETDEBUG5("DebugDataBodyP1.dat");
-  RESETDEBUG5("FootPosRight.dat");
-  RESETDEBUG5("FootPosLeft.dat");
+  RESETDEBUG4("DebugDataBodyP0.dat");
+  RESETDEBUG4("DebugDataBodyP1.dat");
+  RESETDEBUG4("FootPosRight.dat");
+  RESETDEBUG4("FootPosLeft.dat");
 
   // Variables for stepping over upper body motion.
   m_UpperBodyMotion.resize(3);
@@ -459,7 +459,7 @@ InitializationCoM
           << m_DiffBetweenComAndWaist[2]);
   // This term is usefull if
 
-  ODEBUG5("m_DiffBetweenComAndWaist :" << m_DiffBetweenComAndWaist,"DebugData.txt");
+  ODEBUG4("m_DiffBetweenComAndWaist :" << m_DiffBetweenComAndWaist,"DebugData.txt");
   // the initial position does not put z at Zc
 
   // The most important line of the method...
@@ -685,7 +685,7 @@ KinematicsForOneLeg
   // Compute the inverse kinematics.
   if ((LeftOrRight==1) && (Stage==0))
   {
-    ODEBUG5SIMPLE(Body_P[0] << " " <<
+    ODEBUG4SIMPLE(Body_P[0] << " " <<
                   Body_P[1] << " " <<
                   Body_P[2] << " " <<
                   Foot_P[0] << " " <<
@@ -809,11 +809,11 @@ KinematicsForTheLegs
     m_FinalDesiredCOMPose(2,3) = aCoMPosition(2);
     m_FinalDesiredCOMPose(3,3) = 1.0;
 
-    ODEBUG5(Body_P ,"DebugDataBodyP1.dat");
+    ODEBUG4(Body_P ,"DebugDataBodyP1.dat");
   }
   else
   {
-    ODEBUG5(Body_P ,"DebugDataBodyP0.dat");
+    ODEBUG4(Body_P ,"DebugDataBodyP0.dat");
   }
 
 
@@ -841,7 +841,7 @@ KinematicsForTheLegs
 		      aCoMPosition,
 		      ToTheHip,-1,qr,Stage);
 
-  ODEBUG5("**************","DebugDataIK.dat");
+  ODEBUG4("**************","DebugDataIK.dat");
   /* Should compute now the Waist Position */
   m_ComAndWaistInRefFrame=Body_R*m_DiffBetweenComAndWaist;
 
@@ -1011,7 +1011,7 @@ ComputePostureForGivenCoMAndFeetPosture
       }
     }
 
-    ODEBUG5(CurrentVelocity, "DebugDataVelocity0.dat");
+    ODEBUG4(CurrentVelocity, "DebugDataVelocity0.dat");
     m_prev_Configuration = CurrentConfiguration;
     m_prev_Velocity = CurrentVelocity;
   }
@@ -1037,7 +1037,7 @@ ComputePostureForGivenCoMAndFeetPosture
     {
       CurrentVelocity.setZero();
     }
-    ODEBUG5(CurrentVelocity, "DebugDataVelocity1.dat");
+    ODEBUG4(CurrentVelocity, "DebugDataVelocity1.dat");
     m_prev_Configuration1 = CurrentConfiguration;
     m_prev_Velocity1 = CurrentVelocity;
   }
@@ -1066,7 +1066,7 @@ ComputePostureForGivenCoMAndFeetPosture
     {
       CurrentVelocity.setZero();
     }
-    ODEBUG5(CurrentVelocity, "DebugDataVelocity1.dat");
+    ODEBUG4(CurrentVelocity, "DebugDataVelocity1.dat");
     m_prev_Configuration2 = CurrentConfiguration;
     m_prev_Velocity2 = CurrentVelocity;
   }
@@ -1122,20 +1122,20 @@ ComputePostureForGivenCoMAndFeetPosture
 
 
   ODEBUG( "CurrentVelocity :" << endl << CurrentVelocity);
-  ODEBUG5("SamplingPeriod " << getSamplingPeriod(),"LegsSpeed.dat");
+  ODEBUG4("SamplingPeriod " << getSamplingPeriod(),"LegsSpeed.dat");
 
   string aDebugFileName;
 
-  ODEBUG5( (1.0/M_PI)*180.0*lql[0] << " " <<
+  ODEBUG4( (1.0/M_PI)*180.0*lql[0] << " " <<
            (1.0/M_PI)*180.0*lql[1] << " " <<
            (1.0/M_PI)*180.0*lql[2] << " " <<
            (1.0/M_PI)*180.0*lql[3] << " " <<
            (1.0/M_PI)*180.0*lql[4] << " " <<
            (1.0/M_PI)*180.0*lql[5],(char *)aDebugFileName.c_str());
 
-  ODEBUG5(CurrentVelocity,"DebugDataVelocity.dat");
+  ODEBUG4(CurrentVelocity,"DebugDataVelocity.dat");
 
-  ODEBUG5( aCoMPosition[0]
+  ODEBUG4( aCoMPosition[0]
            << " " <<
            aCoMPosition[1],"COMPC1.dat");
 
@@ -1217,11 +1217,11 @@ void ComAndFootRealizationByGeometry::
                                               Eigen::VectorXd & LFP)
 {
 
-  ODEBUG5("aCOMPosition:" << aCOMPosition << endl <<
+  ODEBUG4("aCOMPosition:" << aCOMPosition << endl <<
           "Right Foot Position:" << RFP << endl <<
           "Left Foot Position:" << LFP << endl, "DebugDataIKArms.txt");
 
-  ODEBUG5(m_ZARM << " " << m_Xmax << " " << " " << m_GainFactor,"DebugDataIKArms.txt");
+  ODEBUG4(m_ZARM << " " << m_Xmax << " " << " " << m_GainFactor,"DebugDataIKArms.txt");
   double TempXL,TempXR,TempCos,TempSin,
   TempARight,TempALeft;
 
@@ -1235,14 +1235,14 @@ void ComAndFootRealizationByGeometry::
   TempXL = TempCos * (LFP(0)  +m_AnklePositionRight[0] - aCOMPosition(0) - m_COGInitialAnkles(0)) +
            TempSin * (LFP(1) +m_AnklePositionRight[1] - aCOMPosition(1) - m_COGInitialAnkles(1));
 
-  ODEBUG5(aCOMPosition(0) << " " << aCOMPosition(1) << " " << aCOMPosition(3),"DebugDataIKArms.txt");
-  ODEBUG5(RFP(0) << " " << RFP(1) ,"DebugDataIKArms.txt");
-  ODEBUG5(LFP(0) << " " << LFP(1) ,"DebugDataIKArms.txt");
+  ODEBUG4(aCOMPosition(0) << " " << aCOMPosition(1) << " " << aCOMPosition(3),"DebugDataIKArms.txt");
+  ODEBUG4(RFP(0) << " " << RFP(1) ,"DebugDataIKArms.txt");
+  ODEBUG4(LFP(0) << " " << LFP(1) ,"DebugDataIKArms.txt");
 
   TempARight = TempXR*-1.0;
   TempALeft = TempXL*-1.0;
 
-  ODEBUG5("Values: TL " << TempALeft <<
+  ODEBUG4("Values: TL " << TempALeft <<
           " TR " << TempARight <<
           " "    << m_ZARM <<
           " "    << m_Xmax ,"DebugDataIKArms.txt");
@@ -1266,8 +1266,8 @@ void ComAndFootRealizationByGeometry::
         jointRootPosition,
         jointEndPosition,
         qArml);
-  ODEBUG5("ComputeHeuristicArm: Step 2 ","DebugDataIKArms.txt");
-  ODEBUG5( "IK Left arm p:" << qArml(0)<< " " <<  qArml(1)  << " " << qArml(2)
+  ODEBUG4("ComputeHeuristicArm: Step 2 ","DebugDataIKArms.txt");
+  ODEBUG4( "IK Left arm p:" << qArml(0)<< " " <<  qArml(1)  << " " << qArml(2)
            << " " << qArml(3) << "  " << qArml(4) << " " << qArml(5), "DebugDataIKArms.txt" );
 
   jointEndPosition(0,3) = TempARight;
@@ -1279,10 +1279,10 @@ void ComAndFootRealizationByGeometry::
         jointRootPosition,
         jointEndPosition,
         qArmr);
-  ODEBUG5( "IK Right arm p:" << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2)
+  ODEBUG4( "IK Right arm p:" << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2)
            << " " << qArmr(3) << "  " << qArmr(4) << " " << qArmr(5), "DebugDataIKArms.txt" );
 
-  ODEBUG5( qArml(0)<< " " <<  qArml(1)  << " " << qArml(2) << " "
+  ODEBUG4( qArml(0)<< " " <<  qArml(1)  << " " << qArml(2) << " "
            << qArml(3) << "  " << qArml(4) << " " << qArml(5) << " "
            << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2) << " "
            << qArmr(3) << "  " << qArmr(4) << " " << qArmr(5),

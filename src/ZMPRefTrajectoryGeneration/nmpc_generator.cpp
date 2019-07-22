@@ -25,6 +25,9 @@
 /*! \file nmpc_generator.cpp
   \brief implement an SQP method to generate online stable walking motion */
 
+#define EIGEN_RUNTIME_NO_MALLOC
+#include <Eigen/Dense>
+
 #include <ZMPRefTrajectoryGeneration/nmpc_generator.hh>
 #include <cmath>
 #include <Debug.hh>
@@ -33,6 +36,8 @@
 //#define DEBUG_COUT
 
 //#ifdef DEBUG
+
+
 void DumpMatrix(std::string fileName, Eigen::MatrixXd & M)
 {
   std::ofstream aof;
@@ -755,6 +760,7 @@ void NMPCgenerator::solve()
 {
   if(currentSupport_.Phase==DS && currentSupport_.NbStepsLeft == 0)
     return;
+  Eigen::internal::set_is_malloc_allowed(false);
   /* Process and solve problem, s.t. pattern generator data is consistent */
   unsigned iter = 0 ;
   oneMoreStep_ = true;
@@ -785,6 +791,7 @@ void NMPCgenerator::solve()
     os.open("iteration_solver.dat",ios::out);
     ++iteration_solver_file ;
   }
+  Eigen::internal::set_is_malloc_allowed(true);
   ofstream os("iteration_solver.dat",ios::app);
   os << time_ << " "
      << iter-1  << " "

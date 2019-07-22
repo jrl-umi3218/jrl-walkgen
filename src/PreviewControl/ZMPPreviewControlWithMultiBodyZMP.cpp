@@ -70,9 +70,9 @@ ZMPPreviewControlWithMultiBodyZMP(SimplePluginManager *lSPM)
   RESETDEBUG4("DebugConfSO.dat");
   RESETDEBUG4("DebugConfSV.dat");
   RESETDEBUG4("DebugConfSA.dat");
-  RESETDEBUG5("DebugDataCheckZMP1.txt");
+  RESETDEBUG4("DebugDataCheckZMP1.txt");
   RESETDEBUG4("2ndStage.dat");
-  RESETDEBUG5("ZMPPCWMZOGSOC.dat");
+  RESETDEBUG4("ZMPPCWMZOGSOC.dat");
   // Sampling period.DMB
   m_SamplingPeriod = -1;
 

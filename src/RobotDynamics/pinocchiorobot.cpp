@@ -420,11 +420,11 @@ void PinocchioRobot::initializeLegsInverseKinematics()
     {
       m_isLegInverseKinematic=false;
     }
-  RESETDEBUG5("DebugDataInitIK.dat");
-  ODEBUG5("waist_M_leftHip " << waist_M_leftHip,"DebugDataInitIK.dat");
-  ODEBUG5("waist_M_rightHip " << waist_M_rightHip,"DebugDataInitIK.dat");
-  ODEBUG5("m_leftDt " << m_leftDt,"DebugDataInitIK.dat");
-  ODEBUG5("m_rightDt " << m_rightDt,"DebugDataInitIK.dat");
+  RESETDEBUG4("DebugDataInitIK.dat");
+  ODEBUG4("waist_M_leftHip " << waist_M_leftHip,"DebugDataInitIK.dat");
+  ODEBUG4("waist_M_rightHip " << waist_M_rightHip,"DebugDataInitIK.dat");
+  ODEBUG4("m_leftDt " << m_leftDt,"DebugDataInitIK.dat");
+  ODEBUG4("m_rightDt " << m_rightDt,"DebugDataInitIK.dat");
   return ;
 }
 

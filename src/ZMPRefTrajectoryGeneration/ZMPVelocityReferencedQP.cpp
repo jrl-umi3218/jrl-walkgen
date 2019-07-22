@@ -200,15 +200,18 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
    ":numberstepsbeforestop",
    ":stoppg",
    ":setfeetconstraint"};
-  RESETDEBUG5("PgDebug2.txt");
-  ODEBUG5("Before registering methods for ZMPVelocityReferencedQP","PgDebug2.txt");
+  RESETDEBUG4("PgDebug2.txt");
+  ODEBUG4("Before registering methods for ZMPVelocityReferencedQP",
+	  "PgDebug2.txt");
   for(unsigned int i=0;i<NbMethods;i++)
   {
-//#ifdef DEBUG
-//    std::cout << "lMethodNames["<< i << "]=" << lMethodNames[i] <<std::endl;
-//#endif
+    //#ifdef DEBUG
+    //    std::cout << "lMethodNames["<< i << "]="
+    // << lMethodNames[i] <<std::endl;
+    //#endif
     std::string aMethodName(lMethodNames[i]);
-    ODEBUG5("Register method " << aMethodName << "for ZMPVelocityReferencedQP","PgDebug2.txt");
+    ODEBUG4("Register method " << aMethodName
+	    << "for ZMPVelocityReferencedQP","PgDebug2.txt");
     if (!RegisterMethod(aMethodName))
     {
       std::cerr << "Unable to register " << aMethodName << std::endl;
