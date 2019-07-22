@@ -82,6 +82,8 @@ IF(USE_LSSOL)
 ENDIF(USE_LSSOL)
 
 OPTION(USE_QUADPROG "Do you want to use the solver eigen-quadprog?" ON)
+OPTION(DISABLE_TESTS ON)
+
 IF(USE_QUADPROG)
   ADD_REQUIRED_DEPENDENCY("eigen-quadprog >= 1.0.0")
 ENDIF(USE_QUADPROG)
