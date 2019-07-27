@@ -45,7 +45,8 @@
 namespace PatternGeneratorJRL
 {
 
-  /// \brief Generate a stack of inequalities relative to feet centers for the whole preview window.
+  /// \brief Generate a stack of inequalities relative to feet centers for
+  /// the whole preview window.
   class RelativeFeetInequalities:public SimplePlugin
   {
 
@@ -83,7 +84,8 @@ namespace PatternGeneratorJRL
     void set_inequalities( convex_hull_t & ConvexHull,
                            const support_state_t & Support, ineq_e type);
 
-    /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
+    /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq
+    /// {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.
     ///
     /// \param[out] aVecOfPoints a vector of vertices

@@ -93,11 +93,12 @@ namespace PatternGeneratorJRL
     /// \param[out] RightFootTraj_deq
     ///
     /// return 0
-    int generate_trajectories( double time, const solution_t & Result,
-                               const std::deque<support_state_t> & SupportStates_deq,
-                               const std::deque<double> & PreviewedSupportAngles_deq,
-                               std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
-                               std::deque<FootAbsolutePosition> & RightFootTraj_deq);
+    int generate_trajectories
+    ( double time, const solution_t & Result,
+      const std::deque<support_state_t> & SupportStates_deq,
+      const std::deque<double> & PreviewedSupportAngles_deq,
+      std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
+      std::deque<FootAbsolutePosition> & RightFootTraj_deq);
 
     /// \name Accessors and mutators
     /// \{
@@ -232,10 +233,12 @@ namespace PatternGeneratorJRL
     /// \param[out] RightFootDynamics
     ///
     /// return 0
-    int compute_foot_zero_dynamics( const std::deque<support_state_t> &
-                                    SupportStates_deq,
-                                    linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
-
+    int compute_foot_zero_dynamics
+    ( const std::deque<support_state_t> &
+      SupportStates_deq,
+      linear_dynamics_t & LeftFootDynamics,
+      linear_dynamics_t & RightFootDynamics);
+    
     /// \brief Compute foot dynamics based on polynomial interpolation
     ///
     /// \param[in] SupportStates_deq Previewed support states
@@ -243,10 +246,12 @@ namespace PatternGeneratorJRL
     /// \param[out] RightFootDynamics
     ///
     /// return 0
-    int compute_foot_pol_dynamics( const std::deque<support_state_t> &
-                                   SupportStates_deq,
-                                   linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
-
+    int compute_foot_pol_dynamics
+    ( const std::deque<support_state_t> &
+      SupportStates_deq,
+      linear_dynamics_t & LeftFootDynamics,
+      linear_dynamics_t & RightFootDynamics);
+    
     /// \brief Compute foot dynamics based on "piecewise constant jerk" splines
     ///
     /// \param[in] SupportStates_deq Previewed support states
@@ -254,10 +259,12 @@ namespace PatternGeneratorJRL
     /// \param[out] RightFootDynamics
     ///
     /// return 0
-    int compute_foot_cjerk_dynamics( const std::deque<support_state_t> &
-                                     SupportStates_deq,
-                                     linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
-
+    int compute_foot_cjerk_dynamics
+    ( const std::deque<support_state_t> &
+      SupportStates_deq,
+      linear_dynamics_t & LeftFootDynamics,
+      linear_dynamics_t & RightFootDynamics);
+    
     /// \brief Initialize static trajectories
     int initialize_trajectories();
 

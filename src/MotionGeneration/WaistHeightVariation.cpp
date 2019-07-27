@@ -70,11 +70,6 @@ void WaistHeightVariation::PolyPlanner(deque<COMPosition> &aCOMBuffer,
 
   aTimeDistr[0]=aFootHolds[stepnumber].SStime+aFootHolds[stepnumber].DStime;
 
-  /*
-    cout << "Time distributed computed from "
-    << m_SamplingPeriod << " "
-    << aFootHolds[stepnumber].SStime << " " << aFootHolds[stepnumber].DStime << endl;
-  */
   aBoundCond(0)=aCOMBuffer[0].z[0];
   aBoundCond(1)=0.0;
   aBoundCond(2)=aCOMBuffer[0].z[0]+aFootHolds[stepnumber].DeviationHipHeight;
@@ -92,18 +87,20 @@ void WaistHeightVariation::PolyPlanner(deque<COMPosition> &aCOMBuffer,
     {
       if ((aFootHolds[stepnumber].sx>0)|(stepnumber==0))
         {
-          if ((aZMPPosition[u-1].stepType==11)&(std::fabs((double)
-                                                          aZMPPosition[u].stepType)==1))
+          if ((aZMPPosition[u-1].stepType==11)&
+              (std::fabs((double) aZMPPosition[u].stepType)==1))
             {
-              ODEBUG("Deviation Hip Height: " << aFootHolds[stepnumber].DeviationHipHeight);
+              ODEBUG("Deviation Hip Height: "
+                     << aFootHolds[stepnumber].DeviationHipHeight);
               stepnumber++;
-
-              aTimeDistr[0]=aFootHolds[stepnumber].SStime+aFootHolds[stepnumber].DStime;
+              
+              aTimeDistr[0]=
+                aFootHolds[stepnumber].SStime+aFootHolds[stepnumber].DStime;
 
               u_start=u;
 
-              aBoundCond(0)=aCOMBuffer[u_start].z[0]+aFootHolds[stepnumber
-                                                                -1].DeviationHipHeight;
+              aBoundCond(0)=aCOMBuffer[u_start].z[0]+
+                aFootHolds[stepnumber-1].DeviationHipHeight;
               aBoundCond(1)=0.0;
               aBoundCond(2)=aCOMBuffer[u_start].z[0]
                 +aFootHolds[stepnumber].DeviationHipHeight;
@@ -113,11 +110,13 @@ void WaistHeightVariation::PolyPlanner(deque<COMPosition> &aCOMBuffer,
 
               m_PolynomeHip->SetParameters(aBoundCond,aTimeDistr);
               //m_PolynomeHip->print();
-              aCOMBuffer[u_start].z[0]=m_PolynomeHip->Compute(0);//+aCOMBuffer[u_start].z[0];
-              aCOMBuffer[u_start].z[1]=(aCOMBuffer[u_start].z[0]-aCOMBuffer[u_start
-                                                                            -1].z[0])/m_SamplingPeriod;
-              aCOMBuffer[u_start].z[2]=(aCOMBuffer[u_start].z[1]-aCOMBuffer[u_start
-                                                                            -1].z[1])/m_SamplingPeriod;
+              aCOMBuffer[u_start].z[0]=m_PolynomeHip->Compute(0);
+              aCOMBuffer[u_start].z[1]=
+                (aCOMBuffer[u_start].z[0]-aCOMBuffer[u_start-1].z[0])
+                /m_SamplingPeriod;
+              aCOMBuffer[u_start].z[2]=
+                (aCOMBuffer[u_start].z[1]-
+                 aCOMBuffer[u_start-1].z[1])/m_SamplingPeriod;
 
             }
           else
@@ -126,10 +125,12 @@ void WaistHeightVariation::PolyPlanner(deque<COMPosition> &aCOMBuffer,
               double LocalTime;
               LocalTime=(u-u_start)*m_SamplingPeriod;
 
-              aCOMBuffer[u].z[0]=m_PolynomeHip->Compute(
-                                                        LocalTime);//+aCOMBuffer[u_start].z[0];
-              aCOMBuffer[u].z[1]=(aCOMBuffer[u].z[0]-aCOMBuffer[u-1].z[0])/m_SamplingPeriod;
-              aCOMBuffer[u].z[2]=(aCOMBuffer[u].z[1]-aCOMBuffer[u-1].z[1])/m_SamplingPeriod;
+              aCOMBuffer[u].z[0]=
+                m_PolynomeHip->Compute(LocalTime);//+aCOMBuffer[u_start].z[0];
+              aCOMBuffer[u].z[1]=
+                (aCOMBuffer[u].z[0]-aCOMBuffer[u-1].z[0])/m_SamplingPeriod;
+              aCOMBuffer[u].z[2]=
+                (aCOMBuffer[u].z[1]-aCOMBuffer[u-1].z[1])/m_SamplingPeriod;
 
             }
         }

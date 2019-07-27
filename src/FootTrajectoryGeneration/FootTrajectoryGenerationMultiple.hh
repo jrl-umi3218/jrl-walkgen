@@ -67,9 +67,11 @@ namespace PatternGeneratorJRL
 
     /*! \name Single support foot subcategories
       @{ */
-    /*! \brief The robot is in single support and the foot considered is the support foot */
+    /*! \brief The robot is in single support and the foot 
+      considered is the support foot */
     const static int SINGLE_SUPPORT_SUPPORT=1;
-    /*! \brief The robot is in single support and the foot considered is flying. */
+    /*! \brief The robot is in single support and 
+      the foot considered is flying. */
     const static int SINGLE_SUPPORT_FLYING=2;
 
     /*! @} */
@@ -130,15 +132,18 @@ namespace PatternGeneratorJRL
 
     /*! \brief Compute the value asked for according to :
       @param[in] t: the time,
-      @param[in] IndexInterval: Index of the interval to be used for the computation.
+      @param[in] IndexInterval: Index of the interval to be used 
+      for the computation.
       @param[out] aFootAbsolutePosition: a foot absolute position.
     */
     bool Compute(double t, FootAbsolutePosition & aFootAbsolutePosition,
                  unsigned int IndexInterval);
 
-    /*! This method specifies the parameters for each of the polynome used by this
-      object. In this case, as it is used for the 3rd order polynome. The polynome to
-      which those parameters are set is specified with PolynomeIndex.
+    /*! This method specifies the parameters for each of the polynome 
+      used by this
+      object. In this case, as it is used for the 3rd order polynome. 
+      The polynome to which those parameters are set is specified 
+      with PolynomeIndex.
       @param PolynomeIndex: Set to which axis the parameters will be applied.
       @param TimeInterval: Set the time base of the polynome.
       @param Position: Set the final position of the polynome at TimeInterval.
@@ -148,53 +153,68 @@ namespace PatternGeneratorJRL
                       double TimeInterval,
                       double FinalPosition);
 
-    /*! This method specifies the parameters for each of the polynome used by this
-      object. In this case, as it is used for the 3rd order polynome. The polynome to
+    /*! This method specifies the parameters for each of the polynome used 
+      by this object. 
+      In this case, as it is used for the 3rd order polynome. The polynome to
       which those parameters are set is specified with PolynomeIndex.
       @param PolynomeIndex: Set to which axis the parameters will be applied.
       @param AxisReference: Index to the axis to be used.
       @param TimeInterval: Set the time base of the polynome.
-      @param FinalPosition: Set the final position of the polynome at TimeInterval.
-      @param InitPosition: Initial position when computing the polynome at t= m_AbsoluteTimeReference.
-      @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
+      @param FinalPosition: Set the final position of the polynome at 
+      TimeInterval.
+      @param InitPosition: Initial position when computing the polynome at 
+      t= m_AbsoluteTimeReference.
+      @param InitSpeed: Initial speed when computing the polynome at
+      t=m_AbsoluteTimeReference.
     */
-    int SetParametersWithInitPosInitSpeed(unsigned int PolynomeIndex,
-                                          int AxisReference,
-                                          double TimeInterval,
-                                          double FinalPosition,
-                                          double InitPosition,
-                                          double InitSpeed,
-                                          vector<double> MiddlePos=vector<double>(3,-1));
-
-    /*! This method specifies the parameters for each of the polynome used by this
-      object. In this case, as it is used for the 3rd order polynome. The polynome to
+    int SetParametersWithInitPosInitSpeed
+    (unsigned int PolynomeIndex,
+     int AxisReference,
+     double TimeInterval,
+     double FinalPosition,
+     double InitPosition,
+     double InitSpeed,
+     vector<double> MiddlePos=vector<double>(3,-1));
+    
+    /*! This method specifies the parameters for each of the polynome used by 
+      this object. 
+      In this case, as it is used for the 3rd order polynome. The polynome to
       which those parameters are set is specified with PolynomeIndex.
       @param PolynomeIndex: Set to which axis the parameters will be applied.
       @param AxisReference: Index to the axis to be used.
       @param TimeInterval: Set the time base of the polynome.
-      @param FinalPosition: Set the final position of the polynome at TimeInterval.
-      @param InitPosition: Initial position when computing the polynome at t= m_AbsoluteTimeReference.
-      @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
-      @param InitAcc: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
+      @param FinalPosition: Set the final position of the polynome at 
+      TimeInterval.
+      @param InitPosition: Initial position when computing the polynome at 
+      t= m_AbsoluteTimeReference.
+      @param InitSpeed: Initial speed when computing the polynome at
+      t=m_AbsoluteTimeReference.
+      @param InitAcc: Initial speed when computing the polynome at
+      t=m_AbsoluteTimeReference.
     */
-    int SetParametersWithInitPosInitSpeedInitAcc(unsigned int PolynomeIndex,
-                                                 int AxisReference,
-                                                 double TimeInterval,
-                                                 double FinalPosition,
-                                                 double InitPosition,
-                                                 double InitSpeed,
-                                                 double InitAcc,
-                                                 vector<double> middlePos = vector<double>(3,-1));
-
+    int SetParametersWithInitPosInitSpeedInitAcc
+    (unsigned int PolynomeIndex,
+     int AxisReference,
+     double TimeInterval,
+     double FinalPosition,
+     double InitPosition,
+     double InitSpeed,
+     double InitAcc,
+     vector<double> middlePos = vector<double>(3,-1));
+    
     /*! This method gets the parameters for each of the polynome used by this
-      object. In this case, as it is used for the 3rd order polynome. The polynome to
-      which those parameters are set is specified with PolynomeIndex.
+      object. In this case, as it is used for the 3rd order polynome. 
+      The polynome to which those parameters are set is specified with 
+      PolynomeIndex.
       @param PolynomeIndex: Set to which axis the parameters will be applied.
       @param AxisReference: Index to the axis to be used.
       @param TimeInterval: Set the time base of the polynome.
-      @param FinalPosition: Set the final position of the polynome at TimeInterval.
-      @param InitPosition: Initial position when computing the polynome at t= m_AbsoluteTimeReference.
-      @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
+      @param FinalPosition: Set the final position of the polynome at 
+      TimeInterval.
+      @param InitPosition: Initial position when computing the polynome at 
+      t= m_AbsoluteTimeReference.
+      @param InitSpeed: Initial speed when computing the polynome at
+      t=m_AbsoluteTimeReference.
     */
     int GetParametersWithInitPosInitSpeed(unsigned int PolynomeIndex,
                                           int AxisReference,
@@ -215,12 +235,13 @@ namespace PatternGeneratorJRL
 
     /*! @} */
 
-    FootTrajectoryGenerationMultiple & operator=(const
-                                                 FootTrajectoryGenerationMultiple & aFTGM);
+    FootTrajectoryGenerationMultiple & operator=
+    (const FootTrajectoryGenerationMultiple & aFTGM);
 
   protected:
 
-    /*! \brief Handle a set of object allowing the generation of the foot trajectory.*/
+    /*! \brief Handle a set of object allowing the generation of the foot
+      trajectory.*/
     std::vector<FootTrajectoryGenerationStandard *>
     m_SetOfFootTrajectoryGenerationObjects;
 

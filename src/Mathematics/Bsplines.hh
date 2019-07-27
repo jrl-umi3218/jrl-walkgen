@@ -1,5 +1,6 @@
 /** \file Bsplines.h
-    \brief Bsplines object for generating trajectoire from set of Points given. */
+    \brief Bsplines object for generating trajectoire 
+    from set of Points given. */
 
 
 #ifndef _BSPLINES_H_

@@ -305,10 +305,11 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       Q = 1.0;
       R = 1e-5;
       ODEBUG("COMPUTATION WITH INITIALPOS !");
-      anOCS = new PatternGeneratorJRL::OptimalControllerSolver(m_A,m_B,m_C,Q,R,Nl);
+      anOCS = new PatternGeneratorJRL::
+        OptimalControllerSolver(m_A,m_B,m_C,Q,R,Nl);
 
-      anOCS->ComputeWeights(
-                            PatternGeneratorJRL::OptimalControllerSolver::MODE_WITH_INITIALPOS);
+      anOCS->ComputeWeights
+        (PatternGeneratorJRL::OptimalControllerSolver::MODE_WITH_INITIALPOS);
 
       anOCS->GetF(m_F);
 

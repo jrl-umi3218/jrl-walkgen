@@ -659,8 +659,10 @@ int ql0002_(integer *n,integer *m,integer *meq,integer *mmax,
             doublereal *diag, doublereal *w,
             integer * /* lw */)
 #else
-  /* Subroutine */ int ql0002_(n, m, meq, mmax, mn, mnn, nmax, lql, a, b, grad,
-                               g, xl, xu, x, nact, iact, maxit, vsmall, info, diag, w, lw)
+  /* Subroutine */
+  int ql0002_
+  (n, m, meq, mmax, mn, mnn, nmax, lql, a, b, grad,
+   g, xl, xu, x, nact, iact, maxit, vsmall, info, diag, w, lw)
   integer *n, *m, *meq, *mmax, *mn, *mnn, *nmax;
 logical *lql;
 doublereal *a, *b, *grad, *g, *xl, *xu, *x;
@@ -872,8 +874,8 @@ integer *lw;
           /* Computing MIN */
           d__1 = w[id], d__2 = g[j + j * g_dim1];
           ga = -min(d__1,d__2);
-          gb = (d__1 = w[id] - g[j + j * g_dim1], abs(d__1)) + (d__2 = g[i
-                                                                         + j * g_dim1], abs(d__2));
+          gb = (d__1 = w[id] - g[j + j * g_dim1], abs(d__1)) +
+            (d__2 = g[i + j * g_dim1], abs(d__2));
           if (gb > zero)
             {
               /* Computing 2nd power */
@@ -2255,8 +2257,9 @@ integer *lw;
   i__2 = *n;
   for (i = 1; i <= i__2; ++i)
     {
-      sum += (d__1 = x[i], abs(d__1)) * vfact * ((d__2 = grad[i], abs(d__2))
-                                                 + (d__3 = g[i + i * g_dim1] * x[i], abs(d__3)));
+      sum += (d__1 = x[i], abs(d__1)) *
+        vfact * ((d__2 = grad[i], abs(d__2))
+                 + (d__3 = g[i + i * g_dim1] * x[i], abs(d__3)));
       if (*lql)
         {
           goto L920;

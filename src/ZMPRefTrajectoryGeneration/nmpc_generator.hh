@@ -48,12 +48,13 @@ namespace PatternGeneratorJRL
                            COMState & lStartingCOMState,
                            reference_t & local_vel_ref,
                            unsigned N, unsigned nf, double T, double T_step);
-    void updateInitialCondition(double time,
-                                FootAbsolutePosition &currentLeftFootAbsolutePosition,
-                                FootAbsolutePosition &currentRightFootAbsolutePosition,
-                                COMState & currentCOMState,
-                                reference_t & local_vel_ref
-                                );
+    void updateInitialCondition
+    (double time,
+     FootAbsolutePosition &currentLeftFootAbsolutePosition,
+     FootAbsolutePosition &currentRightFootAbsolutePosition,
+     COMState & currentCOMState,
+     reference_t & local_vel_ref
+     );
     void solve();
 
   private:
@@ -283,7 +284,8 @@ namespace PatternGeneratorJRL
     Eigen::VectorXd UBcop_ ;
     Eigen::MatrixXd D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;
     Eigen::MatrixXd derv_Acop_map2_ ;
-    Eigen::VectorXd b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
+    Eigen::VectorXd b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_,
+      v_kp1f_x_, v_kp1f_y_ ;
     Eigen::VectorXd v_kf_x_, v_kf_y_ ;
     Eigen::MatrixXd diffMat_ ;
     Eigen::MatrixXd rotMat_xy_, rotMat_theta_, rotMat_;

@@ -191,17 +191,22 @@ int LinearizedInvertedPendulum2D::InitializeSystem()
 
 
 
-int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
-                                                deque<ZMPPosition> &ZMPRefPositions,
-                                                int CurrentPosition,
-                                                double CX, double CY)
+int LinearizedInvertedPendulum2D::
+Interpolation
+(deque<COMState> &COMStates,
+ deque<ZMPPosition> &ZMPRefPositions,
+ int CurrentPosition,
+ double CX, double CY)
 {
   int lCurrentPosition = CurrentPosition;
   // Fill the queues with the interpolated CoM values.
-  //TODO: with TestHerdt, it is mandatory to use COMStates.size()-1, or it will crash.
+  // TODO: with TestHerdt, it is mandatory to use COMStates.size()-1, or it will
+  // crash.
   // Is it the same for the other PG ? Please check.
-  // TODO: with TestHerdt, it is mandatory to use m_InterpolationInterval-1 to interpolate correctly
-  // along the whole preview window will it be still fine with the reste of the PG?
+  // TODO: with TestHerdt, it is mandatory to use m_InterpolationInterval-1 to
+  // interpolate correctly
+  // along the whole preview window will it be still fine with the reste of the
+  // PG ?
   int loopEnd = std::min<int>( m_InterpolationInterval-1,
                                ((int)COMStates.size())-1-CurrentPosition);
   for(int lk=0; lk<=loopEnd; lk++,lCurrentPosition++)
@@ -256,8 +261,10 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
 
       aZMPPos.pz = 0.0 ;
 
-      ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
-              aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
+      ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " "
+              << aCOMPos.x[2] << " " <<
+              aCOMPos.y[0] << " " << aCOMPos.y[1] << " "
+              << aCOMPos.y[2] << " " <<
               aCOMPos.yaw << " " <<
               aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta << " " <<
               CX << " " << CY << " " <<

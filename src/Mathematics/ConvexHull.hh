@@ -52,8 +52,10 @@ namespace PatternGeneratorJRL
 
     /*! Compute the convex hull
       by applying Graham's algorithm.
-      @param aVecOfPoints: The set of 2D points on which the convex hull is computed.
-      @param TheConvexHull: The set of 2D points which give the convex hull. */
+      @param aVecOfPoints: 
+      The set of 2D points on which the convex hull is computed.
+      @param TheConvexHull: 
+      The set of 2D points which give the convex hull. */
     void DoComputeConvexHull(std::vector<CH_Point> aVecOfPoints,
                              std::vector<CH_Point> &TheConvexHull);
 

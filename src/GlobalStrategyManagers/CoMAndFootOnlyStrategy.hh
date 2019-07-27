@@ -56,16 +56,22 @@ namespace PatternGeneratorJRL
     */
 
     /*! Perform a 5 ms step to generate the necessary information.
-      \note{The meaning and the way to use this method depends on the child class}.
+      \note{The meaning and the way to use this method depends on the child 
+      class}.
 
       @param[out] LeftFootPosition: The position of the Left Foot position.
       @param[out] RightFootPosition: The position of the Right Foot position.
-      @param[out] ZMPRefPos: The ZMP position to be feed to the controller, in the waist
+      @param[out] ZMPRefPos: The ZMP position to be feed to the controller, 
+      in the waist
       frame reference.
-      @param[out] finalCOMState: returns CoM state position, velocity and acceleration.
-      @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
-      @param[out] CurrentVelocity: The results is a state vector containing the speed.
-      @param[out] CurrentAcceleration: The results is a state vector containing the acceleration.
+      @param[out] finalCOMState: returns CoM state position, velocity 
+      and acceleration.
+      @param[out] CurrentConfiguration: The results is a state vector 
+      containing the articular positions.
+      @param[out] CurrentVelocity: The results is a state vector 
+      containing the speed.
+      @param[out] CurrentAcceleration: The results is a state vector 
+      containing the acceleration.
     */
     int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
                                FootAbsolutePosition &RightFootPosition,
@@ -78,14 +84,17 @@ namespace PatternGeneratorJRL
 
 
     /*! Computes the COM of the robot with the Joint values given in BodyAngles,
-      velocities set to zero, and returns the values of the COM in aStaringCOMState.
-      Assuming that the waist is at (0,0,0)
+      velocities set to zero, and returns the values of the COM in 
+      aStaringCOMState.  Assuming that the waist is at (0,0,0)
       it returns the associate initial values for the left and right foot.
-      @param[in] BodyAngles: 4x4 matrix of the robot's root (most of the time, the waist)
+      @param[in] BodyAngles: 4x4 matrix of the robot's root (most of the time, 
+      the waist)
       pose (position + orientation).
-      @param[out] aStartingCOMState: Returns the 3D position of the CoM for the current
+      @param[out] aStartingCOMState: Returns the 3D position of the CoM for 
+      the current
       position of the robot.
-      @param[out] aStartingZMPPosition: Returns the 3D position of the ZMP for the current
+      @param[out] aStartingZMPPosition: Returns the 3D position of the ZMP for 
+      the current
       position of the robot.
       @param[out] InitLeftFootPosition: Returns the position of the left foot in
       the waist coordinates frame.
@@ -138,8 +147,8 @@ namespace PatternGeneratorJRL
     /*! Count the number of successives hits on the bottom of the buffers. */
     int m_NbOfHitBottom;
 
-    /*! Keeps a link towards an object allowing to find a pose for a given CoM and
-      foot position. */
+    /*! Keeps a link towards an object allowing to find a pose for a given CoM 
+      and foot position. */
     std::vector<ComAndFootRealization *>m_ComAndFootRealization;
 
     /*! Set the position of the buffer size limit. */

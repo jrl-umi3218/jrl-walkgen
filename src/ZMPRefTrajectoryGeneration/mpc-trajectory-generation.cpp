@@ -23,7 +23,8 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file mpc-trajectory-generation.cpp
-   \brief Abstract object for trajectory generation via model predictive control.*/
+   \brief Abstract object for trajectory generation 
+   via model predictive control.*/
 
 #include <Debug.hh>
 #include <ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh>

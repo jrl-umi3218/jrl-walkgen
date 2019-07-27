@@ -61,8 +61,9 @@ namespace PatternGeneratorJRL
   }
 
 
-  bool AnalyticalMorisawaAbstract::SetNumberOfStepsInAdvance(
-                                                             int lNumberOfStepsInAdvance)
+  bool AnalyticalMorisawaAbstract::
+  SetNumberOfStepsInAdvance
+  (int lNumberOfStepsInAdvance)
   {
     m_NumberOfStepsInAdvance = lNumberOfStepsInAdvance;
     return true;

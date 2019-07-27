@@ -43,11 +43,12 @@ typedef int integer ;
 extern "C" {
   extern doublereal dlapy2_(doublereal *, doublereal *);
   extern double dlamch_ (char *);
-  extern /* Subroutine */ int dgges_(char *, char *, char *, L_fp, integer *
-                                     , doublereal *, integer *, doublereal *, integer *, integer *,
-                                     doublereal *, doublereal *, doublereal *, doublereal *, integer *,
-                                     doublereal *, integer *, doublereal *, integer *, logical *,
-                                     integer *);
+  extern /* Subroutine */
+  int dgges_(char *, char *, char *, L_fp, integer * ,
+             doublereal *, integer *, doublereal *, integer *, integer *,
+             doublereal *, doublereal *, doublereal *, doublereal *, integer *,
+             doublereal *, integer *, doublereal *, integer *, logical *,
+             integer *);
 
 }
 
@@ -268,12 +269,14 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   MatrixRXd ZE(2*n,2*n); // The matrix of Schur vectors.
   Eigen::VectorXd WR(2*n);
   Eigen::VectorXd WI(
-                     2*n); // The eigenvalues ( a matrix to handle complex eigenvalues).
+                     2*n);
+  // The eigenvalues ( a matrix to handle complex eigenvalues).
   Eigen::VectorXd GS(2*n);
 
   if (!GeneralizedSchur(H,E,WR,WI,GS,ZH,ZE))
     {
-      std::cerr << "Something is wrong with the weights for the preview control !"
+      std::cerr << "Something is wrong with the weights "
+                << "for the preview control !"
                 << std::endl;
     }
 

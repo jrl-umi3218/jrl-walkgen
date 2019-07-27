@@ -25,7 +25,8 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file PatternGeneratorInterface.h
-  \brief This object provides a unified interface to access the pattern generator.
+  \brief This object provides a unified interface to access 
+  the pattern generator.
   It allows to hide all the computation and hacking to the user.
 */
 
@@ -67,7 +68,8 @@ namespace PatternGeneratorJRL
 
   /** @ingroup Interface
       This class is the interface between the Pattern Generator and the
-      external world. In addition to the classical setter and getter for various parameters
+      external world. In addition to the classical setter and getter 
+      for various parameters
       there is the possibility to pass commands a string of stream to the method
       \a ParseCmd().
 
@@ -85,30 +87,35 @@ namespace PatternGeneratorJRL
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     /*! Constructor
       @param strm: Should provide the file to initialize the preview control,
-      the path to the VRML model, and the name of the file containing the VRML model.
+      the path to the VRML model, and the name of the file containing 
+      the VRML model.
     */
     PatternGeneratorInterfacePrivate(PinocchioRobot *aPinocchioRobotRobot);
 
     /*! Destructor */
     ~PatternGeneratorInterfacePrivate();
 
-    /*! \brief Function to specify steps in the stack of the walking pattern generator.
-      This method is different AddOnLineStep which is the default step add when there is no policy,
-      or no step available.
+    /*! \brief Function to specify steps in the stack of the walking pattern
+      generator.
+      This method is different AddOnLineStep which is the default step add when
+      there is no policy, or no step available.
     */
     void AddStepInStack(double dx, double dy, double theta);
 
-    /*! \name High levels function to create automatically stack of steps following specific motions.
+    /*! \name High levels function to create automatically stack of steps 
+      following specific motions.
       @{
     */
-    /*! \brief This methods generate a stack of steps which make the robot follows an arc.
+    /*! \brief This methods generate a stack of steps which make the robot 
+      follows an arc.
       The direction of the robot is tangential to the arc.
 
       @param[in] x: Position of the center of the circle along the X-axis.
       @param[in] y: Position of the center of the circle along the Y-axis.
       @param[in] R: Ray of the circle.
       @param[in] arc_deg: Arc in degrees along which the robot walks.
-      @param[in] SupportFoot: Indicates which is the first support foot (1) Left or (-1) Right.
+      @param[in] SupportFoot: Indicates which is the first support foot (1) 
+      Left or (-1) Right.
     */
     void CreateArcInStepStack(  double x,
                                 double y,
@@ -116,63 +123,79 @@ namespace PatternGeneratorJRL
                                 double arc_deg,
                                 int SupportFoot);
 
-    /*! \brief This methods generate a stack of steps which make the robot follows an arc.
+    /*! \brief This methods generate a stack of steps which make the robot 
+      follows an arc.
       The direction of the robot is towards the center of the arc.
       The robot is therefore expected to move sideways.
 
       @param[in] R: Ray of the circle.
       @param[in] arc_deg: Arc in degrees along which the robot walks.
-      @param[in] SupportFoot: Indicates which is the first support foot (1) Left or (-1) Right.
+      @param[in] SupportFoot: Indicates which is the first support foot (1) 
+      Left or (-1) Right.
     */
     void CreateArcCenteredInStepStack( double R,
                                        double arc_deg,
                                        int SupportFoot);
 
-    /*! \brief This specifies which foot will be used as the first support of the motion. */
+    /*! \brief This specifies which foot will be used as the first support 
+      of the motion. */
     void PrepareForSupportFoot(int SupportFoot);
 
-    /*! \brief This method precomputes all the buffers necessary for walking according to the chosen strategy. */
+    /*! \brief This method precomputes all the buffers necessary for walking
+      according to the chosen strategy. */
     void FinishAndRealizeStepSequence();
     /*! @} */
 
 
     /*! Common Initialization of walking.
-      @param[out] lStartingCOMPosition: For the starting position on the articular space, returns
+      @param[out] lStartingCOMPosition: For the starting position on the 
+      articular space, returns
       the COM position.
-      @param[out] lStartingZMPPosition: For the starting position on the articular space, returns
+      @param[out] lStartingZMPPosition: For the starting position on the 
+      articular space, returns
       the ZMP position.
-      @param[out] BodyAnglesIni: Basically it is a copy of CurrentJointValues but as a vector.
-      @param[out] InitLeftFootAbsPos: Returns the current absolute position of the left foot for
+      @param[out] BodyAnglesIni: Basically it is a copy of CurrentJointValues 
+      but as a vector.
+      @param[out] InitLeftFootAbsPos: Returns the current absolute position 
+      of the left foot for
       the given posture of the robot.
-      @param[out] InitRightFootAbsPos: Returns the current absolute position of the right foot
+      @param[out] InitRightFootAbsPos: Returns the current absolute position 
+      of the right foot
       for the given posture of the robot.
-      @param[out] lRelativeFootPositions: List of relative positions for the support foot still in the
+      @param[out] lRelativeFootPositions: List of relative positions for 
+      the support foot still in the
       stack of steps.
-      @param[in] lCurrentJointValues: The vector of articular values in classical C++ style.
+      @param[in] lCurrentJointValues: The vector of articular values in 
+      classical C++ style.
       @param[in] ClearStepStackHandler: Clean the stack of steps after copy.
     */
-    void CommonInitializationOfWalking(COMState & lStartingCOMState,
-                                       Eigen::Vector3d & lStartingZMPPosition,
-                                       Eigen::VectorXd & BodyAnglesIni,
-                                       FootAbsolutePosition & InitLeftFootAbsPos,
-                                       FootAbsolutePosition & InitRightFootAbsPos,
-                                       deque<RelativeFootPosition> & lRelativeFootPositions,
-                                       std::vector<double> & lCurrentJointValues,
-                                       bool ClearStepStackHandler);
+    void CommonInitializationOfWalking
+    (COMState & lStartingCOMState,
+     Eigen::Vector3d & lStartingZMPPosition,
+     Eigen::VectorXd & BodyAnglesIni,
+     FootAbsolutePosition & InitLeftFootAbsPos,
+     FootAbsolutePosition & InitRightFootAbsPos,
+     deque<RelativeFootPosition> & lRelativeFootPositions,
+     std::vector<double> & lCurrentJointValues,
+     bool ClearStepStackHandler);
 
 
     /*! \name Methods for the control part.
       @{
     */
 
-    /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
-      @param[out]  CurrentConfiguration The current configuration of the robot according to
-      the implementation of dynamic-JRLJapan. This should be first position and orientation
+    /*! \brief Run One Step of the global control loop aka The Main Method 
+      To Be Used.
+      @param[out]  CurrentConfiguration The current configuration of the robot 
+      according to the implementation of Pinocchio. 
+      This should be first position and orientation
       of the waist, and then all the DOFs of your robot.
-      @param[out]  CurrentVelocity  The current velocity of the robot according to the
-      the implementation of dynamic-JRLJapan.
-      @param[out]  CurrentAcceleration  The current acceleration of the robot according to the
-      the implementation of dynamic-JRLJapan.
+      @param[out]  CurrentVelocity  The current velocity of the robot 
+      according to the
+      the implementation of Pinocchio.
+      @param[out]  CurrentAcceleration  The current acceleration of the robot 
+      according to the
+      the implementation of Pinocchio.
       @param[out]  ZMPTarget  The target ZMP in the waist reference frame.
       @return True is there is still some data to send, false otherwise.
     */
@@ -181,14 +204,19 @@ namespace PatternGeneratorJRL
                                     Eigen::VectorXd & CurrentAcceleration,
                                     Eigen::VectorXd & ZMPTarget);
 
-    /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
-      @param[out]  CurrentConfiguration The current configuration of the robot according to
-      the implementation of dynamic-JRLJapan. This should be first position and orientation
+    /*! \brief Run One Step of the global control loop aka The Main 
+      Method To Be Used.
+      @param[out]  CurrentConfiguration The current configuration of the robot 
+      according to
+      the implementation of Pinocchio. This should be first position and 
+      orientation
       of the waist, and then all the DOFs of your robot.
-      @param[out]  CurrentVelocity  The current velocity of the robot according to the
-      the implementation of dynamic-JRLJapan.
-      @param[out]  CurrentAcceleration  The current acceleration of the robot according to the
-      the implementation of dynamic-JRLJapan.
+      @param[out]  CurrentVelocity  The current velocity of the robot according 
+      to the
+      the implementation of Pinocchio.
+      @param[out]  CurrentAcceleration  The current acceleration of the robot 
+      according to the
+      the implementation of Pinocchio.
       @param[out]  ZMPTarget  The target ZMP in the waist reference frame.
       @param[out] COMState The CoM state for this motion.
       @param[out] LeftFootPosition: Absolute position of the left foot.
@@ -203,14 +231,19 @@ namespace PatternGeneratorJRL
                                     FootAbsolutePosition &LeftFootPosition,
                                     FootAbsolutePosition &RightFootPosition);
 
-    /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
-      @param[out]  CurrentConfiguration The current configuration of the robot according to
-      the implementation of dynamic-JRLJapan. This should be first position and orientation
+    /*! \brief Run One Step of the global control loop 
+      aka The Main Method To Be Used.
+      @param[out]  CurrentConfiguration The current configuration of the robot 
+      according to
+      the implementation of Pinocchio. This should be first position and 
+      orientation
       of the waist, and then all the DOFs of your robot.
-      @param[out]  CurrentVelocity  The current velocity of the robot according to the
-      the implementation of dynamic-JRLJapan.
-      @param[out]  CurrentAcceleration  The current acceleration of the robot according to the
-      the implementation of dynamic-JRLJapan.
+      @param[out]  CurrentVelocity  The current velocity of the robot according
+      to the
+      the implementation of Pinocchio.
+      @param[out]  CurrentAcceleration  The current acceleration of the robot 
+      according to the
+      the implementation of Pinocchio.
       @param[out]  ZMPTarget  The target ZMP in the waist reference frame.
       @param[out] aCOMPosition The CoM position for this motion.
       @param[out] LeftFootPosition: Absolute position of the left foot.
@@ -226,7 +259,8 @@ namespace PatternGeneratorJRL
                                     FootAbsolutePosition &RightFootPosition);
 
 
-    /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
+    /*! \brief Run One Step of the global control loop aka 
+      The Main Method To Be Used.
       @param[out] LeftFootPosition: Absolute position of the left foot.
       @param[out] RightFootPosition: Absolute position of the right foot.
       @param[out] ZMPRefPos: ZMP position new reference
@@ -283,16 +317,20 @@ namespace PatternGeneratorJRL
     /*! \brief Change online step.
       The strategy is the following: the step in single support phase at time t
       has its landing position changed to \f$ (X,Y,\theta) \f$ in absolute
-      coordinates (i.e. in the world reference frame of the free flyer of the robot).
+      coordinates (i.e. in the world reference frame of the free flyer 
+      of the robot).
       For stability reason there is no guarantee that this method can
-      realized the operation. Please see the documentation of the walking pattern generator
+      realized the operation. Please see the documentation of the walking 
+      pattern generator
       algorithm used.
 
-      If the time falls during a double support phase, the next single support phase is chosen.
+      If the time falls during a double support phase, the next single support
+      phase is chosen.
 
       @param[in] Time: Time information of the step.
       @param[in] aFootAbsolutePosition: Absolute position of the foot.
-      @return If the operation failed the method returns a negative number related
+      @return If the operation failed the method returns a negative number 
+      related
       to an error, 0 otherwise.
     */
     int ChangeOnLineStep(double Time,
@@ -353,16 +391,19 @@ namespace PatternGeneratorJRL
       @{
     */
 
-    /*! \brief Parse a command (to be used out of a plugin) and call all objects which registered the method. */
+    /*! \brief Parse a command (to be used out of a plugin) and call all
+      objects which registered the method. */
     int ParseCmd(std::istringstream &strm);
 
-    /*! \brief This method register a method to a specific object which derivates from SimplePlugin class. */
+    /*! \brief This method register a method to a specific object which 
+      derivates from SimplePlugin class. */
     bool RegisterMethod(string &MethodName, SimplePlugin *aSP);
 
     /*! @} */
 
 
-    /*! \brief Returns the ZMP, CoM, left foot absolute position, and right foot absolute position
+    /*! \brief Returns the ZMP, CoM, left foot absolute position, and 
+      right foot absolute position
       for the initiale pose.*/
     void EvaluateStartingState(COMState  & lStartingCOMState,
                                Eigen::Vector3d & lStartingZMPPosition,
@@ -635,16 +676,19 @@ namespace PatternGeneratorJRL
 
     /*! Constants
       @{ */
-    /*! Using Preview Control with 2 stages proposed by Shuuji Kajita in 2003. */
+    /*! Using Preview Control with 2 stages proposed by Shuuji Kajita in 2003.
+     */
     static const int ZMPCOM_KAJITA_2003=1;
 
-    /*! Using the preview control with 2 stages proposed by Pierre-Brice Wieber in 2006. */
+    /*! Using the preview control with 2 stages proposed by Pierre-Brice 
+      Wieber in 2006. */
     static const int ZMPCOM_WIEBER_2006=2;
 
     /*! Using the analytical solution proposed by Morisawa in 2007. */
     static const int ZMPCOM_MORISAWA_2007=3;
 
-    /*! Using the QP constrained problem resolution proposed by Dimitrov in 2008. */
+    /*! Using the QP constrained problem resolution proposed by Dimitrov 
+      in 2008. */
     static const int ZMPCOM_DIMITROV_2008=4;
 
     /*! Using the velocity referenced QP proposed by Herdt in 2010. */
@@ -657,7 +701,8 @@ namespace PatternGeneratorJRL
 
     /*! Humanoid Dynamic robot */
     PinocchioRobot * m_PinocchioRobot ;
-    //CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot, * m_2HumanoidDynamicRobot;
+    //CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot, *
+    // m_2HumanoidDynamicRobot;
 
     /*! Speed of the leg. */
     Eigen::VectorXd m_dqr,m_dql;
@@ -716,7 +761,8 @@ namespace PatternGeneratorJRL
     virtual void CallMethod(string &MethodName,
                             istringstream &istrm);
 
-    /*! \brief Register the methods handled by the SimplePlugin part of this object. */
+    /*! \brief Register the methods handled by the SimplePlugin part of
+      this object. */
     void RegisterPluginMethods();
 
     /*! \brief Start FPE trapping. */
@@ -733,12 +779,14 @@ namespace PatternGeneratorJRL
       as well as Upper Body Positions. */
     void ExpandCOMPositionsQueues(int aNumber);
 
-    /*! \brief Compute the COM, left and right foot position for a given BodyAngle position */
+    /*! \brief Compute the COM, left and right foot position for a 
+      given BodyAngle position */
     void EvaluateStartingCOM(Eigen::VectorXd &Configuration,
                              Eigen::Vector3d &lStartingCOMPosition);
 
 
-    /*! \brief Fill the internal buffer with the appropriate information depending on the strategy.
+    /*! \brief Fill the internal buffer with the appropriate information 
+      depending on the strategy.
       The behavior of this method depends on \a m_AlgorithmforZMPCOM.
     */
     int CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
@@ -747,7 +795,8 @@ namespace PatternGeneratorJRL
                             FootAbsolutePosition & InitLeftFootAbsPos,
                             FootAbsolutePosition & InitRightFootAbsPos);
 
-    /*! \brief Create automatically a new step for a ZMP based stability criteria */
+    /*! \brief Create automatically a new step for a ZMP based stability 
+      criteria */
     void AutomaticallyAddFirstStep(deque<RelativeFootPosition> &
                                    lRelativeFootPositions,
                                    FootAbsolutePosition & InitLeftFootAbsPos,

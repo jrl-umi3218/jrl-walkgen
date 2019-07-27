@@ -63,8 +63,10 @@ namespace PatternGeneratorJRL
   {
   public:
     /// Constructor:
-    /// boundCond: the different boundary conditions begin, intermediate and end of polynomial
-    /// timeDistr: vector with time instants for intermediate boundary conditions and end time
+    /// boundCond: the different boundary conditions begin,
+    /// intermediate and end of polynomial
+    /// timeDistr: vector with time instants for intermediate
+    /// boundary conditions and end time
 
     WaistPolynome();
 
@@ -80,7 +82,8 @@ namespace PatternGeneratorJRL
 
 
 
-  /// Object to compute new foot trajectories for the height of the waist with waist differnces as input for each step
+  /// Object to compute new foot trajectories for the height of the waist
+  /// with waist differnces as input for each step
   class WaistHeightVariation
   {
   public :

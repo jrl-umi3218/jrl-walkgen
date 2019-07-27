@@ -40,9 +40,10 @@ using namespace PatternGeneratorJRL;
 
 
 
-FootConstraintsAsLinearSystem::FootConstraintsAsLinearSystem(
-                                                             SimplePluginManager *aSPM,
-                                                             PinocchioRobot *aPR) :
+FootConstraintsAsLinearSystem::
+FootConstraintsAsLinearSystem
+(SimplePluginManager *aSPM,
+ PinocchioRobot *aPR) :
   SimplePlugin(aSPM)
 {
   m_PR = aPR;
@@ -53,8 +54,10 @@ FootConstraintsAsLinearSystem::~FootConstraintsAsLinearSystem()
 {
 }
 
-int FootConstraintsAsLinearSystem::FindSimilarConstraints(Eigen::MatrixXd &A,
-                                                          vector<int> &SimilarConstraints)
+int FootConstraintsAsLinearSystem::
+FindSimilarConstraints
+(Eigen::MatrixXd &A,
+ vector<int> &SimilarConstraints)
 {
 
   SimilarConstraints.resize(A.rows());
@@ -194,8 +197,9 @@ ComputeLinearSystem
   C(1) /= (double)n;
 
 
-  ODEBUG("(x["<< n-1 << "],y["<< n-1 << "]): " << aVecOfPoints[n-1].col << " " <<
-         aVecOfPoints[n-1].row << " "
+  ODEBUG("(x["<< n-1 << "],y["<< n-1 << "]): "
+         << aVecOfPoints[n-1].col << " "
+         << aVecOfPoints[n-1].row << " "
          << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row );
 
   if (fabs(aVecOfPoints[0].col-aVecOfPoints[n-1].col)>1e-7)
@@ -268,15 +272,16 @@ ComputeLinearSystem
   return 0;
 }
 
-int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(
-                                                                     deque<FootAbsolutePosition>
-                                                                     &LeftFootAbsolutePositions,
-                                                                     deque<FootAbsolutePosition>
-                                                                     &RightFootAbsolutePositions,
-                                                                     deque<LinearConstraintInequality_t *> &
-                                                                     QueueOfLConstraintInequalities,
-                                                                     double ConstraintOnX,
-                                                                     double ConstraintOnY)
+int FootConstraintsAsLinearSystem::
+BuildLinearConstraintInequalities
+(deque<FootAbsolutePosition>
+ &LeftFootAbsolutePositions,
+ deque<FootAbsolutePosition>
+ &RightFootAbsolutePositions,
+ deque<LinearConstraintInequality_t *> &
+ QueueOfLConstraintInequalities,
+ double ConstraintOnX,
+ double ConstraintOnY)
 {
   // Find the convex hull for each of the position,
   // in order to create the corresponding trajectory.
@@ -410,13 +415,18 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(
 
 
                   // Computes the maxima.
-                  xmin = aVecOfPoints[j].col < xmin ? aVecOfPoints[j].col : xmin;
-                  xmax = aVecOfPoints[j].col > xmax ? aVecOfPoints[j].col : xmax;
-                  ymin = aVecOfPoints[j].row < ymin ? aVecOfPoints[j].row : ymin;
-                  ymax = aVecOfPoints[j].row > ymax ? aVecOfPoints[j].row : ymax;
+                  xmin = aVecOfPoints[j].col < xmin ?
+                                               aVecOfPoints[j].col : xmin;
+                  xmax = aVecOfPoints[j].col > xmax ?
+                    aVecOfPoints[j].col : xmax;
+                  ymin = aVecOfPoints[j].row < ymin ?
+                                               aVecOfPoints[j].row : ymin;
+                  ymax = aVecOfPoints[j].row > ymax ?
+                    aVecOfPoints[j].row : ymax;
 
                 }
-              ODEBUG("State 3-1 " << xmin << " " << xmax << " " << ymin << " " << ymax);
+              ODEBUG("State 3-1 " << xmin << " " << xmax
+                     << " " << ymin << " " << ymax);
               lx=RightFootAbsolutePositions[i].x;
               ly=RightFootAbsolutePositions[i].y;
 
@@ -428,21 +438,28 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(
                      RightFootAbsolutePositions[i].theta);
               for(unsigned j=0; j<4; j++)
                 {
-                  aVecOfPoints[j+4].col = lx + ( lxcoefs[j] * lRightFootHalfWidth
-                                                 * c_t - lycoefs[j] *
-                                                 lRightFootHalfHeight * s_t );
-                  aVecOfPoints[j+4].row = ly + ( lxcoefs[j] * lRightFootHalfWidth
-                                                 * s_t + lycoefs[j] *
-                                                 lRightFootHalfHeight * c_t );
+                  aVecOfPoints[j+4].col =
+                    lx + ( lxcoefs[j] * lRightFootHalfWidth
+                           * c_t - lycoefs[j] *
+                           lRightFootHalfHeight * s_t );
+                  aVecOfPoints[j+4].row =
+                    ly + ( lxcoefs[j] * lRightFootHalfWidth
+                           * s_t + lycoefs[j] *
+                           lRightFootHalfHeight * c_t );
                   // Computes the maxima.
-                  xmin = aVecOfPoints[j+4].col < xmin ? aVecOfPoints[j+4].col : xmin;
-                  xmax = aVecOfPoints[j+4].col > xmax ? aVecOfPoints[j+4].col : xmax;
-                  ymin = aVecOfPoints[j+4].row < ymin ? aVecOfPoints[j+4].row : ymin;
-                  ymax = aVecOfPoints[j+4].row > ymax ? aVecOfPoints[j+4].row : ymax;
+                  xmin = aVecOfPoints[j+4].col < xmin ?
+                                                 aVecOfPoints[j+4].col : xmin;
+                  xmax = aVecOfPoints[j+4].col > xmax ?
+                    aVecOfPoints[j+4].col : xmax;
+                  ymin = aVecOfPoints[j+4].row < ymin ?
+                                                 aVecOfPoints[j+4].row : ymin;
+                  ymax = aVecOfPoints[j+4].row > ymax ?
+                    aVecOfPoints[j+4].row : ymax;
 
                 }
 
-              ODEBUG("State 3-2" << xmin << " " << xmax << " " << ymin << " " << ymax);
+              ODEBUG("State 3-2" << xmin << " " << xmax
+                     << " " << ymin << " " << ymax);
               aCH.DoComputeConvexHull(aVecOfPoints,TheConvexHull);
             }
           // In the second case, it is necessary to compute
@@ -453,7 +470,8 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(
               TheConvexHull.resize(4);
 
               // Who is support foot ?
-              if (LeftFootAbsolutePositions[i].z < RightFootAbsolutePositions[i].z)
+              if (LeftFootAbsolutePositions[i].z <
+                  RightFootAbsolutePositions[i].z)
                 {
                   lx=LeftFootAbsolutePositions[i].x;
                   ly=LeftFootAbsolutePositions[i].y;
@@ -469,10 +487,14 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(
                         ( lxcoefs[j] * lLeftFootHalfWidth * s_t +
                           lycoefs[j] * lLeftFootHalfHeight * c_t );
                       // Computes the maxima.
-                      xmin = TheConvexHull[j].col < xmin ? TheConvexHull[j].col : xmin;
-                      xmax = TheConvexHull[j].col > xmax ? TheConvexHull[j].col : xmax;
-                      ymin = TheConvexHull[j].row < ymin ? TheConvexHull[j].row : ymin;
-                      ymax = TheConvexHull[j].row > ymax ? TheConvexHull[j].row : ymax;
+                      xmin = TheConvexHull[j].col < xmin ?
+                                                    TheConvexHull[j].col : xmin;
+                      xmax = TheConvexHull[j].col > xmax ?
+                        TheConvexHull[j].col : xmax;
+                      ymin = TheConvexHull[j].row < ymin ?
+                                                    TheConvexHull[j].row : ymin;
+                      ymax = TheConvexHull[j].row > ymax ?
+                        TheConvexHull[j].row : ymax;
 
                     }
                   ODEBUG("Left support foot");
@@ -485,29 +507,37 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(
                   c_t = cos(RightFootAbsolutePositions[i].theta*M_PI/180.0);
                   for(unsigned j=0; j<4; j++)
                     {
-                      TheConvexHull[j].col = lx + ( lxcoefs[j] *
-                                                    lRightFootHalfWidth * c_t -
-                                                    lycoefs[j] *
-                                                    lRightFootHalfHeight * s_t );
-                      TheConvexHull[j].row = ly + ( lxcoefs[j] *
-                                                    lRightFootHalfWidth * s_t +
-                                                    lycoefs[j] *
-                                                    lRightFootHalfHeight * c_t );
+                      TheConvexHull[j].col =
+                        lx + ( lxcoefs[j] *
+                               lRightFootHalfWidth * c_t -
+                               lycoefs[j] *
+                               lRightFootHalfHeight * s_t );
+                      TheConvexHull[j].row =
+                        ly + ( lxcoefs[j] *
+                               lRightFootHalfWidth * s_t +
+                               lycoefs[j] *
+                               lRightFootHalfHeight * c_t );
                       // Computes the maxima.
-                      xmin = TheConvexHull[j].col < xmin ? TheConvexHull[j].col : xmin;
-                      xmax = TheConvexHull[j].col > xmax ? TheConvexHull[j].col : xmax;
-                      ymin = TheConvexHull[j].row < ymin ? TheConvexHull[j].row : ymin;
-                      ymax = TheConvexHull[j].row > ymax ? TheConvexHull[j].row : ymax;
+                      xmin = TheConvexHull[j].col < xmin ?
+                                                    TheConvexHull[j].col : xmin;
+                      xmax = TheConvexHull[j].col > xmax ?
+                        TheConvexHull[j].col : xmax;
+                      ymin = TheConvexHull[j].row < ymin ?
+                                                    TheConvexHull[j].row : ymin;
+                      ymax = TheConvexHull[j].row > ymax ?
+                        TheConvexHull[j].row : ymax;
 
                     }
                   ODEBUG("Right support foot");
                 }
-              ODEBUG("State !=3 " << xmin << " " << xmax << " " << ymin << " " << ymax);
+              ODEBUG("State !=3 " << xmin << " " << xmax << " "
+                     << ymin << " " << ymax);
 
             }
 
           // Linear Constraint Inequality
-          LinearConstraintInequality_t * aLCI = new LinearConstraintInequality_t;
+          LinearConstraintInequality_t * aLCI =
+            new LinearConstraintInequality_t;
           // Building those constraints.
           ComputeLinearSystem(TheConvexHull,aLCI->A, aLCI->B, aLCI->Center);
           // Finding the similar one (i.e. Ai identical).
@@ -518,8 +548,10 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(
             {
               QueueOfLConstraintInequalities.back()->EndingTime =
                 LeftFootAbsolutePositions[i].time;
-              ODEBUG4( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
-                       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
+              ODEBUG4( QueueOfLConstraintInequalities.back()->StartingTime
+                       << " " <<
+                       QueueOfLConstraintInequalities.back()->EndingTime
+                       << " " <<
                        prev_xmin << " "  <<
                        prev_xmax << " "  <<
                        prev_ymin << " "  <<
@@ -542,8 +574,10 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(
             {
               QueueOfLConstraintInequalities.back()->EndingTime =
                 LeftFootAbsolutePositions[i].time;
-              ODEBUG4( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
-                       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
+              ODEBUG4( QueueOfLConstraintInequalities.back()->StartingTime
+                       << " " <<
+                       QueueOfLConstraintInequalities.back()->EndingTime
+                       << " " <<
                        prev_xmin << " "  <<
                        prev_xmax << " "  <<
                        prev_ymin << " "  <<

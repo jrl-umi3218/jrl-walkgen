@@ -25,7 +25,8 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /** \file FootConstraintAsLinearSystemForVelRef.cpp
-    \brief This object builds linear constraints relative to the current and the previewed feet positions.
+    \brief This object builds linear constraints relative to the current 
+    and the previewed feet positions.
 */
 
 #include <iostream>
@@ -39,8 +40,9 @@ using namespace PatternGeneratorJRL;
 #include <Debug.hh>
 
 
-RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
-                                                    PinocchioRobot *aPR ) :
+RelativeFeetInequalities::RelativeFeetInequalities
+( SimplePluginManager *aSPM,
+  PinocchioRobot *aPR ) :
   SimplePlugin(aSPM)
 {
 
@@ -102,10 +104,10 @@ RelativeFeetInequalities::init_convex_hulls()
   FootPosEdges_.LeftSS.resize( nbVertFeet );
   FootPosEdges_.RightDS.resize( nbVertFeet );
   FootPosEdges_.RightSS.resize( nbVertFeet );
-  FootPosEdges_.LeftDS.set_vertices ( LeftFPosEdgesX_, LeftFPosEdgesY_          );
-  FootPosEdges_.LeftSS.set_vertices ( LeftFPosEdgesX_, LeftFPosEdgesY_          );
-  FootPosEdges_.RightDS.set_vertices( RightFPosEdgesX_, RightFPosEdgesY_        );
-  FootPosEdges_.RightSS.set_vertices( RightFPosEdgesX_, RightFPosEdgesY_        );
+  FootPosEdges_.LeftDS.set_vertices ( LeftFPosEdgesX_, LeftFPosEdgesY_  );
+  FootPosEdges_.LeftSS.set_vertices ( LeftFPosEdgesX_, LeftFPosEdgesY_  );
+  FootPosEdges_.RightDS.set_vertices( RightFPosEdgesX_, RightFPosEdgesY_);
+  FootPosEdges_.RightSS.set_vertices( RightFPosEdgesX_, RightFPosEdgesY_);
 
 
   // ZMP polygonal hulls:
@@ -122,28 +124,42 @@ RelativeFeetInequalities::init_convex_hulls()
   for( unsigned j = 0; j < nbVertCoP; j++ )
     {
       //Left single support phase
-      ZMPPosEdges_.LeftSS.X_vec[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
-      ZMPPosEdges_.LeftSS.Y_vec[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeight();
+      ZMPPosEdges_.LeftSS.X_vec[j] = lxcoefsLeft[j]*
+        LeftFootSize_.getHalfWidth();
+      ZMPPosEdges_.LeftSS.Y_vec[j] = lycoefsLeft[j]*
+        LeftFootSize_.getHalfHeight();
       //Right single support phase
-      ZMPPosEdges_.RightSS.X_vec[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
-      ZMPPosEdges_.RightSS.Y_vec[j] = lycoefsRight[j]*RightFootSize_.getHalfHeight();
+      ZMPPosEdges_.RightSS.X_vec[j] = lxcoefsRight[j]*
+        RightFootSize_.getHalfWidth();
+      ZMPPosEdges_.RightSS.Y_vec[j] = lycoefsRight[j]*
+        RightFootSize_.getHalfHeight();
       //Left DS phase
-      ZMPPosEdges_.LeftDS.X_vec[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
-      ZMPPosEdges_.LeftDS.Y_vec[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeightDS()
+      ZMPPosEdges_.LeftDS.X_vec[j] = lxcoefsLeft[j]*
+        LeftFootSize_.getHalfWidth();
+      ZMPPosEdges_.LeftDS.Y_vec[j] = lycoefsLeft[j]*
+        LeftFootSize_.getHalfHeightDS()
         -DSFeetDistance_/2.0;
       //Right DS phase
-      ZMPPosEdges_.RightDS.X_vec[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
-      ZMPPosEdges_.RightDS.Y_vec[j] = lycoefsRight[j]*RightFootSize_.getHalfHeightDS()
+      ZMPPosEdges_.RightDS.X_vec[j] = lxcoefsRight[j]*
+        RightFootSize_.getHalfWidth();
+      ZMPPosEdges_.RightDS.Y_vec[j] =lycoefsRight[j]*
+        RightFootSize_.getHalfHeightDS()
         +DSFeetDistance_/2.0;
     }
 
 
   // CoM polyhedric hull:
   // --------------------
-  double IneqCoMA_a[nbIneqCoM] = { -0.6, -0.6, -0.6, -0.6, -0.6, -0.3, -0.3, -0.3, -0.3, -0.3};
-  double IneqCoMB_a[nbIneqCoM] = {-0.3, -0.175,  -0.05, 0.075, 0.2, -0.3, -0.175,  -0.05, 0.075, 0.2};
-  double IneqCoMC_a[nbIneqCoM] = {-0.8544, -0.818917, -0.801561, -0.803508, -0.824621, -1, -0.969858, -0.955249, -0.956883, -0.974679};
-  double IneqCoMD_a[nbIneqCoM] = {-0.862318, -0.836995, -0.818542, -0.807405, -0.803531, -0.9175, -0.894201, -0.876789, -0.865534, -0.860404};
+  double IneqCoMA_a[nbIneqCoM] =
+    { -0.6, -0.6, -0.6, -0.6, -0.6, -0.3, -0.3, -0.3, -0.3, -0.3};
+  double IneqCoMB_a[nbIneqCoM] =
+    {-0.3, -0.175,  -0.05, 0.075, 0.2, -0.3, -0.175,  -0.05, 0.075, 0.2};
+  double IneqCoMC_a[nbIneqCoM] =
+    {-0.8544, -0.818917, -0.801561, -0.803508, -0.824621,
+     -1, -0.969858, -0.955249, -0.956883, -0.974679};
+  double IneqCoMD_a[nbIneqCoM] =
+    {-0.862318, -0.836995, -0.818542, -0.807405, -0.803531,
+     -0.9175, -0.894201, -0.876789, -0.865534, -0.860404};
 
   CoMHull_.resize(0, nbIneqCoM);
   CoMHull_.set_inequalities( IneqCoMA_a, IneqCoMB_a, IneqCoMC_a, IneqCoMD_a );
@@ -193,8 +209,10 @@ RelativeFeetInequalities::set_feet_dimensions( PinocchioRobot *aPR )
 
 
 void
-RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
-                                        const support_state_t & Support, ineq_e type)
+RelativeFeetInequalities::
+set_vertices
+( convex_hull_t & ConvexHull,
+  const support_state_t & Support, ineq_e type)
 {
 
   edges_s * ConvexHull_p = 0;
@@ -245,8 +263,10 @@ RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
 
 
 void
-RelativeFeetInequalities::set_inequalities( convex_hull_t & ConvexHull,
-                                            const support_state_t &, ineq_e type)
+RelativeFeetInequalities::
+set_inequalities
+( convex_hull_t & ConvexHull,
+  const support_state_t &, ineq_e type)
 {
 
   convex_hull_t * ConvexHull_p = 0;
@@ -272,8 +292,10 @@ RelativeFeetInequalities::set_inequalities( convex_hull_t & ConvexHull,
 
 
 void
-RelativeFeetInequalities::compute_linear_system ( convex_hull_t & ConvexHull,
-                                                  const support_state_t & PrwSupport ) const
+RelativeFeetInequalities::
+compute_linear_system
+( convex_hull_t & ConvexHull,
+  const support_state_t & PrwSupport ) const
 {
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned int nbRows = (unsigned int)ConvexHull.X_vec.size();

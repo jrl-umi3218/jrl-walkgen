@@ -206,11 +206,15 @@ namespace PatternGeneratorJRL
                                            double &InitPos,
                                            double &InitSpeed);
 
-    /// \brief Set parameters considering initial position, velocity, acceleration
-    void SetParameters(double FT, double FP,
-                       double InitPos, double InitSpeed, double InitAcc, double InitJerk = 0.0);
+    /// \brief Set parameters considering initial position, velocity,
+    /// acceleration
+    void SetParameters
+    (double FT, double FP,
+     double InitPos, double InitSpeed, double InitAcc,
+     double InitJerk = 0.0);
 
-    /// \brief Set parameters considering initial position, velocity, acceleration,
+    /// \brief Set parameters considering initial position, velocity,
+    /// acceleration,
     /// and final poistion, velocity and acceleration
     void SetParameters(double FT,
                        double InitPos, double InitSpeed, double InitAcc,
@@ -236,8 +240,10 @@ namespace PatternGeneratorJRL
     // Initial acceleration, velocity and position by default 0
     // Final acceleration, velocity and position are 0
     void SetParameters(double FT, double MP, double FP = 0.0);
-    void SetParametersWithMiddlePos(double FT, double MP,
-                                    double InitPos, double InitSpeed, double InitAcc=0.0, double FP = 0.0);
+    void SetParametersWithMiddlePos
+    (double FT, double MP,
+     double InitPos, double InitSpeed, double InitAcc=0.0, double FP = 0.0);
+    
     void GetParametersWithInitPosInitSpeed(double &TimeInterval,
                                            double &MiddlePosition,
                                            double &FinalPosition,
@@ -270,10 +276,13 @@ namespace PatternGeneratorJRL
                                            double InitPos,
                                            double InitSpeed);
 
-    /// \brief Set parameters considering initial position, velocity, acceleration, jerk
-    void SetParameters(double FT, double FP,
-                       double InitPos, double InitSpeed, double InitAcc, double InitJerk=0.0);
-
+    /// \brief Set parameters considering initial position,
+    /// velocity, acceleration, jerk
+    void SetParameters
+    (double FT, double FP,
+     double InitPos, double InitSpeed, double InitAcc,
+     double InitJerk=0.0);
+    
 
     /*! Set the parameters such that
       the initial position, and initial speed

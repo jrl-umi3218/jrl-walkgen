@@ -67,29 +67,38 @@ namespace PatternGeneratorJRL
     ~ComAndFootRealizationByGeometry();
     /** @} */
 
-    /*! Initialization which should be done after setting the HumanoidDynamicRobot member. */
+    /*! Initialization which should be done after setting the 
+      HumanoidDynamicRobot member. */
     void Initialization();
 
 
     /*! Compute the robot state for a given CoM and feet posture.
-      Each posture is given by a 3D position and two Euler angles \f$ (\theta, \omega) \f$.
+      Each posture is given by a 3D position and two Euler angles 
+      \f$ (\theta, \omega) \f$.
       Very important: This method is assume to set correctly the body angles of
       its \a HumanoidDynamicRobot and a subsequent call to the ZMP position
       will return the associated ZMP vector.
-      @param[in] CoMPosition a 6 dimensional vector with the first 3 dimension for position,
+      @param[in] CoMPosition a 6 dimensional vector with the first 3 dimension 
+      for position,
       and the last two for the orientation (Euler angle).
-      @param[in] aCoMSpeed a 6 dimensional vector with the first 3 dimension for linear velocity,
+      @param[in] aCoMSpeed a 6 dimensional vector with the first 3 dimension 
+      for linear velocity,
       and the last two for the angular velocity.
-      @param[in] aCoMAcc a 6 dimensional vector with the first 3 dimension for linear velocity,
+      @param[in] aCoMAcc a 6 dimensional vector with the first 3 dimension 
+      for linear velocity,
       and the last two for the angular velocity.
-      @param[in] LeftFoot a 6 dimensional following the same convention than for \a CoMPosition.
+      @param[in] LeftFoot a 6 dimensional following the same convention than 
+      for \a CoMPosition.
       @param[in] RightFoot idem.
       @param[out] CurrentConfiguration The result is a state vector containing
       the position which are put inside this parameter.
-      @param[out] CurrentVelocity The result is a state vector containing the speed which are put inside this parameter.
-      @param[out] CurrentAcceleration The result is a state vector containing the acceleratio which are put inside this parameter.
+      @param[out] CurrentVelocity The result is a state vector containing 
+      the speed which are put inside this parameter.
+      @param[out] CurrentAcceleration The result is a state vector containing 
+      the acceleratio which are put inside this parameter.
       @param[in] IterationNumber Number of iteration.
-      @param[in] Stage indicates which stage is reach by the Pattern Generator. If this is the
+      @param[in] Stage indicates which stage is reach by the Pattern Generator. 
+      If this is the
       last stage, we store some information.
 
     */
@@ -113,10 +122,12 @@ namespace PatternGeneratorJRL
     /*! \brief Initialize the humanoid model considering the current
       configuration set by the user.
       \param[in] BodyAnglesIni: The configuration vector provided by the user.
-      \param[out] lStartingWaistPose: The waist pose according to the user configuration vector.
+      \param[out] lStartingWaistPose: The waist pose according to the user
+      configuration vector.
     */
-    bool InitializationHumanoid(Eigen::VectorXd &BodyAnglesIni,
-                                Eigen::Matrix<double, 6, 1> &lStartingWaistPose);
+    bool InitializationHumanoid
+    (Eigen::VectorXd &BodyAnglesIni,
+     Eigen::Matrix<double, 6, 1> &lStartingWaistPose);
 
     /*! \brief Initialize the foot position.
       \param[in] aFoot: Pointer to the foot to be updated.
@@ -146,24 +157,23 @@ namespace PatternGeneratorJRL
     /*! This initialization phase, make sure that the needed buffers
       for the upper body motion are correctly setup.
     */
-    bool InitializationUpperBody(deque<ZMPPosition> &inZMPPositions,
-                                 deque<COMPosition> &inCOMBuffer,
-                                 deque<RelativeFootPosition> lRelativeFootPositions);
+    bool InitializationUpperBody
+    (deque<ZMPPosition> &inZMPPositions,
+     deque<COMPosition> &inCOMBuffer,
+     deque<RelativeFootPosition> lRelativeFootPositions);
 
     /* @} */
-
-
-
 
     /*! Evaluate CoM for a given position.
       Assuming that the waist is at (0,0,0)
       It returns the associate initial values for the left and right foot.
     */
-    int EvaluateCOMForStartingPosition(Eigen::VectorXd &BodyAngles,
-                                       double omega, double theta,
-                                       Eigen::Vector3d &lCOMPosition,
-                                       FootAbsolutePosition & LeftFootPosition,
-                                       FootAbsolutePosition & RightFootPosition);
+    int EvaluateCOMForStartingPosition
+    (Eigen::VectorXd &BodyAngles,
+     double omega, double theta,
+     Eigen::Vector3d &lCOMPosition,
+     FootAbsolutePosition & LeftFootPosition,
+     FootAbsolutePosition & RightFootPosition);
 
     /*! Evaluate CoM for a given position.
       Assuming that the waist is at (0,0,0)
@@ -181,13 +191,15 @@ namespace PatternGeneratorJRL
                             FootAbsolutePosition & InitRightFootPosition);
 
     /*! Method to compute the heuristic for the arms. */
-    void ComputeUpperBodyHeuristicForNormalWalking(Eigen::VectorXd & qArmr,
-                                                   Eigen::VectorXd & qArml,
-                                                   Eigen::VectorXd & aCOMPosition,
-                                                   Eigen::VectorXd & RFP,
-                                                   Eigen::VectorXd &  LFP);
+    void ComputeUpperBodyHeuristicForNormalWalking
+    (Eigen::VectorXd & qArmr,
+     Eigen::VectorXd & qArml,
+     Eigen::VectorXd & aCOMPosition,
+     Eigen::VectorXd & RFP,
+     Eigen::VectorXd &  LFP);
 
-    /*! This method returns the final COM pose matrix after the second stage of control. */
+    /*! This method returns the final COM pose matrix 
+      after the second stage of control. */
     Eigen::MatrixXd GetFinalDesiredCOMPose();
 
     /*! Returns the position of the Waist in the the COM Frame . */
@@ -198,11 +210,13 @@ namespace PatternGeneratorJRL
     /*! Reimplementation of the setter of the HumanoidDynamicRobot. */
     bool setPinocchioRobot(PinocchioRobot * aHumanoidDynamicRobot);
 
-    /*! Compute the angles values considering a 6DOF leg for a given configuration
+    /*! Compute the angles values considering a 6DOF leg for a given 
+      configuration
       of the waist and the foot of the leg:
       @param[in] Body_R : orientation of the Waist.
       @param[in] Body_P: position of the waist.
-      @param[in] aFoot: A vector giving the foot configuration (x,y,z, theta, omega).
+      @param[in] aFoot: A vector giving the foot configuration 
+      (x,y,z, theta, omega).
       @param[in] lDt: Vector describing the hip configuration.
       @param[in] aCoMPosition: Position of the CoM.
       @param[in] ToTheHip: Vector to go from the Waist to the Hip.
@@ -219,7 +233,8 @@ namespace PatternGeneratorJRL
                              Eigen::VectorXd &lq,
                              int Stage);
 
-    /*! Compute the angles values considering two 6DOF legs for a given configuration
+    /*! Compute the angles values considering two 6DOF legs for a given 
+      configuration
       of the waist and of the feet:
       @param aCoMPosition: Position of the CoM (x,y,z,theta, omega, phi).
       @param aLeftFoot: Position of the foot (x,y,z, theta, omega).
@@ -248,8 +263,10 @@ namespace PatternGeneratorJRL
     */
     Eigen::Matrix4d GetCurrentPositionofWaistInCOMFrame();
 
-    /*! \brief Getter and setter for the previous configurations and velocities */
-    inline void SetPreviousConfigurationStage0(Eigen::VectorXd & prev_Configuration)
+    /*! \brief Getter and setter for the previous 
+      configurations and velocities */
+    inline void SetPreviousConfigurationStage0
+    (Eigen::VectorXd & prev_Configuration)
     {
       m_prev_Configuration = prev_Configuration ;
     }
@@ -258,7 +275,8 @@ namespace PatternGeneratorJRL
       m_prev_Velocity = prev_Velocity ;
     }
 
-    inline void SetPreviousConfigurationStage1(Eigen::VectorXd & prev_Configuration)
+    inline void SetPreviousConfigurationStage1
+    (Eigen::VectorXd & prev_Configuration)
     {
       m_prev_Configuration1 = prev_Configuration ;
     }
@@ -267,7 +285,8 @@ namespace PatternGeneratorJRL
       m_prev_Velocity1 = prev_Velocity ;
     }
 
-    inline void SetPreviousConfigurationStage2(Eigen::VectorXd & prev_Configuration)
+    inline void SetPreviousConfigurationStage2
+    (Eigen::VectorXd & prev_Configuration)
     {
       m_prev_Configuration2 = prev_Configuration ;
     }
@@ -276,7 +295,8 @@ namespace PatternGeneratorJRL
       m_prev_Velocity2 = prev_Velocity ;
     }
 
-    /*! \brief Getter and setter for the previous configurations and velocities */
+    /*! \brief Getter and setter for the 
+      previous configurations and velocities */
     inline void SetPreviousConfigurationStage0(const Eigen::VectorXd &
                                                prev_Configuration)
     {
@@ -307,7 +327,8 @@ namespace PatternGeneratorJRL
       m_prev_Velocity2 = prev_Velocity;
     }
 
-    /*! \brief Getter and setter for the previous configurations and velocities */
+    /*! \brief Getter and setter for the previous 
+      configurations and velocities */
     inline Eigen::VectorXd & GetPreviousConfigurationStage0()
     {
       return m_prev_Configuration ;
@@ -328,19 +349,23 @@ namespace PatternGeneratorJRL
       return m_prev_Velocity1 ;
     };
 
-    inline void leftLegIndexinConfiguration(std::vector<int> & leftLegMaps) const
+    inline void leftLegIndexinConfiguration
+    (std::vector<int> & leftLegMaps) const
     {
       leftLegMaps = m_LeftLegIndexinConfiguration ;
     }
-    inline void rightLegIndexinConfiguration(std::vector<int> & rightLegMaps) const
+    inline void rightLegIndexinConfiguration
+    (std::vector<int> & rightLegMaps) const
     {
       rightLegMaps = m_RightLegIndexinConfiguration ;
     }
-    inline void leftArmIndexinConfiguration(std::vector<int> & leftArmMaps) const
+    inline void leftArmIndexinConfiguration
+    (std::vector<int> & leftArmMaps) const
     {
       leftArmMaps = m_LeftArmIndexinConfiguration ;
     }
-    inline void rightArmIndexinConfiguration(std::vector<int> & rightArmMaps) const
+    inline void rightArmIndexinConfiguration
+    (std::vector<int> & rightArmMaps) const
     {
       rightArmMaps = m_RightArmIndexinConfiguration ;
     }

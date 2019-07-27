@@ -37,7 +37,8 @@
 
 namespace PatternGeneratorJRL
 {
-  /// \brief Custom (value based) container providing intermediate elements for the construction of a QP.
+  /// \brief Custom (value based) container providing intermediate elements
+  /// for the construction of a QP.
   class  IntermedQPMat
   {
     //
@@ -68,7 +69,8 @@ namespace PatternGeneratorJRL
       Eigen::MatrixXd VT;
       /// \brief Selection matrix multiplied with the current foot position
       Eigen::VectorXd VcX, VcY;
-      /// \brief Shifted selection matrix multiplied with the current feet position
+      /// \brief Shifted selection matrix multiplied with the current feet
+      /// position
       Eigen::VectorXd VcshiftX, VcshiftY;
       /// \brief Selection matrix for the current foot position
       Eigen::VectorXd Vc_fX, Vc_fY;

@@ -60,8 +60,8 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
   else
     {
       lWidth = 0.2;
-      cerr << "WARNING: no object with humanoid specificities properly defined." <<
-        endl;
+      cerr << "WARNING: no object with humanoid specificities properly defined."
+           << endl;
       m_AnkleSoilDistance = 0.1;
       m_tipToAnkle = 0.1;
       m_heelToAnkle = 0.1;
@@ -82,7 +82,8 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
   m_nominalStepWidth = 0.19;
 
 
-  //this angle is used to limit the position during feasibility in double support over the obstacle
+  //this angle is used to limit the position during feasibility in
+  // double support over the obstacle
   m_KneeAngleBound=15.0*M_PI/180.0;
 
   m_Tsingle = 0.78;
@@ -130,7 +131,8 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
   m_StaticToTheRightHip(1) = -0.1;
   m_StaticToTheRightHip(2) = m_DiffBetweenComAndWaist;
 
-  // defining the points on the shank to set the boundary lines of the leg layout
+  // defining the points on the shank to set the boundary lines
+  // of the leg layout
   // for the values of the coordinates see paper guan san IROS 2004
   // 'feasibility of humanoid robots stepping over obstacles'
 
@@ -231,7 +233,8 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition>
   /// Returns the double support time.
   float GetTDoubleSupport();
 
-  DoubleSupportFeasibility(); //perform this function to set m_StepOverStepLenght and  m_StepOverHipHeight;
+  DoubleSupportFeasibility();
+  //perform this function to set m_StepOverStepLenght and  m_StepOverHipHeight;
 
 
   double ankleDistToObstacle;
@@ -251,13 +254,13 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition>
 
   double walkStepLenght;
 
-  walkStepLenght=m_nominalStepLenght+(footDistLeftToMove
-                                      -m_nominalStepLenght*numberOfSteps)/numberOfSteps;
+  walkStepLenght=m_nominalStepLenght+
+    (footDistLeftToMove-m_nominalStepLenght*numberOfSteps)/numberOfSteps;
 
-  cout << "Obstacle height with safety boundary:" << m_ObstacleParameters.h <<
-    endl;
-  cout << "Obstacle thickness with safety boundary:" << m_ObstacleParameters.d <<
-    endl;
+  cout << "Obstacle height with safety boundary:"
+       << m_ObstacleParameters.h << endl;
+  cout << "Obstacle thickness with safety boundary:"
+       << m_ObstacleParameters.d <<  endl;
   cout << "Distance to Obstacle:" << m_ObstacleParameters.x << endl;
   cout << "StepOver steplenght:" << m_StepOverStepLenght << endl;
   cout << "StepOver COMHeight:" << m_StepOverHipHeight << endl;
@@ -283,7 +286,8 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition>
   for (int i=0; i<numberOfSteps-1; i++)
     {
       tempPos.sx=walkStepLenght;
-      tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;
+      tempPos.sy=(-1.0)*(tempPos.sy)/
+        std::fabs((double)tempPos.sy)*m_nominalStepWidth;
       tempPos.theta=0.0;
       tempPos.SStime=m_Tsingle;
       tempPos.DStime=m_Tdble;
@@ -294,7 +298,8 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition>
   // one step before stepover obstacle
 
   tempPos.sx=walkStepLenght;
-  tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;
+  tempPos.sy=(-1.0)*(tempPos.sy)
+    /std::fabs((double)tempPos.sy)*m_nominalStepWidth;
   tempPos.theta=0.0;
   tempPos.SStime=m_TsingleStepOverBeforeAfter;
   tempPos.DStime=m_TdbleStepOverBeforeAfter;
@@ -304,7 +309,8 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition>
   // first leg over the obsacle
 
   tempPos.sx=m_StepOverStepLenght;
-  tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;
+  tempPos.sy=(-1.0)*(tempPos.sy)
+    /std::fabs((double)tempPos.sy)*m_nominalStepWidth;
   //*cos(m_WaistRotationStepOver*M_PI/180.0);
   tempPos.theta=0.0;
   tempPos.SStime=m_TsingleStepOver;
@@ -315,7 +321,8 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition>
   // second leg over the obsacle
 
   tempPos.sx=m_nominalStepLenght;
-  tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;
+  tempPos.sy=(-1.0)*(tempPos.sy)
+    /std::fabs((double)tempPos.sy)*m_nominalStepWidth;
   //*cos(m_WaistRotationStepOver*M_PI/180.0);
   tempPos.theta=0.0;
   tempPos.SStime=m_TsingleStepOver;
@@ -325,7 +332,8 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition>
 
   //one step after the obstacle stepping over
   tempPos.sx=m_nominalStepLenght;
-  tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;
+  tempPos.sy=(-1.0)*(tempPos.sy)
+    /std::fabs((double)tempPos.sy)*m_nominalStepWidth;
   tempPos.theta=0.0;
   tempPos.SStime=m_TsingleStepOverBeforeAfter;
   tempPos.DStime=m_TdbleStepOverBeforeAfter;
@@ -334,7 +342,8 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition>
 
   //one extra regular step
   tempPos.sx=m_nominalStepLenght;
-  tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;
+  tempPos.sy=(-1.0)*(tempPos.sy)
+    /std::fabs((double)tempPos.sy)*m_nominalStepWidth;
   tempPos.theta=0.0;
   tempPos.SStime=m_Tsingle;
   tempPos.DStime=m_Tdble;
@@ -344,7 +353,8 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition>
 
   //last step
   tempPos.sx=0;
-  tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;
+  tempPos.sy=(-1.0)*(tempPos.sy)
+    /std::fabs((double)tempPos.sy)*m_nominalStepWidth;
   tempPos.theta=0.0;
   tempPos.SStime=m_Tsingle;
   tempPos.DStime=m_Tdble;
@@ -361,7 +371,8 @@ void StepOverPlanner::DoubleSupportFeasibility()
   double StepOverStepLenght, StepOverStepLenghtMin, StepOverStepLenghtMax;
   double StepOverCOMHeight, StepOverCOMHeightMin, StepOverCOMHeightMax;
   double OrientationFeetToObstacle = 0.0, OmegaAngleFeet = 0.0;
-  //this is the factor determining aproximately the COM position due to preview control during double support
+  //this is the factor determining
+  // aproximately the COM position due to preview control during double support
   double DoubleSupportCOMPosFactor;
 
 
@@ -400,50 +411,57 @@ void StepOverPlanner::DoubleSupportFeasibility()
   bool CollisionStatus, FinalCollisionStatus;
 
 
-  StepOverStepLenghtMin = m_ObstacleParameters.d + m_heelToAnkle + m_tipToAnkle +
-    m_heelDistAfter + m_tipDistBefore;
+  StepOverStepLenghtMin = m_ObstacleParameters.d + m_heelToAnkle +
+    m_tipToAnkle + m_heelDistAfter + m_tipDistBefore;
   StepOverStepLenghtMax = 0.6;
 
-  //0.4 - m_DiffBetweenComAndWaist + m_soleToAnkle;0.6 * cos(90.0*M_PI/180.0/2.0)
+  //0.4 - m_DiffBetweenComAndWaist + m_soleToAnkle;0.6 *cos(90.0*M_PI/180.0/2.0)
   StepOverCOMHeightMin = 0.4- m_DiffBetweenComAndWaist + m_soleToAnkle;
 
-  //m_NominalCOMStepHeight;//0.6 * cos(m_KneeAngleBound/2.0) - m_DiffBetweenComAndWaist + m_soleToAnkle;
+  //m_NominalCOMStepHeight;//0.6 * cos(m_KneeAngleBound/2.0) -
+  // m_DiffBetweenComAndWaist + m_soleToAnkle;
   StepOverCOMHeightMax =0.75-m_DeltaStepOverCOMHeightMax;
 
   IncrementStepLenght = double ((StepOverStepLenghtMax  -
                                  StepOverStepLenghtMin)/((EvaluationNumber)));
-  IncrementCOMHeight  = double ((StepOverCOMHeightMax   - StepOverCOMHeightMin)/((
-                                                                                  EvaluationNumber)));
+  IncrementCOMHeight  = double ((StepOverCOMHeightMax   - StepOverCOMHeightMin)
+                                /((EvaluationNumber)));
 
-  /*! this angle can be used to extend the steplength during stepover but currently it is set to 0 convinience*/
+  /*! this angle can be used to extend the steplength 
+    during stepover but currently it is set to 0 convinience*/
 
-
-  /*! this parameter should be evaluated and checked and in the end to be retreieved
+  /*! this parameter should be evaluated and checked and in the end 
+    to be retreieved
     from a table containing these values for different step situations ...
     for which a first round of preview control has been performed */
   DoubleSupportCOMPosFactor = 0.50;
   CollisionStatus = 1;
   FinalCollisionStatus = 1;
 
-  /*! we suppose that both feet have the same orentation with respect to the obstacle */
+  /*! we suppose that both feet have the same orentation with respect 
+    to the obstacle */
   for (int i=0; i<EvaluationNumber+1; i++)
     {
       for (int j=0; j<EvaluationNumber+1; j++)
         {
 
           StepOverStepLenght = StepOverStepLenghtMin + i*IncrementStepLenght;
-          StepOverCOMHeight = StepOverCOMHeightMax - (double(j*IncrementCOMHeight));
+          StepOverCOMHeight = StepOverCOMHeightMax -
+            (double(j*IncrementCOMHeight));
           StepOverStepWidth = m_nominalStepWidth;
 
 
           //cout << "StepOverStepcd ../Lenght: " << StepOverStepLenght <<
-          //" StepOverStepWidth: " << StepOverStepWidth << " StepOverCOMHeight: " << StepOverCOMHeight << endl;
+          //" StepOverStepWidth: " << StepOverStepWidth
+          // << " StepOverCOMHeight: " << StepOverCOMHeight << endl;
 
           //coordinates ankles in obstacle frame
           //assuming the left foot is in front of the obstacle
-          //and that in the Y direction of the obstacle the feet are symmetrical with respect to the obstacle origin
+          //and that in the Y direction of the obstacle the feet
+          // are symmetrical with respect to the obstacle origin
 
-          AnkleBeforeObst(0) =-( StepOverStepLenght-m_heelToAnkle-m_heelDistAfter
+          AnkleBeforeObst(0) =-( StepOverStepLenght-m_heelToAnkle-
+                                 m_heelDistAfter
                                  -m_ObstacleParameters.d);
           AnkleBeforeObst(1) = StepOverStepWidth/2.0;
           AnkleBeforeObst(2) = m_soleToAnkle;
@@ -453,14 +471,17 @@ void StepOverPlanner::DoubleSupportFeasibility()
           AnkleAfterObst(2) = m_soleToAnkle;
 
 
-          //position left foot in front of the obstacle to world frame coordinates
+          //position left foot in front of the obstacle
+          //to world frame coordinates
           Foot_P = m_ObstaclePosition + m_ObstacleRot*AnkleBeforeObst;
 
 
           TempCOMState(0) = AnkleBeforeObst(0)+ DoubleSupportCOMPosFactor *
             StepOverStepLenght;
           TempCOMState(1) =
-            0.0; //suppose the preview control sets Y coordinate in the middel of the dubbel support
+            0.0;
+          //suppose the preview control sets Y coordinate
+          // in the middle of the double support
           TempCOMState(2) = StepOverCOMHeight;
 
           //to worldframe
@@ -471,7 +492,8 @@ void StepOverPlanner::DoubleSupportFeasibility()
           aCOMState.z[0] = TempCOMState(2);
 
           aCOMState.yaw[0] = -
-            m_WaistRotationStepOver;//m_ObstacleParameters.theta + OrientationHipToObstacle;
+            m_WaistRotationStepOver;
+          //m_ObstacleParameters.theta + OrientationHipToObstacle;
 
 
           c = cos(aCOMState.yaw[0]*M_PI/180.0);
@@ -499,7 +521,9 @@ void StepOverPlanner::DoubleSupportFeasibility()
 
           c = cos(m_ObstacleParameters.theta*M_PI/180.0);
           s = sin(m_ObstacleParameters.theta*M_PI/180.0);
-          co = cos(0.0*M_PI/180.0);  //at the moment the feet stand flat on the ground when in double support phase
+          co = cos(0.0*M_PI/180.0);
+          //at the moment the feet stand flat on 
+          // the ground when in double support phase
           so = sin(0.0*M_PI/180.0);
 
           Foot_R(0,0) = c*co;
@@ -570,7 +594,10 @@ void StepOverPlanner::DoubleSupportFeasibility()
 
 
 
-          ///TO DO a check on all the maximum values for the angles after the inverse kinematics....or implement a check in the inverskinematics claas itself...at this moments there is only a protection against knee overstretch built in
+          ///TO DO a check on all the maximum values for the angles 
+          //after the inverse kinematics....or implement a check in the
+          // inverskinematics claas itself...at this moments there is only a
+          // protection against knee overstretch built in
           if (!((LeftLegAngles(3)<m_KneeAngleBound)
                 ||(RightLegAngles(3)<m_KneeAngleBound)))
             {
@@ -581,8 +608,10 @@ void StepOverPlanner::DoubleSupportFeasibility()
 
               WaistRot = Body_R;
 
-              //check collision : for the leg in front of the obstacle only lines (points 1, 2, 3, 4) on the shin
-              //                 for the leg behind the obstacle only lines (point 5, 6, 7) on the calf
+              // check collision : for the leg in front of the obstacle
+              // only lines (points 1, 2, 3, 4) on the shin
+              // for the leg behind the obstacle only lines
+              // (point 5, 6, 7) on the calf
               CollisionStatus = 0;
               FinalCollisionStatus = 0;
 
@@ -593,25 +622,32 @@ void StepOverPlanner::DoubleSupportFeasibility()
                   PointOnLeg[0] = m_LegLayoutPoint(0,k);
                   PointOnLeg[1] = m_LegLayoutPoint(1,k);
                   PointOnLeg[2] = m_LegLayoutPoint(2,k);
-                  //            MAL_MATRIX_C_eq_EXTRACT_A(PointOnLeg,m_LegLayoutPoint,double,0,k,3,1);
+                  //            MAL_MATRIX_C_eq_EXTRACT_A(PointOnLeg,
+                  // m_LegLayoutPoint,double,0,k,3,1);
                   ODEBUG("PointOnLeg : " << k << endl << PointOnLeg << endl );
-                  m_CollDet->CalcCoordShankLowerLegPoint(PointOnLeg,AbsCoord,
-                                                         LeftLegAngles,WaistRot,WaistPos,1);
-                  m_CollDet->WorldFrameToObstacleFrame(AbsCoord, ObstFrameCoord1);
+                  m_CollDet->CalcCoordShankLowerLegPoint
+                    (PointOnLeg,AbsCoord, LeftLegAngles,WaistRot,WaistPos,1);
+                  m_CollDet->WorldFrameToObstacleFrame
+                    (AbsCoord, ObstFrameCoord1);
                   //PointOnLeg = m_LegLayoutPoint.GetNColumns(k+1,1);
                   PointOnLeg[0] = m_LegLayoutPoint(0,k+1);
                   PointOnLeg[1] = m_LegLayoutPoint(1,k+1);
                   PointOnLeg[2] = m_LegLayoutPoint(2,k+1);
 
-                  //            MAL_MATRIX_C_eq_EXTRACT_A(PointOnLeg,m_LegLayoutPoint,double,0,k+1,3,1);
+                  //            MAL_MATRIX_C_eq_EXTRACT_A(PointOnLeg,
+                  // m_LegLayoutPoint,double,0,k+1,3,1);
                   ODEBUG("PointOnLeg : " << k+1 << endl << PointOnLeg << endl );
-                  m_CollDet->CalcCoordShankLowerLegPoint(PointOnLeg,AbsCoord,
-                                                         LeftLegAngles,WaistRot,WaistPos,1);
-                  m_CollDet->WorldFrameToObstacleFrame(AbsCoord, ObstFrameCoord2);
-                  CollisionStatus = m_CollDet->CollisionLineObstacleComplete(ObstFrameCoord1,
-                                                                             ObstFrameCoord2);
-                  //cout << "collision status for line with starting point " << k+1 << " is : " << CollisionStatus << endl;
-                  FinalCollisionStatus = FinalCollisionStatus || CollisionStatus;
+                  m_CollDet->CalcCoordShankLowerLegPoint
+                    (PointOnLeg,AbsCoord, LeftLegAngles,WaistRot,WaistPos,1);
+                  m_CollDet->WorldFrameToObstacleFrame
+                    (AbsCoord, ObstFrameCoord2);
+                  CollisionStatus =
+                    m_CollDet->CollisionLineObstacleComplete(ObstFrameCoord1,
+                                                             ObstFrameCoord2);
+                  //cout << "collision status for line with starting point "
+                  // << k+1 << " is : " << CollisionStatus << endl;
+                  FinalCollisionStatus = FinalCollisionStatus ||
+                    CollisionStatus;
                 }
               for (unsigned int k=4; k<6; k++)
                 {
@@ -620,24 +656,36 @@ void StepOverPlanner::DoubleSupportFeasibility()
                   PointOnLeg[0] = m_LegLayoutPoint(0,k);
                   PointOnLeg[1] = m_LegLayoutPoint(1,k);
                   PointOnLeg[2] = m_LegLayoutPoint(2,k);
-                  //MAL_MATRIX_C_eq_EXTRACT_A(PointOnLeg,m_LegLayoutPoint,double,0,k,3,1);
-                  m_CollDet->CalcCoordShankLowerLegPoint(PointOnLeg,AbsCoord,LeftLegAngles,
-                                                         WaistRot,WaistPos,1);
-                  m_CollDet->WorldFrameToObstacleFrame(AbsCoord, ObstFrameCoord1);
+                  //MAL_MATRIX_C_eq_EXTRACT_A(PointOnLeg,
+                  //                  m_LegLayoutPoint,double,0,k,3,1);
+                  m_CollDet->CalcCoordShankLowerLegPoint
+                    (PointOnLeg,AbsCoord,
+                     LeftLegAngles,
+                     WaistRot,WaistPos,1);
+                  m_CollDet->WorldFrameToObstacleFrame
+                    (AbsCoord,
+                     ObstFrameCoord1);
                   //PointOnLeg = m_LegLayoutPoint.GetNColumns(k+1,1);
                   PointOnLeg[0] = m_LegLayoutPoint(0,k+1);
                   PointOnLeg[1] = m_LegLayoutPoint(1,k+1);
                   PointOnLeg[2] = m_LegLayoutPoint(2,k+1);
 
-                  //MAL_MATRIX_C_eq_EXTRACT_A(PointOnLeg,m_LegLayoutPoint,double,0,k+1,3,1);
+                  //MAL_MATRIX_C_eq_EXTRACT_A(PointOnLeg,m_LegLayoutPoint,
+                  // double,0,k+1,3,1);
                   ODEBUG("PointOnLeg : " << k+1 << endl << PointOnLeg << endl );
-                  m_CollDet->CalcCoordShankLowerLegPoint(PointOnLeg,AbsCoord,LeftLegAngles,
-                                                         WaistRot,WaistPos,1);
-                  m_CollDet->WorldFrameToObstacleFrame(AbsCoord, ObstFrameCoord2);
-                  CollisionStatus = m_CollDet->CollisionLineObstacleComplete(ObstFrameCoord1,
-                                                                             ObstFrameCoord2);
-                  //cout << "collision status for line with starting point " << k+1 << " is : " << CollisionStatus << endl;
-                  FinalCollisionStatus = FinalCollisionStatus || CollisionStatus;
+                  m_CollDet->CalcCoordShankLowerLegPoint
+                    (PointOnLeg,AbsCoord,LeftLegAngles,
+                     WaistRot,WaistPos,1);
+                  m_CollDet->
+                    WorldFrameToObstacleFrame(AbsCoord, ObstFrameCoord2);
+                  CollisionStatus = m_CollDet->
+                    CollisionLineObstacleComplete
+                    (ObstFrameCoord1,
+                     ObstFrameCoord2);
+                  //cout << "collision status for line with starting point "
+                  // << k+1 << " is : " << CollisionStatus << endl;
+                  FinalCollisionStatus = FinalCollisionStatus ||
+                    CollisionStatus;
                 }
             }
           //cout << "FinalCollisionStatus is " << FinalCollisionStatus << endl;
@@ -649,17 +697,22 @@ void StepOverPlanner::DoubleSupportFeasibility()
         {
           m_StepOverStepLenght = StepOverStepLenght;
           m_StepOverHipHeight = StepOverCOMHeight;
-          //cout << "feasibility selected StepOverStepLenght : " << StepOverStepLenght << " and StepOverCOMHeight : " << StepOverCOMHeight << endl;
-          //   cout << "while the nominal steplength is : " << m_nominalStepLenght << " and the nominal COMHeight is " << m_NominalCOMStepHeight << endl;;
+          //cout << "feasibility selected StepOverStepLenght : " <<
+          // StepOverStepLenght << " and StepOverCOMHeight : "
+          // << StepOverCOMHeight << endl;
+          //   cout << "while the nominal steplength is : "
+          // << m_nominalStepLenght << " and the nominal COMHeight is "
+          // << m_NominalCOMStepHeight << endl;;
           break;
         }
     }
 }
 
-void StepOverPlanner::PolyPlanner(deque<COMState> &aCOMBuffer,
-                                  deque<FootAbsolutePosition> & aLeftFootBuffer,
-                                  deque<FootAbsolutePosition> & aRightFootBuffer,
-                                  deque<ZMPPosition> & aZMPPositions)
+void StepOverPlanner::PolyPlanner
+(deque<COMState> &aCOMBuffer,
+ deque<FootAbsolutePosition> & aLeftFootBuffer,
+ deque<FootAbsolutePosition> & aRightFootBuffer,
+ deque<ZMPPosition> & aZMPPositions)
 {
   m_RightFootBuffer = aRightFootBuffer;
   m_LeftFootBuffer = aLeftFootBuffer;
@@ -694,11 +747,13 @@ void StepOverPlanner::PolyPlanner(deque<COMState> &aCOMBuffer,
       if ((std::fabs((double)m_LeftFootBuffer[u].stepType)==13)&
           (m_EndPrevStepOver==0))
         m_EndPrevStepOver = u;
-      if ((std::fabs((double)m_LeftFootBuffer[u].stepType)==3)&(m_StartStepOver==0))
+      if ((std::fabs((double)m_LeftFootBuffer[u].stepType)==3)&
+          (m_StartStepOver==0))
         m_StartStepOver = u;
       if ((m_LeftFootBuffer[u].stepType==14)&(m_StartDoubleSupp==0))
         m_StartDoubleSupp = u;
-      if ((std::fabs((double)m_LeftFootBuffer[u].stepType)==4)&(m_StartSecondStep==0))
+      if ((std::fabs((double)m_LeftFootBuffer[u].stepType)==4)&
+          (m_StartSecondStep==0))
         m_StartSecondStep = u;
       if ((m_LeftFootBuffer[u].stepType==15)&(m_EndStepOver==0))
         m_EndStepOver = u;
@@ -825,19 +880,22 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition>
 
   //m_ModulationSupportCoefficient=0.8;// MOET ERGENS ANDERS GEDEFINIEERD WORDEN
 
-  //for now it is only in the 2D and with the obstacle perpendicular to absolute x direction
+  //for now it is only in the 2D and with the obstacle
+  //perpendicular to absolute x direction
 
   Point1X = StepLenght-m_heelToAnkle-m_ObstacleParameters.d-xOffset
     -m_tipToAnkle*cos(Omega1*M_PI/180.0);
   Point1Y = 0.00;
   Point1Z = m_ObstacleParameters.h-m_tipToAnkle*sin(Omega1*M_PI/180.0);
 
-  Point2X = StepLenght-m_heelToAnkle+xOffset+m_heelToAnkle*cos(Omega2*M_PI/180.0);
+  Point2X = StepLenght-m_heelToAnkle+xOffset+
+    m_heelToAnkle*cos(Omega2*M_PI/180.0);
   Point2Y = 0.00;
   Point2Z = m_ObstacleParameters.h-m_tipToAnkle*sin(Omega2*M_PI/180.0);
 
   Point3Z= Point1Z
-    +0.04;// m_ObstacleParameters.h+zOffset+0.04+m_tipToAnkle*sin(Omega2*M_PI/180.0);
+    +0.04;
+  // m_ObstacleParameters.h+zOffset+0.04+m_tipToAnkle*sin(Omega2*M_PI/180.0);
 
 
   vector<double> aTimeDistr,aTimeDistrModulated;
@@ -853,7 +911,9 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition>
   aTimeDistr[2]=StepTime;
 
 
-  //this time schedule is used for the X and Y coordinate of the foot in order to make sure the foot lifts the ground (Z) before moving the X and Y direction
+  // this time schedule is used for the X and Y coordinate of the foot in order
+  // to make sure the foot lifts the ground (Z) before moving
+  // the X and Y direction
 
   aTimeDistrModulated.resize(3);
 
@@ -901,18 +961,20 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition>
 
   for (int i=1; i<=NumberIntermediate; i++)
     {
-      SpeedWeightZ[i-1] = (EndSpeedZ-PreviousSpeedZ)*((double (i-1)/(double (
-                                                                             NumberIntermediate))))+PreviousSpeedZ;
+      SpeedWeightZ[i-1] = (EndSpeedZ-PreviousSpeedZ)*
+        ((double (i-1)/
+          (double (NumberIntermediate))))+PreviousSpeedZ;
       //      cout << "SpeedWeightZ[i-1]" << SpeedWeightZ[i-1] << endl;
       SpeedAccZ = SpeedAccZ + SpeedWeightZ[i-1];
     }
   for (int i=1; i<=NumberIntermediate; i++)
     {
-      IntermediateZAcc = IntermediateZAcc + (Point3Z-Point1Z)*SpeedWeightZ[i
-                                                                           -1]/SpeedAccZ;
+      IntermediateZAcc = IntermediateZAcc + (Point3Z-Point1Z)*
+        SpeedWeightZ[i-1]/SpeedAccZ;
       ZfootPos(Counter+i) =  IntermediateZAcc + ZfootPos(Counter);
 
-      TimeIntervalsZ(Counter+i) = TimeIntervalsZ(Counter)+i*IntermediateTimeStep;
+      TimeIntervalsZ(Counter+i) =
+        TimeIntervalsZ(Counter)+i*IntermediateTimeStep;
       CounterTemp = i;
     }
 
@@ -927,21 +989,24 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition>
 
   for (int i=1; i<=NumberIntermediate; i++)
     {
-      SpeedWeightZ[i-1] = (EndSpeedZ-PreviousSpeedZ)*((double (i-1)/(double (
-                                                                             NumberIntermediate))))+PreviousSpeedZ;
+      SpeedWeightZ[i-1] = (EndSpeedZ-PreviousSpeedZ)*
+        ((double (i-1)/
+          (double (NumberIntermediate))))+PreviousSpeedZ;
       SpeedAccZ = SpeedAccZ + SpeedWeightZ[i-1];
     }
   for (int i=1; i<=NumberIntermediate; i++)
     {
-      IntermediateZAcc = IntermediateZAcc + (Point2Z-Point3Z)*SpeedWeightZ[i
-                                                                           -1]/SpeedAccZ;
+      IntermediateZAcc = IntermediateZAcc +
+        (Point2Z-Point3Z)*SpeedWeightZ[i-1]/SpeedAccZ;
       ZfootPos(Counter+i) =  IntermediateZAcc + ZfootPos(Counter);
 
-      TimeIntervalsZ(Counter+i) = TimeIntervalsZ(Counter)+i*IntermediateTimeStep;
+      TimeIntervalsZ(Counter+i) =
+        TimeIntervalsZ(Counter)+i*IntermediateTimeStep;
       CounterTemp = i;
     }
 
-  //going down from point2Z to the ground with smooth velocity profile at touch down
+  //going down from point2Z to the ground with smooth velocity profile
+  //at touch down
 
   IntermediateTimeStep = (aTimeDistr[2]-aTimeDistr[1])/(NumberIntermediate);
 
@@ -956,17 +1021,19 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition>
 
   for (int i=1; i<=NumberIntermediate; i++)
     {
-      SpeedWeightZ[i-1] = (EndSpeedZ-PreviousSpeedZ)*pow((double (i-1)/(double (
-                                                                                NumberIntermediate))),1)+PreviousSpeedZ;
+      SpeedWeightZ[i-1] = (EndSpeedZ-PreviousSpeedZ)*
+        pow((double (i-1)/(double (NumberIntermediate))),1)+PreviousSpeedZ;
       SpeedAccZ = SpeedAccZ + SpeedWeightZ[i-1];
     }
 
   for (int i=1; i<=NumberIntermediate; i++)
     {
-      IntermediateZAcc = IntermediateZAcc + (-Point2Z)*SpeedWeightZ[i-1]/SpeedAccZ;
+      IntermediateZAcc = IntermediateZAcc + (-Point2Z)*SpeedWeightZ[i-1]/
+        SpeedAccZ;
       ZfootPos(Counter+i) =  IntermediateZAcc + ZfootPos(Counter);
 
-      TimeIntervalsZ(Counter+i) = TimeIntervalsZ(Counter)+i*IntermediateTimeStep;
+      TimeIntervalsZ(Counter+i) = TimeIntervalsZ(Counter)+
+        i*IntermediateTimeStep;
 
     }
 
@@ -1029,11 +1096,10 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition>
   OmegaImpactfootSpeedBound(0)=0.0;
   OmegaImpactfootSpeedBound(1)=0.0;
 
-  m_ClampedCubicSplineStepOverFootOmegaImpact->SetParameters(OmegaImpactfootPos,
-                                                             TimeIntervalsOmegaImpact,
-                                                             OmegaImpactfootSpeedBound);
-
-
+  m_ClampedCubicSplineStepOverFootOmegaImpact->
+    SetParameters(OmegaImpactfootPos,
+                  TimeIntervalsOmegaImpact,
+                  OmegaImpactfootSpeedBound);
 
   vector<double> aTimeDistrModulatedYSide;
   Eigen::Matrix<double,5,1> aBoundCondYSide;
@@ -1105,28 +1171,39 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition>
         {
           aStepOverFootBuffer[i+aStart].x=aStepOverFootBuffer[i+aStart-1].x;
           aStepOverFootBuffer[i+aStart].y=aStepOverFootBuffer[i+aStart-1].y;
-          aStepOverFootBuffer[i+aStart].theta=aStepOverFootBuffer[i+aStart-1].theta;
+          aStepOverFootBuffer[i+aStart].theta=
+            aStepOverFootBuffer[i+aStart-1].theta;
           aStepOverFootBuffer[i+aStart].omega=
-            m_ClampedCubicSplineStepOverFootOmegaImpact->GetValueSpline(
-                                                                        TimeIntervalsOmegaImpact,
-                                                                        LocalTime-TouchDownTime)+aStepOverFootBuffer[aStart].omega;
+            m_ClampedCubicSplineStepOverFootOmegaImpact->
+            GetValueSpline
+            (TimeIntervalsOmegaImpact,
+             LocalTime-TouchDownTime)
+            +aStepOverFootBuffer[aStart].omega;
         }
       else
         {
           aStepOverFootBuffer[i+aStart].x =
-            m_ClampedCubicSplineStepOverFootX->GetValueSpline(TimeIntervalsX,
-                                                              LocalTime-LiftOffTime)+aStepOverFootBuffer[aStart].x;
+            m_ClampedCubicSplineStepOverFootX->
+            GetValueSpline
+            (TimeIntervalsX,
+             LocalTime-LiftOffTime)+aStepOverFootBuffer[aStart].x;
           aStepOverFootBuffer[i+aStart].y =
-            m_ClampedCubicSplineStepOverFootY->GetValueSpline(TimeIntervalsY,
-                                                              LocalTime-LiftOffTime)+aStepOverFootBuffer[aStart].y;
+            m_ClampedCubicSplineStepOverFootY->
+            GetValueSpline
+            (TimeIntervalsY,
+             LocalTime-LiftOffTime)+aStepOverFootBuffer[aStart].y;
           aStepOverFootBuffer[i+aStart].omega=
-            m_ClampedCubicSplineStepOverFootOmega->GetValueSpline(TimeIntervalsOmega,
-                                                                  LocalTime-LiftOffTime)+aStepOverFootBuffer[aStart].omega;
+            m_ClampedCubicSplineStepOverFootOmega->
+            GetValueSpline
+            (TimeIntervalsOmega,
+             LocalTime-LiftOffTime)+aStepOverFootBuffer[aStart].omega;
           aStepOverFootBuffer[i+aStart].theta=aStepOverFootBuffer[aStart].theta;
         }
       aStepOverFootBuffer[i+aStart].z =
-        m_ClampedCubicSplineStepOverFootZ->GetValueSpline(TimeIntervalsZ,
-                                                          LocalTime)+aStepOverFootBuffer[aStart].z;
+        m_ClampedCubicSplineStepOverFootZ->
+        GetValueSpline
+        (TimeIntervalsZ,
+         LocalTime)+aStepOverFootBuffer[aStart].z;
     }
 
 }
@@ -1164,10 +1241,12 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition>
   Point1Y = 0.0;
   Point1Z = m_ObstacleParameters.h+m_tipToAnkle*sin(Omega1*M_PI/180.0);
 
-  Point2X = m_StepOverStepLenght-m_heelToAnkle+xOffset+m_heelToAnkle*cos(
-                                                                         Omega2*M_PI/180.0);
+  Point2X = m_StepOverStepLenght-
+    m_heelToAnkle+xOffset+m_heelToAnkle*
+    cos(Omega2*M_PI/180.0);
   Point2Y = 0.0;
-  Point2Z = Point1Z;// m_ObstacleParameters.h+0.04;//-m_tipToAnkle*sin(Omega2*M_PI/180.0);
+  Point2Z = Point1Z;
+  // m_ObstacleParameters.h+0.04;//-m_tipToAnkle*sin(Omega2*M_PI/180.0);
 
   vector<double> aTimeDistr,aTimeDistrModulated;
   double ModulatedStepTime = StepTime * m_ModulationSupportCoefficient;
@@ -1181,7 +1260,9 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition>
   aTimeDistr[1]=m_TimeDistrFactor[3]*StepTime/5.0;
   aTimeDistr[2]=StepTime;
 
-  //this time schedule is used for the X and Y coordinate of the foot in order to make sure the foot lifts the ground (Z) before moving the X and Y direction
+  // this time schedule is used for the X and Y coordinate of the foot in
+  // order to make sure the foot lifts the ground (Z) before
+  // moving the X and Y direction
 
   aTimeDistrModulated.resize(3);
 
@@ -1225,8 +1306,10 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition>
   TimeIntervalsZ(1+Counter+1) = aTimeDistr[1];
   TimeIntervalsZ(1+Counter+2) = aTimeDistr[2];
 
-  m_ClampedCubicSplineStepOverFootZ->SetParameters(ZfootPos,TimeIntervalsZ,
-                                                   ZfootSpeedBound);
+  m_ClampedCubicSplineStepOverFootZ->
+    SetParameters
+    (ZfootPos,TimeIntervalsZ,
+     ZfootSpeedBound);
 
   Eigen::Matrix<double,4,1> XfootPos;
   Eigen::Matrix<double,4,1> TimeIntervalsX;
@@ -1242,7 +1325,8 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition>
   XfootPos.resize(4+NumberIntermediate);
   TimeIntervalsX.resize(4+NumberIntermediate);
 
-  //Use of speed to weight the extra points for the last interval on X to prevent overshoot of the spline on X
+  // Use of speed to weight the extra points for
+  // the last interval on X to prevent overshoot of the spline on X
   double PreviousSpeedX,EndSpeedX,SpeedAccX;
   vector<double> SpeedWeightX;
 
@@ -1269,7 +1353,8 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition>
 
   for (int i=1; i<=NumberIntermediate; i++)
     {
-      XfootPos(2+i) = XfootPos(2+i-1)+(StepLenght-Point2X)*SpeedWeightX[i]/SpeedAccX;
+      XfootPos(2+i) = XfootPos(2+i-1)+
+        (StepLenght-Point2X)*SpeedWeightX[i]/SpeedAccX;
       TimeIntervalsX(2+i) = aTimeDistrModulated[1]+i*IntermediateTimeStep;
       Counter = i;
     }
@@ -1326,8 +1411,8 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition>
     TimeIntervalsOmega(2) = aTimeDistrModulated[1];
     TimeIntervalsOmega(3) = aTimeDistrModulated[2];
   */
-  m_ClampedCubicSplineStepOverFootOmega->SetParameters(OmegafootPos,
-                                                       TimeIntervalsOmega,OmegafootSpeedBound);
+  m_ClampedCubicSplineStepOverFootOmega->
+    SetParameters(OmegafootPos,TimeIntervalsOmega,OmegafootSpeedBound);
 
   Eigen::Matrix<double,2,1> OmegaImpactfootPos;
   Eigen::Matrix<double,2,1> TimeIntervalsOmegaImpact;
@@ -1342,10 +1427,10 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition>
   OmegaImpactfootSpeedBound(0)=0.0;
   OmegaImpactfootSpeedBound(1)=0.0;
 
-  m_ClampedCubicSplineStepOverFootOmegaImpact->SetParameters(OmegaImpactfootPos,
-                                                             TimeIntervalsOmegaImpact,
-                                                             OmegaImpactfootSpeedBound);
-
+  m_ClampedCubicSplineStepOverFootOmegaImpact->
+    SetParameters(OmegaImpactfootPos,
+                  TimeIntervalsOmegaImpact,
+                  OmegaImpactfootSpeedBound);
 
   Eigen::Matrix<double,4,1> YfootPos;
   Eigen::Matrix<double,4,1> TimeIntervalsY;
@@ -1366,8 +1451,9 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition>
   YfootSpeedBound(0)=0.0;
   YfootSpeedBound(1)=0.0;
 
-  m_ClampedCubicSplineStepOverFootY->SetParameters(YfootPos,TimeIntervalsY,
-                                                   YfootSpeedBound);
+  m_ClampedCubicSplineStepOverFootY->
+    SetParameters(YfootPos,TimeIntervalsY,
+                  YfootSpeedBound);
 
   //update the footbuffers with the new calculated polynomials for stepping over
   unsigned int diff = m_EndStepOver-m_StartSecondStep;
@@ -1389,33 +1475,40 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition>
         {
           aStepOverFootBuffer[i+aStart].x=aStepOverFootBuffer[i+aStart-1].x;
           aStepOverFootBuffer[i+aStart].y=aStepOverFootBuffer[i+aStart-1].y;
-          aStepOverFootBuffer[i+aStart].theta=aStepOverFootBuffer[i+aStart-1].theta;
+          aStepOverFootBuffer[i+aStart].theta=
+            aStepOverFootBuffer[i+aStart-1].theta;
           aStepOverFootBuffer[i+aStart].omega=
-            m_ClampedCubicSplineStepOverFootOmegaImpact->GetValueSpline(
-                                                                        TimeIntervalsOmegaImpact,
-                                                                        LocalTime-TouchDownTime)+
+            m_ClampedCubicSplineStepOverFootOmegaImpact->
+            GetValueSpline
+            (TimeIntervalsOmegaImpact,LocalTime-TouchDownTime)+
             aStepOverFootBuffer[aStart].omega;
         }
       else
         {
           aStepOverFootBuffer[i+aStart].x =
-            m_ClampedCubicSplineStepOverFootX->GetValueSpline(TimeIntervalsX,
-                                                              LocalTime-LiftOffTime)
+            m_ClampedCubicSplineStepOverFootX->
+            GetValueSpline(TimeIntervalsX,
+                           LocalTime-LiftOffTime)
             +aStepOverFootBuffer[aStart].x;
           aStepOverFootBuffer[i+aStart].y =
-            m_ClampedCubicSplineStepOverFootY->GetValueSpline(TimeIntervalsY,
-                                                              LocalTime-LiftOffTime)
+            m_ClampedCubicSplineStepOverFootY->
+            GetValueSpline(TimeIntervalsY,
+                           LocalTime-LiftOffTime)
             +aStepOverFootBuffer[aStart].y;
           /* aStepOverFootBuffer[i+aStart].y=
-             m_PolynomeStepOverY->Compute(LocalTime-LiftOffTime)+aStepOverFootBuffer[aStart].y; */
+             m_PolynomeStepOverY->Compute(LocalTime-LiftOffTime)
+             +aStepOverFootBuffer[aStart].y; */
           aStepOverFootBuffer[i+aStart].omega=
-            m_ClampedCubicSplineStepOverFootOmega->GetValueSpline(TimeIntervalsOmega,
-                                                                  LocalTime-LiftOffTime)
+            m_ClampedCubicSplineStepOverFootOmega->
+            GetValueSpline
+            (TimeIntervalsOmega,
+             LocalTime-LiftOffTime)
             +aStepOverFootBuffer[aStart].omega;
           aStepOverFootBuffer[i+aStart].theta=aStepOverFootBuffer[aStart].theta;
         }
       aStepOverFootBuffer[i+aStart].z =
-        m_ClampedCubicSplineStepOverFootZ->GetValueSpline(TimeIntervalsZ,LocalTime)
+        m_ClampedCubicSplineStepOverFootZ->
+        GetValueSpline(TimeIntervalsZ,LocalTime)
         +aStepOverFootBuffer[aStart].z;
     }
 
@@ -1433,8 +1526,9 @@ void StepOverPlanner::PolyPlannerHip()
 
   StepTime = m_LeftFootBuffer[m_EndPrevStepOver].time
     -m_LeftFootBuffer[m_StartPrevStepOver].time;
-  //StepTime = m_LeftFootBuffer[m_StartDoubleSupp].time-m_LeftFootBuffer[m_StartStepOver].time;
-  //we take foot buffer since this contains the time course
+  // StepTime = m_LeftFootBuffer[m_StartDoubleSupp].time-
+  // m_LeftFootBuffer[m_StartStepOver].time;
+  // we take foot buffer since this contains the time course
   HeightDifference =m_StepOverHipHeight-m_COMBuffer[m_StartPrevStepOver].z[0];
 
   vector<double> aTimeDistr;
@@ -1448,15 +1542,10 @@ void StepOverPlanner::PolyPlannerHip()
   aTimeDistr.resize(1);
   aTimeDistr[0]=diff*m_SamplingPeriod;
 
-
-
-
-
   aBoundCond(0)=0.0;
   aBoundCond(1)=0.0;
   aBoundCond(2)=HeightDifference;
   aBoundCond(3)=0.0;
-
 
   m_PolynomeStepOverHipStep2->SetParameters(aBoundCond,aTimeDistr);
 
@@ -1472,19 +1561,21 @@ void StepOverPlanner::PolyPlannerHip()
     {
       LocalTime=(i)*m_SamplingPeriod;
       {
-        m_COMBuffer[i+aStart].z[0]=m_PolynomeStepOverHipStep2->Compute(
-                                                                       LocalTime)+m_COMBuffer[aStart].z[0];
+        m_COMBuffer[i+aStart].z[0]=
+          m_PolynomeStepOverHipStep2->
+          Compute(LocalTime)+m_COMBuffer[aStart].z[0];
 
-        m_COMBuffer[i+aStart].z[1]=(m_COMBuffer[i+aStart].z[0]-m_COMBuffer[i+aStart
-                                                                           -1].z[0])/m_SamplingPeriod;
-        m_COMBuffer[i+aStart].z[2]=(m_COMBuffer[i+aStart].z[1]-m_COMBuffer[i+aStart
-                                                                           -1].z[1])/m_SamplingPeriod;
+        m_COMBuffer[i+aStart].z[1]=
+          (m_COMBuffer[i+aStart].z[0]-
+           m_COMBuffer[i+aStart-1].z[0])/m_SamplingPeriod;
+        m_COMBuffer[i+aStart].z[2]=
+          (m_COMBuffer[i+aStart].z[1]-
+           m_COMBuffer[i+aStart-1].z[1])/m_SamplingPeriod;
 
         m_COMBuffer[i+aStart].yaw[0]=
-          m_PolynomeStepOverHipRotation->Compute(LocalTime)+m_COMBuffer[aStart].yaw[0];
+          m_PolynomeStepOverHipRotation->
+          Compute(LocalTime)+m_COMBuffer[aStart].yaw[0];
       }
-
-
     }
 
 
@@ -1496,10 +1587,13 @@ void StepOverPlanner::PolyPlannerHip()
     {
       m_COMBuffer[i+aStart].z[0]=m_COMBuffer[i+aStart-1].z[0];
 
-      m_COMBuffer[i+aStart].z[1]=(m_COMBuffer[i+aStart].z[0]-m_COMBuffer[i+aStart
-                                                                         -1].z[0])/m_SamplingPeriod;
-      m_COMBuffer[i+aStart].z[2]=(m_COMBuffer[i+aStart].z[1]-m_COMBuffer[i+aStart
-                                                                         -1].z[1])/m_SamplingPeriod;
+      m_COMBuffer[i+aStart].z[1]=
+        (m_COMBuffer[i+aStart].z[0]-
+         m_COMBuffer[i+aStart-1].z[0])
+        /m_SamplingPeriod;
+      m_COMBuffer[i+aStart].z[2]=
+        (m_COMBuffer[i+aStart].z[1]-m_COMBuffer[i+aStart-1].z[1])
+        /m_SamplingPeriod;
 
       m_COMBuffer[i+aStart].yaw[0]=m_COMBuffer[i+aStart-1].yaw[0];
     }
@@ -1533,25 +1627,31 @@ void StepOverPlanner::PolyPlannerHip()
     {
       LocalTime=(i)*m_SamplingPeriod;
       {
-        m_COMBuffer[i+aStart].z[0]=m_PolynomeStepOverHipStep2->Compute(
-                                                                       LocalTime)+m_COMBuffer[aStart].z[0];
+        m_COMBuffer[i+aStart].z[0]=
+          m_PolynomeStepOverHipStep2->Compute(LocalTime)
+          +m_COMBuffer[aStart].z[0];
 
-        m_COMBuffer[i+aStart].z[1]=(m_COMBuffer[i+aStart].z[0]-m_COMBuffer[i+aStart
-                                                                           -1].z[0])/m_SamplingPeriod;
-        m_COMBuffer[i+aStart].z[2]=(m_COMBuffer[i+aStart].z[1]-m_COMBuffer[i+aStart
-                                                                           -1].z[1])/m_SamplingPeriod;
+        m_COMBuffer[i+aStart].z[1]=
+          (m_COMBuffer[i+aStart].z[0]-m_COMBuffer[i+aStart-1].z[0])
+          /m_SamplingPeriod;
+        m_COMBuffer[i+aStart].z[2]=
+          (m_COMBuffer[i+aStart].z[1]-m_COMBuffer[i+aStart-1].z[1])
+          /m_SamplingPeriod;
 
-        m_COMBuffer[i+aStart].yaw[0]=m_PolynomeStepOverHipRotation->Compute(
-                                                                            LocalTime)+m_COMBuffer[aStart].yaw[0];
+        m_COMBuffer[i+aStart].yaw[0]=
+          m_PolynomeStepOverHipRotation->
+          Compute(LocalTime)+m_COMBuffer[aStart].yaw[0];
       }
     }
 
 }
 
 
-void StepOverPlanner::SetExtraBuffer(deque<COMState> aExtraCOMBuffer,
-                                     deque<FootAbsolutePosition> aExtraRightFootBuffer,
-                                     deque<FootAbsolutePosition> aExtraLeftFootBuffer)
+void StepOverPlanner::
+SetExtraBuffer
+(deque<COMState> aExtraCOMBuffer,
+ deque<FootAbsolutePosition> aExtraRightFootBuffer,
+ deque<FootAbsolutePosition> aExtraLeftFootBuffer)
 {
   m_ExtraCOMBuffer=aExtraCOMBuffer;
   m_ExtraRightFootBuffer = aExtraRightFootBuffer;
@@ -1560,41 +1660,50 @@ void StepOverPlanner::SetExtraBuffer(deque<COMState> aExtraCOMBuffer,
 
 
 
-void StepOverPlanner::GetExtraBuffer(deque<COMState> &aExtraCOMBuffer,
-                                     deque<FootAbsolutePosition> &aExtraRightFootBuffer,
-                                     deque<FootAbsolutePosition> &aExtraLeftFootBuffer)
+void StepOverPlanner::
+GetExtraBuffer
+(deque<COMState> &aExtraCOMBuffer,
+ deque<FootAbsolutePosition> &aExtraRightFootBuffer,
+ deque<FootAbsolutePosition> &aExtraLeftFootBuffer)
 {
   aExtraCOMBuffer = m_ExtraCOMBuffer;
   aExtraRightFootBuffer = m_ExtraRightFootBuffer;
   aExtraLeftFootBuffer = m_ExtraLeftFootBuffer;
 }
 
-void StepOverPlanner::SetFootBuffers(deque<FootAbsolutePosition>
-                                     aLeftFootBuffer,
-                                     deque<FootAbsolutePosition> aRightFootBuffer)
+void StepOverPlanner::
+SetFootBuffers
+(deque<FootAbsolutePosition>
+ aLeftFootBuffer,
+ deque<FootAbsolutePosition> aRightFootBuffer)
 {
   m_RightFootBuffer = aRightFootBuffer;
   m_LeftFootBuffer = aLeftFootBuffer;
 }
 
-void StepOverPlanner::GetFootBuffers(deque<FootAbsolutePosition> &
-                                     aRightFootBuffer,
-                                     deque<FootAbsolutePosition> & aLeftFootBuffer)
+void StepOverPlanner::
+GetFootBuffers
+(deque<FootAbsolutePosition> &
+ aRightFootBuffer,
+ deque<FootAbsolutePosition> & aLeftFootBuffer)
 {
   aRightFootBuffer = m_RightFootBuffer;
   aLeftFootBuffer = m_LeftFootBuffer;
 }
 
-void StepOverPlanner::SetObstacleInformation(ObstaclePar ObstacleParameters)
+void StepOverPlanner::
+SetObstacleInformation
+(ObstaclePar ObstacleParameters)
 {
 
-  //add safety boundaries to the obstacle , the safety bounderies at the moment are chosen
-  //but they can vary in the fuuter in function of the vision information uncertainty
+  // add safety boundaries to the obstacle ,
+  // the safety bounderies at the moment are chosen
+  // but they can vary in the fuuter in function
+  // of the vision information uncertainty
 
   double safeBoundWidth=0.03;
   double safeBoundHeight=0.03;
   double safeBoundDepth=0.03;
-
 
   ObstacleParameters.h+=safeBoundHeight;
   ObstacleParameters.w+=2.0*safeBoundWidth;
@@ -1603,8 +1712,6 @@ void StepOverPlanner::SetObstacleInformation(ObstaclePar ObstacleParameters)
 
   //m_obstacles is visible and requered in the rest of the class
   m_ObstacleParameters = ObstacleParameters;
-
-
 
   m_ObstaclePosition(0) = m_ObstacleParameters.x;
   m_ObstaclePosition(1) = m_ObstacleParameters.y;
@@ -1615,9 +1722,8 @@ void StepOverPlanner::SetObstacleInformation(ObstaclePar ObstacleParameters)
   c = cos(m_ObstacleParameters.theta*M_PI/180.0);
   s = sin(m_ObstacleParameters.theta*M_PI/180.0);
 
-
-
-  //this matrix transformes coordinates in the obstacle frame into the world frame
+  // this matrix transformes coordinates in the obstacle
+  // frame into the world frame
   m_ObstacleRot(0,0) = c;
   m_ObstacleRot(0,1) =-s;
   m_ObstacleRot(0,2) = 0;
@@ -1628,7 +1734,8 @@ void StepOverPlanner::SetObstacleInformation(ObstaclePar ObstacleParameters)
   m_ObstacleRot(2,1) = 0;
   m_ObstacleRot(2,2) = 1;
 
-  //this matrix transformes coordinates in the world frame into the obstacle frame
+  // this matrix transformes coordinates in the world
+  // frame into the obstacle frame
   m_ObstacleRotInv(0,0) = c;
   m_ObstacleRotInv(0,1) = s;
   m_ObstacleRotInv(0,2) = 0;
@@ -1681,17 +1788,17 @@ void StepOverPlanner::TimeDistributeFactor(vector<double> &TimeDistrFactor)
 
 }
 
-void StepOverPlanner::SetDeltaStepOverCOMHeightMax(double
-                                                   aDeltaStepOverCOMHeightMax)
+void StepOverPlanner::SetDeltaStepOverCOMHeightMax
+(double aDeltaStepOverCOMHeightMax)
 {
-
   m_DeltaStepOverCOMHeightMax = aDeltaStepOverCOMHeightMax;
 }
 
 
-void StepOverPlanner::CreateBufferFirstPreview(deque<COMState> &m_COMBuffer,
-                                               deque<ZMPPosition> &m_ZMPBuffer,
-                                               deque<ZMPPosition> &m_ZMPRefBuffer)
+void StepOverPlanner::CreateBufferFirstPreview
+(deque<COMState> &m_COMBuffer,
+ deque<ZMPPosition> &m_ZMPBuffer,
+ deque<ZMPPosition> &m_ZMPRefBuffer)
 {
   deque<ZMPPosition> aFIFOZMPRefPositions;
   Eigen::MatrixXd aPC1x;
@@ -1848,7 +1955,8 @@ void StepOverPlanner::m_SetObstacleParameters(istringstream &strm)
         }
       else
         {
-          cout << "Not enough inputs for completion of obstacle information structure!" <<
+          cout << "Not enough inputs for completion of "
+               << "obstacle information structure!" <<
             endl;
           break;
         }

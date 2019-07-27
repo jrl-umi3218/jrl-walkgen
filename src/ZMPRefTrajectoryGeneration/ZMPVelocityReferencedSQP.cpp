@@ -569,18 +569,6 @@ OnLine(double time,
           FinalLeftFootTraj_deq [i] = LeftFootTraj_deq_ctrl_ [i] ;
           FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i] ;
         }
-      //    if(outputPreviewDuration_==m_SamplingPeriod)
-      //    {
-      //      dynamicFilter_->InverseKinematics(initCOM_,initLeftFoot_,initRightFoot_,
-      //                                        m_CurrentConfiguration_,
-      //                                        m_CurrentVelocity_,
-      //                                        m_CurrentAcceleration_,
-      //                                        m_SamplingPeriod,2,20);
-      //      dynamicFilter_->getComAndFootRealization()
-      //          ->SetPreviousConfigurationStage1(m_CurrentConfiguration_);
-      //      dynamicFilter_->getComAndFootRealization()
-      //          ->SetPreviousVelocityStage1(m_CurrentVelocity_);
-      //    }
       dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
                                    LeftFootTraj_deq_,
                                    RightFootTraj_deq_,
@@ -647,9 +635,11 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
                                + CurrentIndexUpperBound_,itCOM_);
       ZMPTraj_deq_ctrl_.resize(CurrentIndex_ + previewSize_ * NbSampleControl_
                                + CurrentIndexUpperBound_,initZMP_);
-      LeftFootTraj_deq_ctrl_.resize(CurrentIndex_ + previewSize_ * NbSampleControl_
+      LeftFootTraj_deq_ctrl_.resize(CurrentIndex_ + previewSize_ *
+                                    NbSampleControl_
                                     + CurrentIndexUpperBound_,initLeftFoot_);
-      RightFootTraj_deq_ctrl_.resize(CurrentIndex_ + previewSize_ * NbSampleControl_
+      RightFootTraj_deq_ctrl_.resize(CurrentIndex_ + previewSize_ *
+                                     NbSampleControl_
                                      + CurrentIndexUpperBound_,initRightFoot_);
     }
 
@@ -742,14 +732,15 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   return ;
 }
 
-void ZMPVelocityReferencedSQP::CoMZMPInterpolation(
-                                                   std::vector<double> & JerkX,           // INPUT
-                                                   std::vector<double> & JerkY,           // INPUT
-                                                   LinearizedInvertedPendulum2D * LIPM, // INPUT/OUTPUT
-                                                   const unsigned,        // INPUT
-                                                   const int IterationNumber,           // INPUT
-                                                   const unsigned int currentIndex,     // INPUT
-                                                   const std::deque<support_state_t> & SupportStates_deq )// INPUT
+void ZMPVelocityReferencedSQP::
+CoMZMPInterpolation
+(std::vector<double> & JerkX,           // INPUT
+ std::vector<double> & JerkY,           // INPUT
+ LinearizedInvertedPendulum2D * LIPM, // INPUT/OUTPUT
+ const unsigned,        // INPUT
+ const int IterationNumber,           // INPUT
+ const unsigned int currentIndex,     // INPUT
+ const std::deque<support_state_t> & SupportStates_deq )// INPUT
 {
   if(SupportStates_deq[0].Phase==DS && SupportStates_deq[0].NbStepsLeft == 0)
     {

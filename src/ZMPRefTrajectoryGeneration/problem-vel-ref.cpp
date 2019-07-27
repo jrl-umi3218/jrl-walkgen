@@ -105,7 +105,8 @@ void ProblemVelRef_s::AllocateMemory()
 
 
   Q=new double[4*(m_QP_N+m_stepNumber)*(m_QP_N
-                                        +m_stepNumber)];  //Quadratic part of the objective function
+                                        +m_stepNumber)];
+  //Quadratic part of the objective function
   D=new double[2*(m_QP_N
                   +m_stepNumber)];   // Linear part of the objective function
   XL=new double[2*(m_QP_N+m_stepNumber)];  // Lower bound of the jerk.

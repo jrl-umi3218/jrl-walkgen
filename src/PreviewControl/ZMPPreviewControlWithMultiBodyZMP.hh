@@ -206,20 +206,25 @@ namespace PatternGeneratorJRL
     /*! \name Implementation of the GlobalStrategyManager interface.
       @{ */
     /*! Set the algorithm used for ZMP and CoM trajectory.
-      @param[in] anAlgo: The algorithm to be used for ZMP and CoM trajectory generation.
+      @param[in] anAlgo: 
+      The algorithm to be used for ZMP and CoM trajectory generation.
       They are 3 possible values:
 
       \li ZMPCOM_TRAJECTORY_FULL: Two preview control are computed. The first
-      to generate a CoM trajectory based on the cart model. The second to correct
+      to generate a CoM trajectory based on the cart model. 
+      The second to correct
       this trajectory using the multibody ZMP.
 
       \li ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY: Only the second stage is used.
       The first CoM trajectory is used by a different process. This allow
-      to mix different algorithms (notable the quadratic problem with constraints).
+      to mix different algorithms (notable the quadratic problem with 
+      constraints).
 
-      \li ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY: Use only the first stage to generate
-      the CoM trajectory. It is strongly adviced in this case, to not use
-      the geometrical ZMP and CoM trajectory generation but an external CoM task.
+      \li ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY: Use only the first stage 
+      to generate the CoM trajectory. 
+      It is strongly adviced in this case, to not use
+      the geometrical ZMP and CoM trajectory generation but an external 
+      CoM task.
 
       @return Returns false if this is not possible.
     */
@@ -230,25 +235,32 @@ namespace PatternGeneratorJRL
     int GetStrategyForStageActivation();
 
     /*! @} */
-    /*! Returns the difference between the Waist and the CoM for a starting position. */
+    /*! Returns the difference between the Waist and the CoM 
+      for a starting position. */
     void GetDifferenceBetweenComAndWaist(double lComAndWaist[3]);
 
     /*! Perform a 5 ms step to generate the full set of angular positions.
       The main point of the preview control is to use the future to compute
       the current state needed for the robot. Therefore knowing that
-      the future window needed is of size NL=SamplingPeriod * PreviewControlWindow,
+      the future window needed is of size NL=SamplingPeriod * 
+      PreviewControlWindow,
       and that the algorithm is a two stages preview control,
       the foot position needs to be provided at k+NL, and the ZMP references
       at k+2*NL.
 
       @param[in] LeftFootPosition: The position of the k+NL Left Foot position.
-      @param[in] RightFootPosition: The position of the k+NL Right Foot position.
+      @param[in] RightFootPosition: The position of the k+NL 
+      Right Foot position.
       @param[in] NewZMPRefPos: The ZMP position at k + 2*NL.
-      @param[out] finalCOMState: returns position, velocity and acceleration of the CoM
+      @param[out] finalCOMState: returns position, velocity and acceleration of
+      the CoM
       after the second stage of control, i.e. the final value.
-      @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
-      @param[out] CurrentVelocity: The results is a state vector containing the speed.
-      @param[out] CurrentAcceleration: The results is a state vector containing the acceleration.
+      @param[out] CurrentConfiguration: The results is a state vector 
+      containing the articular positions.
+      @param[out] CurrentVelocity: The results is a state vector containing the
+      speed.
+      @param[out] CurrentAcceleration: The results is a state vector containing
+      the acceleration.
     */
     int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
                                FootAbsolutePosition &RightFootPosition,
@@ -265,7 +277,8 @@ namespace PatternGeneratorJRL
       aCOMState will be updated with the new value of the COM computed by
       the card model.
       @param[in] LeftFootPosition: The position of the k+NL Left Foot position.
-      @param[in] RightFootPosition: The position of the k+NL Right Foot position.
+      @param[in] RightFootPosition: The position of the k+NL 
+      Right Foot position.
       @param[in] afCOMState: A COM position of reference, in this context,
       this will be the height of the waist.
 
@@ -296,14 +309,18 @@ namespace PatternGeneratorJRL
     int SecondStageOfControl(COMState &refandfinal);
 
     /*! Compute the COM of the robot with the Joint values given in BodyAngles,
-      velocities set to zero, and returns the values of the COM in aStaringCOMState.
+      velocities set to zero, and returns the values of the COM in 
+      aStaringCOMState.
       Assuming that the waist is at (0,0,0)
       it returns the associate initial values for the left and right foot.
-      @param[in] BodyAngles: 4x4 matrix of the robot's root (most of the time, the waist)
+      @param[in] BodyAngles: 4x4 matrix of the robot's root (most of the time,
+      the waist)
       pose (position + orientation).
-      @param[out] aStartingCOMState: Returns the 3D position of the CoM for the current
+      @param[out] aStartingCOMState: Returns the 3D position of the CoM for the
+      current
       position of the robot.
-      @param[out] aStartingZMPPosition: Returns the 3D position of the ZMP for the current
+      @param[out] aStartingZMPPosition: Returns the 3D position of the ZMP for
+      the current
       position of the robot.
       @param[out] InitLeftFootPosition: Returns the position of the left foot in
       the waist coordinates frame.
@@ -318,15 +335,17 @@ namespace PatternGeneratorJRL
                               FootAbsolutePosition & InitRightFootPosition);
 
     /*! Compute the COM of the robot with the Joint values given in BodyAngles,
-      velocities set to zero, and returns the values of the COM in aStaringCOMState.
+      velocities set to zero, and returns the values of the COM in 
+      aStaringCOMState.
       Assuming that the waist is at (0,0,0)
       it returns the associate initial values for the left and right foot.
       @param BodyAngles: Vector of the joint values for the robot.
       @param[out] aStartingCOMState: Position of the CoM.
       @param[out] aWaistPosition: Position of the Waist.
-      @param[out] InitLeftFootPosition: Position of the left foot in the waist coordinates frame.
-      @param[out] InitRightFootPosition: Position of the right foot in the waist coordinates
-      frame.
+      @param[out] InitLeftFootPosition: Position of the left foot in the
+      waist coordinates frame.
+      @param[out] InitRightFootPosition: Position of the right foot in the
+      waist coordinates frame.
     */
     int EvaluateStartingCoM(Eigen::MatrixXd  BodyAngles,
                             Eigen::Vector3d & aStartingCOMState,
@@ -339,7 +358,8 @@ namespace PatternGeneratorJRL
       @{
     */
 
-    /*! Setup (Frontal Global), compute internally all the steps to get NL ZMP multibody values.
+    /*! Setup (Frontal Global), compute internally all the steps to get 
+      NL ZMP multibody values.
 
       @param[in] ZMPRefPositions: FIFO of the ZMP reference values.
       @param[out] COMStates: FIFO of the COM reference positions
@@ -355,8 +375,9 @@ namespace PatternGeneratorJRL
               deque<FootAbsolutePosition> &LeftFootPositions,
               deque<FootAbsolutePosition> &RightFootPositions);
 
-    /*! Method to perform the First Phase. It initializes properly the internal fields
-      of ZMPPreviewControlWithMultiBodyZMP for the setup phase.
+    /*! Method to perform the First Phase. It initializes properly 
+      the internal fields of ZMPPreviewControlWithMultiBodyZMP 
+      for the setup phase.
 
       @param[in] ZMPRefPositions: FIFO of the ZMP reference values.
       @param[in] COMStates: FIFO of the COM reference positions
@@ -386,11 +407,14 @@ namespace PatternGeneratorJRL
       trajectories).
       @param[in] RightFootPositions: idem than the previous one but for the
       right foot.
-      @param[out] CurrentConfiguration: The position part of the state vector realizing the current CoM and
+      @param[out] CurrentConfiguration: The position part of the state vector
+      realizing the current CoM and
       feet position instance.
-      @param[out] CurrentVelocity: The velocity part of the state vector realizing the current CoM and
+      @param[out] CurrentVelocity: The velocity part of the state vector 
+      realizing the current CoM and
       feet position instance.
-      @param[out] CurrentAcceleration: The acceleration part of the state vector realizing the current CoM and
+      @param[out] CurrentAcceleration: The acceleration part of the state 
+      vector realizing the current CoM and
       feet position instance.
       @param[in] localindex: Value of the index which goes from 0 to 2 * m_NL.
     */
@@ -408,7 +432,8 @@ namespace PatternGeneratorJRL
       used by the stepover planner.
 
       @param[out] ExtraCOMBuffer: Extra FIFO for the CoM positions.
-      @param[out] ExtraZMPBuffer: Extra FIFO for the ZMP positions (for the stepping over
+      @param[out] ExtraZMPBuffer: Extra FIFO for the ZMP positions 
+      (for the stepping over
       first preview control).
       @param[out] ExtraZMPRefBuffer: Extra FIFO for the ZMP ref positions.
     */
@@ -419,8 +444,8 @@ namespace PatternGeneratorJRL
     /*! Evaluate Starting CoM for a given position.
       @param[in] BodyAnglesInit: The state vector used to compute the CoM.
       @param[out] aStartingCOMState: The CoM of the position specified.
-      @param[out] InitLeftFootPosition: Position of the InitLeftFootPosition in the same
-      reference frame than the waist.
+      @param[out] InitLeftFootPosition: Position of the InitLeftFootPosition 
+      in the same reference frame than the waist.
       @param[out] InitRightFootPosition: Position of the InitRightFootPosition
       in the same reference frame than the waist
     */
@@ -430,18 +455,22 @@ namespace PatternGeneratorJRL
                             FootAbsolutePosition & InitLeftFootPosition,
                             FootAbsolutePosition & InitRightFootPosition);
 
-    /*! This method returns the final COM pose matrix after the second stage of control.
-      @return A 4x4 matrix of double which includes the desired final CoM position and orientation.*/
+    /*! This method returns the final COM pose matrix after the second 
+      stage of control.
+      @return A 4x4 matrix of double which includes the desired final 
+      CoM position and orientation.*/
     Eigen::Matrix4d GetFinalDesiredCOMPose();
 
     /*! This method returns the current waist position in the COM reference
       frame. This can be used with the previous method to get the final Waist
       position.
-      @return A 4x4 matrix of double which includes the desired final Waist in the CoM
+      @return A 4x4 matrix of double which includes the desired final 
+      Waist in the CoM
       phase position and orientation.*/
     Eigen::Matrix4d GetCurrentPositionofWaistInCOMFrame();
 
-    /*! Returns the last element of the COM FIFO in the first stage of control */
+    /*! Returns the last element of the COM FIFO in the first stage of 
+      control */
     COMState GetLastCOMFromFirstStage();
 
     /*! Update the queue of ZMP reference value. */
@@ -463,13 +492,17 @@ namespace PatternGeneratorJRL
       and the feet positions will be used.
       @param[in] acomp : COM position,
       @param[in] aLeftFAP: Pose of the left foot (3D position + 2 euler angles)
-      @param[in] aRightFAP: Pose of the right foot (3D position + 2 euler angles)
-      @param[out] CurrentConfiguration: Returns the part of state vector corresponding
+      @param[in] aRightFAP: Pose of the right foot (3D position + 2 euler 
+      angles)
+      @param[out] CurrentConfiguration: Returns the part of state vector
+      corresponding
       to the position of the free floating, and the articular values.
-      @param[out] CurrentVelocity: Returns the part of state vector corresponding
-      to the velocity of the free floating and the articular values.
-      @param[out] CurrentAcceleration: Returns the part of state vector corresponding
-      to the acceleration of the free floating, and the articular values.
+      @param[out] CurrentVelocity: Returns the part of state vector 
+      corresponding to the velocity of the free floating and the 
+      articular values.
+      @param[out] CurrentAcceleration: Returns the part of state vector 
+      corresponding to the acceleration of the free floating, 
+      and the articular values.
       @param[in] IterationNumber: Number of time slot realized so far.
       @param[in] StageOfTheAlgorithm: Indicates if this is the second stage of
       the preview control or the first one.
@@ -488,8 +521,8 @@ namespace PatternGeneratorJRL
     void SetPreviewControl(PreviewControl *aPC);
 
     /*! \name Setter and getter for the jrlHumanoidDynamicRobot object. */
-    /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic parameters
-      of the robot. */
+    /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic
+      parameters of the robot. */
     inline  bool setPinocchioRobot(PinocchioRobot *aPinocchioRobot)
     {
       m_PinocchioRobot = aPinocchioRobot;

@@ -148,8 +148,9 @@ namespace PatternGeneratorJRL
                                       std::vector<double> &lW);
 
     /*! \brief Set the starting point and the height variation. */
-    void SetStartingTimeIntervalsAndHeightVariation(std::vector<double> &lDeltaTj,
-                                                    std::vector<double> &lomegaj);
+    void SetStartingTimeIntervalsAndHeightVariation
+    (std::vector<double> &lDeltaTj,
+     std::vector<double> &lomegaj);
 
     /*! \brief Set the degree of each polynomials for the CoG
       Remark: the size of the vector of degrees should match the number
@@ -159,7 +160,8 @@ namespace PatternGeneratorJRL
 
     /*! \brief Get the degree of each polynomials for the CoG.
      */
-    void GetPolynomialDegrees(std::vector<unsigned int> &lPolynomialDegree) const;
+    void GetPolynomialDegrees
+    (std::vector<unsigned int> &lPolynomialDegree) const;
 
     /*! \brief Set the number of Intervals for this
       trajectory. */
@@ -187,23 +189,26 @@ namespace PatternGeneratorJRL
     */
     bool GetFromListOfZMPPolynomials(unsigned int j, Polynome * & aPoly ) const;
 
-    /*! \brief Transfert the coefficients from the COG trajectory to the ZMP for all intervals.
+    /*! \brief Transfert the coefficients from the COG trajectory 
+      to the ZMP for all intervals.
       @param lCOMZ: Profile of the height CoM for each interval.
       @param lZMPZ: Profile of the height ZMP for each interval.
     */
-    void TransfertCoefficientsFromCOGTrajectoryToZMPOne(std::vector<double> &lCOMZ,
-                                                        std::vector<double> &lZMPZ);
+    void TransfertCoefficientsFromCOGTrajectoryToZMPOne
+    (std::vector<double> &lCOMZ,
+     std::vector<double> &lZMPZ);
 
     /*! \brief Transfert the coefficients from the COG trajectory to the ZMP.
       @param IntervalIndex: Number of the interval.
       @param lCOMZ: Value of the CoM height for this interval.
       @param lZMPZ: Value of the ZMP height for this interval.
     */
-    void TransfertOneIntervalCoefficientsFromCOGTrajectoryToZMPOne(
-                                                                   unsigned int IntervalIndex,
-                                                                   double &lCOMZ,
-                                                                   double &lZMPZ);
-
+    void TransfertOneIntervalCoefficientsFromCOGTrajectoryToZMPOne
+    (
+     unsigned int IntervalIndex,
+     double &lCOMZ,
+     double &lZMPZ);
+    
 
     /*! Build the coefficients of a third order COG polynomial according
       to  the OmegaC and the value of the ZMP at the beginning and the end
@@ -214,7 +219,8 @@ namespace PatternGeneratorJRL
 
     /*@} */
 
-    /*! \brief Returns the maximal fluctuation for the first segment of this trajectory. */
+    /*! \brief Returns the maximal fluctuation for the first segment of this
+      trajectory. */
     double FluctuationMaximal();
 
     friend std::ostream& operator <<(std::ostream &os,
@@ -237,7 +243,8 @@ namespace PatternGeneratorJRL
 
     /*! \brief Get the index of the interval according to the time,
       and the previous value of the interval. */
-    bool GetIntervalIndexFromTime(double t, unsigned int &j, unsigned int &prev_j);
+    bool GetIntervalIndexFromTime(double t, unsigned int &j,
+                                  unsigned int &prev_j);
 
   protected:
 

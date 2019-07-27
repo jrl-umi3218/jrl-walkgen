@@ -175,12 +175,13 @@ NMPCgenerator::~NMPCgenerator()
     }
 }
 
-void NMPCgenerator::initNMPCgenerator(
-                                      bool useLineSearch,
-                                      support_state_t & currentSupport,
-                                      COMState &lStartingCOMState,
-                                      reference_t &local_vel_ref,
-                                      unsigned N, unsigned nf, double T, double T_step)
+void NMPCgenerator::
+initNMPCgenerator
+(bool useLineSearch,
+ support_state_t & currentSupport,
+ COMState &lStartingCOMState,
+ reference_t &local_vel_ref,
+ unsigned N, unsigned nf, double T, double T_step)
 {
   N_ = N ;
   nf_ = nf ;
@@ -417,11 +418,16 @@ void NMPCgenerator::updateConstraint()
 
   // Global Jacobian for all constraints
   // Constraints
-  // qp_lbJ_ = (qp_lbJ_cop_  ) < qp_J_ * X = (qp_J_cop_  ) * X < qp_ubJ_ = (qp_ubJ_cop_  )
-  //           (qp_lbJ_foot_ ) <             (qp_J_foot_ )     <           (qp_ubJ_foot_ )
-  //           (qp_lbJ_vel_  ) <             (qp_J_vel_  )     <           (qp_ubJ_vel_  )
-  //           (qp_lbJ_obs_  ) <             (qp_J_obs_  )     <           (qp_ubJ_obs_  )
-  //           (qp_lbJ_theta_) <             (qp_J_theta_)     <           (qp_ubJ_theta_)
+  // qp_lbJ_ = (qp_lbJ_cop_  ) < qp_J_ * X = (qp_J_cop_  ) * X < qp_ubJ_ =
+  // (qp_ubJ_cop_  )
+  //           (qp_lbJ_foot_ ) <             (qp_J_foot_ )     <
+  // (qp_ubJ_foot_ )
+  //           (qp_lbJ_vel_  ) <             (qp_J_vel_  )     <
+  // (qp_ubJ_vel_  )
+  //           (qp_lbJ_obs_  ) <             (qp_J_obs_  )     <
+  // (qp_ubJ_obs_  )
+  //           (qp_lbJ_theta_) <             (qp_J_theta_)     <        
+  // (qp_ubJ_theta_)
   //
   //  Jacobians
   // qp_J_cop_ = (Acop_xy_  , Acop_theta_ )
@@ -576,11 +582,13 @@ void NMPCgenerator::evalConstraint(Eigen::VectorXd & U)
   return ;
 }
 
-void NMPCgenerator::updateInitialCondition(double time,
-                                           FootAbsolutePosition & currentLeftFootAbsolutePosition,
-                                           FootAbsolutePosition & currentRightFootAbsolutePosition,
-                                           COMState & currentCOMState,
-                                           reference_t & local_vel_ref)
+void NMPCgenerator::
+updateInitialCondition
+(double time,
+ FootAbsolutePosition & currentLeftFootAbsolutePosition,
+ FootAbsolutePosition & currentRightFootAbsolutePosition,
+ COMState & currentCOMState,
+ reference_t & local_vel_ref)
 {
   time_ = time ;
 
@@ -1087,9 +1095,10 @@ getSolution
     }
 }
 
-void NMPCgenerator::updateCurrentSupport(double time,
-                                         FootAbsolutePosition &FinalLeftFoot,
-                                         FootAbsolutePosition &FinalRightFoot)
+void NMPCgenerator::updateCurrentSupport
+(double time,
+ FootAbsolutePosition &FinalLeftFoot,
+ FootAbsolutePosition &FinalRightFoot)
 {
 #ifdef DEBUG_COUT
   cout << "previous support : \n"
@@ -1122,9 +1131,10 @@ void NMPCgenerator::updateCurrentSupport(double time,
     }
 }
 
-void NMPCgenerator::updateSupportdeque(double time,
-                                       FootAbsolutePosition &FinalLeftFoot,
-                                       FootAbsolutePosition &FinalRightFoot)
+void NMPCgenerator::updateSupportdeque
+(double time,
+ FootAbsolutePosition &FinalLeftFoot,
+ FootAbsolutePosition &FinalRightFoot)
 {
   SupportStates_deq_[0] = currentSupport_ ;
   const FootAbsolutePosition * FAP = NULL;
@@ -1521,8 +1531,10 @@ void NMPCgenerator::updateCoPconstraint(Eigen::VectorXd &U)
     {
       for(unsigned j=0 ; j<Acop_theta_.cols() ; ++j)
         {
-          Acop_theta_(i,j) = derv_Acop_map2_(i,
-                                             j) * Acop_theta_dummy1_(i); // warning this is the real jacobian
+          Acop_theta_(i,j) =
+            derv_Acop_map2_(i,
+                            j) *
+            Acop_theta_dummy1_(i); // warning this is the real jacobian
           //Acop_theta_(i,j) = 0.0 ; // WARNING this is not the real jacobian !
         }
     }
@@ -1664,7 +1676,8 @@ void NMPCgenerator::updateFootPoseConstraint(Eigen::VectorXd &U)
 
   //  if( desiredNextSupportFootRelativePosition.size()!=0 )
   //  {
-  //    unsigned nbFoot = std::min(desiredNextSupportFootRelativePosition.size(),nf_);
+  //    unsigned nbFoot =
+  // std::min(desiredNextSupportFootRelativePosition.size(),nf_);
   //    ignoreFirstStep = nbFoot ;
   //  }
 
@@ -1722,7 +1735,8 @@ void NMPCgenerator::updateFootPoseConstraint(Eigen::VectorXd &U)
       if(n!=0)
         {
           deltaF_[n](0)=U(N_+n)-U(N_+n-1) ;//F_kp1_x_[n]-F_kp1_x_[n-1];
-          deltaF_[n](1)=U(2*N_+nf_+n)-U(2*N_+nf_+n-1) ;//F_kp1_y_[n]-F_kp1_y_[n-1];
+          deltaF_[n](1)=U(2*N_+nf_+n)-U(2*N_+nf_+n-1) ;
+          //F_kp1_y_[n]-F_kp1_y_[n-1];
           AdRdF_[n] = A0f_theta_[n]*deltaF_[n];
           double sum = 0.0 ;
           for (unsigned j=0 ; j<n_vertices_ ; ++j)
@@ -1732,8 +1746,10 @@ void NMPCgenerator::updateFootPoseConstraint(Eigen::VectorXd &U)
           for (unsigned j=0 ; j<n_vertices_ ; ++j)
             {
               //Afoot_theta_[n](j,n-1) = sum;
-              Afoot_theta_[n](j,n-1) = AdRdF_[n](j); // This is the real jacobian!
-              //Afoot_theta_[n](j,n-1) = 0.0; // WARNING this is not the real jacobian!
+              Afoot_theta_[n](j,n-1) = AdRdF_[n](j);
+              // This is the real jacobian!
+              //Afoot_theta_[n](j,n-1) = 0.0;
+              // WARNING this is not the real jacobian!
             }
           for(unsigned i=0 ; i<n_vertices_ ; ++i)
             for(unsigned j=0 ; j<nf_ ; ++j)
@@ -2172,8 +2188,10 @@ void NMPCgenerator::initializeCostFunction()
   // are computed in the update function
 
   // p_xy_ =  ( p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ )
-  // p_theta_ = ( 0.5 * a * (-2) * [ f_k_theta+T_step*dTheta^ref  f_k_theta+2*T_step*dTheta^ref ] )
-  // Those are time dependant matrices so they are computed in the update function
+  // p_theta_ = ( 0.5 * a * (-2) * [ f_k_theta+T_step*dTheta^ref
+  // f_k_theta+2*T_step*dTheta^ref ] )
+  // Those are time dependant matrices so they are computed in
+  // the update function
 }
 
 void NMPCgenerator::updateCostFunction()
@@ -2314,7 +2332,8 @@ void NMPCgenerator::updateCostFunction()
   for(unsigned i=0 ; i<nf_ ; ++i)
     p_(index+i) = p_xy_Fy_(i) ;
   index+=nf_;
-  // p_theta_ = ( 0.5 * a * [ f_k_theta+T_step*dTheta^ref  f_k_theta+2*T_step*dTheta^ref ] )
+  // p_theta_ = ( 0.5 * a * [ f_k_theta+T_step*dTheta^ref
+  // f_k_theta+2*T_step*dTheta^ref ] )
   for(unsigned i=0 ; i<nf_ ; ++i)
     p_(index+i) = - alpha_theta_ * ( currentSupport_.Yaw +
                                      (i+1) * T_step_* vel_ref_.Global.Yaw )

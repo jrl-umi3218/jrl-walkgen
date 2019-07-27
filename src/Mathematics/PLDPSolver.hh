@@ -39,7 +39,8 @@ namespace Optimization
 {
   namespace Solver
   {
-    /*! This class implements a two stage strategy to solve the following optimal problem:
+    /*! This class implements a two stage strategy to solve the 
+      following optimal problem:
      */
     class PLDPSolver
     {

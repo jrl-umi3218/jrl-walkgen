@@ -23,7 +23,8 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file mpc-trajectory-generation.cpp
-   \brief Abstract object for trajectory generation via model predictive control.*/
+   \brief Abstract object for trajectory generation via model 
+   predictive control.*/
 
 #ifndef _TRAJ_GEN_H_
 #define _TRAJ_GEN_H_
@@ -38,7 +39,8 @@
 namespace PatternGeneratorJRL
 {
 
-  /*! This class defines an abstract interface to generate low-dimensional walking trajectories (CoM/CdP/Feet).
+  /*! This class defines an abstract interface to generate 
+    low-dimensional walking trajectories (CoM/CdP/Feet).
    */
   class  MPCTrajectoryGeneration : public SimplePlugin
   {
@@ -83,7 +85,8 @@ namespace PatternGeneratorJRL
 
     /// \name Members related to the generation of feet trajectories.
     /// @{
-    /// \brief ModulationSupportCoefficient coeeficient to wait a little before foot is of the ground
+    /// \brief ModulationSupportCoefficient coeeficient to wait
+    /// a little before foot is of the ground
     double ModulationSupportCoefficient_;
 
     /// \brief The foot orientation for the lift off and the landing
@@ -165,7 +168,8 @@ namespace PatternGeneratorJRL
       Tdble_ = Tdble;
     };
 
-    /// \brief Get the sampling period for the control, set to 0.005 by default. */
+    /// \brief Get the sampling period for the control, set
+    /// to 0.005 by default. */
     inline const double & SamplingPeriodControl() const
     {
       return Tctr_;

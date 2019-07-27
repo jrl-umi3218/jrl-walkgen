@@ -630,8 +630,10 @@ InitializeFromRelativeSteps
                  << LeftFootTmpFinalPos.dy << " , "
                  << LeftFootTmpFinalPos.dz << " ) " );
 
-          ODEBUG("RightFootTmpInitPos.stepType="<<RightFootTmpInitPos.stepType);
-          ODEBUG("RightFootTmpFinalPos.stepType="<<RightFootTmpFinalPos.stepType);
+          ODEBUG("RightFootTmpInitPos.stepType=" <<
+                 RightFootTmpInitPos.stepType);
+          ODEBUG("RightFootTmpFinalPos.stepType=" <<
+                 RightFootTmpFinalPos.stepType);
           ODEBUG("End of Single support phase");
           SetAnInterval(IntervalIndex,m_RightFootTrajectory,
                         RightFootTmpInitPos,
@@ -663,7 +665,8 @@ InitializeFromRelativeSteps
           /*! At this stage the phase of double support is dealt with */
           unsigned int limitk=1;
 
-          /*! If we are at the end a second double support phase has to be added. */
+          /*! If we are at the end a second double support phase 
+            has to be added. */
           if (i==RelativeFootPositions.size()-1)
             limitk=2;
 

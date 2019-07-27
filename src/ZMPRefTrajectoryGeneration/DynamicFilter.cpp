@@ -21,8 +21,8 @@ DynamicFilter::DynamicFilter(
 
   PR_ = aPR ;
 
-  comAndFootRealization_ = new ComAndFootRealizationByGeometry((
-                                                                PatternGeneratorInterfacePrivate*) SPM );
+  comAndFootRealization_ = new
+    ComAndFootRealizationByGeometry((PatternGeneratorInterfacePrivate*) SPM );
   comAndFootRealization_->setPinocchioRobot(PR_);
   comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
   comAndFootRealization_->ShiftFoot(true);
@@ -42,11 +42,10 @@ DynamicFilter::DynamicFilter(
   deltax_.resize(3,1);
   deltay_.resize(3,1);
 
-  comAndFootRealization_->SetPreviousConfigurationStage0(
-                                                         PR_->currentRPYConfiguration());
-  comAndFootRealization_->SetPreviousVelocityStage0(
-                                                    PR_->currentRPYVelocity());
-
+  comAndFootRealization_->
+    SetPreviousConfigurationStage0(PR_->currentRPYConfiguration());
+  comAndFootRealization_->
+    SetPreviousVelocityStage0(PR_->currentRPYVelocity());
 
   sxzmp_.clear();
   syzmp_.clear();
@@ -139,13 +138,14 @@ void DynamicFilter::setRobotUpperPart(const Eigen::VectorXd & configuration,
 /// \brief Initialise all objects, to be called just after the constructor
 /// the filter takes a subsampled previewWindow,
 /// interpolate it and use the kajita preview control on it
-void DynamicFilter::init(
-                         double controlPeriod,
-                         double interpolationPeriod,
-                         double controlWindowSize,
-                         double previewWindowSize,
-                         double kajitaPCwindowSize,
-                         COMState inputCoMState)
+void DynamicFilter::
+init
+(double controlPeriod,
+ double interpolationPeriod,
+ double controlWindowSize,
+ double previewWindowSize,
+ double kajitaPCwindowSize,
+ COMState inputCoMState)
 {
   controlPeriod_       = controlPeriod       ;
   interpolationPeriod_ = interpolationPeriod ;
@@ -227,15 +227,16 @@ void DynamicFilter::init(
   return ;
 }
 
-int DynamicFilter::OffLinefilter(
-                                 const deque<COMState> &inputCOMTraj_deq_,
-                                 const deque<ZMPPosition> &inputZMPTraj_deq_,
-                                 const deque<FootAbsolutePosition> &inputLeftFootTraj_deq_,
-                                 const deque<FootAbsolutePosition> &inputRightFootTraj_deq_,
-                                 const vector< Eigen::VectorXd > & UpperPart_q,
-                                 const vector< Eigen::VectorXd > & UpperPart_dq,
-                                 const vector< Eigen::VectorXd > & UpperPart_ddq,
-                                 deque<COMState> & outputDeltaCOMTraj_deq)
+int DynamicFilter::
+OffLinefilter
+( const deque<COMState> &inputCOMTraj_deq_,
+  const deque<ZMPPosition> &inputZMPTraj_deq_,
+  const deque<FootAbsolutePosition> &inputLeftFootTraj_deq_,
+  const deque<FootAbsolutePosition> &inputRightFootTraj_deq_,
+  const vector< Eigen::VectorXd > & UpperPart_q,
+  const vector< Eigen::VectorXd > & UpperPart_dq,
+  const vector< Eigen::VectorXd > & UpperPart_ddq,
+  deque<COMState> & outputDeltaCOMTraj_deq)
 {
   unsigned int N = (unsigned int)inputCOMTraj_deq_.size() ;
   deltaZMP_deq_.resize(N);
@@ -269,12 +270,13 @@ int DynamicFilter::OffLinefilter(
   return 0;
 }
 
-int DynamicFilter::OnLinefilter(
-                                const deque<COMState> & inputCOMTraj_deq_,
-                                const deque<ZMPPosition> & inputZMPTraj_deq_,
-                                const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-                                const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-                                deque<COMState> & outputDeltaCOMTraj_deq_)
+int DynamicFilter::
+OnLinefilter
+(const deque<COMState> & inputCOMTraj_deq_,
+ const deque<ZMPPosition> & inputZMPTraj_deq_,
+ const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+ const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+ deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   unsigned int N = (unsigned int)inputRightFootTraj_deq_.size() ;
   int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
@@ -291,17 +293,10 @@ int DynamicFilter::OnLinefilter(
                        stage1_,
                        //currentIteration
                        i);
-          //      cout << "DF : " ;
-          //      cout << ZMPMBAcceleration_(3) << " "
-          //           << ZMPMBAcceleration_(4) << " "
-          //           << ZMPMBAcceleration_(5) << endl ;
         }
       ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
       ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
       ZMPMB_vec_[0][2]=0.0;
-      //    ZMPMB_vec_[1][0]=inputZMPTraj_deq_[0].px;
-      //    ZMPMB_vec_[1][1]=inputZMPTraj_deq_[0].py;
-      //    ZMPMB_vec_[1][2]=0.0;
       if(false)
         {
           zmpmb_i_.resize( N1 ) ;
@@ -340,8 +335,10 @@ int DynamicFilter::OnLinefilter(
           dZMPMB_vec[N-1][1] = (ZMPMB_vec_[N-1][1]-ZMPMB_vec_[N-2][1])/inc;
           for(unsigned i=1 ; i<N-2  ; ++i)
             {
-              dZMPMB_vec[i][0] = (ZMPMB_vec_[i+1][0]-ZMPMB_vec_[i-1][0])/(2*inc);
-              dZMPMB_vec[i][1] = (ZMPMB_vec_[i+1][1]-ZMPMB_vec_[i-1][1])/(2*inc);
+              dZMPMB_vec[i][0] =
+                (ZMPMB_vec_[i+1][0]-ZMPMB_vec_[i-1][0])/(2*inc);
+              dZMPMB_vec[i][1] =
+                (ZMPMB_vec_[i+1][1]-ZMPMB_vec_[i-1][1])/(2*inc);
             }
           for(unsigned i=0 ; i<N-1  ; ++i)
             {
@@ -383,11 +380,12 @@ int DynamicFilter::OnLinefilter(
 }
 
 // #############################
-int DynamicFilter::zmpmb(
-                         Eigen::VectorXd& configuration,
-                         Eigen::VectorXd& velocity,
-                         Eigen::VectorXd& acceleration,
-                         Eigen::Vector3d & zmpmb)
+int DynamicFilter::
+zmpmb
+(Eigen::VectorXd& configuration,
+ Eigen::VectorXd& velocity,
+ Eigen::VectorXd& acceleration,
+ Eigen::Vector3d & zmpmb)
 {
   PR_->computeInverseDynamics(configuration,velocity,acceleration);
   PR_->zeroMomentumPoint(zmpmb);
@@ -395,16 +393,17 @@ int DynamicFilter::zmpmb(
 }
 
 //##################################
-void DynamicFilter::InverseKinematics(
-                                      const COMState & inputCoMState,
-                                      const FootAbsolutePosition & inputLeftFoot,
-                                      const FootAbsolutePosition & inputRightFoot,
-                                      Eigen::VectorXd& configuration,
-                                      Eigen::VectorXd& velocity,
-                                      Eigen::VectorXd& acceleration,
-                                      double samplingPeriod,
-                                      int stage,
-                                      int iteration)
+void DynamicFilter::
+InverseKinematics
+(const COMState & inputCoMState,
+ const FootAbsolutePosition & inputLeftFoot,
+ const FootAbsolutePosition & inputRightFoot,
+ Eigen::VectorXd& configuration,
+ Eigen::VectorXd& velocity,
+ Eigen::VectorXd& acceleration,
+ double samplingPeriod,
+ int stage,
+ int iteration)
 {
 
   // lower body !!!!! the angular quantities are set in degree !!!!!!
@@ -445,12 +444,13 @@ void DynamicFilter::InverseKinematics(
     << " aCoMAcc_ :" << aCoMAcc_ << std::endl;
   */
   comAndFootRealization_->setSamplingPeriod(samplingPeriod);
-  comAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(
-                                                                  aCoMState_, aCoMSpeed_, aCoMAcc_,
-                                                                  aLeftFootPosition_, aRightFootPosition_,
-                                                                  configuration, velocity, acceleration,
-                                                                  iteration, stage);
-
+  comAndFootRealization_->
+    ComputePostureForGivenCoMAndFeetPosture
+    (aCoMState_, aCoMSpeed_, aCoMAcc_,
+     aLeftFootPosition_, aRightFootPosition_,
+     configuration, velocity, acceleration,
+     iteration, stage);
+  
   //  std::cout << " configuration:" << configuration << std::endl;
   ODEBUG5SIMPLE(configuration,"/tmp/test_configuration.dat");
 
@@ -491,20 +491,24 @@ void DynamicFilter::InverseKinematics(
 
 void DynamicFilter::stage0INstage1()
 {
-  comAndFootRealization_->SetPreviousConfigurationStage1(
-                                                         comAndFootRealization_->GetPreviousConfigurationStage0());
-  comAndFootRealization_->SetPreviousVelocityStage1(
-                                                    comAndFootRealization_->GetPreviousVelocityStage0());
+  comAndFootRealization_->
+    SetPreviousConfigurationStage1
+    (comAndFootRealization_->GetPreviousConfigurationStage0());
+  comAndFootRealization_->
+    SetPreviousVelocityStage1
+    (comAndFootRealization_->GetPreviousVelocityStage0());
   return ;
 }
 
-void DynamicFilter::ComputeZMPMB(double samplingPeriod,
-                                 const COMState & inputCoMState,
-                                 const FootAbsolutePosition & inputLeftFoot,
-                                 const FootAbsolutePosition & inputRightFoot,
-                                 Eigen::Vector3d &ZMPMB,
-                                 unsigned int stage,
-                                 unsigned int iteration)
+void DynamicFilter::
+ComputeZMPMB
+(double samplingPeriod,
+ const COMState & inputCoMState,
+ const FootAbsolutePosition & inputLeftFoot,
+ const FootAbsolutePosition & inputRightFoot,
+ Eigen::Vector3d &ZMPMB,
+ unsigned int stage,
+ unsigned int iteration)
 {
   InverseKinematics( inputCoMState, inputLeftFoot, inputRightFoot,
                      ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
@@ -522,9 +526,10 @@ void DynamicFilter::ComputeZMPMB(double samplingPeriod,
   return ;
 }
 
-int DynamicFilter::OptimalControl(
-                                  deque<ZMPPosition> & inputdeltaZMP_deq,
-                                  deque<COMState> & outputDeltaCOMTraj_deq_)
+int DynamicFilter::
+OptimalControl
+( deque<ZMPPosition> & inputdeltaZMP_deq,
+  deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   assert(PC_->IsCoherent());
   std::size_t Nctrl = (int)round(controlWindowSize_/controlPeriod_) ;
@@ -583,12 +588,14 @@ int DynamicFilter::OptimalControl(
 //  // compute the speed and acceleration of the waist in the world frame
 //  if (PreviousSupportFoot_)
 //    {
-//      Jac_LF::run(robot_, prev_q_, Vector3dTpl<LocalFloatType>::Type(0,0,0), jacobian_lf_);
+//      Jac_LF::run(robot_, prev_q_, Vector3dTpl<LocalFloatType>::Type(0,0,0),
+//  jacobian_lf_);
 //      waist_speed = jacobian_lf_ * prev_dq_ ;
 //      waist_acc = jacobian_lf_ * prev_ddq_ /* + d_jacobian_lf_ * prev_dq_*/ ;
 //    }else
 //    {
-//      Jac_RF::run(robot_, prev_q_, Vector3dTpl<LocalFloatType>::Type(0,0,0), jacobian_rf_);
+//      Jac_RF::run(robot_, prev_q_, Vector3dTpl<LocalFloatType>::Type(0,0,0),
+// jacobian_rf_);
 //      waist_speed = jacobian_rf_ * prev_dq_ ;
 //      waist_acc = jacobian_rf_ * prev_ddq_ /*+ d_jacobian_rf_ * prev_dq_*/ ;
 //    }
@@ -598,7 +605,8 @@ int DynamicFilter::OptimalControl(
 //      ddq_(i,0)  = waist_acc(i,0);
 //    }
 //  // compute the position of the waist in the world frame
-//  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+//  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>
+// (robot_.nodes);
 //  waist_theta(0,0) = prev_q_(3,0) ;
 //  waist_theta(1,0) = prev_dq_(4,0) ;
 //  waist_theta(2,0) = prev_ddq_(5,0) ;
@@ -636,8 +644,10 @@ int DynamicFilter::OptimalControl(
 //  }
 //
 //  metapod::rnea< Robot_Model, true >::run(robot_2, q, dq, ddq);
-//  LankleNode & node_lankle = boost::fusion::at_c<Robot_Model::l_ankle>(robot_2.nodes);
-//  RankleNode & node_rankle = boost::fusion::at_c<Robot_Model::r_ankle>(robot_2.nodes);
+//  LankleNode & node_lankle =
+// boost::fusion::at_c<Robot_Model::l_ankle>(robot_2.nodes);
+//  RankleNode & node_rankle =
+// boost::fusion::at_c<Robot_Model::r_ankle>(robot_2.nodes);
 //
 //  CWx = node_waist.body.iX0.r()(0,0) - inputCoMState.x[0] ;
 //  CWy = node_waist.body.iX0.r()(1,0) - inputCoMState.y[0] ;
@@ -747,14 +757,16 @@ int DynamicFilter::OptimalControl(
 //  return ;
 //}
 
-void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
-                          const deque<FootAbsolutePosition> & ctrlLeftFoot,
-                          const deque<FootAbsolutePosition> & ctrlRightFoot,
-                          const deque<COMState> & inputCOMTraj_deq_,
-                          const deque<ZMPPosition> inputZMPTraj_deq_,
-                          const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-                          const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-                          const deque<COMState> & outputDeltaCOMTraj_deq_)
+void DynamicFilter::
+Debug
+(const deque<COMState> & ctrlCoMState,
+ const deque<FootAbsolutePosition> & ctrlLeftFoot,
+ const deque<FootAbsolutePosition> & ctrlRightFoot,
+ const deque<COMState> & inputCOMTraj_deq_,
+ const deque<ZMPPosition> inputZMPTraj_deq_,
+ const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+ const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+ const deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   deque<COMState> CoM_tmp = ctrlCoMState ;
   int Nctrl = (int)round(controlWindowSize_/controlPeriod_) ;
@@ -779,7 +791,8 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
       com.pitch[0] = com.pitch[0] * 180 / M_PI ;
       com.yaw[0]   = com.yaw[0]   * 180 / M_PI ;
       InverseKinematics( com, ctrlLeftFoot[i], ctrlRightFoot[i],
-                         ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
+                         ZMPMBConfiguration_, ZMPMBVelocity_,
+                         ZMPMBAcceleration_,
                          controlPeriod_, 2, 20) ;
 
       PR_->computeInverseDynamics(ZMPMBConfiguration_,
@@ -872,18 +885,26 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
       aof << inputRightFootTraj_deq_[i].dz << " " ;     // 39
       aof << inputRightFootTraj_deq_[i].ddz << " " ;    // 40
 
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[0] << " "
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/
+                                  controlPeriod_)].x[0] << " "
         ; // 41
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[1] << " "
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/
+                                  controlPeriod_)].x[1] << " "
         ; // 42
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[2] << " "
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/
+                                  controlPeriod_)].x[2] << " "
         ; // 43
 
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[0] << " "
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/
+                                  controlPeriod_)].y[0] << " "
         ; // 44
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[1] << " "
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/
+                                  controlPeriod_)].y[1]
+          << " "
         ; // 45
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[2] << " "
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/
+                                  controlPeriod_)].y[2]
+          << " "
         ; // 46
 
       //47

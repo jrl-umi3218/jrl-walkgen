@@ -431,7 +431,8 @@ interpolate_feet_positions
           FinalRightFootTraj_deq [CurrentIndex+k].ddtheta   = 0.0 ;
 
           FinalLeftFootTraj_deq[CurrentIndex+k].time =
-            FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
+            FinalRightFootTraj_deq[CurrentIndex+k].time =
+            Time+k*m_SamplingPeriod;
           FinalLeftFootTraj_deq[CurrentIndex+k].stepType =
             FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
         }
@@ -522,7 +523,8 @@ interpolate_feet_positions
                                  StepType, 1);
             }
           FinalLeftFootTraj_deq[CurrentIndex+k].time =
-            FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
+            FinalRightFootTraj_deq[CurrentIndex+k].time =
+            Time+k*m_SamplingPeriod;
         }
     }
   else if (CurrentSupport.Phase == DS ||
@@ -564,7 +566,8 @@ interpolate_feet_positions
           FinalRightFootTraj_deq [CurrentIndex+k].ddtheta   = 0.0 ;
 
           FinalLeftFootTraj_deq[CurrentIndex+k].time =
-            FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
+            FinalRightFootTraj_deq[CurrentIndex+k].time =
+            Time+k*m_SamplingPeriod;
           FinalLeftFootTraj_deq[CurrentIndex+k].stepType =
             FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
         }

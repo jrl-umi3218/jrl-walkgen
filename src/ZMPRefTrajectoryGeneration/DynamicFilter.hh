@@ -45,64 +45,67 @@ namespace PatternGeneratorJRL
                   );
     ~DynamicFilter();
     /// \brief
-    int OffLinefilter(
-                      const deque<COMState> & inputCOMTraj_deq_,
-                      const deque<ZMPPosition> & inputZMPTraj_deq_,
-                      const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-                      const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-                      const vector<Eigen::VectorXd > &UpperPart_q,
-                      const vector<Eigen::VectorXd > &UpperPart_dq,
-                      const vector<Eigen::VectorXd > &UpperPart_ddq,
-                      deque<COMState> & outputDeltaCOMTraj_deq_);
-
-    int OnLinefilter(const deque<COMState> & inputCOMTraj_deq_,
-                     const deque<ZMPPosition> & inputZMPTraj_deq_,
-                     const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-                     const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-                     deque<COMState> & outputDeltaCOMTraj_deq_);
-
-    void init(
-              double controlPeriod,
-              double interpolationPeriod,
-              double controlWindowSize,
-              double previewWindowSize,
-              double kajitaPCwindowSize,
-              COMState inputCoMState);
+    int OffLinefilter
+    (const deque<COMState> & inputCOMTraj_deq_,
+     const deque<ZMPPosition> & inputZMPTraj_deq_,
+     const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+     const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+     const vector<Eigen::VectorXd > &UpperPart_q,
+     const vector<Eigen::VectorXd > &UpperPart_dq,
+     const vector<Eigen::VectorXd > &UpperPart_ddq,
+     deque<COMState> & outputDeltaCOMTraj_deq_);
+    
+    int OnLinefilter
+    (const deque<COMState> & inputCOMTraj_deq_,
+     const deque<ZMPPosition> & inputZMPTraj_deq_,
+     const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+     const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+     deque<COMState> & outputDeltaCOMTraj_deq_);
+    
+    void init
+    (double controlPeriod,
+     double interpolationPeriod,
+     double controlWindowSize,
+     double previewWindowSize,
+     double kajitaPCwindowSize,
+     COMState inputCoMState);
 
     /// \brief atomic function
-    void InverseKinematics(
-                           const COMState & inputCoMState,
-                           const FootAbsolutePosition & inputLeftFoot,
-                           const FootAbsolutePosition & inputRightFoot,
-                           Eigen::VectorXd & configuration,
-                           Eigen::VectorXd & velocity,
-                           Eigen::VectorXd & acceleration,
-                           double samplingPeriod,
-                           int stage,
-                           int iteration);
-
+    void InverseKinematics
+    ( const COMState & inputCoMState,
+      const FootAbsolutePosition & inputLeftFoot,
+      const FootAbsolutePosition & inputRightFoot,
+      Eigen::VectorXd & configuration,
+      Eigen::VectorXd & velocity,
+      Eigen::VectorXd & acceleration,
+      double samplingPeriod,
+      int stage,
+      int iteration);
+    
     /// \brief atomic function allow to compute
-    void ComputeZMPMB(
-                      double samplingPeriod,
-                      const COMState & inputCoMState,
-                      const FootAbsolutePosition & inputLeftFoot,
-                      const FootAbsolutePosition & inputRightFoot,
-                      Eigen::Vector3d & ZMPMB,
-                      unsigned int stage,
-                      unsigned int iteration);
+    void ComputeZMPMB
+    (double samplingPeriod,
+     const COMState & inputCoMState,
+     const FootAbsolutePosition & inputLeftFoot,
+     const FootAbsolutePosition & inputRightFoot,
+     Eigen::Vector3d & ZMPMB,
+     unsigned int stage,
+     unsigned int iteration);
 
     void stage0INstage1();
 
     /// \brief Preview control on the ZMPMBs computed
-    int OptimalControl(deque<ZMPPosition> &inputdeltaZMP_deq,
-                       deque<COMState> & outputDeltaCOMTraj_deq_);
-
+    int OptimalControl
+    (deque<ZMPPosition> &inputdeltaZMP_deq,
+     deque<COMState> & outputDeltaCOMTraj_deq_);
+    
     /// \brief compute the zmpmb from articulated pos vel and acc
-    int zmpmb(Eigen::VectorXd& configuration,
-              Eigen::VectorXd& velocity,
-              Eigen::VectorXd& acceleration,
-              Eigen::Vector3d & zmpmb);
-
+    int zmpmb
+    (Eigen::VectorXd& configuration,
+     Eigen::VectorXd& velocity,
+     Eigen::VectorXd& acceleration,
+     Eigen::Vector3d & zmpmb);
+    
     void CallMethod(std::string & Method, std::istringstream &strm);
 
   private: // Private methods

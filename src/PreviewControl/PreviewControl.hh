@@ -54,9 +54,10 @@ namespace PatternGeneratorJRL
   public:
 
     /*! Constructor */
-    PreviewControl(SimplePluginManager *lSPM,
-                   unsigned int defaultMode = OptimalControllerSolver::MODE_WITH_INITIALPOS,
-                   bool computeWeightsAutomatically = false);
+    PreviewControl
+    (SimplePluginManager *lSPM,
+     unsigned int defaultMode = OptimalControllerSolver::MODE_WITH_INITIALPOS,
+     bool computeWeightsAutomatically = false);
 
     /*! Destructor */
     ~PreviewControl();
@@ -68,16 +69,18 @@ namespace PatternGeneratorJRL
 
 
     /*! \brief One iteration of the preview control. */
-    int OneIterationOfPreview(Eigen::MatrixXd &x,
-                              Eigen::MatrixXd &y,
-                              double & sxzmp, double & syzmp,
-                              deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
-                              unsigned long int lindex,
-                              double & zmpx2, double & zmpy2,
-                              bool Simulation);
+    int OneIterationOfPreview
+    (Eigen::MatrixXd &x,
+     Eigen::MatrixXd &y,
+     double & sxzmp, double & syzmp,
+     deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
+     unsigned long int lindex,
+     double & zmpx2, double & zmpy2,
+     bool Simulation);
 
 
-    /*! \brief One iteration of the preview control along one axis (using queues)*/
+    /*! \brief One iteration of the preview control 
+      along one axis (using queues)*/
     int OneIterationOfPreview1D(Eigen::MatrixXd &x,
                                 double & sxzmp,
                                 deque<double> & ZMPPositions,
@@ -85,11 +88,13 @@ namespace PatternGeneratorJRL
                                 double & zmpx2,
                                 bool Simulation);
 
-    /*! \brief One iteration of the preview control along one axis (using vectors)
+    /*! \brief One iteration of the preview control along one axis 
+      (using vectors)
       \param [in][out] x: Current state of the CoM along the axis.
       \param [in][out] sxzmp: Summed error.
       \param [in] ZMPPositions: Vector of ZMP reference positions.
-      \param [in] lindex: Starting index in the array of ZMP reference positions.
+      \param [in] lindex: Starting index in the array of ZMP reference 
+      positions.
       \param [out] zmpx2: Resulting ZMP value.
       \param [in] Simulation: This should be set to false.
     */
@@ -126,8 +131,10 @@ namespace PatternGeneratorJRL
     /*! @} */
 
     /*! \brief Compute optimal weights.
-      \param [in] mode: with initial pos (OptimalControllerSolver::MODE_WITH_INITIALPOS),
-      without initial position (OptimalControllerSolver::MODE_WITHOUT_INITIALPOS).
+      \param [in] mode: with initial pos
+      (OptimalControllerSolver::MODE_WITH_INITIALPOS),
+      without initial position (OptimalControllerSolver::
+      MODE_WITHOUT_INITIALPOS).
     */
     void ComputeOptimalWeights(unsigned int mode);
 

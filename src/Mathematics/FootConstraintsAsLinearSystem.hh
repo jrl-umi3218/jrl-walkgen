@@ -60,8 +60,10 @@ namespace PatternGeneratorJRL
     /*! Destructor */
     ~FootConstraintsAsLinearSystem();
 
-    /*! Compute the linear system \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
-      set of points specified by aVecOfPoints. aVecOfPoints is supposed to represent
+    /*! Compute the linear system \f${\bf A}{\bf x} \geq {\bf b}\f$ 
+      associated with the
+      set of points specified by aVecOfPoints. aVecOfPoints is 
+      supposed to represent
       the convex hull of the robot contact points with the ground.
     */
     int ComputeLinearSystem(std::vector<CH_Point> aVecOfPoints,
@@ -69,25 +71,28 @@ namespace PatternGeneratorJRL
                             Eigen::MatrixXd &B,
                             Eigen::VectorXd &C);
 
-    /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
-      Position.
+    /*!  Build a queue of constraint Inequalities based on a list of 
+      Foot Absolute Position.
     */
-    int BuildLinearConstraintInequalities(std::deque< FootAbsolutePosition>
-                                          &LeftFootAbsolutePositions,
-                                          std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-                                          std::deque<LinearConstraintInequality_t *> &
-                                          QueueOfLConstraintInequalities,
-                                          double ConstraintOnX,
-                                          double ConstraintOnY);
-
-    /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute Position.  */
-    int BuildLinearConstraintInequalities2(std::deque< FootAbsolutePosition>
-                                           &LeftFootAbsolutePositions,
-                                           std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-                                           std::deque<LinearConstraintInequality_t *> &
-                                           QueueOfLConstraintInequalities,
-                                           double ConstraintOnX,
-                                           double ConstraintOnY);
+    int BuildLinearConstraintInequalities
+    (std::deque< FootAbsolutePosition>
+     &LeftFootAbsolutePositions,
+     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+     std::deque<LinearConstraintInequality_t *> &
+     QueueOfLConstraintInequalities,
+     double ConstraintOnX,
+     double ConstraintOnY);
+    
+    /*!  Build a queue of constraint Inequalities based on a list 
+      of Foot Absolute Position.  */
+    int BuildLinearConstraintInequalities2
+    (std::deque< FootAbsolutePosition>
+     &LeftFootAbsolutePositions,
+     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+     std::deque<LinearConstraintInequality_t *> &
+     QueueOfLConstraintInequalities,
+     double ConstraintOnX,
+     double ConstraintOnY);
 
     /*! Find Similar Constraints */
     int FindSimilarConstraints(Eigen::MatrixXd &A,

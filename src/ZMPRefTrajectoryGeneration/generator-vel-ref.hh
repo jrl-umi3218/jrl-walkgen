@@ -70,12 +70,14 @@ namespace PatternGeneratorJRL
     /// \param[in] FinalLeftFootTraj_deq
     /// \param[in] FinalRightFootTraj_deq
     /// \param[out] SupportStates_deq
-    void preview_support_states( double Time, const SupportFSM * FSM,
-                                 const deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-                                 const deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-                                 deque<support_state_t> & SupportStates_deq );
-
-    /// \brief Set the global reference from the local one and the orientation of the trunk frame
+    void preview_support_states
+    ( double Time, const SupportFSM * FSM,
+      const deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+      const deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+      deque<support_state_t> & SupportStates_deq );
+    
+    /// \brief Set the global reference from the local one and the
+    /// orientation of the trunk frame
     /// for the whole preview window
     ///
     /// \param[in] Solution
@@ -101,7 +103,8 @@ namespace PatternGeneratorJRL
     /// \param[in] Pb
     /// \param[in] SupportStates_deq
     void update_problem( QPProblem & Pb,
-                         const std::deque<support_state_t> & SupportStates_deq );
+                         const std::deque<support_state_t> &
+                         SupportStates_deq );
 
     /// \brief Compute the initial solution vector for warm start
     ///
@@ -150,8 +153,9 @@ namespace PatternGeneratorJRL
     ///
     /// \param[out] Inequalities
     /// \param[in] SupportStates_deq
-    void build_inequalities_feet(linear_inequality_t & Inequalities,
-                                 const std::deque<support_state_t> & SupportStates_deq) const;
+    void build_inequalities_feet
+    (linear_inequality_t & Inequalities,
+     const std::deque<support_state_t> & SupportStates_deq) const;
 
     //
     // Protected methods
@@ -164,12 +168,14 @@ namespace PatternGeneratorJRL
     void generate_selection_matrices( const std::deque<support_state_t> &
                                       SupportStates_deq);
 
-    /// \brief Generate a queue of inequalities with respect to the centers of the feet
+    /// \brief Generate a queue of inequalities with respect to the centers of
+    /// the feet
     ///
     /// \param[out] Inequalities
     /// \param[in] SupportStates_deq
     void build_inequalities_cop(linear_inequality_t & Inequalities,
-                                const std::deque<support_state_t> & SupportStates_deq) const;
+                                const std::deque<support_state_t> &
+                                SupportStates_deq) const;
 
     /// \brief Generate a queue of inequality constraints on
     /// the feet positions with respect to previous foot positions
@@ -177,7 +183,8 @@ namespace PatternGeneratorJRL
     /// \param[out] Inequalities In matrix form
     /// \param[in] SupportStates_deq
     void build_inequalities_com(linear_inequality_t & Inequalities,
-                                const std::deque<support_state_t> & SupportStates_deq) const;
+                                const std::deque<support_state_t> &
+                                SupportStates_deq) const;
 
     /// \brief Compute CoP constraints corresponding to the set of inequalities
     ///
@@ -204,7 +211,8 @@ namespace PatternGeneratorJRL
     /// \param[in] CurrentSupport
     /// \param[out] Pb
     void build_constraints_com( const linear_inequality_t & IneqCoM,
-                                const support_state_t & CurrentSupport, QPProblem & Pb );
+                                const support_state_t & CurrentSupport,
+                                QPProblem & Pb );
 
     /// \brief Compute feet equality constraints from a trajectory
     ///
@@ -213,9 +221,11 @@ namespace PatternGeneratorJRL
     /// \param[out] Pb
     void build_eq_constraints_feet( const std::deque<support_state_t> &
                                     SupportStates_deq,
-                                    unsigned int NbStepsPreviewed, QPProblem & Pb );
+                                    unsigned int NbStepsPreviewed,
+                                    QPProblem & Pb );
 
-    /// \brief Compute feet equality constraints to restrain the previewed foot position
+    /// \brief Compute feet equality constraints to restrain the previewed foot
+    /// position
     /// some iteration before landing
     /// \param[in] Solution
     /// \param[out] Pb

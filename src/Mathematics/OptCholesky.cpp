@@ -59,7 +59,9 @@ void OptCholesky::SetToZero()
   if (m_NbMaxOfConstraints!=0)
     {
       if (m_L!=0)
-        for(unsigned int i=0; i<m_NbMaxOfConstraints * m_NbMaxOfConstraints; i++)
+        for(unsigned int i=0;
+            i<m_NbMaxOfConstraints * m_NbMaxOfConstraints;
+            i++)
           m_L[i]=0.0;
 
 

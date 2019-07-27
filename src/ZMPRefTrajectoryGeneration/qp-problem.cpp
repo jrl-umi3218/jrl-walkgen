@@ -277,7 +277,8 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
     case QLD:
 
       ql0001_(&m_, &me_, &mmax_, &n_, &nmax_, &mnn_,
-              Q_dense_.Array_, D_.Array_, DU_dense_.Array_, DS_.Array_, XL_.Array_,
+              Q_dense_.Array_, D_.Array_, DU_dense_.Array_,
+              DS_.Array_, XL_.Array_,
               XU_.Array_,
               X_.Array_, U_.Array_, &iout_, &ifail_, &iprint_,
               war_.Array_, &lwar_, iwar_.Array_, &liwar_, &eps_);
@@ -376,8 +377,9 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
             {
               if (tmp(i)+DS(i)<-1e-6)
                 {
-                  std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " < " << -DS(
-                                                                                                 i)  << std::endl;
+                  std::cout << "Unrespected constraint " << i
+                            << " : " << tmp(i) << " < "
+                            << -DS(i)  << std::endl;
                   ++nb_ctr;
                 }
             }
@@ -392,9 +394,6 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
              istate_, kx_, X_.Array_, Q_dense_.Array_, b_,
              &inform_, &iter_, &obj_, clamda_,
              iwar_.Array_, &liwar_, war_.Array_, &lwar_);
-
-
-
 
       lastSolution_.resize(n_);
       for(int i = 0; i < n_; i++)
@@ -440,15 +439,18 @@ QPProblem::add_term_to( qp_element_e Type, const Eigen::MatrixXd &Mat,
     {
     case MATRIX_Q:
       Array_p = &Q_;
-      NbVariables_ = (unsigned int)((col+Mat.cols()>NbVariables_) ? col+Mat.cols() :
-                                    NbVariables_);
+      NbVariables_ =
+        (unsigned int)((col+Mat.cols()>NbVariables_) ?
+                       col+Mat.cols() :
+                       NbVariables_);
       break;
 
     case MATRIX_DU:
       Array_p = &DU_;
       NbConstraints_ = (unsigned int)(( row+Mat.rows() > NbConstraints_ ) ? row
                                       +Mat.rows() : NbConstraints_);
-      NbVariables_ = (unsigned int)(( col+Mat.cols() > NbVariables_ ) ? col+Mat.cols()
+      NbVariables_ = (unsigned int)(( col+Mat.cols() > NbVariables_ ) ?
+                                    col+Mat.cols()
                                     : NbVariables_);
       row++;//The first rows of DU,DS are empty
       break;
@@ -514,25 +516,29 @@ QPProblem::add_term_to( qp_element_e Type, const Eigen::VectorXd &Vec,
     {
     case VECTOR_D:
       Array_p = &D_;
-      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() :
+      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ?
+                                    row+Vec.size() :
                                     NbVariables_);
       break;
 
     case VECTOR_XL:
       Array_p = &XL_;
-      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() :
+      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ?
+                                    row+Vec.size() :
                                     NbVariables_);
       break;
 
     case VECTOR_XU:
       Array_p = &XU_;
-      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() :
+      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ?
+                                    row+Vec.size() :
                                     NbVariables_);
       break;
 
     case VECTOR_DS:
       Array_p = &DS_;
-      NbConstraints_ = (unsigned int)((row+Vec.size()>NbConstraints_) ? row+Vec.size()
+      NbConstraints_ = (unsigned int)((row+Vec.size()>NbConstraints_) ?
+                                      row+Vec.size()
                                       : NbConstraints_);
       row++;//The first rows of DU,DS are empty
       break;

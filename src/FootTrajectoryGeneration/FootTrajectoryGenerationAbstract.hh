@@ -23,7 +23,8 @@
  */
 
 /*!\file FootTrajectoryGenerationAbstract.h
-  \brief This class determinate how it s generate all the values for the foot trajectories.
+  \brief This class determinate how it s generate all the values for the foot
+  trajectories.
 
   @ingroup foottrajectorygeneration
 */
@@ -48,7 +49,8 @@ namespace PatternGeneratorJRL
 {
 
   /** @ingroup foottrajectorygeneration
-      This class defines the abstract interface to interact with foot generation object.
+      This class defines the abstract interface to interact with 
+      foot generation object.
 
       Two parameters \f$ T_{DS} \f$ and \f$ T_{SS} \f$ defines respectively
       the double support time and the single support time.
@@ -67,8 +69,8 @@ namespace PatternGeneratorJRL
       should call InitializeInternalDataStructures() once all the internal
       parameters of the object are set.
 
-      The virtual function FreeInternalDataStructures() is used when changing some
-      parameters and by the destructor.
+      The virtual function FreeInternalDataStructures() is used when changing 
+      some parameters and by the destructor.
 
       The most important function is UpdateFootPosition() which populates a
       queue of foot absolute positions data structure.
@@ -90,36 +92,44 @@ namespace PatternGeneratorJRL
     /*! Default destructor. */
     virtual ~FootTrajectoryGenerationAbstract() {};
 
-    /*! This method computes the position of the swinging foot during single support phase,
-      and maintian a constant position for the support foot.
-      @param SupportFootAbsolutePositions: Queue of absolute position for the support foot.
-      This method will set the foot position at index CurrentAbsoluteIndex of the queue.
-      This position is supposed to be constant.
-      @param NoneSupportFootAbsolutePositions: Queue of absolute position for the swinging
-      foot. This method will set the foot position at index NoneSupportFootAbsolutePositions
+    /*! This method computes the position of the swinging foot during 
+      single support phase, and maintian a constant position 
+      for the support foot.
+      @param SupportFootAbsolutePositions: Queue of absolute position for the
+      support foot.
+      This method will set the foot position at index CurrentAbsoluteIndex 
       of the queue.
-      @param CurrentAbsoluteIndex: Index in the queues of the foot position to be set.
-      @param IndexInitial: Index in the queues which correspond to the starting point
-      of the current single support phase.
+      This position is supposed to be constant.
+      @param NoneSupportFootAbsolutePositions: Queue of absolute position 
+      for the swinging
+      foot. This method will set the foot position at index
+      NoneSupportFootAbsolutePositions
+      of the queue.
+      @param CurrentAbsoluteIndex: Index in the queues of the foot position to 
+      be set.
+      @param IndexInitial: Index in the queues which correspond to the 
+      starting point of the current single support phase.
       @param ModulatedSingleSupportTime: Amount of time where the foot is flat.
       @param StepType: Type of steps (for book-keeping).
       @param LeftOrRight: Specify if it is left (1) or right (-1).
     */
-    virtual void UpdateFootPosition(std::deque<FootAbsolutePosition>
-                                    &SupportFootAbsolutePositions,
-                                    std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
-                                    int CurrentAbsoluteIndex,
-                                    int IndexInitial,
-                                    double ModulatedSingleSupportTime,
-                                    int StepType, int LeftOrRight);
-
-    virtual void UpdateFootPosition(std::deque<FootAbsolutePosition>
-                                    &SupportFootAbsolutePositions,
-                                    std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
-                                    int StartIndex, int k,
-                                    double LocalInterpolationStartTime,
-                                    double ModulatedSingleSupportTime,
-                                    int StepType, int LeftOrRight);
+    virtual void UpdateFootPosition
+    (std::deque<FootAbsolutePosition>
+     &SupportFootAbsolutePositions,
+     std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
+     int CurrentAbsoluteIndex,
+     int IndexInitial,
+     double ModulatedSingleSupportTime,
+     int StepType, int LeftOrRight);
+    
+    virtual void UpdateFootPosition
+    (std::deque<FootAbsolutePosition>
+     &SupportFootAbsolutePositions,
+     std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
+     int StartIndex, int k,
+     double LocalInterpolationStartTime,
+     double ModulatedSingleSupportTime,
+     int StepType, int LeftOrRight);
 
     /*! Initialize internal data structures. */
     virtual void InitializeInternalDataStructures()=0;

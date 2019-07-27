@@ -22,8 +22,8 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file GlobalStrategyManager.h
-  \brief This object defines a global strategy abstract object to generate an output
-  handled by the PatternGeneratorInterface object. */
+  \brief This object defines a global strategy abstract object to 
+  generate an output handled by the PatternGeneratorInterface object. */
 #include <deque>
 
 
@@ -70,15 +70,20 @@ namespace PatternGeneratorJRL
 
 
     /*! Perform a 5 ms step to generate the necessary information.
-      \note{The meaning and the way to use this method depends on the child class}.
+      \note{The meaning and the way to use this method depends on 
+      the child class}.
 
       @param[out] LeftFootPosition: The position of the Left Foot position.
       @param[out] RightFootPosition: The position of the Right Foot position.
       @param[out] ZMPRefPos: The ZMP position to be fed to the controller.
-      @param[out] aCOMState: returns position, velocity and acceleration of the CoM.
-      @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
-      @param[out] CurrentVelocity: The results is a state vector containing the speed.
-      @param[out] CurrentAcceleration: The results is a state vector containing the acceleration.
+      @param[out] aCOMState: returns position, velocity and acceleration of the 
+      CoM.
+      @param[out] CurrentConfiguration: The results is a state vector containing
+      the articular positions.
+      @param[out] CurrentVelocity: The results is a state vector containing the
+      speed.
+      @param[out] CurrentAcceleration: The results is a state vector containing
+      the acceleration.
     */
     virtual int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
                                        FootAbsolutePosition &RightFootPosition,
@@ -91,27 +96,32 @@ namespace PatternGeneratorJRL
 
 
     /*! Computes the COM of the robot with the Joint values given in BodyAngles,
-      velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
+      velocities set to zero, and returns the values of the COM in
+      aStaringCOMPosition.
       Assuming that the waist is at (0,0,0)
       it returns the associate initial values for the left and right foot.
-      @param[in] BodyAngles: 4x4 matrix of the robot's root (most of the time, the waist)
+      @param[in] BodyAngles: 4x4 matrix of the robot's root (most of the time,
+      the waist)
       pose (position + orientation).
-      @param[out] aStartingCOMPosition: Returns the 3D position of the CoM for the current
+      @param[out] aStartingCOMPosition: Returns the 3D position of the CoM for
+      the current
       position of the robot.
-      @param[out] aStartingZMPPosition: Returns the 3D position of the ZMP for the current
+      @param[out] aStartingZMPPosition: Returns the 3D position of the ZMP for
+      the current
       position of the robot.
       @param[out] InitLeftFootPosition: Returns the position of the left foot in
       the waist coordinates frame.
       @param[out] InitRightFootPosition: Returns the position of the right foot
       in the waist coordinates frame.
     */
-    virtual int EvaluateStartingState(Eigen::VectorXd & BodyAngles,
-                                      COMState & aStartingCOMState,
-                                      Eigen::Vector3d & aStartingZMPPosition,
-                                      Eigen::Matrix<double, 6, 1> & aStartingWaistPose,
-                                      FootAbsolutePosition & InitLeftFootPosition,
-                                      FootAbsolutePosition & InitRightFootPosition)=0;
-
+    virtual int EvaluateStartingState
+    (Eigen::VectorXd & BodyAngles,
+     COMState & aStartingCOMState,
+     Eigen::Vector3d & aStartingZMPPosition,
+     Eigen::Matrix<double, 6, 1> & aStartingWaistPose,
+     FootAbsolutePosition & InitLeftFootPosition,
+     FootAbsolutePosition & InitRightFootPosition)=0;
+    
 
     /*! \brief Method to detect the status regarding the end of the motion.
       This method returns :
@@ -122,22 +132,28 @@ namespace PatternGeneratorJRL
     virtual int EndOfMotion()=0;
 
     /*! \brief Setting the pointers towards buffers of positions.
-      \param[in] aZMPositions: Absolute frame positions buffer of the Zero Momentum Point reference.
-      \param[in] aCOMBuffer: Absolute frame positions buffer of the CoM trajectory related to the previous
+      \param[in] aZMPositions: Absolute frame positions buffer of the 
+      Zero Momentum Point reference.
+      \param[in] aCOMBuffer: Absolute frame positions buffer of the CoM 
+      trajectory related to the previous
       ZMP reference trajectory.
-      \param[in] aLeftFootAbsolutePositions: Absolute frame positions buffer of the left foot.
-      \param[in] aRightFootAbsolutePositions: Absolute frame positions buffer of the right foot.
+      \param[in] aLeftFootAbsolutePositions: Absolute frame positions 
+      buffer of the left foot.
+      \param[in] aRightFootAbsolutePositions: Absolute frame positions 
+      buffer of the right foot.
     */
-    void SetBufferPositions(deque<ZMPPosition> * aZMPositions,
-                            deque<COMState> * aCOMBuffer,
-                            deque<FootAbsolutePosition> *aLeftFootAbsolutePositions,
-                            deque<FootAbsolutePosition> *aRightFootAbsolutePositions );
-
+    void SetBufferPositions
+    (deque<ZMPPosition> * aZMPositions,
+     deque<COMState> * aCOMBuffer,
+     deque<FootAbsolutePosition> *aLeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> *aRightFootAbsolutePositions );
+    
     /*! Prepare the buffers at the beginning of the foot positions. */
-    virtual void Setup(deque<ZMPPosition> & aZMPositions,
-                       deque<COMState> & aCOMBuffer,
-                       deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
-                       deque<FootAbsolutePosition> & aRightFootAbsolutePositions )=0;
+    virtual void Setup
+    (deque<ZMPPosition> & aZMPositions,
+     deque<COMState> & aCOMBuffer,
+     deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> & aRightFootAbsolutePositions )=0;
 
   protected:
 
@@ -169,15 +185,16 @@ namespace PatternGeneratorJRL
   public:
 
     /*! \name Setter and getter for the jrlHumanoidDynamicRobot object. */
-    /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic parameters
-      of the robot. */
+    /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic
+      parameters of the robot. */
     inline  bool setHumanoidDynamicRobot(PinocchioRobot *aHumanoidDynamicRobot)
     {
       m_PinocchioRobot = aHumanoidDynamicRobot;
       return true;
     }
 
-    /*! \brief Returns the object able to compute the dynamic parameters of the robot. */
+    /*! \brief Returns the object able to compute the dynamic parameters 
+      of the robot. */
     inline PinocchioRobot * getHumanoidDynamicRobot() const
     {
       return m_PinocchioRobot;

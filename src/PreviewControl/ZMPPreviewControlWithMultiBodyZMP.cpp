@@ -641,9 +641,11 @@ SetupIterativePhase
          " COMStates.size()=" <<COMStates.size());
   FirstStageOfControl(LeftFootPositions[localindex],
                       RightFootPositions[localindex],COMStates[localindex]);
-  ODEBUG("m_FIFOCOMStates["<<localindex<<"]=" << m_FIFOCOMStates[localindex].x[0]
+  ODEBUG("m_FIFOCOMStates["<<localindex<<"]="
+         << m_FIFOCOMStates[localindex].x[0]
          << " " <<
-         m_FIFOCOMStates[localindex].y[0] << " " << m_FIFOCOMStates[localindex].z[0] <<
+         m_FIFOCOMStates[localindex].y[0] << " "
+         << m_FIFOCOMStates[localindex].z[0] <<
          " m_FIFOCOMStates.size()=" <<m_FIFOCOMStates.size());
   //COMState acompos = m_FIFOCOMStates[localindex];
   //FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[localindex];
@@ -809,7 +811,9 @@ GetCurrentPositionofWaistInCOMFrame()
     m_ComAndFootRealization->
     GetCurrentPositionofWaistInCOMFrame();
 
-  //  cerr << " Should implement: ZMPPreviewControlWithMultiBodyZMP::GetCurrentPositionOfWaistInCOMFrame()" << endl;
+  //  cerr << " Should implement:
+  // ZMPPreviewControlWithMultiBodyZMP::
+  // GetCurrentPositionOfWaistInCOMFrame()" << endl;
   return PosOfWaistInCoMFrame;
 }
 

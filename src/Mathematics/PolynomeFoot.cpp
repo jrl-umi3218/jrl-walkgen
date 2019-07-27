@@ -219,11 +219,14 @@ void Polynome4::SetParametersWithInitPosInitSpeed(double FT,
     }
   else
     {
-      m_Coefficients[2] = (-4.0*InitSpeed*FT - 11.0*InitPos + 16.0*MP -  5*FP)/tmp;
+      m_Coefficients[2] = (-4.0*InitSpeed*FT - 11.0*InitPos +
+                           16.0*MP -  5*FP)/tmp;
       tmp=tmp*FT;
-      m_Coefficients[3] = ( 5.0*InitSpeed*FT + 18.0*InitPos - 32.0*MP + 14*FP)/tmp;
+      m_Coefficients[3] = ( 5.0*InitSpeed*FT + 18.0*InitPos -
+                            32.0*MP + 14*FP)/tmp;
       tmp=tmp*FT;
-      m_Coefficients[4] = (-2.0*InitSpeed*FT - 8.0 *InitPos + 16.0*MP -  8*FP)/tmp;
+      m_Coefficients[4] = (-2.0*InitSpeed*FT - 8.0 *InitPos +
+                           16.0*MP -  8*FP)/tmp;
     }
 }
 void Polynome4::GetParametersWithInitPosInitSpeed(double &FT,
@@ -281,8 +284,9 @@ void Polynome5::GetParametersWithInitPosInitSpeed(double &FT,
   FP = FinalPos_;
 }
 
-void Polynome5::SetParameters(double FT, double FP,
-                              double InitPos, double InitSpeed, double InitAcc, double)
+void Polynome5::SetParameters
+(double FT, double FP,
+ double InitPos, double InitSpeed, double InitAcc, double)
 {
   double tmp;
   m_Coefficients[0] = InitPos_ = InitPos;
@@ -300,20 +304,24 @@ void Polynome5::SetParameters(double FT, double FP,
     }
   else
     {
-      m_Coefficients[3] = (-3.0/2.0*InitAcc*FT*FT-6.0*InitSpeed*FT - 10.0*InitPos +
+      m_Coefficients[3] = (-3.0/2.0*InitAcc*FT*FT-6.0*InitSpeed*FT -
+                           10.0*InitPos +
                            10.0*FP)/tmp;
       tmp=tmp*FT;
-      m_Coefficients[4] = ( 3.0/2.0*InitAcc*FT*FT + 8.0*InitSpeed*FT + 15.0*InitPos -
+      m_Coefficients[4] = ( 3.0/2.0*InitAcc*FT*FT + 8.0*InitSpeed*FT +
+                            15.0*InitPos -
                             15.0*FP)/tmp;
       tmp=tmp*FT;
-      m_Coefficients[5] = ( -1.0/2.0*InitAcc*FT*FT - 3.0*InitSpeed*FT - 6.0*InitPos +
+      m_Coefficients[5] = ( -1.0/2.0*InitAcc*FT*FT - 3.0*InitSpeed*FT -
+                            6.0*InitPos +
                             6.0*FP)/tmp;
     }
 }
 
-void Polynome5::SetParameters(double FT,
-                              double InitPos, double InitSpeed, double InitAcc,
-                              double FinalPos, double FinalSpeed, double FinalAcc)
+void Polynome5::SetParameters
+(double FT,
+ double InitPos, double InitSpeed, double InitAcc,
+ double FinalPos, double FinalSpeed, double FinalAcc)
 {
   double tmp;
   m_Coefficients[0] = InitPos_ = InitPos;
@@ -331,14 +339,20 @@ void Polynome5::SetParameters(double FT,
     }
   else
     {
-      m_Coefficients[3] = -(1.5*InitAcc*FT*FT - 0.5*FinalAcc*FT*FT + 6.0*InitSpeed*FT
-                            + 4.0*FinalSpeed*FT + 10.0*InitPos - 10.0*FinalPos)/tmp;
+      m_Coefficients[3] = -(1.5*InitAcc*FT*FT - 0.5*FinalAcc*FT*FT +
+                            6.0*InitSpeed*FT
+                            + 4.0*FinalSpeed*FT + 10.0*InitPos -
+                            10.0*FinalPos)/tmp;
       tmp=tmp*FT;
-      m_Coefficients[4] =  (1.5*InitAcc*FT*FT -     FinalAcc*FT*FT + 8.0*InitSpeed*FT
-                            + 7.0*FinalSpeed*FT + 15.0*InitPos - 15.0*FinalPos)/tmp;
+      m_Coefficients[4] =  (1.5*InitAcc*FT*FT -     FinalAcc*FT*FT +
+                            8.0*InitSpeed*FT
+                            + 7.0*FinalSpeed*FT + 15.0*InitPos -
+                            15.0*FinalPos)/tmp;
       tmp=tmp*FT;
-      m_Coefficients[5] = -(0.5*InitAcc*FT*FT - 0.5*FinalAcc*FT*FT + 3.0*InitSpeed*FT
-                            + 3.0*FinalSpeed*FT + 6.0*InitPos - 6.0*FinalPos)/tmp;
+      m_Coefficients[5] = -(0.5*InitAcc*FT*FT - 0.5*FinalAcc*FT*FT
+                            + 3.0*InitSpeed*FT
+                            + 3.0*FinalSpeed*FT + 6.0*InitPos
+                            - 6.0*FinalPos)/tmp;
     }
 }
 
@@ -359,10 +373,11 @@ void Polynome6::SetParameters(double FT, double MP, double FP)
 }
 
 
-void Polynome6::SetParametersWithMiddlePos(
-                                           double FT, double MP,
-                                           double InitPos, double InitSpeed, double InitAcc,
-                                           double FP)
+void Polynome6::
+SetParametersWithMiddlePos
+(double FT, double MP,
+ double InitPos, double InitSpeed, double InitAcc,
+ double FP)
 {
   FT_=FT;
   MP_=MP;
@@ -382,13 +397,17 @@ void Polynome6::SetParametersWithMiddlePos(
     }
   else
     {
-      m_Coefficients[3] = -0.5*( 5*FT*FT*InitAcc+32*FT*InitSpeed-128*MP+ 84*InitPos+
+      m_Coefficients[3] = -0.5*( 5*FT*FT*InitAcc+32*FT*InitSpeed-128*MP+
+                                 84*InitPos+
                                  44*FP )/(FT*FT*FT);
-      m_Coefficients[4] =  0.5*( 9*FT*FT*InitAcc+76*FT*InitSpeed-384*MP+222*InitPos
+      m_Coefficients[4] =  0.5*( 9*FT*FT*InitAcc+76*FT*InitSpeed-384*MP+
+                                 222*InitPos
                                  +162*FP )/(FT*FT*FT*FT);
-      m_Coefficients[5] = -0.5*( 7*FT*FT*InitAcc+66*FT*InitSpeed-384*MP+204*InitPos
+      m_Coefficients[5] = -0.5*( 7*FT*FT*InitAcc+66*FT*InitSpeed-384*MP+
+                                 204*InitPos
                                  +180*FP )/(FT*FT*FT*FT*FT);
-      m_Coefficients[6] =      (   FT*FT*InitAcc+10*FT*InitSpeed- 64*MP+ 32*InitPos+
+      m_Coefficients[6] =      (   FT*FT*InitAcc+10*FT*InitSpeed- 64*MP+
+                                   32*InitPos+
                                    32*FP )/(FT*FT*FT*FT*FT*FT);
     }
 
@@ -450,8 +469,9 @@ void Polynome7::GetParametersWithInitPosInitSpeed(double &FT,
   FP = FP_;
 }
 
-void Polynome7::SetParameters(double FT, double FP,
-                              double InitPos, double InitSpeed, double InitAcc, double InitJerk)
+void Polynome7::SetParameters
+(double FT, double FP,
+ double InitPos, double InitSpeed, double InitAcc, double InitJerk)
 {
   double tmp;
   FT_ = FT;
@@ -473,16 +493,20 @@ void Polynome7::SetParameters(double FT, double FP,
     }
   else
     {
-      m_Coefficients[4] = -(2*InitJerk*FT*FT*FT + 15*InitAcc*FT*FT + 60*InitSpeed_*FT
+      m_Coefficients[4] = -(2*InitJerk*FT*FT*FT + 15*InitAcc*FT*FT +
+                            60*InitSpeed_*FT
                             + 105*InitPos_ - 105*FP)/(3*tmp);
       tmp *=FT;
-      m_Coefficients[5] = (InitJerk*FT*FT*FT + 10*InitAcc*FT*FT + 45*InitSpeed_*FT +
+      m_Coefficients[5] = (InitJerk*FT*FT*FT + 10*InitAcc*FT*FT +
+                           45*InitSpeed_*FT +
                            84*InitPos_ - 84*FP)/tmp;
       tmp*=FT;
-      m_Coefficients[6] = -(4*InitJerk*FT*FT*FT + 45*InitAcc*FT*FT + 216*InitSpeed_*FT
+      m_Coefficients[6] = -(4*InitJerk*FT*FT*FT + 45*InitAcc*FT*FT +
+                            216*InitSpeed_*FT
                             + 420*InitPos_ - 420*FP)/(6*tmp);
       tmp*=FT;
-      m_Coefficients[7] = (InitJerk*FT*FT*FT + 12*InitAcc*FT*FT + 60*InitSpeed_*FT +
+      m_Coefficients[7] = (InitJerk*FT*FT*FT + 12*InitAcc*FT*FT +
+                           60*InitSpeed_*FT +
                            120*InitPos_ - 120*FP)/(6*tmp);
     }
 }

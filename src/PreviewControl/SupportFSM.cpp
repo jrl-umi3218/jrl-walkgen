@@ -107,8 +107,9 @@ SupportFSM::update_vel_reference(reference_t & Ref,
 
 
 void
-SupportFSM::set_support_state(double time, unsigned int pi,
-                              support_state_t & Support, const reference_t & Ref) const
+SupportFSM::set_support_state
+(double time, unsigned int pi,
+ support_state_t & Support, const reference_t & Ref) const
 {
 
   Support.StateChanged = false;

@@ -40,7 +40,8 @@ namespace Optimization
 {
   namespace Solver
   {
-    /*! This class implements a two stage strategy to solve the following optimal problem:
+    /*! This class implements a two stage strategy to solve the following 
+      optimal problem:
      */
     class PLDPSolverHerdt
     {
@@ -57,31 +58,35 @@ namespace Optimization
 
       /*! \brief Solve the optimization problem
        */
-      int SolveProblem(
-                       std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> &
-                       QueueOfLConstraintInequalitiesFreeFeet,
-                       std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet,
-                       double *CstPartOfTheCostFunction,
-                       unsigned int NbOfConstraints,
-                       double *LinearPartOfConstraints,
-                       double *CstPartOfConstraints,
-                       double *XkYk,
-                       double *X,
-                       unsigned int NumberOfRemovedConstraints, unsigned int NbRemovedFootCstr,
-                       bool StartingSequence, unsigned int NumberSteps, bool CurrentStateChanged,
-                       double time);
+      int SolveProblem
+      (std::deque<PatternGeneratorJRL::
+       LinearConstraintInequalityFreeFeet_t> &
+       QueueOfLConstraintInequalitiesFreeFeet,
+       std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet,
+       double *CstPartOfTheCostFunction,
+       unsigned int NbOfConstraints,
+       double *LinearPartOfConstraints,
+       double *CstPartOfConstraints,
+       double *XkYk,
+       double *X,
+       unsigned int NumberOfRemovedConstraints,
+       unsigned int NbRemovedFootCstr,
+       bool StartingSequence,
+       unsigned int NumberSteps,
+       bool CurrentStateChanged,
+       double time);
     protected:
 
       /*! \name Initial solution methods related
         @{
       */
       /*! Compute the initial solution */
-      int ComputeInitialSolution(
-                                 std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> &
-                                 QueueOfLConstraintInequalitiesFreeFeet,
-                                 std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet,
-                                 unsigned int NumberSteps,
-                                 double *XkYk);
+      int ComputeInitialSolution
+      (std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> &
+       QueueOfLConstraintInequalitiesFreeFeet,
+       std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet,
+       unsigned int NumberSteps,
+       double *XkYk);
 
       /*! Precompite iPuPx */
       int PrecomputeiPuPx(unsigned int NumberSteps);
@@ -124,8 +129,8 @@ namespace Optimization
       double ComputeAlpha(vector<unsigned int> &NewActivatedConstraints,
                           unsigned int NumberSteps);
 
-      /*       /\*! Store the current ZMP solution for hot start purposes. *\/ */
-      /*       void StoreCurrentZMPSolution(double *XkYk); */
+      /*! Store the current ZMP solution for hot start purposes. *\/ */
+      /*      void StoreCurrentZMPSolution(double *XkYk); */
 
       /*! Write current ZMP ref trajectory associated with
         current value of m_Vk. */

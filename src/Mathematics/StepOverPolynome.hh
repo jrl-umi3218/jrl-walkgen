@@ -25,7 +25,8 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /** \file StepOverPolynome.h
-    \brief Polynomes object for generating foot and hip trajectories while stepping over. */
+    \brief Polynomes object for generating foot and hip trajectories 
+    while stepping over. */
 
 
 #ifndef _STEPOVER_POLYNOME_H_
@@ -45,8 +46,10 @@ namespace PatternGeneratorJRL
   {
   public:
     /*! Constructor:
-      boundCond: the different boundary conditions begin, intermediate and end of polynomial
-      timeDistr: vector with time instants for intermediate boundary conditions and end time */
+      boundCond: the different boundary conditions begin, 
+      intermediate and end of polynomial
+      timeDistr: vector with time instants for 
+      intermediate boundary conditions and end time */
     StepOverPolynomeFoot();
 
     /*! Set the parameters */
@@ -103,8 +106,10 @@ namespace PatternGeneratorJRL
   {
   public:
     /*! Constructor:
-      boundCond: the different boundary conditions begin, intermediate and end of polynomial
-      timeDistr: vector with time instants for intermediate boundary conditions and end time
+      boundCond: the different boundary conditions begin, 
+      intermediate and end of polynomial
+      timeDistr: vector with time instants for intermediate 
+      boundary conditions and end time
     */
     StepOverPolynomeHip4();
 

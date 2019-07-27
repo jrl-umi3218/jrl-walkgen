@@ -95,7 +95,8 @@ namespace PatternGeneratorJRL
         aif >> version;
         if (version!=2.0)
           {
-            cerr << "Not version 2.0. Do not understand the information. Aborted. " << endl;
+            cerr << "Not version 2.0. Do not understand the information. "
+                 << "Aborted. " << endl;
             return -1;
 
           }
@@ -193,8 +194,9 @@ namespace PatternGeneratorJRL
   }
 
 
-  void GenerateMotionFromKineoWorks::CreateBufferFirstPreview(
-                                                              deque<ZMPPosition> &ZMPRefBuffer)
+  void GenerateMotionFromKineoWorks::
+  CreateBufferFirstPreview
+  (deque<ZMPPosition> &ZMPRefBuffer)
   {
     deque<ZMPPosition> aFIFOZMPRefPositions;
     Eigen::MatrixXd aPC1x;
@@ -295,14 +297,16 @@ namespace PatternGeneratorJRL
       m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
   }
 
-  void GenerateMotionFromKineoWorks::ComputeUpperBodyPosition(
-                                                              deque< KWNode >&     UpperBodyPositionsBuffer,
-                                                              vector<int> &ConversionFromLocalToRobotDOFsIndex)
+  void GenerateMotionFromKineoWorks::
+  ComputeUpperBodyPosition
+  (deque< KWNode >&     UpperBodyPositionsBuffer,
+   vector<int> &ConversionFromLocalToRobotDOFsIndex)
   {
     vector<int> ConversionFromLocalToKW;
     int count=0;
     //! Find the sizes for the buffer, and the conversion array..
-    //! First dimension: count the number of DOFs which are -1 inside the array of indexes.
+    //! First dimension: count the number of DOFs which are -1
+    // inside the array of indexes.
     int NbOfUsedDOFs=0;
     KWNode deltaJoints;
 
@@ -313,14 +317,16 @@ namespace PatternGeneratorJRL
     deltaJoints.Joints.resize(NbOfUsedDOFs);
     ConversionFromLocalToKW.resize(NbOfUsedDOFs);
 
-    //! Second dimension: directly the number of elements inside the COM's buffer of position.
+    //! Second dimension: directly the number of elements inside
+    // the COM's buffer of position.
     UpperBodyPositionsBuffer.resize(m_COMBuffer.size());
     for(unsigned int i=0; i<UpperBodyPositionsBuffer.size(); i++)
       {
         UpperBodyPositionsBuffer[i].Joints.resize(NbOfUsedDOFs);
       }
 
-    //! First initialize the first upper body position at the beginning of the motion.
+    //! First initialize the first upper body position at the
+    // beginning of the motion.
     //! and fill the conversion array.
     int k=0;
     for(unsigned int i=0; i<m_Path[0].Joints.size(); i++)
@@ -349,7 +355,8 @@ namespace PatternGeneratorJRL
         lY = m_Path[IdWayPoint].Joints[7];
         lZ = m_Path[IdWayPoint].Joints[8];
 
-        //! Find the closest (X,Y,Z) position in the remaining part of the CoM buffer.
+        //! Find the closest (X,Y,Z) position in the remaining
+        // part of the CoM buffer.
         for(unsigned int i=count; i<m_COMBuffer.size(); i++)
           {
             double ldist= (lX-m_COMBuffer[i].x[0])*(lX - m_COMBuffer[i].x[0])
@@ -376,13 +383,15 @@ namespace PatternGeneratorJRL
             int k = ConversionFromLocalToKW[i];
 
             deltaJoints.Joints[i]= (m_Path[IdWayPoint].Joints[k] -
-                                    m_Path[IdWayPoint-1].Joints[k])/(double)(CountTarget-count);
+            m_Path[IdWayPoint-1].Joints[k])/(double)(CountTarget-count);
           }
 
         //! Fill the buffer with linear interpolation.
         while(count<=CountTarget)
           {
-            for(unsigned int i=0; i<ConversionFromLocalToRobotDOFsIndex.size(); i++)
+            for(unsigned int i=0;
+                i<ConversionFromLocalToRobotDOFsIndex.size();
+                i++)
               {
                 UpperBodyPositionsBuffer[count].Joints[i]=
                   UpperBodyPositionsBuffer[count-1].Joints[i]

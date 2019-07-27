@@ -23,7 +23,8 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/* Polynomes object for generating foot and hip trajectories while stepping over. */
+/* Polynomes object for generating foot and hip trajectories 
+while stepping over. */
 #include <iostream>
 #include <vector>
 
@@ -166,7 +167,7 @@ StepOverPolynomeFoot::~StepOverPolynomeFoot()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
 StepOverPolynomeFootZtoX::StepOverPolynomeFootZtoX() :Polynome(3)
 {
   // SetParameters(boundCond,timeDistr);
@@ -233,7 +234,7 @@ StepOverPolynomeFootZtoX::~StepOverPolynomeFootZtoX()
 {
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
 StepOverPolynomeFootXtoTime::StepOverPolynomeFootXtoTime() :Polynome(4)
 {
@@ -383,11 +384,7 @@ StepOverPolynomeHip4::~StepOverPolynomeHip4()
 {
 }
 
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+//////////////////////////////////////////////////////
 
 
 StepOverSpline::StepOverSpline()
@@ -440,9 +437,10 @@ void StepOverSpline::SetParameters(Eigen::VectorXd Points)
     {
       m_Coefficients(0,i) = Points(i);
       m_Coefficients(1,i) = TempSol(i,0);
-      m_Coefficients(2,i) = 3.0*(Points(i+1)-Points(i))-2.0*TempSol(i,0)-TempSol(i+1,
-                                                                                 0);
-      m_Coefficients(3,i) = 2.0*(Points(i)-Points(i+1))+TempSol(i,0)+TempSol(i+1,0);
+      m_Coefficients(2,i) = 3.0*(Points(i+1)-Points(i))-
+        2.0*TempSol(i,0)-TempSol(i+1, 0);
+      m_Coefficients(3,i) = 2.0*(Points(i)-Points(i+1))+
+        TempSol(i,0)+TempSol(i+1,0);
     }
 
 }
@@ -515,7 +513,8 @@ void StepOverSpline::print()
   for (unsigned int i=0; i<m_number-1; i++)
     {
 
-      cout << "             Spline m_number " << i+1 << ":" << endl << "            ";
+      cout << "             Spline m_number " << i+1 << ":"
+           << endl << "            ";
       for (unsigned int j=0; j<4; j++)
         cout << m_Coefficients(j,i) << "          " ;
       cout << endl;
@@ -531,16 +530,18 @@ StepOverSpline::~StepOverSpline()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 
 StepOverClampedCubicSpline::StepOverClampedCubicSpline()
 {
   // SetParameters(boundCond,timeDistr);
 }
-void StepOverClampedCubicSpline::SetParameters(Eigen::VectorXd Points,
-                                               Eigen::VectorXd TimePoints,
-                                               Eigen::VectorXd DerivativeEndPoints)
+void StepOverClampedCubicSpline::
+SetParameters
+(Eigen::VectorXd Points,
+ Eigen::VectorXd TimePoints,
+ Eigen::VectorXd DerivativeEndPoints)
 {
   Eigen::Matrix<double,4,4> LhSide;;
   Eigen::Matrix<double,4,1> RhSide;;
@@ -567,12 +568,13 @@ void StepOverClampedCubicSpline::SetParameters(Eigen::VectorXd Points,
 
   for (unsigned int i=1; i<m_number; i++)
     {
-      RhSide(i,0)=3.0/h(i)*(Points(i+1)-Points(i))-3.0/h(i-1)*(Points(i)-Points(i-1));
+      RhSide(i,0)=3.0/h(i)*(Points(i+1)-Points(i))-3.0/
+        h(i-1)*(Points(i)-Points(i-1));
     }
 
   RhSide(0,0)=3.0/h(0)*(Points(1)-Points(0))-3.0*DerivativeEndPoints(0);
-  RhSide(m_number,0)=-3.0/h(m_number-1)*(Points(m_number)-Points(
-                                                                 m_number-1))+3.0*DerivativeEndPoints(1);
+  RhSide(m_number,0)=-3.0/h(m_number-1)*
+    (Points(m_number)-Points(m_number-1))+3.0*DerivativeEndPoints(1);
 
   for (unsigned int i=1; i<m_number; i++)
     {
@@ -594,7 +596,8 @@ void StepOverClampedCubicSpline::SetParameters(Eigen::VectorXd Points,
   for (unsigned int i=0; i<m_number; i++)
     {
       m_Coefficients(0,i) = Points(i);
-      m_Coefficients(1,i) = (Points(i+1)-Points(i)-(2.0*TempSol(i,0)+TempSol(i+1,0))
+      m_Coefficients(1,i) = (Points(i+1)-Points(i)-
+                             (2.0*TempSol(i,0)+TempSol(i+1,0))
                              *h(i)*h(i)/3.0)/h(i);
       m_Coefficients(2,i) = TempSol(i,0);
       m_Coefficients(3,i) = (TempSol(i+1,0)-TempSol(i,0))/(3.0*h(i));
@@ -612,7 +615,8 @@ GetValueSpline
   numberComp = TimePoints.size();
   if (!(numberComp=m_number))
     {
-      cout << "CCS: number of intervals is not the same as for the calculation of the spline coefficients !"
+      cout << "CCS: number of intervals is not the same "
+           << "as for the calculation of the spline coefficients !"
            << endl;
       return 0.0;
     }
@@ -635,7 +639,8 @@ GetValueSpline
     } // for
 
   if (CurrentLocalTime>=TimePoints(m_number))
-    // if the CurrentLocalTime is out of range it will return the end position if t>tmax
+    // if the CurrentLocalTime is out of range it will return
+    //the end position if t>tmax
     {
       double Time0to1 =0.0;
       double Time0to1_2 =0.0;
@@ -644,18 +649,20 @@ GetValueSpline
       Time0to1_2=Time0to1*Time0to1;
       Time0to1_3=Time0to1_2*Time0to1;
 
-      ValueSpline = m_Coefficients(0,m_number-1)+m_Coefficients(1,m_number-1)*Time0to1
-        +m_Coefficients(2,m_number-1)*Time0to1_2+m_Coefficients(3,
-                                                                m_number-1)*Time0to1_3;
+      ValueSpline = m_Coefficients(0,m_number-1)+m_Coefficients(1,m_number-1)*
+        Time0to1 +  m_Coefficients(2,m_number-1)*
+        Time0to1_2+m_Coefficients(3,  m_number-1)*Time0to1_3;
       // cout << "CCS: timevalue is beyond the range of given time intervals,
       // last position is returned" << endl;
     }
 
   if (CurrentLocalTime<=TimePoints(0))
-    // if the CurrentLocalTime is out of range it will return the start position if t<tmin
+    // if the CurrentLocalTime is out of range it will
+    // return the start position if t<tmin
     {
       ValueSpline = m_Coefficients(0,0);
-      // cout << "CCS: timevalue falls before the range of given time intervals, first position is returned" << endl;
+      // cout << "CCS: timevalue falls before the range
+      // of given time intervals, first position is returned" << endl;
     }
 
   return ValueSpline;

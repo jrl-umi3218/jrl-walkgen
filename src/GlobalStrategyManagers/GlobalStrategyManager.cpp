@@ -22,8 +22,8 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file GlobalStrategyManager.cpp
-  \brief This object defines a global strategy abstract object to generate an output
-  handled by the PatternGeneratorInterface object.
+  \brief This object defines a global strategy abstract object to generate 
+  an output handled by the PatternGeneratorInterface object.
 */
 
 #include <Debug.hh>

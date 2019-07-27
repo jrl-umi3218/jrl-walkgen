@@ -66,11 +66,13 @@ namespace PatternGeneratorJRL
 
     \f{eqnarray*}
     {\bf K} & \equiv & (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA} \\
-    K_p(i) & \equiv & (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T({\bf A}-{\bf bK})^{T*(i-1)}{\bf c}^TQ \\
+    K_p(i) & \equiv & (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T({\bf A}-
+    {\bf bK})^{T*(i-1)}{\bf c}^TQ \             \
     \f}
     where \f$ {\bf P} \f$ is solution of the following Riccati equation:
     \f[
-    {\bf P} = {\bf A}^T {\bf PA} + {\bf c}^TQ{\bf c} - {\bf A}^T{\bf Pb}(R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA}
+    {\bf P} = {\bf A}^T {\bf PA} + {\bf c}^TQ{\bf c} - 
+    {\bf A}^T{\bf Pb}(R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA}
     \f]
 
 
@@ -81,13 +83,15 @@ namespace PatternGeneratorJRL
     we can reformulate the discrete problem by posing the following:
     \f{eqnarray*}
     \begin{matrix}
-    {\bf x}^*_{k+1} &= \widetilde{\bf A} {\bf x}^*_{k} + \widetilde{\bf b}\Delta u_k \\
+    {\bf x}^*_{k+1} &= \widetilde{\bf A} {\bf x}^*_{k} + 
+    \widetilde{\bf b}\Delta u_k \               \
     p_k &= \widetilde{\bf c}{\bf x}^*_{k}
     \end{matrix}
     \f}
     with
     \f{eqnarray*}
-    \Delta u_k \equiv u_k - u_{k-1} & \Delta {\bf x}_k \equiv {\bf x}_k - {\bf x}_{k-1}\\
+    \Delta u_k \equiv u_k - u_{k-1} & \Delta {\bf x}_k \equiv {\bf x}_k 
+    - {\bf x}_{k-1}\                            \
     {\bf x}_k \equiv \left[
     \begin{matrix}
     p_k\\
@@ -123,16 +127,19 @@ namespace PatternGeneratorJRL
 
     the solution is then:
     \f{eqnarray*}
-    u_j = - K_1 \sum_{i=0}^k e(i) - {\bf K}_2 x(k) - \sum_{j=1}^{N_L} K_p(j)p^{ref}_j(k+j)
+    u_j = - K_1 \sum_{i=0}^k e(i) - {\bf K}_2 x(k) - \sum_{j=1}^{N_L}
+    K_p(j)p^{ref}_j(k+j)
     \f}
 
     where \f{eqnarray*}
-    \left[ \begin{matrix} K_1 \\ {\bf K}_2 \\ \end{matrix} \right]= \widetilde{\bf K}
+    \left[ \begin{matrix} K_1 \\ {\bf K}_2 \\ \end{matrix} \right]= 
+    \widetilde{\bf K}
     \f}
 
 
     \anchor Laub1979
-    Alan J. Laub A Schur method for solving Algebraic Riccati Equations, IEEE Transaction on Automatic Control,
+    Alan J. Laub A Schur method for solving Algebraic Riccati Equations, 
+    IEEE Transaction on Automatic Control,
     Vol AC-24, No.6 December 1979
   */
   class  OptimalControllerSolver
@@ -170,7 +177,8 @@ namespace PatternGeneratorJRL
 
   protected:
 
-    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,Eigen::RowMajor>
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                          Eigen::RowMajor>
     MatrixRXd;
     /*! The matrices needed for the dynamical system such as
       \f{eqnarray*}
@@ -210,7 +218,8 @@ namespace PatternGeneratorJRL
   };
 
   /*!
-    \defgroup pageexampleoptimalweights Computing optimal weights for the preview control.
+    \defgroup pageexampleoptimalweights Computing optimal weights 
+    for the preview control.
     \ingroup codesourceexamples
 
     \dontinclude TestRiccatiEquation.cpp
@@ -275,12 +284,14 @@ namespace PatternGeneratorJRL
     To suppress the problem of the initial CoM position,
     we can reformulate the discrete problem by posing the following:
     \f{eqnarray*}
-    {\bf x}^*_{k+1} = \widetilde{\bf A} {\bf x}^*_{k} + \widetilde{\bf b}\Delta u_k
+    {\bf x}^*_{k+1} = \widetilde{\bf A} {\bf x}^*_{k} + \widetilde{\bf b}
+    \Delta u_k
     p_k = \widetilde{\bf c}{\bf x}^*_{k}
     \f}
     with
     \f{eqnarray*
-    \Delta u_k \equiv u_k - u_{k-1} & \Delta {\bf x}_k \equiv {\bf x}_k - {\bf x}_{k-1}
+    \Delta u_k \equiv u_k - u_{k-1} & \Delta {\bf x}_k \equiv {\bf x}_k - 
+    {\bf x}_{k-1}
     {\bf x}_k \equiv \left[
     \begin{matrix}
     p_k\\
@@ -321,7 +332,8 @@ namespace PatternGeneratorJRL
     The computation of the weights is done by calling ComputeWeights().
     There is only one parameter to specify, but it is important
     as the weights are computed differently according to this parameter.
-    If you use the mode without initial position please uses MODE_WITH_INITIALPOS.
+    If you use the mode without initial position please uses 
+    MODE_WITH_INITIALPOS.
     \skipline PatternGeneratorJRL::OptimalControllerSolver
 
     To display the weights in the standard output

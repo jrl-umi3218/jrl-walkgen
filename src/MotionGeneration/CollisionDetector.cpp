@@ -52,9 +52,9 @@ void CollisionDetector::SetObstacleCoordinates(ObstaclePar aObstacleInfo)
   /*! ObstacleInfo contains x, y, z position of obstacle in worldframe
     (point taken on the front plan of the obstacle on the floor and in
     the middel of the width and also the orientation of the obstacle
-    in the X,Y plane of the world and the obstacle dimensions: depth, Width and height
+    in the X,Y plane of the world and the obstacle dimensions: 
+    depth, Width and height
   */
-
 
   //double ObstacleAngle;
   //double ObstacleWidth, ObstacleHeight, ObstacleDepth;
@@ -66,14 +66,12 @@ void CollisionDetector::SetObstacleCoordinates(ObstaclePar aObstacleInfo)
   m_ObstaclePosition(1) = aObstacleInfo.y;
   m_ObstaclePosition(2) = aObstacleInfo.z;
 
-
   //   ObstacleAngle = m_ObstacleInfo.theta;
   c = cos(aObstacleInfo.theta*M_PI/180.0);
   s = sin(aObstacleInfo.theta*M_PI/180.0);
 
-
-
-  //this matrix transformes coordinates in the obstacle frame into the world frame
+  // this matrix transformes coordinates in the obstacle frame
+  // into the world frame
   m_ObstacleRot(0,0) = c;
   m_ObstacleRot(0,1) =-s;
   m_ObstacleRot(0,2) = 0;
@@ -84,7 +82,8 @@ void CollisionDetector::SetObstacleCoordinates(ObstaclePar aObstacleInfo)
   m_ObstacleRot(2,1) = 0;
   m_ObstacleRot(2,2) = 1;
 
-  //this matrix transformes coordinates in the world frame into the obstacle frame
+  // this matrix transformes coordinates in the world
+  // frame into the obstacle frame
   m_ObstacleRotInv(0,0) = c;
   m_ObstacleRotInv(0,1) = s;
   m_ObstacleRotInv(0,2) = 0;
@@ -100,7 +99,8 @@ void CollisionDetector::SetObstacleCoordinates(ObstaclePar aObstacleInfo)
   //ObstacleHeight = ObstacleInfo.h;
 
   // obstacle points are the four corner points at one side of the obstacle
-  // in the obstacle coordinate frame...the other side have the same coordinates,
+  // in the obstacle coordinate frame...the other side have
+  // the same coordinates,
   // except for the Y coordinate which has opposite sign
   // point 0:
   m_ObstaclePoints(0,0) = 0.0;
@@ -119,17 +119,20 @@ void CollisionDetector::SetObstacleCoordinates(ObstaclePar aObstacleInfo)
   m_ObstaclePoints(1,3) = aObstacleInfo.w/2.0;
   m_ObstaclePoints(2,3) = 0.0;
 
-  //cout << "I have set the obstacle info in the colission detection class" << endl;
+  // cout << "I have set the obstacle info in the colission detection class"
+  // << endl;
 }
 
-void CollisionDetector::WorldFrameToObstacleFrame(Eigen::Vector3d
-                                                  &WorldFrameCoord,
-                                                  Eigen::Vector3d &ObstacleFrameCoord)
+void CollisionDetector::WorldFrameToObstacleFrame
+(Eigen::Vector3d
+ &WorldFrameCoord,
+ Eigen::Vector3d &ObstacleFrameCoord)
 {
   // This function transforms the coordinates of a point
   // expressed in the world frame to the local coordinates in the obstacle frame
 
-  ObstacleFrameCoord = m_ObstacleRotInv * (WorldFrameCoord - m_ObstaclePosition);
+  ObstacleFrameCoord = m_ObstacleRotInv *
+    (WorldFrameCoord - m_ObstaclePosition);
   /*
     cout << "X WorldFrameCoord:  " <<  WorldFrameCoord(0,0) << endl;
     cout << "Y WorldFrameCoord:  " <<  WorldFrameCoord(1,0) << endl;
@@ -139,18 +142,23 @@ void CollisionDetector::WorldFrameToObstacleFrame(Eigen::Vector3d
     cout << "Y obstacle position:  " <<  m_ObstaclePosition(1,0) << endl;
     cout << "Z obstacle position:  " <<  m_ObstaclePosition(2,0) << endl;
 
-    cout << "X obstacle frame coordinate:  " <<  ObstacleFrameCoord(0,0) << endl;
-    cout << "Y obstacle frame coordinate:  " <<  ObstacleFrameCoord(1,0) << endl;
-    cout << "Z obstacle frame coordinate:  " <<  ObstacleFrameCoord(2,0) << endl;
+    cout << "X obstacle frame coordinate:  " 
+    <<  ObstacleFrameCoord(0,0) << endl;
+    cout << "Y obstacle frame coordinate:  " 
+    <<  ObstacleFrameCoord(1,0) << endl;
+    cout << "Z obstacle frame coordinate:  " 
+    <<  ObstacleFrameCoord(2,0) << endl;
   */
 }
 
-void CollisionDetector::CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord,
-                                                    Eigen::Vector3d &AbsCoord,
-                                                    Eigen::VectorXd LegAngles,
-                                                    Eigen::Matrix3d WaistRot,
-                                                    Eigen::Vector3d WaistPos,
-                                                    int WhichLeg)
+void CollisionDetector::
+CalcCoordShankLowerLegPoint
+(Eigen::Vector3d RelCoord,
+ Eigen::Vector3d &AbsCoord,
+ Eigen::VectorXd LegAngles,
+ Eigen::Matrix3d WaistRot,
+ Eigen::Vector3d WaistPos,
+ int WhichLeg)
 {
   Eigen::Matrix3d Rotation;
   Eigen::Vector3d TempCoord;
@@ -243,7 +251,8 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord,
 
   Translation(0) = 0.0;
 
-  //this is currenlty hard coded but has to be solved when using functions in dynamic multi body class
+  // this is currenlty hard coded but has to be solved
+  // when using functions in dynamic multi body class
   if(WhichLeg>0)
     Translation(1) = 0.09;
   else
@@ -279,9 +288,10 @@ bool CollisionDetector::CollisionTwoLines(vector<double> p1,
                                           vector<double> v1,
                                           vector<double> v2)
 {
-  //this function checks for intersection of two line segments p1p2 and v1v2.
-  //since this is a 2D problem the coordinates are the respective planar coordinates
-  //it returns true if a collision occurs, else false
+  // this function checks for intersection of two line segments p1p2 and v1v2.
+  // since this is a 2D problem the coordinates are the respective
+  // planar coordinates
+  // it returns true if a collision occurs, else false
 
   double Ap1p2v1, Ap1p2v2, Av1v2p1,Av1v2p2;
 
@@ -299,21 +309,22 @@ bool CollisionDetector::CollisionTwoLines(vector<double> p1,
 
 }
 
-bool CollisionDetector::CollisionLineObstaclePlane(Eigen::Vector3d &LegPoint1,
-                                                   Eigen::Vector3d &LegPoint2,
-                                                   int PlaneNumber)
+bool CollisionDetector::
+CollisionLineObstaclePlane
+(Eigen::Vector3d &LegPoint1,
+ Eigen::Vector3d &LegPoint2,
+ int PlaneNumber)
 {
   /*! This function checks for intersection of a linesegment p1p2
     of the robot, expressed in the obstacle frame, with one of
-    the three planes of the obstacle: plane 0: front; plane 1: top; plane 2:rear plane
+    the three planes of the obstacle: plane 0: front; plane 1: top; 
+    plane 2:rear plane
     it returns true if a collision occurs, else false
 
     for the intersection of a linesegment with an obstacle plane,
     two separate 2D line intersections will be performed: in the XZ plane
     and the XY plane or YZ plane  depending planenumber
     indicates a side plan og the obstacle or not. */
-
-
 
   bool CollisionStatusXZ, CollisionStatusXY,CollisionStatusYZ;
 
@@ -327,8 +338,6 @@ bool CollisionDetector::CollisionLineObstaclePlane(Eigen::Vector3d &LegPoint1,
   CollisionStatusXY = 1;
   CollisionStatusXZ = 1;
   CollisionStatusYZ = 1;
-
-
 
   if (PlaneNumber==3)
     {

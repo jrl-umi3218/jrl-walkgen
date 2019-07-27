@@ -48,7 +48,8 @@
 #define isnan _isnan
 
 //definition of isinf for win32
-//src:  http://www.gnu.org/software/libtool/manual/autoconf/Function-Portability.html
+//src:  http://www.gnu.org/software/libtool/manual/autoconf/
+//Function-Portability.html
 inline int isinf (double x)
 {
   return isnan (x - x);
@@ -95,9 +96,10 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
   m_NbMaxOfConstraints = 8*m_CardV;
   m_NbOfConstraints = 0;
 
-  m_OptCholesky = new PatternGeneratorJRL::OptCholesky(m_NbMaxOfConstraints,
-                                                       2*m_CardV,
-                                                       OptCholesky::MODE_FORTRAN);
+  m_OptCholesky = new PatternGeneratorJRL::
+    OptCholesky(m_NbMaxOfConstraints,
+                2*m_CardV,
+                OptCholesky::MODE_FORTRAN);
 
   string Buffer("InfosPLDP");
   if (m_HotStart)
@@ -317,8 +319,10 @@ int PLDPSolver::ComputeInitialSolution(double *ZMPRef,
           m_Vk[i]+= m_iPu[(m_CardV-1)*m_CardV+i] * ZMPRef[m_CardV-1];
 
           for(unsigned int j=0; j<m_CardV-1; j++)
-            m_Vk[i+m_CardV]+= m_iPu[j*m_CardV+i] * m_PreviousZMPSolution[j+m_CardV+1];
-          m_Vk[i+m_CardV]+= m_iPu[(m_CardV-1)*m_CardV+i] * ZMPRef[m_CardV-1+m_CardV];
+            m_Vk[i+m_CardV]+= m_iPu[j*m_CardV+i] *
+              m_PreviousZMPSolution[j+m_CardV+1];
+          m_Vk[i+m_CardV]+= m_iPu[(m_CardV-1)*m_CardV+i] *
+            ZMPRef[m_CardV-1+m_CardV];
 
         }
 
@@ -626,9 +630,11 @@ double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints,
 
           if (m_tmp2[li]>m_tol)
             {
-              std::cerr << "PB ON constraint "<<li<< " at time " << m_InternalTime << endl;
+              std::cerr << "PB ON constraint "<<li<< " at time "
+                        << m_InternalTime << endl;
               std::cerr << " Check current V k="<<m_ItNb<< endl;
-              std::cerr << " should be faisable : " << m_tmp2[li]<< " " << -m_v2[li] << endl;
+              std::cerr << " should be faisable : " << m_tmp2[li]<< " "
+                        << -m_v2[li] << endl;
             }
           else if (m_tmp2[li]>0.0)
             m_tmp2[li] = -m_tol;
@@ -789,7 +795,8 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
     {
       for(unsigned int i=0; i<m_PreviouslyActivatedConstraints.size(); i++)
         {
-          int lindex=m_PreviouslyActivatedConstraints[i]-NumberOfRemovedConstraints;
+          int lindex=m_PreviouslyActivatedConstraints[i]-
+            NumberOfRemovedConstraints;
           if (lindex>=0)
             {
               m_ActivatedConstraints.push_back(lindex);
@@ -864,7 +871,8 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 
       if (ContinueAlgo)
         {
-          ODEBUG("Nb of activated constraints: " << NewActivatedConstraints.size());
+          ODEBUG("Nb of activated constraints: " <<
+                 NewActivatedConstraints.size());
           m_OptCholesky->AddActiveConstraints(NewActivatedConstraints);
           for(unsigned int i=0; i<NewActivatedConstraints.size(); i++)
             m_ActivatedConstraints.push_back(NewActivatedConstraints[i]);
@@ -921,10 +929,12 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
       ODEBUG("AR (" << lTime <<") :") ;
       for( unsigned int i=0; i<m_ActivatedConstraints.size(); i++)
         {
-          ODEBUG( "( " << m_ActivatedConstraints[i] << " , " << m_v2[i] << " ) ");
+          ODEBUG( "( " << m_ActivatedConstraints[i] << " , "
+                  << m_v2[i] << " ) ");
           if (m_v2[i]<0.0)
             {
-              m_PreviouslyActivatedConstraints.push_back(m_ActivatedConstraints[i]);
+              m_PreviouslyActivatedConstraints.
+                push_back(m_ActivatedConstraints[i]);
               ODEBUG3( m_ActivatedConstraints[i] << " " );
             }
         }
@@ -1008,7 +1018,8 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 
   ODEBUG6(m_ActivatedConstraints.size() << " "
           << NbOfConstraints << " "
-          << m_ActivatedConstraints.size() - m_PreviouslyActivatedConstraints.size() <<
+          << m_ActivatedConstraints.size() -
+          m_PreviouslyActivatedConstraints.size() <<
           " "
           << m_ItNb,(char*)Buffer.c_str());
 
@@ -1030,7 +1041,8 @@ void PLDPSolver::StoreCurrentZMPSolution(double *XkYk)
       for(unsigned int j=0; j<m_CardV; j++)
         {
           m_PreviousZMPSolution[i] += m_Pu[j*m_CardV+i] * m_Vk[j];
-          m_PreviousZMPSolution[i+m_CardV] += m_Pu[j*m_CardV+i] * m_Vk[j+m_CardV];
+          m_PreviousZMPSolution[i+m_CardV] += m_Pu[j*m_CardV+i] *
+            m_Vk[j+m_CardV];
         }
       for(unsigned int j=0; j<3; j++)
         {

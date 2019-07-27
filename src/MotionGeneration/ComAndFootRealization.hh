@@ -97,21 +97,29 @@ namespace PatternGeneratorJRL
       \a  ZMPPreviewControlWithMultiBodyZMP.  */
 
     /*! Compute the robot state for a given CoM and feet posture.
-      Each posture is given by a 3D position and two Euler angles \f$ (\theta, \omega) \f$.
+      Each posture is given by a 3D position and two Euler angles 
+      \f$ (\theta, \omega) \f$.
       Very important: This method is assume to set correctly the body angles of
       its \a HumanoidDynamicRobot and a subsequent call to the ZMP position
       will return the associated ZMP vector.
-      @param CoMPosition: a 5 dimensional vector with the first dimension for position,
+      @param CoMPosition: a 5 dimensional vector with the first dimension 
+      for position,
       and the last two for the orientation (Euler angle).
-      @param CoMSpeed: a 5 dimensional vector: 3 for the linear velocity in X,Y,Z,
+      @param CoMSpeed: a 5 dimensional vector: 3 for the linear velocity in 
+      X,Y,Z,
       and two for the angular velocity.
-      @param CoMAcc: a 5 dimensional vector: 3 for the linear acceleration in X,Y,Z,
+      @param CoMAcc: a 5 dimensional vector: 3 for the linear acceleration in 
+      X,Y,Z,
       and two for the angular acceleration.
-      @param LeftFoot: a 5 dimensional following the same convention than for \a CoMPosition.
+      @param LeftFoot: a 5 dimensional following the same convention than for 
+      \a CoMPosition.
       @param RightFoot: idem.
-      @param CurrentConfiguration: The result is a state vector containing the position which are put inside this parameter.
-      @param CurrentVelocity: The result is a state vector containing the speed which are put inside this parameter.x
-      @param CurrentAcceleration: The result is a state vector containing the acceleration which are put inside this parameter.x
+      @param CurrentConfiguration: The result is a state vector containing the
+      position which are put inside this parameter.
+      @param CurrentVelocity: The result is a state vector containing the speed
+      which are put inside this parameter.x
+      @param CurrentAcceleration: The result is a state vector containing the
+      acceleration which are put inside this parameter.x
       @param IterationNumber: Number of iteration.
       @param Stage: indicates which stage is reach by the Pattern Generator.
     */
@@ -132,7 +140,8 @@ namespace PatternGeneratorJRL
 
     /*! \name Setter and getter for the jrlHumanoidDynamicRobot object. */
 
-    /*! @param aHumanoidDynamicRobot: an object able to compute dynamic parameters
+    /*! @param aHumanoidDynamicRobot: an object able to 
+      compute dynamic parameters
       of the robot. */
     inline  virtual bool setPinocchioRobot(PinocchioRobot *aPinocchioRobot)
     {
@@ -158,18 +167,20 @@ namespace PatternGeneratorJRL
       IMPORTANT: The jrlHumanoidDynamicRobot must have been properly set up.
 
     */
-    virtual bool InitializationCoM(Eigen::VectorXd &BodyAnglesIni,
-                                   Eigen::Vector3d & lStartingCOMPosition,
-                                   Eigen::Matrix<double,6,1> & lStartingWaistPose,
-                                   FootAbsolutePosition & InitLeftFootAbsPos,
-                                   FootAbsolutePosition & InitRightFootAbsPos)=0;
+    virtual bool InitializationCoM
+    (Eigen::VectorXd &BodyAnglesIni,
+     Eigen::Vector3d & lStartingCOMPosition,
+     Eigen::Matrix<double,6,1> & lStartingWaistPose,
+     FootAbsolutePosition & InitLeftFootAbsPos,
+     FootAbsolutePosition & InitRightFootAbsPos)=0;
 
     /*! This initialization phase, make sure that the needed buffers
       for the upper body motion are correctly setup.
     */
-    virtual    bool InitializationUpperBody(deque<ZMPPosition> &inZMPPositions,
-                                            deque<COMPosition> &inCOMBuffer,
-                                            deque<RelativeFootPosition> lRelativeFootPositions)=0;
+    virtual bool InitializationUpperBody
+    (deque<ZMPPosition> &inZMPPositions,
+     deque<COMPosition> &inCOMBuffer,
+     deque<RelativeFootPosition> lRelativeFootPositions)=0;
 
     /* @} */
 

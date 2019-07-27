@@ -65,7 +65,8 @@ namespace PatternGeneratorJRL
   typedef struct ObstaclePar_t ObstaclePar;
 
   /*!\ingroup steppingover
-    \brief Object to compute new foot trajectories to step over obstacle dynamically*/
+    \brief Object to compute new foot trajectories to step over obstacle
+    dynamically*/
   class  StepOverPlanner
   {
   public :
@@ -81,31 +82,34 @@ namespace PatternGeneratorJRL
       footholds to be set in function of an obstacle in front. */
     void CalculateFootHolds(deque<RelativeFootPosition> &FootHolds);
 
-    /*! \brief Call for polynomial planning of both steps during the obstacle stepover */
+    /*! \brief Call for polynomial planning of both steps during the obstacle
+      stepover */
     void PolyPlanner(deque<COMState> &aCOMBuffer,
                      deque<FootAbsolutePosition> & aLeftFootBuffer,
                      deque<FootAbsolutePosition> & aRightFootBuffer,
                      deque<ZMPPosition> & aZMPPositions);
 
-    /*! function which calculates the polynomial coeficients for the first step*/
+    /*! function which calculates the polynomial coeficients 
+      for the first step*/
     void PolyPlannerFirstStep(deque<FootAbsolutePosition>
                               &aFirstStepOverFootBuffer);
 
-    /*! function which calculates the polynomial coeficients for the first step*/
+    /*! function which calculates the polynomial coeficients 
+      for the first step*/
     void PolyPlannerSecondStep(deque<FootAbsolutePosition>
                                &aSecondStepOverFootBuffer);
 
-    /*! function which calculates the polynomial coeficients for the changing COM height*/
+    /*! function which calculates the polynomial coeficients 
+      for the changing COM height*/
     void PolyPlannerHip();
-
-
 
     /*! this sets the extra COM buffer calculated in the ZMPMultybody class*/
     void SetExtraBuffer(deque<COMState> aExtraCOMBuffer,
                         deque<FootAbsolutePosition> aExtraRightFootBuffer,
                         deque<FootAbsolutePosition> aExtraLeftFootBuffer);
 
-    /*! this gets the extra COM buPreviewControlffer calculated in the ZMPMultybody class*/
+    /*! this gets the extra COM buPreviewControlffer calculated 
+      in the ZMPMultybody class*/
     void GetExtraBuffer(deque<COMState> &aExtraCOMBuffer,
                         deque<FootAbsolutePosition> &aExtraRightFootBuffer,
                         deque<FootAbsolutePosition> &aExtraLeftFootBuffer);
