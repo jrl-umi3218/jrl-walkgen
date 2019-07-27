@@ -67,9 +67,9 @@ namespace PatternGeneratorJRL
       \param[in]: CY: command parameter in the perpendicular direction.
     */
     int Interpolation(std::deque<COMState> &COMStates,
-		      std::deque<ZMPPosition> &ZMPRefPositions,
-		      int CurrentPosition,
-		      double CX, double CY);
+                      std::deque<ZMPPosition> &ZMPRefPositions,
+                      int CurrentPosition,
+                      double CX, double CY);
 
 
     /*! \brief Simulate one iteration of the LIPM

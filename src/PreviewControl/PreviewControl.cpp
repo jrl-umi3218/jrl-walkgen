@@ -25,7 +25,7 @@
  */
 
 /** Object to perform preview control on a cart model.
-*/
+ */
 
 #include <fstream>
 //#define _DEBUG_MODE_ON_
@@ -38,8 +38,8 @@
 using namespace::PatternGeneratorJRL;
 
 PreviewControl::PreviewControl(SimplePluginManager *lSPM,
-			       unsigned int defaultMode,
-			       bool lAutoComputeWeights)
+                               unsigned int defaultMode,
+                               bool lAutoComputeWeights)
   : SimplePlugin(lSPM)
 {
 
@@ -68,13 +68,13 @@ PreviewControl::PreviewControl(SimplePluginManager *lSPM,
   for(int i=0;i<3;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
-	{
-	  std::cerr << "Unable to register " << aMethodName << std::endl;
-	}
+        {
+          std::cerr << "Unable to register " << aMethodName << std::endl;
+        }
       else
-	{
-	  ODEBUG("Succeed in registering " << aMethodName[i]);
-	}
+        {
+          ODEBUG("Succeed in registering " << aMethodName[i]);
+        }
 
     }
 
@@ -129,7 +129,7 @@ void PreviewControl::SetHeightOfCoM(double lHeightOfCom)
   if (m_Zc!=lHeightOfCom)
     {
       ODEBUG("m_Zc: " << m_Zc << " lHeightOfCom: "<< lHeightOfCom)
-      m_Coherent = false;
+        m_Coherent = false;
     }
 
   m_Zc = lHeightOfCom;
@@ -158,24 +158,24 @@ void PreviewControl::ReadPrecomputedFile(string aFileName)
 
       float r;
       for(int i=0;i<3;i++)
-	{
-	  aif >> r;
-	  m_Kx(0,i)=r ;
-	}
+        {
+          aif >> r;
+          m_Kx(0,i)=r ;
+        }
 
       aif >> r;
       m_Ks=r;
 
 
       m_SizeOfPreviewWindow = (unsigned int)(m_PreviewControlTime/
-					     m_SamplingPeriod);
+                                             m_SamplingPeriod);
       Eigen::MatrixXd m_F(m_SizeOfPreviewWindow,1);
 
       for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
-	{
-	  aif >> r;
-	  m_F(i,0)=r;
-	}
+        {
+          aif >> r;
+          m_F(i,0)=r;
+        }
       //      cout << (*m_F) << endl;
       double T = m_SamplingPeriod;
       m_A(0,0) = 1.0; m_A(0,1) =   T; m_A(0,2) = T*T/2.0;
@@ -250,19 +250,19 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
 
       Ax(0,0)= 1.0;
       for(int i=0;i<3;i++)
-      {
-        cx(0,i+1)=0.0;
-        Ax(0,i+1) = tmpA(0,i);
-        for(int j=0;j<3;j++)
-          Ax(i+1,j+1) = m_A(i,j);
-      }
+        {
+          cx(0,i+1)=0.0;
+          Ax(0,i+1) = tmpA(0,i);
+          for(int j=0;j<3;j++)
+            Ax(i+1,j+1) = m_A(i,j);
+        }
 
       tmpb = m_C*m_B;
       bx(0,0) = tmpb(0,0);
       for(int i=0;i<3;i++)
-      {
-        bx(i+1,0) = m_B(i,0);
-      }
+        {
+          bx(i+1,0) = m_B(i,0);
+        }
 
       cx(0,0) =1.0;
 
@@ -272,7 +272,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       ODEBUG("Q:" << Q);
       ODEBUG("R:" << R);
       anOCS = new PatternGeneratorJRL::
-	OptimalControllerSolver(Ax,bx,cx,Q,R,Nl);
+        OptimalControllerSolver(Ax,bx,cx,Q,R,Nl);
 
       anOCS->ComputeWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
@@ -313,15 +313,15 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
   ODEBUG("Q:" << Q <<" R:" << R);
   ODEBUG("m_Ks: " <<m_Ks);
   ODEBUG("m_Kx(0,0): " << m_Kx(0,0) << " " <<
-	  "m_Kx(0,1): " << m_Kx(0,1) << " " <<
-	  "m_Kx(0,2): " << m_Kx(0,2) );
+         "m_Kx(0,1): " << m_Kx(0,1) << " " <<
+         "m_Kx(0,2): " << m_Kx(0,2) );
 
   ODEBUG("m_A" <<m_A);
   ODEBUG("m_B" <<m_B);
   ODEBUG("m_C" <<m_C);
 
   m_SizeOfPreviewWindow = (unsigned int)(m_PreviewControlTime/
-					 m_SamplingPeriod);
+                                         m_SamplingPeriod);
   Eigen::MatrixXd m_F(m_SizeOfPreviewWindow,1);
 
   m_Coherent = true;
@@ -404,7 +404,7 @@ OneIterationOfPreview1D
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
     {
       ODEBUG("ZMPPositions.size()<m_SizeOfPreviewWindow:" <<
-	      ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
+             ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
       exit(0);
     }
 
@@ -453,7 +453,7 @@ OneIterationOfPreview1D
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
     {
       ODEBUG("ZMPPositions.size()< m_SizeOfPreviewWindow:" <<
-	      ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
+             ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
       exit(0);
     }
 
@@ -463,25 +463,25 @@ OneIterationOfPreview1D
   if (TestSize>=0)
     {
       for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
-	ux += m_F(i,0)* ZMPPositions[lindex+i];
+        ux += m_F(i,0)* ZMPPositions[lindex+i];
     }
   else
     {
       ODEBUG("Case where TestSize<0 (lindex:" <<lindex <<
-	      " , ZMPPositions.size(): " << ZMPPositions.size() <<
-	      " , m_SizeOfPreviewWindow: " << m_SizeOfPreviewWindow);
+             " , ZMPPositions.size(): " << ZMPPositions.size() <<
+             " , m_SizeOfPreviewWindow: " << m_SizeOfPreviewWindow);
       for(unsigned long int i=lindex;
-	  i<ZMPPositions.size();
-	  i++)
-	ux += m_F(i,0)* ZMPPositions[i];
+          i<ZMPPositions.size();
+          i++)
+        ux += m_F(i,0)* ZMPPositions[i];
 
       int StillToRealized = (int)m_SizeOfPreviewWindow
-	- (int)ZMPPositions.size()
-	+ (int)lindex;
+        - (int)ZMPPositions.size()
+        + (int)lindex;
       for(unsigned int i=0;
-	  i<(unsigned int)StillToRealized ;
-	  i++)
-	ux += m_F(i,0)* ZMPPositions[i];
+          i<(unsigned int)StillToRealized ;
+          i++)
+        ux += m_F(i,0)* ZMPPositions[i];
     }
   ODEBUG(" ux preview window phase: " << ux );
   x = m_A*x + ux * m_B;
@@ -530,44 +530,44 @@ CallMethod
     {
       std::string aws;
       if (strm.good())
-	{
-	  double lSamplingPeriod;
-	  strm >> lSamplingPeriod;
-	  SetSamplingPeriod(lSamplingPeriod);
-	}
+        {
+          double lSamplingPeriod;
+          strm >> lSamplingPeriod;
+          SetSamplingPeriod(lSamplingPeriod);
+        }
     }
   else if (Method==":previewcontroltime")
     {
       std::string aws;
       if (strm.good())
-	{
-	  double lpreviewcontroltime;
-	  strm >> lpreviewcontroltime;
-	  SetPreviewControlTime(lpreviewcontroltime);
-	}
+        {
+          double lpreviewcontroltime;
+          strm >> lpreviewcontroltime;
+          SetPreviewControlTime(lpreviewcontroltime);
+        }
     }
   else if (Method==":comheight")
     { std::string aws;
       if (strm.good())
-	{
-	  double lcomheight;
-	  strm >> lcomheight;
-	  SetHeightOfCoM(lcomheight);
-	}
+        {
+          double lcomheight;
+          strm >> lcomheight;
+          SetHeightOfCoM(lcomheight);
+        }
     }
   else if (Method==":computeweightsofpreview")
     {
       std::string aws;
       if (strm.good())
-	{
-	  string initialpos;
-	  strm >> initialpos;
-	  if (initialpos=="withinitialpos")
-	    ComputeOptimalWeights
-	      (OptimalControllerSolver::MODE_WITH_INITIALPOS);
-	  else if (initialpos=="withoutinitialpos")
-	    ComputeOptimalWeights
-	      (OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
-	}
+        {
+          string initialpos;
+          strm >> initialpos;
+          if (initialpos=="withinitialpos")
+            ComputeOptimalWeights
+              (OptimalControllerSolver::MODE_WITH_INITIALPOS);
+          else if (initialpos=="withoutinitialpos")
+            ComputeOptimalWeights
+              (OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
+        }
     }
 }

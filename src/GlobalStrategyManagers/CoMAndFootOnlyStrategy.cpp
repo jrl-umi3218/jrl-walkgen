@@ -70,10 +70,10 @@ OneGlobalStepOfControl
  Eigen::VectorXd & )//CurrentAcceleration)
 {
   ODEBUG("Begin OneGlobalStepOfControl "
-	  << m_LeftFootPositions->size() << " "
-	  << m_RightFootPositions->size() << " "
-	  << m_COMBuffer->size() << " "
-	  << m_ZMPPositions->size());
+         << m_LeftFootPositions->size() << " "
+         << m_RightFootPositions->size() << " "
+         << m_COMBuffer->size() << " "
+         << m_ZMPPositions->size());
 
   /* The strategy of this class is simply to pull off values from the buffers. */
   if (m_LeftFootPositions->size()>0)
@@ -84,7 +84,7 @@ OneGlobalStepOfControl
   else
     {
       std::cerr << "Problem on the left foot position queue: empty"
-		<< std::endl;
+                << std::endl;
       return -2;
     }
 
@@ -96,7 +96,7 @@ OneGlobalStepOfControl
   else
     {
       std::cerr << "Problem on the right foot position queue: empty"
-		<< std::endl;
+                << std::endl;
       return -3;
     }
 
@@ -108,7 +108,7 @@ OneGlobalStepOfControl
   else
     {
       std::cerr << "Problem on the COM queue: empty"
-	        << std::endl;
+                << std::endl;
       return -4;
     }
 
@@ -127,10 +127,10 @@ OneGlobalStepOfControl
     }
 
   ODEBUG("End of OneGlobalStepOfControl"
-	  << m_LeftFootPositions->size() << " "
-	  << m_RightFootPositions->size() << " "
-	  << m_COMBuffer->size() << " "
-	  << m_ZMPPositions->size());
+         << m_LeftFootPositions->size() << " "
+         << m_RightFootPositions->size() << " "
+         << m_COMBuffer->size() << " "
+         << m_ZMPPositions->size());
   return 0;
 }
 
@@ -154,26 +154,26 @@ EvaluateStartingState
   for (itCFR = m_ComAndFootRealization.begin() ;
        itCFR != m_ComAndFootRealization.end() ;
        ++itCFR )
-  {
-    // here we use the analytical forward kinematics
-    // to initialise the position of the CoM of mass according to
-    // the articular position of the robot.
-    (*itCFR)->InitializationCoM
-      (BodyAngles,lStartingCOMState,
-       lStartingWaistPose,
-       InitLeftFootPosition,
-       InitRightFootPosition);
+    {
+      // here we use the analytical forward kinematics
+      // to initialise the position of the CoM of mass according to
+      // the articular position of the robot.
+      (*itCFR)->InitializationCoM
+        (BodyAngles,lStartingCOMState,
+         lStartingWaistPose,
+         InitLeftFootPosition,
+         InitRightFootPosition);
 
-    ODEBUG("EvaluateStartingCOM: m_StartingCOMState: "
-	   << lStartingCOMState);
-    aStartingCOMState.x[0] = lStartingCOMState(0);
-    aStartingCOMState.y[0] = lStartingCOMState(1);
-    aStartingCOMState.z[0] = lStartingCOMState(2);
-    aStartingCOMState.yaw[0] = lStartingWaistPose(5);
-    aStartingCOMState.pitch[0] = lStartingWaistPose(4);
-    aStartingCOMState.roll[0] = lStartingWaistPose(3);
-    aStartingZMPPosition= (*itCFR)->GetCOGInitialAnkles();
-  }
+      ODEBUG("EvaluateStartingCOM: m_StartingCOMState: "
+             << lStartingCOMState);
+      aStartingCOMState.x[0] = lStartingCOMState(0);
+      aStartingCOMState.y[0] = lStartingCOMState(1);
+      aStartingCOMState.z[0] = lStartingCOMState(2);
+      aStartingCOMState.yaw[0] = lStartingWaistPose(5);
+      aStartingCOMState.pitch[0] = lStartingWaistPose(4);
+      aStartingCOMState.roll[0] = lStartingWaistPose(3);
+      aStartingZMPPosition= (*itCFR)->GetCOGInitialAnkles();
+    }
 
   // We assume that the robot is not moving
   // at the beginning so the zmp is the projection of the com on the ground.
@@ -201,25 +201,25 @@ int CoMAndFootOnlyStrategy::EndOfMotion()
   if (m_LeftFootPositions->size()>m_BufferSizeLimit)
     {
       if (m_LeftFootPositions->size()==m_BufferSizeLimit+1)
-	{
-	  ODEBUG("LeftFootPositions position ( "<< (*m_LeftFootPositions)[0].x
-		 << " , " << (*m_LeftFootPositions)[0].y << " ) " );
-	}
+        {
+          ODEBUG("LeftFootPositions position ( "<< (*m_LeftFootPositions)[0].x
+                 << " , " << (*m_LeftFootPositions)[0].y << " ) " );
+        }
 
       m_NbOfHitBottom=0;
       return 1;
     }
   else if ((m_LeftFootPositions->size()==m_BufferSizeLimit) &&
-	   (m_NbOfHitBottom==0))
+           (m_NbOfHitBottom==0))
     {
       ODEBUG("LeftFootPositions size : "<< m_LeftFootPositions->size()
-	     << "Buffer size limit: " << m_BufferSizeLimit);
+             << "Buffer size limit: " << m_BufferSizeLimit);
 
       m_NbOfHitBottom++;
       return 0;
     }
   else if ((m_LeftFootPositions->size()==m_BufferSizeLimit) &&
-	   (m_NbOfHitBottom>0))
+           (m_NbOfHitBottom>0))
     {
       return -1;
     }
@@ -227,14 +227,14 @@ int CoMAndFootOnlyStrategy::EndOfMotion()
 }
 
 void CoMAndFootOnlyStrategy::Setup(deque<ZMPPosition> &,          // aZMPPositions,
-				   deque<COMState> &,             // aCOMBuffer,
-				   deque<FootAbsolutePosition> &, // aLeftFootAbsolutePositions,
-				   deque<FootAbsolutePosition> &) // aRightFootAbsolutePositions)
+                                   deque<COMState> &,             // aCOMBuffer,
+                                   deque<FootAbsolutePosition> &, // aLeftFootAbsolutePositions,
+                                   deque<FootAbsolutePosition> &) // aRightFootAbsolutePositions)
 {
 }
 
 void CoMAndFootOnlyStrategy::CallMethod(std::string &,//Method,
-					std::istringstream &)// astrm)
+                                        std::istringstream &)// astrm)
 {
 }
 

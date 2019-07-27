@@ -52,7 +52,7 @@ namespace PatternGeneratorJRL
     ~CoMAndFootOnlyStrategy();
 
     /*! \name Reimplement the interface inherited from Global Strategy Manager
-     @{
+      @{
     */
 
     /*! Perform a 5 ms step to generate the necessary information.
@@ -68,12 +68,12 @@ namespace PatternGeneratorJRL
       @param[out] CurrentAcceleration: The results is a state vector containing the acceleration.
     */
     int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
-			       FootAbsolutePosition &RightFootPosition,
-			       Eigen::VectorXd & ZMPRefPos,
-			       COMState & finalCOMState,
-			       Eigen::VectorXd & CurrentConfiguration,
-			       Eigen::VectorXd & CurrentVelocity,
-			       Eigen::VectorXd & CurrentAcceleration);
+                               FootAbsolutePosition &RightFootPosition,
+                               Eigen::VectorXd & ZMPRefPos,
+                               COMState & finalCOMState,
+                               Eigen::VectorXd & CurrentConfiguration,
+                               Eigen::VectorXd & CurrentVelocity,
+                               Eigen::VectorXd & CurrentAcceleration);
 
 
 
@@ -93,11 +93,11 @@ namespace PatternGeneratorJRL
       in the waist coordinates frame.
     */
     int EvaluateStartingState(Eigen::VectorXd & BodyAngles,
-			      COMState & aStartingCOMState,
-			      Eigen::Vector3d & aStartingZMPPosition,
-			      Eigen::Matrix<double,6,1> & aStartingWaistPose,
-			      FootAbsolutePosition & InitLeftFootPosition,
-			      FootAbsolutePosition & InitRightFootPosition);
+                              COMState & aStartingCOMState,
+                              Eigen::Vector3d & aStartingZMPPosition,
+                              Eigen::Matrix<double,6,1> & aStartingWaistPose,
+                              FootAbsolutePosition & InitLeftFootPosition,
+                              FootAbsolutePosition & InitRightFootPosition);
 
 
 
@@ -112,7 +112,7 @@ namespace PatternGeneratorJRL
     /*! @} */
 
     /*! Methods related to the end of the motion.
-     @{
+      @{
     */
     /* Fix the end of the buffer to be tested. */
     void SetTheLimitOfTheBuffer(unsigned int lBufferSizeLimit);
@@ -125,14 +125,14 @@ namespace PatternGeneratorJRL
 
     /*! */
     void Setup(deque<ZMPPosition> & aZMPPositions,
-	       deque<COMState> & aCOMBuffer,
-	       deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
-	       deque<FootAbsolutePosition> & aRightFootAbsolutePositions);
+               deque<COMState> & aCOMBuffer,
+               deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
+               deque<FootAbsolutePosition> & aRightFootAbsolutePositions);
 
     /*! \brief Initialization of the inter objects relationship. */
     int InitInterObjects(PinocchioRobot * aPR,
-			 std::vector<ComAndFootRealization *> aCFR,
-			 StepStackHandler * aSSH);
+                         std::vector<ComAndFootRealization *> aCFR,
+                         StepStackHandler * aSSH);
 
   protected:
     /*! Count the number of successives hits on the bottom of the buffers. */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Andrei Herdt
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file mpc-trajectory-generation.cpp
@@ -49,24 +49,24 @@ MPCTrajectoryGeneration::MPCTrajectoryGeneration(SimplePluginManager *lSPM)
   , Omega_(0.)
 {
 
-  std::string aMethodName[6] = 
+  std::string aMethodName[6] =
     {":omega",
      ":stepheight",
      ":singlesupporttime",
      ":doublesupporttime",
      ":comheight",
      ":samplingperiod"};
-  
+
   for(int i=0;i<6;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
-	{
-	  std::cerr << "Unable to register " << aMethodName << std::endl;
-	}
+        {
+          std::cerr << "Unable to register " << aMethodName << std::endl;
+        }
       else
-	{
-	  ODEBUG("Succeed in registering " << aMethodName[i]);
-	}
+        {
+          ODEBUG("Succeed in registering " << aMethodName[i]);
+        }
 
     }
 }
@@ -108,7 +108,7 @@ void MPCTrajectoryGeneration::CallMethod(std::string & Method, std::istringstrea
       strm >> Tprw_;
       ODEBUG(":samplingperiod" << Tprw_ << " ID: " << this);
     }
-  
+
 }
 
 bool MPCTrajectoryGeneration::GetOnLineMode()

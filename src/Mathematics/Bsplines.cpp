@@ -26,9 +26,9 @@ void Bsplines::GenerateDegree()
   if (degree < 0)
     {
       std::cerr << __FILE__<< ":"
-		<< __FUNCTION__ << "(#"
-		<< __LINE__ << "):" 
-		<< " Carefull !! degree is smaller than 0 " << endl;
+                << __FUNCTION__ << "(#"
+                << __LINE__ << "):"
+                << " Carefull !! degree is smaller than 0 " << endl;
     }
   m_degree = (unsigned)degree ;
 }
@@ -143,34 +143,34 @@ int Bsplines::ComputeBasisFunctions(double t)
       m_basis_functions[j].resize(n+1,0.0);
 
       for(unsigned int i=0 ; i<=n ; i++)
-	{
-	  if ( j == 0)
-	    {
-	      if(t==1)
-		is_in = (m_knot[i] <  t) && (t <= m_knot[i+1]);
-	      else
-		is_in = (m_knot[i] <= t) && (t <  m_knot[i+1]);
+        {
+          if ( j == 0)
+            {
+              if(t==1)
+                is_in = (m_knot[i] <  t) && (t <= m_knot[i+1]);
+              else
+                is_in = (m_knot[i] <= t) && (t <  m_knot[i+1]);
 
-	      if ( is_in )
-		m_basis_functions[j][i] = 1.0;
-	      else
-		m_basis_functions[j][i] = 0.0;
-	    }
-	  else
-	    {
-	      if ( m_knot[i] == m_knot[i+j] )
-		tmp1 = 0.0 ;
-	      else
-		tmp1 = (t - m_knot[i]) / (m_knot[i+j]-m_knot[i]) * m_basis_functions[j-1][i] ;
+              if ( is_in )
+                m_basis_functions[j][i] = 1.0;
+              else
+                m_basis_functions[j][i] = 0.0;
+            }
+          else
+            {
+              if ( m_knot[i] == m_knot[i+j] )
+                tmp1 = 0.0 ;
+              else
+                tmp1 = (t - m_knot[i]) / (m_knot[i+j]-m_knot[i]) * m_basis_functions[j-1][i] ;
 
-	      if (m_knot[i+j+1] == m_knot[i+1])
-		tmp2 = 0.0 ;
-	      else
-		tmp2 = (m_knot[i+j+1] - t) / (m_knot[i+j+1]-m_knot[i+1] ) * m_basis_functions[j-1][i+1] ;
+              if (m_knot[i+j+1] == m_knot[i+1])
+                tmp2 = 0.0 ;
+              else
+                tmp2 = (m_knot[i+j+1] - t) / (m_knot[i+j+1]-m_knot[i+1] ) * m_basis_functions[j-1][i+1] ;
 
-	      m_basis_functions[j][i] = tmp1 + tmp2  ;
-	    }
-	}
+              m_basis_functions[j][i] = tmp1 + tmp2  ;
+            }
+        }
     }
 
   // compute their time derivative for the m_degree p=m_m_degree : d Nip(t) /dt
@@ -179,16 +179,16 @@ int Bsplines::ComputeBasisFunctions(double t)
     {
       tmp1=0.0;tmp2=0.0;
       if ( m_knot[i+m_degree] == m_knot[i] )
-	tmp1 = 0.0 ;
+        tmp1 = 0.0 ;
       else
-	tmp1 = (double)m_degree / (double)((m_knot[i+m_degree]-m_knot[i]))
-	  * m_basis_functions[m_degree-1][i] ;
+        tmp1 = (double)m_degree / (double)((m_knot[i+m_degree]-m_knot[i]))
+          * m_basis_functions[m_degree-1][i] ;
 
       if (m_knot[i+m_degree+1] == m_knot[i+1])
-	tmp2 = 0.0 ;
+        tmp2 = 0.0 ;
       else
-	tmp2 = (double)m_degree / (double)((m_knot[i+m_degree+1]-m_knot[i+1]))
-	  * m_basis_functions[m_degree-1][i+1] ;
+        tmp2 = (double)m_degree / (double)((m_knot[i+m_degree+1]-m_knot[i+1]))
+          * m_basis_functions[m_degree-1][i+1] ;
       m_basis_functions_derivative[i] = tmp1 - tmp2 ;
     }
 
@@ -206,33 +206,33 @@ int Bsplines::ComputeBasisFunctions(double t)
       den1=0.0;den2=0.0;den3=0.0;den4=0.0;
 
       den1 = (m_knot[i+m_degree]-m_knot[i]) *
-	(m_knot[i+m_degree-1]-m_knot[i])       ;
+        (m_knot[i+m_degree-1]-m_knot[i])       ;
       den2 = (m_knot[i+m_degree]-m_knot[i]) *
-	(m_knot[i+m_degree]-m_knot[i+1])       ;
+        (m_knot[i+m_degree]-m_knot[i+1])       ;
       den3 = (m_knot[i+m_degree+1]-m_knot[i+1]) *
-	(m_knot[i+m_degree]-m_knot[i+1])   ;
+        (m_knot[i+m_degree]-m_knot[i+1])   ;
       den4 = (m_knot[i+m_degree+1]-m_knot[i+1]) *
-	(m_knot[i+m_degree+1]-m_knot[i+2]) ;
+        (m_knot[i+m_degree+1]-m_knot[i+2]) ;
 
       if ( den1 == 0 )
-	tmp1 = 0.0 ;
+        tmp1 = 0.0 ;
       else
-	tmp1 = factor / den1 ;
+        tmp1 = factor / den1 ;
 
       if ( den2 == 0 )
-	tmp2 = 0.0 ;
+        tmp2 = 0.0 ;
       else
-	tmp2 = -factor / den2 ;
+        tmp2 = -factor / den2 ;
 
       if ( den3 == 0 )
-	tmp3 = 0.0 ;
+        tmp3 = 0.0 ;
       else
-	tmp3 = -factor / den3 ;
+        tmp3 = -factor / den3 ;
 
       if ( den4 == 0 )
-	tmp4 = 0.0 ;
+        tmp4 = 0.0 ;
       else
-	tmp4 = factor / den4 ;
+        tmp4 = factor / den4 ;
 
       m_basis_functions_sec_derivative[i] =
         tmp1 * m_basis_functions[m_degree-2][i]   +
@@ -271,14 +271,14 @@ double Bsplines::Nij_t(int i, int j, double t, deque<double> & m_knot)
       double tmp1 (0.0), tmp2 (0.0) ;
 
       if ( m_knot[i] == m_knot[i+j] )
-	tmp1 = 0.0 ;
+        tmp1 = 0.0 ;
       else
-	tmp1 = (t - m_knot[i]) / (m_knot[i+j]-m_knot[i]) * Bsplines::Nij_t(i,j-1,t,m_knot) ;
+        tmp1 = (t - m_knot[i]) / (m_knot[i+j]-m_knot[i]) * Bsplines::Nij_t(i,j-1,t,m_knot) ;
 
       if (m_knot[i+j+1] == m_knot[i+1])
-	tmp2 = 0.0 ;
+        tmp2 = 0.0 ;
       else
-	tmp2 = (m_knot[i+j+1] - t) / (m_knot[i+j+1]-m_knot[i+1] ) * Bsplines::Nij_t(i+1,j-1,t,m_knot) ;
+        tmp2 = (m_knot[i+j+1] - t) / (m_knot[i+j+1]-m_knot[i+1] ) * Bsplines::Nij_t(i+1,j-1,t,m_knot) ;
 
       Nij_t = tmp1 + tmp2  ;
     }
@@ -313,19 +313,19 @@ Bsplines Bsplines::DerivativeBsplines()
 
       for (unsigned int i=0 ; i<dB_control_points.size() ; ++i)
         {
-	  if(m_knot[i+m_degree+1] - m_knot[i+1]==0.0)
+          if(m_knot[i+m_degree+1] - m_knot[i+1]==0.0)
             {
               cerr << "Knot no differenciable : result in the zero function\n" ;
               dB_control_points[i] = 0.0 ;
             }
-	  else
+          else
             {
               dB_control_points[i] = ((m_control_points[i+1] - m_control_points[i])*double(m_degree) )/ (m_knot[i+m_degree+1] - m_knot[i+1]);
             }
         }
 
       for (unsigned int i=0 ; i<dB_knot_vector.size() ; ++i)
-	dB_knot_vector[i] = m_knot[i+1] ;
+        dB_knot_vector[i] = m_knot[i+1] ;
 
 
       dB.SetKnotVector(dB_knot_vector);
@@ -485,8 +485,8 @@ void  BSplinesFoot::SetParameters(double FT,
         {knot[i]=0.0;}
 
       for (long int i=knot.size()-(m_degree+1) ;
-	   i<=(long int)knot.size() ;
-	   i++)
+           i<=(long int)knot.size() ;
+           i++)
         {knot[i]=1.0;}
 
       SetKnotVector(knot);
@@ -500,8 +500,8 @@ void  BSplinesFoot::SetParameters(double FT,
       knot[m_degree+1] = m_ToMP[0]/m_FT ;
 
       for (long int i=knot.size()-(m_degree+1) ;
-	   i<=(long int)knot.size() ;
-	   i++)
+           i<=(long int)knot.size() ;
+           i++)
         {knot[i]=1.0;}
 
       SetKnotVector(knot);
@@ -517,8 +517,8 @@ void  BSplinesFoot::SetParameters(double FT,
       knot[m_degree+2] = m_ToMP[1]/m_FT ;
 
       for (long int i=knot.size()-(m_degree+1) ;
-	   i<=(long int)knot.size() ;
-	   i++)
+           i<=(long int)knot.size() ;
+           i++)
         {knot[i]=1.0;}
 
       SetKnotVector(knot);
@@ -574,14 +574,14 @@ void BSplinesFoot::ComputeControlPointFrom2DataPoint(void)
   m_control_points[0]=IP ;
   m_control_points[1]=
     1.0/( dN2T*dN3T0*ddN1T*ddN4T0-dN3T*dN4T0*ddN2T*ddN1T0+dN1T*ddN4T0*ddN3T
-	  *dN2T0-dN2T*ddN3T0*dN4T0*ddN1T+ddN4T*dN1T*ddN2T0*dN3T0+dN1T0*dN3T
-	  *ddN4T0*ddN2T+dN4T*dN3T0*ddN2T*ddN1T0-dN1T*ddN2T0*dN4T0*ddN3T+dN2T
-	  *dN4T0*ddN3T*ddN1T0-dN1T*dN3T0*ddN4T0*ddN2T+ddN2T0*dN3T*dN4T0*ddN1T
-	  -ddN4T*ddN2T0*dN1T0*dN3T+dN2T*ddN4T*ddN3T0*dN1T0-dN3T*ddN1T*ddN4T0
-	  *dN2T0-dN4T*ddN2T0*dN3T0*ddN1T-dN2T*dN1T0*ddN4T0*ddN3T+dN4T*ddN2T0
-	  *dN1T0*ddN3T+ddN3T0*dN4T*ddN1T*dN2T0-dN4T*ddN3T*dN2T0*ddN1T0+ddN3T0
-	  *dN1T*dN4T0*ddN2T-dN2T*ddN4T*dN3T0*ddN1T0-ddN3T0*dN4T*dN1T0*ddN2T
-	  +ddN4T*dN3T*dN2T0*ddN1T0-ddN4T*ddN3T0*dN1T*dN2T0)
+          *dN2T0-dN2T*ddN3T0*dN4T0*ddN1T+ddN4T*dN1T*ddN2T0*dN3T0+dN1T0*dN3T
+          *ddN4T0*ddN2T+dN4T*dN3T0*ddN2T*ddN1T0-dN1T*ddN2T0*dN4T0*ddN3T+dN2T
+          *dN4T0*ddN3T*ddN1T0-dN1T*dN3T0*ddN4T0*ddN2T+ddN2T0*dN3T*dN4T0*ddN1T
+          -ddN4T*ddN2T0*dN1T0*dN3T+dN2T*ddN4T*ddN3T0*dN1T0-dN3T*ddN1T*ddN4T0
+          *dN2T0-dN4T*ddN2T0*dN3T0*ddN1T-dN2T*dN1T0*ddN4T0*ddN3T+dN4T*ddN2T0
+          *dN1T0*ddN3T+ddN3T0*dN4T*ddN1T*dN2T0-dN4T*ddN3T*dN2T0*ddN1T0+ddN3T0
+          *dN1T*dN4T0*ddN2T-dN2T*ddN4T*dN3T0*ddN1T0-ddN3T0*dN4T*dN1T0*ddN2T
+          +ddN4T*dN3T*dN2T0*ddN1T0-ddN4T*ddN3T0*dN1T*dN2T0)
     *( FS*ddN4T*ddN2T0*dN3T0-IA*dN3T*dN4T0*ddN2T-ddN3T0*dN4T*ddN2T*IS-dN2T
        *ddN0T0*IP*dN4T0*ddN3T-dN4T*ddN2T0*dN3T0*FA+ddN3T0*dN4T*IP*dN0T0
        *ddN2T-ddN0T0*ddN4T*IP*dN3T*dN2T0-dN3T*ddN4T0*FA*dN2T0+ddN0T0*IP*dN3T
@@ -601,14 +601,14 @@ void BSplinesFoot::ComputeControlPointFrom2DataPoint(void)
        *FP*dN2T0+dN2T*dN3T0*ddN4T0*FA-ddN4T*ddN2T0*dN3T*IS+ddN4T*ddN2T0*IP*dN3T*dN0T0) ;
   m_control_points[2]=
     -1.0/( dN2T*dN3T0*ddN1T*ddN4T0-dN3T*dN4T0*ddN2T*ddN1T0+dN1T*ddN4T0*ddN3T
-	   *dN2T0-dN2T*ddN3T0*dN4T0*ddN1T+ddN4T*dN1T*ddN2T0*dN3T0+dN1T0*dN3T
-	   *ddN4T0*ddN2T+dN4T*dN3T0*ddN2T*ddN1T0-dN1T*ddN2T0*dN4T0*ddN3T+dN2T
-	   *dN4T0*ddN3T*ddN1T0-dN1T*dN3T0*ddN4T0*ddN2T+ddN2T0*dN3T*dN4T0*ddN1T
-	   -ddN4T*ddN2T0*dN1T0*dN3T+dN2T*ddN4T*ddN3T0*dN1T0-dN3T*ddN1T*ddN4T0
-	   *dN2T0-dN4T*ddN2T0*dN3T0*ddN1T-dN2T*dN1T0*ddN4T0*ddN3T+dN4T*ddN2T0
-	   *dN1T0*ddN3T+ddN3T0*dN4T*ddN1T*dN2T0-dN4T*ddN3T*dN2T0*ddN1T0+ddN3T0
-	   *dN1T*dN4T0*ddN2T-dN2T*ddN4T*dN3T0*ddN1T0-ddN3T0*dN4T*dN1T0*ddN2T
-	   +ddN4T*dN3T*dN2T0*ddN1T0-ddN4T*ddN3T0*dN1T*dN2T0)
+           *dN2T0-dN2T*ddN3T0*dN4T0*ddN1T+ddN4T*dN1T*ddN2T0*dN3T0+dN1T0*dN3T
+           *ddN4T0*ddN2T+dN4T*dN3T0*ddN2T*ddN1T0-dN1T*ddN2T0*dN4T0*ddN3T+dN2T
+           *dN4T0*ddN3T*ddN1T0-dN1T*dN3T0*ddN4T0*ddN2T+ddN2T0*dN3T*dN4T0*ddN1T
+           -ddN4T*ddN2T0*dN1T0*dN3T+dN2T*ddN4T*ddN3T0*dN1T0-dN3T*ddN1T*ddN4T0
+           *dN2T0-dN4T*ddN2T0*dN3T0*ddN1T-dN2T*dN1T0*ddN4T0*ddN3T+dN4T*ddN2T0
+           *dN1T0*ddN3T+ddN3T0*dN4T*ddN1T*dN2T0-dN4T*ddN3T*dN2T0*ddN1T0+ddN3T0
+           *dN1T*dN4T0*ddN2T-dN2T*ddN4T*dN3T0*ddN1T0-ddN3T0*dN4T*dN1T0*ddN2T
+           +ddN4T*dN3T*dN2T0*ddN1T0-ddN4T*ddN3T0*dN1T*dN2T0)
     *( ddN0T0*dN4T*dN1T0*IP*ddN3T+ddN5T*ddN3T0*dN1T*dN4T0*FP-dN1T*ddN4T0*ddN3T*IS
        +dN1T*IP*ddN4T0*ddN3T*dN0T0+dN4T0*FP*dN5T*ddN3T*ddN1T0-ddN5T*ddN3T0*dN4T
        *dN1T0*FP+dN1T*dN3T0*ddN4T0*FA-ddN4T*dN3T0*FP*dN5T*ddN1T0-FS*dN4T0*ddN3T
@@ -628,13 +628,13 @@ void BSplinesFoot::ComputeControlPointFrom2DataPoint(void)
        +ddN5T*dN1T0*dN3T*ddN4T0*FP);
   m_control_points[3]=
     -1.0/( dN2T*dN3T0*ddN1T*ddN4T0-dN3T*dN4T0*ddN2T*ddN1T0+dN1T*ddN4T0*ddN3T*dN2T0
-	   -dN2T*ddN3T0*dN4T0*ddN1T+ddN4T*dN1T*ddN2T0*dN3T0+dN1T0*dN3T*ddN4T0*ddN2T
-	   +dN4T*dN3T0*ddN2T*ddN1T0-dN1T*ddN2T0*dN4T0*ddN3T+dN2T*dN4T0*ddN3T*ddN1T0
-	   -dN1T*dN3T0*ddN4T0*ddN2T+ddN2T0*dN3T*dN4T0*ddN1T-ddN4T*ddN2T0*dN1T0*dN3T
-	   +dN2T*ddN4T*ddN3T0*dN1T0-dN3T*ddN1T*ddN4T0*dN2T0-dN4T*ddN2T0*dN3T0*ddN1T
-	   -dN2T*dN1T0*ddN4T0*ddN3T+dN4T*ddN2T0*dN1T0*ddN3T+ddN3T0*dN4T*ddN1T*dN2T0
-	   -dN4T*ddN3T*dN2T0*ddN1T0+ddN3T0*dN1T*dN4T0*ddN2T-dN2T*ddN4T*dN3T0*ddN1T0
-	   -ddN3T0*dN4T*dN1T0*ddN2T+ddN4T*dN3T*dN2T0*ddN1T0-ddN4T*ddN3T0*dN1T*dN2T0)
+           -dN2T*ddN3T0*dN4T0*ddN1T+ddN4T*dN1T*ddN2T0*dN3T0+dN1T0*dN3T*ddN4T0*ddN2T
+           +dN4T*dN3T0*ddN2T*ddN1T0-dN1T*ddN2T0*dN4T0*ddN3T+dN2T*dN4T0*ddN3T*ddN1T0
+           -dN1T*dN3T0*ddN4T0*ddN2T+ddN2T0*dN3T*dN4T0*ddN1T-ddN4T*ddN2T0*dN1T0*dN3T
+           +dN2T*ddN4T*ddN3T0*dN1T0-dN3T*ddN1T*ddN4T0*dN2T0-dN4T*ddN2T0*dN3T0*ddN1T
+           -dN2T*dN1T0*ddN4T0*ddN3T+dN4T*ddN2T0*dN1T0*ddN3T+ddN3T0*dN4T*ddN1T*dN2T0
+           -dN4T*ddN3T*dN2T0*ddN1T0+ddN3T0*dN1T*dN4T0*ddN2T-dN2T*ddN4T*dN3T0*ddN1T0
+           -ddN3T0*dN4T*dN1T0*ddN2T+ddN4T*dN3T*dN2T0*ddN1T0-ddN4T*ddN3T0*dN1T*dN2T0)
     *( dN2T*ddN0T0*ddN4T*dN1T0*IP+dN4T*IP*dN0T0*ddN2T*ddN1T0-ddN5T*dN4T*FP*dN2T0*ddN1T0
        -IA*dN1T*dN4T0*ddN2T+ddN5T*dN2T*dN4T0*FP*ddN1T0-ddN4T*ddN2T0*dN1T0*FP*dN5T
        -dN1T*ddN4T0*FA*dN2T0-ddN4T*dN1T*ddN2T0*IS+ddN4T*FP*dN5T*dN2T0*ddN1T0
@@ -653,13 +653,13 @@ void BSplinesFoot::ComputeControlPointFrom2DataPoint(void)
        +dN2T*ddN4T*ddN1T0*IS-FS*ddN4T*dN2T0*ddN1T0-ddN0T0*ddN4T*dN1T*IP*dN2T0);
   m_control_points[4]=
     -1.0/( dN2T*dN3T0*ddN1T*ddN4T0-dN3T*dN4T0*ddN2T*ddN1T0+dN1T*ddN4T0*ddN3T*dN2T0
-	   -dN2T*ddN3T0*dN4T0*ddN1T+ddN4T*dN1T*ddN2T0*dN3T0+dN1T0*dN3T*ddN4T0*ddN2T
-	   +dN4T*dN3T0*ddN2T*ddN1T0-dN1T*ddN2T0*dN4T0*ddN3T+dN2T*dN4T0*ddN3T*ddN1T0
-	   -dN1T*dN3T0*ddN4T0*ddN2T+ddN2T0*dN3T*dN4T0*ddN1T-ddN4T*ddN2T0*dN1T0*dN3T
-	   +dN2T*ddN4T*ddN3T0*dN1T0-dN3T*ddN1T*ddN4T0*dN2T0-dN4T*ddN2T0*dN3T0*ddN1T
-	   -dN2T*dN1T0*ddN4T0*ddN3T+dN4T*ddN2T0*dN1T0*ddN3T+ddN3T0*dN4T*ddN1T*dN2T0
-	   -dN4T*ddN3T*dN2T0*ddN1T0+ddN3T0*dN1T*dN4T0*ddN2T-dN2T*ddN4T*dN3T0*ddN1T0
-	   -ddN3T0*dN4T*dN1T0*ddN2T+ddN4T*dN3T*dN2T0*ddN1T0-ddN4T*ddN3T0*dN1T*dN2T0)
+           -dN2T*ddN3T0*dN4T0*ddN1T+ddN4T*dN1T*ddN2T0*dN3T0+dN1T0*dN3T*ddN4T0*ddN2T
+           +dN4T*dN3T0*ddN2T*ddN1T0-dN1T*ddN2T0*dN4T0*ddN3T+dN2T*dN4T0*ddN3T*ddN1T0
+           -dN1T*dN3T0*ddN4T0*ddN2T+ddN2T0*dN3T*dN4T0*ddN1T-ddN4T*ddN2T0*dN1T0*dN3T
+           +dN2T*ddN4T*ddN3T0*dN1T0-dN3T*ddN1T*ddN4T0*dN2T0-dN4T*ddN2T0*dN3T0*ddN1T
+           -dN2T*dN1T0*ddN4T0*ddN3T+dN4T*ddN2T0*dN1T0*ddN3T+ddN3T0*dN4T*ddN1T*dN2T0
+           -dN4T*ddN3T*dN2T0*ddN1T0+ddN3T0*dN1T*dN4T0*ddN2T-dN2T*ddN4T*dN3T0*ddN1T0
+           -ddN3T0*dN4T*dN1T0*ddN2T+ddN4T*dN3T*dN2T0*ddN1T0-ddN4T*ddN3T0*dN1T*dN2T0)
     *( ddN2T0*dN1T0*dN3T*FA+ddN5T*dN1T*ddN2T0*dN3T0*FP-ddN0T0*IP*dN3T*ddN1T*dN2T0
        -IA*dN1T*ddN3T*dN2T0-ddN0T0*dN1T*IP*dN3T0*ddN2T-dN2T*ddN0T0*dN1T0*IP*ddN3T
        +dN3T*ddN2T*ddN1T0*IS-FS*dN3T0*ddN2T*ddN1T0+ddN2T0*dN1T0*FP*dN5T*ddN3T
@@ -1357,44 +1357,44 @@ void BSplinesFoot::ComputeControlPointFrom4DataPoint(void)
        *ddN1T0*ddN5T*N4Tm2-N4Tm1*N6Tm2*dN2T0*dN5T*ddN3T*ddN1T0+N6Tm2*N2Tm1*dN3T*ddN4T0*dN1T0*ddN5T);
   m_control_points[3]=
     -1.0/( N3Tm1*ddN6T*dN5T*ddN1T0*N2Tm2*dN4T0+N4Tm1*N5Tm2*dN6T*dN2T0*ddN3T*ddN1T0-ddN2T0*ddN6T*N5Tm2*dN3T
-	   *N1Tm1*dN4T0+dN3T0*ddN2T0*N6Tm2*dN5T*N1Tm1*ddN4T-ddN2T0*N4Tm1*N6Tm2*dN3T*dN1T0*ddN5T-N2Tm1*N5Tm2
-	   *dN6T*ddN3T*ddN1T0*dN4T0-ddN3T0*dN6T*dN2T0*N1Tm1*ddN5T*N4Tm2-ddN2T0*N4Tm1*ddN6T*dN5T*dN1T0*N3Tm2
-	   -N4Tm1*ddN6T*N5Tm2*dN3T*dN2T0*ddN1T0-dN3T0*ddN2T0*ddN6T*dN5T*N1Tm1*N4Tm2-ddN3T0*dN4T*N6Tm2*N2Tm1
-	   *dN1T0*ddN5T-dN3T0*dN4T*N2Tm1*ddN6T*N5Tm2*ddN1T0+ddN3T0*N6Tm2*N2Tm1*dN5T*dN1T0*ddN4T+N3Tm1*ddN2T0
-	   *N5Tm2*dN6T*dN1T0*ddN4T-N5Tm1*dN4T*ddN2T0*N6Tm2*dN1T0*ddN3T-dN3T0*dN6T*ddN4T0*N1Tm1*ddN5T*N2Tm2
-	   +ddN2T0*N6Tm2*dN3T*N1Tm1*ddN5T*dN4T0+N6Tm2*ddN4T0*dN2T0*dN5T*ddN3T*N1Tm1+N5Tm1*ddN6T*dN3T*dN2T0
-	   *ddN1T0*N4Tm2+dN6T*ddN4T0*dN2T0*N1Tm1*N3Tm2*ddN5T-N3Tm1*dN4T*ddN2T0*ddN6T*N5Tm2*dN1T0+N3Tm1*dN6T
-	   *dN2T0*ddN1T0*ddN5T*N4Tm2-N3Tm1*ddN2T0*N6Tm2*dN5T*dN1T0*ddN4T+N2Tm1*N5Tm2*dN6T*ddN4T0*dN1T0*ddN3T
-	   +N5Tm1*ddN2T0*N6Tm2*dN3T*dN1T0*ddN4T+N5Tm1*dN6T*ddN3T*ddN1T0*N2Tm2*dN4T0+dN3T0*dN4T*N6Tm2*N2Tm1
-	   *ddN1T0*ddN5T-dN3T0*N6Tm2*N2Tm1*dN5T*ddN1T0*ddN4T-ddN3T0*N6Tm2*dN2T0*dN5T*N1Tm1*ddN4T+ddN6T*N5Tm2
-	   *dN3T*ddN4T0*dN2T0*N1Tm1+N5Tm1*dN6T*dN2T0*ddN1T0*N3Tm2*ddN4T+ddN2T0*ddN6T*dN5T*N1Tm1*N3Tm2*dN4T0
-	   -ddN2T0*N6Tm2*dN5T*ddN3T*N1Tm1*dN4T0+dN3T0*ddN2T0*dN6T*N1Tm1*ddN5T*N4Tm2+ddN3T0*N2Tm1*dN6T*dN1T0
-	   *ddN5T*N4Tm2+N3Tm1*N6Tm2*dN2T0*dN5T*ddN1T0*ddN4T-ddN3T0*N4Tm1*dN6T*dN1T0*ddN5T*N2Tm2+N4Tm1*N6Tm2
-	   *dN3T*dN2T0*ddN1T0*ddN5T+N4Tm1*ddN6T*dN2T0*dN5T*ddN1T0*N3Tm2+N3Tm1*ddN2T0*ddN6T*dN5T*dN1T0*N4Tm2
-	   -ddN3T0*ddN6T*dN5T*N1Tm1*N2Tm2*dN4T0-N3Tm1*dN6T*ddN1T0*ddN5T*N2Tm2*dN4T0+N5Tm1*ddN6T*dN3T*ddN4T0
-	   *dN1T0*N2Tm2-dN3T0*ddN2T0*N5Tm2*dN6T*N1Tm1*ddN4T-N5Tm1*ddN2T0*ddN6T*dN3T*dN1T0*N4Tm2+ddN3T0*N5Tm1
-	   *dN6T*dN1T0*N2Tm2*ddN4T-ddN6T*ddN4T0*dN2T0*dN5T*N1Tm1*N3Tm2+dN3T0*N2Tm1*N5Tm2*dN6T*ddN1T0*ddN4T
-	   +ddN3T0*dN4T*N2Tm1*ddN6T*N5Tm2*dN1T0+N2Tm1*ddN6T*N5Tm2*dN3T*ddN1T0*dN4T0-N5Tm1*ddN6T*dN3T*ddN1T0
-	   *N2Tm2*dN4T0-N3Tm1*N5Tm2*dN6T*dN2T0*ddN1T0*ddN4T+ddN3T0*N4Tm1*ddN6T*dN5T*dN1T0*N2Tm2-N3Tm1*ddN2T0
-	   *dN6T*dN1T0*ddN5T*N4Tm2-N2Tm1*dN6T*ddN4T0*dN1T0*N3Tm2*ddN5T-N5Tm2*dN6T*ddN4T0*dN2T0*ddN3T*N1Tm1
-	   +ddN3T0*N5Tm2*dN6T*dN2T0*N1Tm1*ddN4T-N5Tm1*dN6T*dN2T0*ddN3T*ddN1T0*N4Tm2+N3Tm1*dN4T*ddN6T*N5Tm2
-	   *dN2T0*ddN1T0-ddN3T0*N2Tm1*ddN6T*dN5T*dN1T0*N4Tm2+dN3T0*ddN6T*ddN4T0*dN5T*N1Tm1*N2Tm2-N2Tm1*ddN6T
-	   *dN5T*ddN1T0*N3Tm2*dN4T0+dN3T0*N5Tm1*dN4T*ddN6T*ddN1T0*N2Tm2-N6Tm2*N2Tm1*dN3T*ddN1T0*ddN5T*dN4T0
-	   +N3Tm1*dN6T*ddN4T0*dN1T0*ddN5T*N2Tm2-N6Tm2*dN3T*ddN4T0*dN2T0*N1Tm1*ddN5T-ddN2T0*N4Tm1*N5Tm2*dN6T
-	   *dN1T0*ddN3T+N3Tm1*dN4T*ddN2T0*N6Tm2*dN1T0*ddN5T-N6Tm2*N2Tm1*ddN4T0*dN5T*dN1T0*ddN3T-N5Tm1*ddN2T0
-	   *dN6T*dN1T0*N3Tm2*ddN4T-ddN3T0*dN4T*ddN6T*N5Tm2*dN2T0*N1Tm1+ddN2T0*N5Tm2*dN6T*ddN3T*N1Tm1*dN4T0
-	   +ddN2T0*N4Tm1*N6Tm2*dN5T*dN1T0*ddN3T+dN3T0*dN4T*ddN2T0*ddN6T*N5Tm2*N1Tm1-N5Tm1*dN4T*ddN6T*dN2T0*
-	   ddN1T0*N3Tm2-ddN3T0*N5Tm1*dN4T*ddN6T*dN1T0*N2Tm2+ddN3T0*dN4T*N6Tm2*dN2T0*N1Tm1*ddN5T-N4Tm1*dN6T
-	   *dN2T0*ddN1T0*N3Tm2*ddN5T-N2Tm1*ddN6T*N5Tm2*dN3T*ddN4T0*dN1T0+ddN2T0*N4Tm1*dN6T*dN1T0*N3Tm2*ddN5T
-	   +dN3T0*N2Tm1*ddN6T*dN5T*ddN1T0*N4Tm2+N5Tm1*ddN2T0*dN6T*dN1T0*ddN3T*N4Tm2+ddN3T0*dN6T*N1Tm1*ddN5T
-	   *N2Tm2*dN4T0-dN3T0*N4Tm1*ddN6T*dN5T*ddN1T0*N2Tm2-ddN2T0*dN6T*N1Tm1*N3Tm2*ddN5T*dN4T0-N5Tm1*N6Tm2
-	   *dN3T*dN2T0*ddN1T0*ddN4T-N3Tm1*ddN6T*ddN4T0*dN5T*dN1T0*N2Tm2-ddN3T0*N2Tm1*N5Tm2*dN6T*dN1T0*ddN4T
-	   +ddN2T0*N4Tm1*ddN6T*N5Tm2*dN3T*dN1T0-N3Tm1*dN4T*N6Tm2*dN2T0*ddN1T0*ddN5T-dN3T0*N5Tm1*dN6T*ddN1T0
-	   *N2Tm2*ddN4T-N5Tm1*dN6T*ddN4T0*dN1T0*ddN3T*N2Tm2+N6Tm2*N2Tm1*dN5T*ddN3T*ddN1T0*dN4T0-N3Tm1*ddN6T
-	   *dN2T0*dN5T*ddN1T0*N4Tm2+N2Tm1*ddN6T*ddN4T0*dN5T*dN1T0*N3Tm2+N5Tm1*dN4T*ddN2T0*ddN6T*dN1T0*N3Tm2
-	   +N2Tm1*dN6T*ddN1T0*N3Tm2*ddN5T*dN4T0+dN3T0*N4Tm1*dN6T*ddN1T0*ddN5T*N2Tm2-dN3T0*dN4T*ddN2T0*N6Tm2
-	   *N1Tm1*ddN5T+ddN3T0*ddN6T*dN2T0*dN5T*N1Tm1*N4Tm2+N5Tm1*dN4T*N6Tm2*dN2T0*ddN3T*ddN1T0-dN3T0*N2Tm1
-	   *dN6T*ddN1T0*ddN5T*N4Tm2-N4Tm1*N6Tm2*dN2T0*dN5T*ddN3T*ddN1T0+N6Tm2*N2Tm1*dN3T*ddN4T0*dN1T0*ddN5T)
+           *N1Tm1*dN4T0+dN3T0*ddN2T0*N6Tm2*dN5T*N1Tm1*ddN4T-ddN2T0*N4Tm1*N6Tm2*dN3T*dN1T0*ddN5T-N2Tm1*N5Tm2
+           *dN6T*ddN3T*ddN1T0*dN4T0-ddN3T0*dN6T*dN2T0*N1Tm1*ddN5T*N4Tm2-ddN2T0*N4Tm1*ddN6T*dN5T*dN1T0*N3Tm2
+           -N4Tm1*ddN6T*N5Tm2*dN3T*dN2T0*ddN1T0-dN3T0*ddN2T0*ddN6T*dN5T*N1Tm1*N4Tm2-ddN3T0*dN4T*N6Tm2*N2Tm1
+           *dN1T0*ddN5T-dN3T0*dN4T*N2Tm1*ddN6T*N5Tm2*ddN1T0+ddN3T0*N6Tm2*N2Tm1*dN5T*dN1T0*ddN4T+N3Tm1*ddN2T0
+           *N5Tm2*dN6T*dN1T0*ddN4T-N5Tm1*dN4T*ddN2T0*N6Tm2*dN1T0*ddN3T-dN3T0*dN6T*ddN4T0*N1Tm1*ddN5T*N2Tm2
+           +ddN2T0*N6Tm2*dN3T*N1Tm1*ddN5T*dN4T0+N6Tm2*ddN4T0*dN2T0*dN5T*ddN3T*N1Tm1+N5Tm1*ddN6T*dN3T*dN2T0
+           *ddN1T0*N4Tm2+dN6T*ddN4T0*dN2T0*N1Tm1*N3Tm2*ddN5T-N3Tm1*dN4T*ddN2T0*ddN6T*N5Tm2*dN1T0+N3Tm1*dN6T
+           *dN2T0*ddN1T0*ddN5T*N4Tm2-N3Tm1*ddN2T0*N6Tm2*dN5T*dN1T0*ddN4T+N2Tm1*N5Tm2*dN6T*ddN4T0*dN1T0*ddN3T
+           +N5Tm1*ddN2T0*N6Tm2*dN3T*dN1T0*ddN4T+N5Tm1*dN6T*ddN3T*ddN1T0*N2Tm2*dN4T0+dN3T0*dN4T*N6Tm2*N2Tm1
+           *ddN1T0*ddN5T-dN3T0*N6Tm2*N2Tm1*dN5T*ddN1T0*ddN4T-ddN3T0*N6Tm2*dN2T0*dN5T*N1Tm1*ddN4T+ddN6T*N5Tm2
+           *dN3T*ddN4T0*dN2T0*N1Tm1+N5Tm1*dN6T*dN2T0*ddN1T0*N3Tm2*ddN4T+ddN2T0*ddN6T*dN5T*N1Tm1*N3Tm2*dN4T0
+           -ddN2T0*N6Tm2*dN5T*ddN3T*N1Tm1*dN4T0+dN3T0*ddN2T0*dN6T*N1Tm1*ddN5T*N4Tm2+ddN3T0*N2Tm1*dN6T*dN1T0
+           *ddN5T*N4Tm2+N3Tm1*N6Tm2*dN2T0*dN5T*ddN1T0*ddN4T-ddN3T0*N4Tm1*dN6T*dN1T0*ddN5T*N2Tm2+N4Tm1*N6Tm2
+           *dN3T*dN2T0*ddN1T0*ddN5T+N4Tm1*ddN6T*dN2T0*dN5T*ddN1T0*N3Tm2+N3Tm1*ddN2T0*ddN6T*dN5T*dN1T0*N4Tm2
+           -ddN3T0*ddN6T*dN5T*N1Tm1*N2Tm2*dN4T0-N3Tm1*dN6T*ddN1T0*ddN5T*N2Tm2*dN4T0+N5Tm1*ddN6T*dN3T*ddN4T0
+           *dN1T0*N2Tm2-dN3T0*ddN2T0*N5Tm2*dN6T*N1Tm1*ddN4T-N5Tm1*ddN2T0*ddN6T*dN3T*dN1T0*N4Tm2+ddN3T0*N5Tm1
+           *dN6T*dN1T0*N2Tm2*ddN4T-ddN6T*ddN4T0*dN2T0*dN5T*N1Tm1*N3Tm2+dN3T0*N2Tm1*N5Tm2*dN6T*ddN1T0*ddN4T
+           +ddN3T0*dN4T*N2Tm1*ddN6T*N5Tm2*dN1T0+N2Tm1*ddN6T*N5Tm2*dN3T*ddN1T0*dN4T0-N5Tm1*ddN6T*dN3T*ddN1T0
+           *N2Tm2*dN4T0-N3Tm1*N5Tm2*dN6T*dN2T0*ddN1T0*ddN4T+ddN3T0*N4Tm1*ddN6T*dN5T*dN1T0*N2Tm2-N3Tm1*ddN2T0
+           *dN6T*dN1T0*ddN5T*N4Tm2-N2Tm1*dN6T*ddN4T0*dN1T0*N3Tm2*ddN5T-N5Tm2*dN6T*ddN4T0*dN2T0*ddN3T*N1Tm1
+           +ddN3T0*N5Tm2*dN6T*dN2T0*N1Tm1*ddN4T-N5Tm1*dN6T*dN2T0*ddN3T*ddN1T0*N4Tm2+N3Tm1*dN4T*ddN6T*N5Tm2
+           *dN2T0*ddN1T0-ddN3T0*N2Tm1*ddN6T*dN5T*dN1T0*N4Tm2+dN3T0*ddN6T*ddN4T0*dN5T*N1Tm1*N2Tm2-N2Tm1*ddN6T
+           *dN5T*ddN1T0*N3Tm2*dN4T0+dN3T0*N5Tm1*dN4T*ddN6T*ddN1T0*N2Tm2-N6Tm2*N2Tm1*dN3T*ddN1T0*ddN5T*dN4T0
+           +N3Tm1*dN6T*ddN4T0*dN1T0*ddN5T*N2Tm2-N6Tm2*dN3T*ddN4T0*dN2T0*N1Tm1*ddN5T-ddN2T0*N4Tm1*N5Tm2*dN6T
+           *dN1T0*ddN3T+N3Tm1*dN4T*ddN2T0*N6Tm2*dN1T0*ddN5T-N6Tm2*N2Tm1*ddN4T0*dN5T*dN1T0*ddN3T-N5Tm1*ddN2T0
+           *dN6T*dN1T0*N3Tm2*ddN4T-ddN3T0*dN4T*ddN6T*N5Tm2*dN2T0*N1Tm1+ddN2T0*N5Tm2*dN6T*ddN3T*N1Tm1*dN4T0
+           +ddN2T0*N4Tm1*N6Tm2*dN5T*dN1T0*ddN3T+dN3T0*dN4T*ddN2T0*ddN6T*N5Tm2*N1Tm1-N5Tm1*dN4T*ddN6T*dN2T0*
+           ddN1T0*N3Tm2-ddN3T0*N5Tm1*dN4T*ddN6T*dN1T0*N2Tm2+ddN3T0*dN4T*N6Tm2*dN2T0*N1Tm1*ddN5T-N4Tm1*dN6T
+           *dN2T0*ddN1T0*N3Tm2*ddN5T-N2Tm1*ddN6T*N5Tm2*dN3T*ddN4T0*dN1T0+ddN2T0*N4Tm1*dN6T*dN1T0*N3Tm2*ddN5T
+           +dN3T0*N2Tm1*ddN6T*dN5T*ddN1T0*N4Tm2+N5Tm1*ddN2T0*dN6T*dN1T0*ddN3T*N4Tm2+ddN3T0*dN6T*N1Tm1*ddN5T
+           *N2Tm2*dN4T0-dN3T0*N4Tm1*ddN6T*dN5T*ddN1T0*N2Tm2-ddN2T0*dN6T*N1Tm1*N3Tm2*ddN5T*dN4T0-N5Tm1*N6Tm2
+           *dN3T*dN2T0*ddN1T0*ddN4T-N3Tm1*ddN6T*ddN4T0*dN5T*dN1T0*N2Tm2-ddN3T0*N2Tm1*N5Tm2*dN6T*dN1T0*ddN4T
+           +ddN2T0*N4Tm1*ddN6T*N5Tm2*dN3T*dN1T0-N3Tm1*dN4T*N6Tm2*dN2T0*ddN1T0*ddN5T-dN3T0*N5Tm1*dN6T*ddN1T0
+           *N2Tm2*ddN4T-N5Tm1*dN6T*ddN4T0*dN1T0*ddN3T*N2Tm2+N6Tm2*N2Tm1*dN5T*ddN3T*ddN1T0*dN4T0-N3Tm1*ddN6T
+           *dN2T0*dN5T*ddN1T0*N4Tm2+N2Tm1*ddN6T*ddN4T0*dN5T*dN1T0*N3Tm2+N5Tm1*dN4T*ddN2T0*ddN6T*dN1T0*N3Tm2
+           +N2Tm1*dN6T*ddN1T0*N3Tm2*ddN5T*dN4T0+dN3T0*N4Tm1*dN6T*ddN1T0*ddN5T*N2Tm2-dN3T0*dN4T*ddN2T0*N6Tm2
+           *N1Tm1*ddN5T+ddN3T0*ddN6T*dN2T0*dN5T*N1Tm1*N4Tm2+N5Tm1*dN4T*N6Tm2*dN2T0*ddN3T*ddN1T0-dN3T0*N2Tm1
+           *dN6T*ddN1T0*ddN5T*N4Tm2-N4Tm1*N6Tm2*dN2T0*dN5T*ddN3T*ddN1T0+N6Tm2*N2Tm1*dN3T*ddN4T0*dN1T0*ddN5T)
     *( ddN6T*IP*dN2T0*dN5T*N1Tm1*N4Tm2*ddN0T0+N5Tm2*dN6T*dN2T0*ddN1T0*MidP1*ddN4T+ddN7T*N5Tm1*dN6T*ddN1T0*FP
        *N2Tm2*dN4T0-ddN6T*dN5T*ddN1T0*MidP1*N2Tm2*dN4T0+N4Tm1*N6Tm2*dN2T0*dN5T*FA*ddN1T0+ddN7T*N2Tm1*N5Tm2
        *dN6T*ddN4T0*dN1T0*FP-dN4T*N6Tm2*N2Tm1*IS*ddN1T0*ddN5T-N5Tm1*dN4T*N6Tm2*dN2T0*FA*ddN1T0-ddN7T*ddN2T0
@@ -1833,10 +1833,10 @@ void BSplinesFoot::ComputeControlPointFrom4DataPoint(void)
 }
 
 void BSplinesFoot::GetParameters(double &FT,
-				 double &IP,
-				 double &FP,
-				 vector<double> &ToMP,
-				 vector<double> &MP)
+                                 double &IP,
+                                 double &FP,
+                                 vector<double> &ToMP,
+                                 vector<double> &MP)
 {
   FT = m_FT ;
   FP = m_FP ;
@@ -1863,10 +1863,10 @@ void BSplinesFoot::SetParametersWithoutMPAndToMP(double FT,
 }
 
 void  BSplinesFoot::SetParametersWithInitFinalPose(double FT,
-						   double IP,
-						   double FP,
-						   std::vector<double> &ToMP,
-						   std::vector<double> &MP)
+                                                   double IP,
+                                                   double FP,
+                                                   std::vector<double> &ToMP,
+                                                   std::vector<double> &MP)
 {
   // verify that each middle point has a reaching time parameter
   assert(ToMP.size()==MP.size());

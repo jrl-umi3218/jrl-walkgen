@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Florent Lamiraux
  * Mathieu Poirier
@@ -20,10 +20,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/** @doc This object is in charge of dealing with the upper body 
+/** @doc This object is in charge of dealing with the upper body
     motion of the robot.
 */
 
@@ -45,28 +45,28 @@ using namespace::std;
 
 namespace PatternGeneratorJRL
 {
-   
+
   class  UpperBodyMotion
-    {
-      public :
-    
-      /// Constructor
-      UpperBodyMotion();
+  {
+  public :
 
-      /// Destructor
-      ~UpperBodyMotion();
-      
-      void GenerateDataFile(string aFileName, int LenghtDataArray);
+    /// Constructor
+    UpperBodyMotion();
 
-      void ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles);
-      
-      void WriteDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles);
-	
-    
-   protected:
+    /// Destructor
+    ~UpperBodyMotion();
+
+    void GenerateDataFile(string aFileName, int LenghtDataArray);
+
+    void ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles);
+
+    void WriteDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles);
 
 
-     
-   };
+  protected:
+
+
+
+  };
 }
 #endif /* _UPPER_BODY_MOTION_*/

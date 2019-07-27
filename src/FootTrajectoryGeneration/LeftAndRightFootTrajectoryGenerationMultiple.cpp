@@ -53,19 +53,19 @@ LeftAndRightFootTrajectoryGenerationMultiple
   m_RightFootTrajectory = new FootTrajectoryGenerationMultiple(lSPM,m_Foot);
 
   string aMethodName[4] =
-  {":omega",":stepheight", ":singlesupporttime",":doublesupporttime"};
+    {":omega",":stepheight", ":singlesupporttime",":doublesupporttime"};
 
   for (int i=0;i<4;i++)
-  {
-    if (!RegisterMethod(aMethodName[i]))
     {
-      std::cerr << "Unable to register " << aMethodName << std::endl;
+      if (!RegisterMethod(aMethodName[i]))
+        {
+          std::cerr << "Unable to register " << aMethodName << std::endl;
+        }
     }
-  }
 
   { for(unsigned int i=0;
-	i<m_MiddleWayPoint.size();
-	m_MiddleWayPoint[i++]=0.0);} ;
+        i<m_MiddleWayPoint.size();
+        m_MiddleWayPoint[i++]=0.0);} ;
 
   wayPoint.resize(2,0.0);
 
@@ -107,25 +107,25 @@ void LeftAndRightFootTrajectoryGenerationMultiple::
 CallMethod(std::string & Method, std::istringstream &strm)
 {
   if (Method==":omega")
-  {
-    strm >> m_Omega;
-  }
+    {
+      strm >> m_Omega;
+    }
   else if (Method==":omega2")
-  {
-    strm >> m_Omega2;
-  }
+    {
+      strm >> m_Omega2;
+    }
   else if (Method==":stepheight")
-  {
-    strm >> m_StepHeight;
-  }
+    {
+      strm >> m_StepHeight;
+    }
   else if (Method==":singlesupporttime")
-  {
-    strm >> m_SingleSupportTime;
-  }
+    {
+      strm >> m_SingleSupportTime;
+    }
   else if (Method==":doublesupporttime")
-  {
-    strm >> m_DoubleSupportTime;
-  }
+    {
+      strm >> m_DoubleSupportTime;
+    }
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::
@@ -138,16 +138,16 @@ SetAnInterval
 {
 
   ODEBUG("Set interval " << IntervalIndex << "/"
-	 << m_DeltaTj.size() << " : " << m_DeltaTj[IntervalIndex] << " X: ("
+         << m_DeltaTj.size() << " : " << m_DeltaTj[IntervalIndex] << " X: ("
          << FootFinalPosition.x << ","
-	 << FootInitialPosition.x << ","
-	 << FootInitialPosition.dx << ")("
+         << FootInitialPosition.x << ","
+         << FootInitialPosition.dx << ")("
          << FootFinalPosition.y << ","
-	 << FootInitialPosition.y << ","
-	 << FootInitialPosition.dy << ")("
+         << FootInitialPosition.y << ","
+         << FootInitialPosition.dy << ")("
          << FootFinalPosition.z << ","
-	 << FootInitialPosition.z << ","
-	 << FootInitialPosition.dz << ")");
+         << FootInitialPosition.z << ","
+         << FootInitialPosition.dz << ")");
   aFTGM->SetNatureInterval(IntervalIndex,FootFinalPosition.stepType);
 
   double ModulationSupportCoefficient = 0.7;
@@ -225,11 +225,11 @@ InitializeFromRelativeSteps
  bool IgnoreFirst, bool Continuity)
 {
   ODEBUG("LeftFootInitialPosition.stepType: "
-	 << LeftFootInitialPosition.stepType
+         << LeftFootInitialPosition.stepType
          << " RightFootInitialPosition.stepType: "
-	 << RightFootInitialPosition.stepType);
+         << RightFootInitialPosition.stepType);
   /*! Makes sure the size of the SupportFootAbsolutePositions is the same than
-   the relative foot positions. */
+    the relative foot positions. */
   if (SupportFootAbsoluteFootPositions.size()!=
       RelativeFootPositions.size())
     SupportFootAbsoluteFootPositions.resize(RelativeFootPositions.size());
@@ -278,26 +278,26 @@ InitializeFromRelativeSteps
       // There is no flying foot because this is the beginning of the stepping.
       ((RelativeFootPositions[0].sy<0) && (IgnoreFirst==true))
       )
-  {
-    ODEBUG("Detect support foot on the right.");
-    SupportFoot=-1;
-    CurrentAbsTheta = RightFootInitialPosition.theta;
-    v2(0,0) = RightFootInitialPosition.x;
-    v2(1,0) = RightFootInitialPosition.y;
-    CurrentSupportFootPosition(2,2) = RightFootInitialPosition.z;
-    // v2(2,0) = RightFootInitialPosition.z;
-  }
+    {
+      ODEBUG("Detect support foot on the right.");
+      SupportFoot=-1;
+      CurrentAbsTheta = RightFootInitialPosition.theta;
+      v2(0,0) = RightFootInitialPosition.x;
+      v2(1,0) = RightFootInitialPosition.y;
+      CurrentSupportFootPosition(2,2) = RightFootInitialPosition.z;
+      // v2(2,0) = RightFootInitialPosition.z;
+    }
   else
-  {
-    ODEBUG("Detect support foot on the left.");
-    CurrentAbsTheta = LeftFootInitialPosition.theta;
-    v2(0,0) = LeftFootInitialPosition.x;
-    v2(1,0) = LeftFootInitialPosition.y;
-    CurrentSupportFootPosition(2,2) = LeftFootInitialPosition.z;
-    //   v2(2,0) = LeftFootInitialPosition.z;
-  }
+    {
+      ODEBUG("Detect support foot on the left.");
+      CurrentAbsTheta = LeftFootInitialPosition.theta;
+      v2(0,0) = LeftFootInitialPosition.x;
+      v2(1,0) = LeftFootInitialPosition.y;
+      CurrentSupportFootPosition(2,2) = LeftFootInitialPosition.z;
+      //   v2(2,0) = LeftFootInitialPosition.z;
+    }
   ODEBUG("Support Foot : " << v2(0,0) << " "
-	 << v2(1,0) << " " << CurrentAbsTheta);
+         << v2(1,0) << " " << CurrentAbsTheta);
 
   // Initial Position of the current support foot.
   c = cos(CurrentAbsTheta*M_PI/180.0);
@@ -342,393 +342,393 @@ InitializeFromRelativeSteps
   ODEBUG("CurrentSupportFootPosition: " << CurrentSupportFootPosition);
   ODEBUG("RelativeFootPositions: " << RelativeFootPositions.size());
   for(unsigned int i=0;i<RelativeFootPositions.size();i++)
-  {
-    if ((i!=0) || (FirstIntervalIsSingleSupport==false))
     {
-      /*! At this stage the phase of double support is dealt with */
-      ODEBUG("Double support phase");
-      //LeftFootTmpInitPos.z = CurrentSupportFootPosition(2,2);
-      // 0.0;//LeftFootTmpInitPos.z + LeftFootTmpFinalPos.z/1.5;
-      LeftFootTmpInitPos.dz = 0;
-      LeftFootTmpInitPos.stepType=11;
+      if ((i!=0) || (FirstIntervalIsSingleSupport==false))
+        {
+          /*! At this stage the phase of double support is dealt with */
+          ODEBUG("Double support phase");
+          //LeftFootTmpInitPos.z = CurrentSupportFootPosition(2,2);
+          // 0.0;//LeftFootTmpInitPos.z + LeftFootTmpFinalPos.z/1.5;
+          LeftFootTmpInitPos.dz = 0;
+          LeftFootTmpInitPos.stepType=11;
 
-      SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
-                    LeftFootTmpInitPos,
-                    LeftFootTmpInitPos);
+          SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
+                        LeftFootTmpInitPos,
+                        LeftFootTmpInitPos);
 
-      /// RightFootTmpInitPos.z = CurrentSupportFootPosition(2,2);
-      RightFootTmpInitPos.dz = 0;
-      RightFootTmpInitPos.stepType=9;
-      SetAnInterval(IntervalIndex,m_RightFootTrajectory,
-                    RightFootTmpInitPos,
-                    RightFootTmpInitPos);
-      ODEBUG("LeftFootTmpInitPos.stepType="<<LeftFootTmpInitPos.stepType);
-      ODEBUG("RightFootTmpInitPos.stepType="<<RightFootTmpInitPos.stepType);
-      ODEBUG("End of Double support phase");
+          /// RightFootTmpInitPos.z = CurrentSupportFootPosition(2,2);
+          RightFootTmpInitPos.dz = 0;
+          RightFootTmpInitPos.stepType=9;
+          SetAnInterval(IntervalIndex,m_RightFootTrajectory,
+                        RightFootTmpInitPos,
+                        RightFootTmpInitPos);
+          ODEBUG("LeftFootTmpInitPos.stepType="<<LeftFootTmpInitPos.stepType);
+          ODEBUG("RightFootTmpInitPos.stepType="<<RightFootTmpInitPos.stepType);
+          ODEBUG("End of Double support phase");
 
-      IntervalIndex++;
+          IntervalIndex++;
 
 
-      ODEBUG("It: " << i << " Double support Phase :" << endl <<
-             "\t Init Left: ( " <<
-             LeftFootTmpInitPos.x << " , " <<
-             LeftFootTmpInitPos.y << " , " <<
-             LeftFootTmpInitPos.z <<" ) " <<
-             endl << "Right : ( " <<
-             RightFootTmpInitPos.x << " , " <<
-             RightFootTmpInitPos.y << " , " <<
-             RightFootTmpInitPos.z <<") " << endl <<
-             "\t Final Left: ( " <<
-             LeftFootTmpFinalPos.x << " , " <<
-             LeftFootTmpFinalPos.y << " , " <<
-             RightFootTmpFinalPos.z << " ) " <<
-             endl << "Right : ( " <<
-             RightFootTmpFinalPos.x << " , " <<
-             RightFootTmpFinalPos.y << " , " <<
-             RightFootTmpFinalPos.z << " ) " << endl <<
-             "\t RelativeFootPosition: ( " <<
-             RelativeFootPositions[i].sx << " , " <<
-             RelativeFootPositions[i].sy << " , " <<
-             RelativeFootPositions[i].sz << " , " <<
-             RelativeFootPositions[i].theta << " )");
-    }
+          ODEBUG("It: " << i << " Double support Phase :" << endl <<
+                 "\t Init Left: ( " <<
+                 LeftFootTmpInitPos.x << " , " <<
+                 LeftFootTmpInitPos.y << " , " <<
+                 LeftFootTmpInitPos.z <<" ) " <<
+                 endl << "Right : ( " <<
+                 RightFootTmpInitPos.x << " , " <<
+                 RightFootTmpInitPos.y << " , " <<
+                 RightFootTmpInitPos.z <<") " << endl <<
+                 "\t Final Left: ( " <<
+                 LeftFootTmpFinalPos.x << " , " <<
+                 LeftFootTmpFinalPos.y << " , " <<
+                 RightFootTmpFinalPos.z << " ) " <<
+                 endl << "Right : ( " <<
+                 RightFootTmpFinalPos.x << " , " <<
+                 RightFootTmpFinalPos.y << " , " <<
+                 RightFootTmpFinalPos.z << " ) " << endl <<
+                 "\t RelativeFootPosition: ( " <<
+                 RelativeFootPositions[i].sx << " , " <<
+                 RelativeFootPositions[i].sy << " , " <<
+                 RelativeFootPositions[i].sz << " , " <<
+                 RelativeFootPositions[i].theta << " )");
+        }
 
-    /*! Compute Orientation matrix related to the relative orientation
-    of the support foot */
-    c = cos(RelativeFootPositions[i].theta*M_PI/180.0);
-    s = sin(RelativeFootPositions[i].theta*M_PI/180.0);
-    MM(0,0) = c;      MM(0,1) = -s;
-    MM(1,0) = s;      MM(1,1) = c;
-    // MM(2,0) = 0;      MM(2,1) = 0; MM(2,2) = 0;
-    /*! Update the orientation */
-    CurrentAbsTheta+= RelativeFootPositions[i].theta;
+      /*! Compute Orientation matrix related to the relative orientation
+        of the support foot */
+      c = cos(RelativeFootPositions[i].theta*M_PI/180.0);
+      s = sin(RelativeFootPositions[i].theta*M_PI/180.0);
+      MM(0,0) = c;      MM(0,1) = -s;
+      MM(1,0) = s;      MM(1,1) = c;
+      // MM(2,0) = 0;      MM(2,1) = 0; MM(2,2) = 0;
+      /*! Update the orientation */
+      CurrentAbsTheta+= RelativeFootPositions[i].theta;
 
-    /*! Extract the current absolute orientation matrix. */
-    for(int k=0;k<2;k++)
-      for(int l=0;l<2;l++)
-        Orientation(k,l) = CurrentSupportFootPosition(k,l);
-
-    /*! Put in a vector form the translation of the relative foot. */
-    v(0,0) = RelativeFootPositions[i].sx;
-    v(1,0) = RelativeFootPositions[i].sy;
-    // v(2,0) = RelativeFootPositions[i].sz;
-    /*! Compute the new orientation of the foot vector. */
-    Orientation = MM*Orientation;
-
-    v2 = Orientation*v;
-
-    /*! Update the world coordinates of the support foot. */
-    if ((!IgnoreFirst) || (i>0))
-    {
+      /*! Extract the current absolute orientation matrix. */
       for(int k=0;k<2;k++)
         for(int l=0;l<2;l++)
-          CurrentSupportFootPosition(k,l) = Orientation(k,l);
+          Orientation(k,l) = CurrentSupportFootPosition(k,l);
 
-      for(int k=0;k<2;k++)
-        CurrentSupportFootPosition(k,2) += v2(k,0);
+      /*! Put in a vector form the translation of the relative foot. */
+      v(0,0) = RelativeFootPositions[i].sx;
+      v(1,0) = RelativeFootPositions[i].sy;
+      // v(2,0) = RelativeFootPositions[i].sz;
+      /*! Compute the new orientation of the foot vector. */
+      Orientation = MM*Orientation;
 
-      CurrentSupportFootPosition(2,2) += RelativeFootPositions[i].sz;
-    }
-    AbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
-    AbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
-    AbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
-    AbsoluteFootPositions[i].theta = CurrentAbsTheta;
+      v2 = Orientation*v;
 
-    ODEBUG("CSFP:" << CurrentSupportFootPosition(0,2) << " "
-	   << CurrentSupportFootPosition(1,2) << " "
-	   << CurrentSupportFootPosition(2,2) << " "
-	   << CurrentAbsTheta);
-
-    /*! We deal with the single support phase,
-    i.e. the target of the next single support phase
-    is the current target of the swinging foot. */
-    if ((!IgnoreFirst) || (i>0))
-    {
-      if (SupportFoot==1)
-      {
-        /*! The current support foot is the left one.*/
-        RightFootTmpFinalPos.x = CurrentSupportFootPosition(0,2);
-        RightFootTmpFinalPos.y = CurrentSupportFootPosition(1,2);
-        RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-        RightFootTmpFinalPos.theta = CurrentAbsTheta;
-        RightFootTmpFinalPos.omega = m_Omega;
-        RightFootTmpFinalPos.omega2 = m_Omega2;
-        RightFootTmpFinalPos.dx = 0.0;
-        RightFootTmpFinalPos.dy = 0.0;
-        RightFootTmpFinalPos.dz = 0.0;
-        RightFootTmpFinalPos.dtheta = 0.0;
-        RightFootTmpFinalPos.domega = 0.0;
-        RightFootTmpFinalPos.domega2 = 0.0;
-        RightFootTmpFinalPos.stepType = 1;
-        LeftFootTmpFinalPos = LeftFootTmpInitPos;
-        LeftFootTmpFinalPos.dz = 0.0;
-        LeftFootTmpFinalPos.stepType = -1;
-      }
-      else
-      {
-        /*! The current support foot is the right one.*/
-        LeftFootTmpFinalPos.x = CurrentSupportFootPosition(0,2);
-        LeftFootTmpFinalPos.y = CurrentSupportFootPosition(1,2);
-        LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-        LeftFootTmpFinalPos.theta = CurrentAbsTheta;
-        LeftFootTmpFinalPos.omega = m_Omega;
-        LeftFootTmpFinalPos.omega2 = m_Omega2;
-        LeftFootTmpFinalPos.dx = 0.0;
-        LeftFootTmpFinalPos.dy = 0.0;
-        LeftFootTmpFinalPos.dz = 0.0;
-        LeftFootTmpFinalPos.dtheta = 0.0;
-        LeftFootTmpFinalPos.domega = 0.0;
-        LeftFootTmpFinalPos.domega2 = 0.0;
-        LeftFootTmpFinalPos.stepType = 1;
-
-        RightFootTmpFinalPos = RightFootTmpInitPos;
-        // RightFootTmpFinalPos.z = 0.0;
-        RightFootTmpFinalPos.dz = 0.0;
-        RightFootTmpFinalPos.stepType = -1;
-      }
-    }
-    else
-    {
-      LeftFootTmpFinalPos = LeftFootTmpInitPos;
-
-      LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-      LeftFootTmpFinalPos.omega = m_Omega;
-      LeftFootTmpFinalPos.omega2 = m_Omega2;
-      LeftFootTmpFinalPos.dx = LeftFootTmpInitPos.dx = 0.0;
-      LeftFootTmpFinalPos.dy = LeftFootTmpInitPos.dy =0.0;
-      LeftFootTmpFinalPos.dz = LeftFootTmpInitPos.dz =0.0;
-      LeftFootTmpFinalPos.domega = LeftFootTmpInitPos.domega =0.0;
-      LeftFootTmpFinalPos.domega2 = LeftFootTmpInitPos.domega2 =0.0;
-      LeftFootTmpFinalPos.stepType = 11;
-
-      RightFootTmpFinalPos = RightFootTmpInitPos;
-      RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-      RightFootTmpFinalPos.omega = m_Omega;
-      RightFootTmpFinalPos.omega2 = m_Omega2 ;
-      RightFootTmpFinalPos.dx = RightFootTmpInitPos.dx = 0.0;
-      RightFootTmpFinalPos.dy = RightFootTmpInitPos.dy =0.0;
-      RightFootTmpFinalPos.dz = RightFootTmpInitPos.dz =0.0;
-      RightFootTmpFinalPos.domega = RightFootTmpInitPos.domega =0.0;
-      RightFootTmpFinalPos.domega2 = RightFootTmpInitPos.domega2 =0.0;
-      RightFootTmpFinalPos.stepType = 9;
-
-    }
-
-
-    if ((i!=0)|| (Continuity))
-    {
-      {// verify auto collision
-        Eigen::Matrix<double,2,1> currSupp;
-        Eigen::Matrix<double,2,1> InitPos;
-        Eigen::Matrix<double,2,1> FinalPos;
-        Eigen::Matrix<double,2,1> relWayPoint;
-        if (SupportFoot==1)
+      /*! Update the world coordinates of the support foot. */
+      if ((!IgnoreFirst) || (i>0))
         {
-          currSupp(0) = LeftFootTmpInitPos.x ;
-          currSupp(1) = LeftFootTmpInitPos.y ;
-          InitPos(0)  = RightFootTmpInitPos.x ;
-          InitPos(1)  = RightFootTmpInitPos.y ;
-          FinalPos(0) = RightFootTmpFinalPos.x ;
-          FinalPos(1) = RightFootTmpFinalPos.y ;
-          relWayPoint(0)=0.0 ;
-          relWayPoint(1)=-m_StepCurving;
+          for(int k=0;k<2;k++)
+            for(int l=0;l<2;l++)
+              CurrentSupportFootPosition(k,l) = Orientation(k,l);
+
+          for(int k=0;k<2;k++)
+            CurrentSupportFootPosition(k,2) += v2(k,0);
+
+          CurrentSupportFootPosition(2,2) += RelativeFootPositions[i].sz;
         }
-        else
-        {
-          currSupp(0) = RightFootTmpInitPos.x ;
-          currSupp(1) = RightFootTmpInitPos.y ;
-          InitPos(0)  = LeftFootTmpInitPos.x ;
-          InitPos(1)  = LeftFootTmpInitPos.y ;
-          FinalPos(0) = LeftFootTmpFinalPos.x ;
-          FinalPos(1) = LeftFootTmpFinalPos.y ;
-          relWayPoint(0)=0.0 ;
-          relWayPoint(1)=m_StepCurving;
-        }
+      AbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
+      AbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
+      AbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
+      AbsoluteFootPositions[i].theta = CurrentAbsTheta;
 
-        double dx , dy , dc , distSquareToLine ;
-        dx = InitPos(1) - FinalPos(1) ;
-        dy = FinalPos(0) - InitPos(0) ;
-        m_MiddleWayPoint.resize(2);
-        { for(unsigned int i=0;
-	      i<m_MiddleWayPoint.size();
-	      m_MiddleWayPoint[i++]=0.0);};
-        if ( dx*dx>=1e-6 || dy*dy>=1e-6 )// not moving implies no collision
+      ODEBUG("CSFP:" << CurrentSupportFootPosition(0,2) << " "
+             << CurrentSupportFootPosition(1,2) << " "
+             << CurrentSupportFootPosition(2,2) << " "
+             << CurrentAbsTheta);
+
+      /*! We deal with the single support phase,
+        i.e. the target of the next single support phase
+        is the current target of the swinging foot. */
+      if ((!IgnoreFirst) || (i>0))
         {
-          dc = -(dx * InitPos(0) + dy *InitPos(1)) ;
-          distSquareToLine = (dx*currSupp(0)  + dy*currSupp(1) + dc)*
-	    (dx*currSupp(0)  + dy*currSupp(1) + dc)/(dx*dx + dy*dy);
-          if( distSquareToLine < m_WayPointThreshold )
-          {
-            double x(currSupp(0)), y(currSupp(1)),
-	      x0((FinalPos(0)+InitPos(0))*0.5),
-	      y0((FinalPos(1)+InitPos(1))*0.5),
-	      R2((dx*dx+dy+dy)*0.5*0.5);
-            bool autocollision = (x-x0)*(x-x0)+(y-y0)*(y-y0)<=R2;
-            if( autocollision )
+          if (SupportFoot==1)
             {
-              m_MiddleWayPoint = Orientation*relWayPoint + currSupp  ;
+              /*! The current support foot is the left one.*/
+              RightFootTmpFinalPos.x = CurrentSupportFootPosition(0,2);
+              RightFootTmpFinalPos.y = CurrentSupportFootPosition(1,2);
+              RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+              RightFootTmpFinalPos.theta = CurrentAbsTheta;
+              RightFootTmpFinalPos.omega = m_Omega;
+              RightFootTmpFinalPos.omega2 = m_Omega2;
+              RightFootTmpFinalPos.dx = 0.0;
+              RightFootTmpFinalPos.dy = 0.0;
+              RightFootTmpFinalPos.dz = 0.0;
+              RightFootTmpFinalPos.dtheta = 0.0;
+              RightFootTmpFinalPos.domega = 0.0;
+              RightFootTmpFinalPos.domega2 = 0.0;
+              RightFootTmpFinalPos.stepType = 1;
+              LeftFootTmpFinalPos = LeftFootTmpInitPos;
+              LeftFootTmpFinalPos.dz = 0.0;
+              LeftFootTmpFinalPos.stepType = -1;
             }
+          else
+            {
+              /*! The current support foot is the right one.*/
+              LeftFootTmpFinalPos.x = CurrentSupportFootPosition(0,2);
+              LeftFootTmpFinalPos.y = CurrentSupportFootPosition(1,2);
+              LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+              LeftFootTmpFinalPos.theta = CurrentAbsTheta;
+              LeftFootTmpFinalPos.omega = m_Omega;
+              LeftFootTmpFinalPos.omega2 = m_Omega2;
+              LeftFootTmpFinalPos.dx = 0.0;
+              LeftFootTmpFinalPos.dy = 0.0;
+              LeftFootTmpFinalPos.dz = 0.0;
+              LeftFootTmpFinalPos.dtheta = 0.0;
+              LeftFootTmpFinalPos.domega = 0.0;
+              LeftFootTmpFinalPos.domega2 = 0.0;
+              LeftFootTmpFinalPos.stepType = 1;
+
+              RightFootTmpFinalPos = RightFootTmpInitPos;
+              // RightFootTmpFinalPos.z = 0.0;
+              RightFootTmpFinalPos.dz = 0.0;
+              RightFootTmpFinalPos.stepType = -1;
+            }
+        }
+      else
+        {
+          LeftFootTmpFinalPos = LeftFootTmpInitPos;
+
+          LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+          LeftFootTmpFinalPos.omega = m_Omega;
+          LeftFootTmpFinalPos.omega2 = m_Omega2;
+          LeftFootTmpFinalPos.dx = LeftFootTmpInitPos.dx = 0.0;
+          LeftFootTmpFinalPos.dy = LeftFootTmpInitPos.dy =0.0;
+          LeftFootTmpFinalPos.dz = LeftFootTmpInitPos.dz =0.0;
+          LeftFootTmpFinalPos.domega = LeftFootTmpInitPos.domega =0.0;
+          LeftFootTmpFinalPos.domega2 = LeftFootTmpInitPos.domega2 =0.0;
+          LeftFootTmpFinalPos.stepType = 11;
+
+          RightFootTmpFinalPos = RightFootTmpInitPos;
+          RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+          RightFootTmpFinalPos.omega = m_Omega;
+          RightFootTmpFinalPos.omega2 = m_Omega2 ;
+          RightFootTmpFinalPos.dx = RightFootTmpInitPos.dx = 0.0;
+          RightFootTmpFinalPos.dy = RightFootTmpInitPos.dy =0.0;
+          RightFootTmpFinalPos.dz = RightFootTmpInitPos.dz =0.0;
+          RightFootTmpFinalPos.domega = RightFootTmpInitPos.domega =0.0;
+          RightFootTmpFinalPos.domega2 = RightFootTmpInitPos.domega2 =0.0;
+          RightFootTmpFinalPos.stepType = 9;
+
+        }
+
+
+      if ((i!=0)|| (Continuity))
+        {
+          {// verify auto collision
+            Eigen::Matrix<double,2,1> currSupp;
+            Eigen::Matrix<double,2,1> InitPos;
+            Eigen::Matrix<double,2,1> FinalPos;
+            Eigen::Matrix<double,2,1> relWayPoint;
+            if (SupportFoot==1)
+              {
+                currSupp(0) = LeftFootTmpInitPos.x ;
+                currSupp(1) = LeftFootTmpInitPos.y ;
+                InitPos(0)  = RightFootTmpInitPos.x ;
+                InitPos(1)  = RightFootTmpInitPos.y ;
+                FinalPos(0) = RightFootTmpFinalPos.x ;
+                FinalPos(1) = RightFootTmpFinalPos.y ;
+                relWayPoint(0)=0.0 ;
+                relWayPoint(1)=-m_StepCurving;
+              }
+            else
+              {
+                currSupp(0) = RightFootTmpInitPos.x ;
+                currSupp(1) = RightFootTmpInitPos.y ;
+                InitPos(0)  = LeftFootTmpInitPos.x ;
+                InitPos(1)  = LeftFootTmpInitPos.y ;
+                FinalPos(0) = LeftFootTmpFinalPos.x ;
+                FinalPos(1) = LeftFootTmpFinalPos.y ;
+                relWayPoint(0)=0.0 ;
+                relWayPoint(1)=m_StepCurving;
+              }
+
+            double dx , dy , dc , distSquareToLine ;
+            dx = InitPos(1) - FinalPos(1) ;
+            dy = FinalPos(0) - InitPos(0) ;
+            m_MiddleWayPoint.resize(2);
+            { for(unsigned int i=0;
+                  i<m_MiddleWayPoint.size();
+                  m_MiddleWayPoint[i++]=0.0);};
+            if ( dx*dx>=1e-6 || dy*dy>=1e-6 )// not moving implies no collision
+              {
+                dc = -(dx * InitPos(0) + dy *InitPos(1)) ;
+                distSquareToLine = (dx*currSupp(0)  + dy*currSupp(1) + dc)*
+                  (dx*currSupp(0)  + dy*currSupp(1) + dc)/(dx*dx + dy*dy);
+                if( distSquareToLine < m_WayPointThreshold )
+                  {
+                    double x(currSupp(0)), y(currSupp(1)),
+                      x0((FinalPos(0)+InitPos(0))*0.5),
+                      y0((FinalPos(1)+InitPos(1))*0.5),
+                      R2((dx*dx+dy+dy)*0.5*0.5);
+                    bool autocollision = (x-x0)*(x-x0)+(y-y0)*(y-y0)<=R2;
+                    if( autocollision )
+                      {
+                        m_MiddleWayPoint = Orientation*relWayPoint + currSupp  ;
+                      }
+                  }
+              }
           }
+          std::vector<double> leftMidPos (3,0);
+          std::vector<double> rightMidPos (3,0);
+          if (SupportFoot==1)
+            {
+              // X offset to curve the step
+              rightMidPos[0] = m_MiddleWayPoint[0];
+              // Y offset to curve the step
+              rightMidPos[1] = m_MiddleWayPoint[1];
+              // Z offset
+              if(RightFootTmpInitPos.dx*RightFootTmpInitPos.dx<=0.000001)
+                {
+                  rightMidPos[2] = m_StepHeight ;
+                }
+            }
+          else
+            {
+              // X offset to curve the step
+              leftMidPos[0] = m_MiddleWayPoint[0];
+              // Y offset to curve the step
+              leftMidPos[1] = m_MiddleWayPoint[1];
+              // Z offset
+              if(LeftFootTmpInitPos.dx*LeftFootTmpInitPos.dx<=0.000001)
+                {
+                  leftMidPos[2] = m_StepHeight ;
+                }
+            }
+
+          /* Initialize properly the interval in single support phase */
+          ODEBUG("Single support phase");
+          ODEBUG("LeftFootTmpInitPos.stepType="<<LeftFootTmpInitPos.stepType);
+          ODEBUG("LeftFootTmpFinalPos.stepType="<<LeftFootTmpFinalPos.stepType);
+          SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
+                        LeftFootTmpInitPos,
+                        LeftFootTmpFinalPos,leftMidPos);
+
+
+          ODEBUG("LeftInit: ( " << LeftFootTmpInitPos.x << " , "
+                 << LeftFootTmpInitPos.y << " , "
+                 << LeftFootTmpInitPos.z << " ) ( "
+                 << LeftFootTmpInitPos.dx << " , "
+                 << LeftFootTmpInitPos.dy << " , "
+                 << LeftFootTmpInitPos.dz << " ) "
+                 << endl << "LeftFinal : ( "
+                 << LeftFootTmpFinalPos.x << " , "
+                 << LeftFootTmpFinalPos.y << " , "
+                 << LeftFootTmpFinalPos.z << " ) ( "
+                 << LeftFootTmpFinalPos.dx << " , "
+                 << LeftFootTmpFinalPos.dy << " , "
+                 << LeftFootTmpFinalPos.dz << " ) " );
+
+          ODEBUG("RightFootTmpInitPos.stepType="<<RightFootTmpInitPos.stepType);
+          ODEBUG("RightFootTmpFinalPos.stepType="<<RightFootTmpFinalPos.stepType);
+          ODEBUG("End of Single support phase");
+          SetAnInterval(IntervalIndex,m_RightFootTrajectory,
+                        RightFootTmpInitPos,
+                        RightFootTmpFinalPos,rightMidPos);
+
+          if (SupportFoot==1)
+            RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+          else
+            LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+          ODEBUG("RightInit: ( " << RightFootTmpInitPos.x << " , "
+                 << RightFootTmpInitPos.y << " , "
+                 << RightFootTmpInitPos.z << " ) ( "
+                 << RightFootTmpInitPos.dx << " , "
+                 << RightFootTmpInitPos.dy << " , "
+                 << RightFootTmpInitPos.dz << " ) "
+                 << endl << "RightFinal : ( "
+                 << RightFootTmpFinalPos.x << " , "
+                 << RightFootTmpFinalPos.y << " , "
+                 << RightFootTmpFinalPos.z << " ) ( "
+                 << RightFootTmpFinalPos.dx << " , "
+                 << RightFootTmpFinalPos.dy << " , "
+                 << RightFootTmpFinalPos.dz << " ) " );
+          // Switch from single support to double support.
+          IntervalIndex++;
         }
-      }
-      std::vector<double> leftMidPos (3,0);
-      std::vector<double> rightMidPos (3,0);
-      if (SupportFoot==1)
-      {
-        // X offset to curve the step
-        rightMidPos[0] = m_MiddleWayPoint[0];
-        // Y offset to curve the step
-        rightMidPos[1] = m_MiddleWayPoint[1];
-        // Z offset
-        if(RightFootTmpInitPos.dx*RightFootTmpInitPos.dx<=0.000001)
+
+      if ((!Continuity) && ((i==0) || (i==RelativeFootPositions.size()-1)))
         {
-          rightMidPos[2] = m_StepHeight ;
+          /*! At this stage the phase of double support is dealt with */
+          unsigned int limitk=1;
+
+          /*! If we are at the end a second double support phase has to be added. */
+          if (i==RelativeFootPositions.size()-1)
+            limitk=2;
+
+          for(unsigned int lk=0;lk<limitk;lk++)
+            {
+              LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+              LeftFootTmpFinalPos.dz = 0;
+              LeftFootTmpFinalPos.stepType = -1;
+
+              SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
+                            LeftFootTmpFinalPos,
+                            LeftFootTmpFinalPos);
+              RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+              RightFootTmpFinalPos.dz = 0;
+              RightFootTmpFinalPos.stepType = -1;
+              SetAnInterval(IntervalIndex,m_RightFootTrajectory,
+                            RightFootTmpFinalPos,
+                            RightFootTmpFinalPos);
+              IntervalIndex++;
+            }
         }
-      }
-      else
-      {
-        // X offset to curve the step
-        leftMidPos[0] = m_MiddleWayPoint[0];
-        // Y offset to curve the step
-        leftMidPos[1] = m_MiddleWayPoint[1];
-        // Z offset
-        if(LeftFootTmpInitPos.dx*LeftFootTmpInitPos.dx<=0.000001)
-        {
-          leftMidPos[2] = m_StepHeight ;
-        }
-      }
-
-      /* Initialize properly the interval in single support phase */
-      ODEBUG("Single support phase");
-      ODEBUG("LeftFootTmpInitPos.stepType="<<LeftFootTmpInitPos.stepType);
-      ODEBUG("LeftFootTmpFinalPos.stepType="<<LeftFootTmpFinalPos.stepType);
-      SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
-                    LeftFootTmpInitPos,
-                    LeftFootTmpFinalPos,leftMidPos);
 
 
-      ODEBUG("LeftInit: ( " << LeftFootTmpInitPos.x << " , "
-             << LeftFootTmpInitPos.y << " , "
-             << LeftFootTmpInitPos.z << " ) ( "
-             << LeftFootTmpInitPos.dx << " , "
-             << LeftFootTmpInitPos.dy << " , "
-             << LeftFootTmpInitPos.dz << " ) "
-             << endl << "LeftFinal : ( "
-             << LeftFootTmpFinalPos.x << " , "
-             << LeftFootTmpFinalPos.y << " , "
-             << LeftFootTmpFinalPos.z << " ) ( "
-             << LeftFootTmpFinalPos.dx << " , "
-             << LeftFootTmpFinalPos.dy << " , "
-             << LeftFootTmpFinalPos.dz << " ) " );
+      /* The final position become the new initial position */
+      LeftFootTmpInitPos = LeftFootTmpFinalPos;
+      RightFootTmpInitPos = RightFootTmpFinalPos;
 
-      ODEBUG("RightFootTmpInitPos.stepType="<<RightFootTmpInitPos.stepType);
-      ODEBUG("RightFootTmpFinalPos.stepType="<<RightFootTmpFinalPos.stepType);
-      ODEBUG("End of Single support phase");
-      SetAnInterval(IntervalIndex,m_RightFootTrajectory,
-                    RightFootTmpInitPos,
-                    RightFootTmpFinalPos,rightMidPos);
 
-      if (SupportFoot==1)
-        RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-      else
-        LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-      ODEBUG("RightInit: ( " << RightFootTmpInitPos.x << " , "
-             << RightFootTmpInitPos.y << " , "
-             << RightFootTmpInitPos.z << " ) ( "
-             << RightFootTmpInitPos.dx << " , "
-             << RightFootTmpInitPos.dy << " , "
-             << RightFootTmpInitPos.dz << " ) "
-             << endl << "RightFinal : ( "
-             << RightFootTmpFinalPos.x << " , "
-             << RightFootTmpFinalPos.y << " , "
-             << RightFootTmpFinalPos.z << " ) ( "
-             << RightFootTmpFinalPos.dx << " , "
-             << RightFootTmpFinalPos.dy << " , "
-             << RightFootTmpFinalPos.dz << " ) " );
-      // Switch from single support to double support.
-      IntervalIndex++;
+      /* Populate the set of support foot absolute positions */
+      SupportFootAbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
+      SupportFootAbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
+      SupportFootAbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
+      SupportFootAbsoluteFootPositions[i].theta = CurrentAbsTheta;
+
+
+      if ((!IgnoreFirst) || (i>0))
+        SupportFoot=-SupportFoot;
     }
-
-    if ((!Continuity) && ((i==0) || (i==RelativeFootPositions.size()-1)))
-    {
-      /*! At this stage the phase of double support is dealt with */
-      unsigned int limitk=1;
-
-      /*! If we are at the end a second double support phase has to be added. */
-      if (i==RelativeFootPositions.size()-1)
-        limitk=2;
-
-      for(unsigned int lk=0;lk<limitk;lk++)
-      {
-        LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-        LeftFootTmpFinalPos.dz = 0;
-        LeftFootTmpFinalPos.stepType = -1;
-
-        SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
-                      LeftFootTmpFinalPos,
-                      LeftFootTmpFinalPos);
-        RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-        RightFootTmpFinalPos.dz = 0;
-        RightFootTmpFinalPos.stepType = -1;
-        SetAnInterval(IntervalIndex,m_RightFootTrajectory,
-                      RightFootTmpFinalPos,
-                      RightFootTmpFinalPos);
-        IntervalIndex++;
-      }
-    }
-
-
-    /* The final position become the new initial position */
-    LeftFootTmpInitPos = LeftFootTmpFinalPos;
-    RightFootTmpInitPos = RightFootTmpFinalPos;
-
-
-    /* Populate the set of support foot absolute positions */
-    SupportFootAbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
-    SupportFootAbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
-    SupportFootAbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
-    SupportFootAbsoluteFootPositions[i].theta = CurrentAbsTheta;
-
-
-    if ((!IgnoreFirst) || (i>0))
-      SupportFoot=-SupportFoot;
-  }
 
   /*! This part initializes correctly the last two intervals
-   if the system is in real-time foot modification. In this case,
-   the representation of the intervals shift from:
-  ONE DOUBLE SUPPORT STARTING PHASE - 1st foot single support phase -
-  double support phase - 2nd foot single support phase
-  - double support phase - 3rd single support phase -
-  ending double support phase
-  to
-  1st foot single support phase - double support phase -
-  2nd foot single support phase
-  - double support phase - 3rd single support phase
-  Two intervals are missing and should be set by
-  default to the end position of the feet
-  if Continuity is set to true, and if the number of intervals
-  so far is the number of
-  intervals minus 2.
+    if the system is in real-time foot modification. In this case,
+    the representation of the intervals shift from:
+    ONE DOUBLE SUPPORT STARTING PHASE - 1st foot single support phase -
+    double support phase - 2nd foot single support phase
+    - double support phase - 3rd single support phase -
+    ending double support phase
+    to
+    1st foot single support phase - double support phase -
+    2nd foot single support phase
+    - double support phase - 3rd single support phase
+    Two intervals are missing and should be set by
+    default to the end position of the feet
+    if Continuity is set to true, and if the number of intervals
+    so far is the number of
+    intervals minus 2.
   */
   if ((Continuity) && (IntervalIndex==(int)(m_DeltaTj.size()-2)))
-  {
-    for(unsigned int lk=0;lk<2;lk++)
     {
-      LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-      LeftFootTmpFinalPos.dz = 0;
-      SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
-                    LeftFootTmpFinalPos,
-                    LeftFootTmpFinalPos);
-      RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-      RightFootTmpFinalPos.dz = 0;
-      SetAnInterval(IntervalIndex,m_RightFootTrajectory,
-                    RightFootTmpFinalPos,
-                    RightFootTmpFinalPos);
-      IntervalIndex++;
-    }
+      for(unsigned int lk=0;lk<2;lk++)
+        {
+          LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+          LeftFootTmpFinalPos.dz = 0;
+          SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
+                        LeftFootTmpFinalPos,
+                        LeftFootTmpFinalPos);
+          RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+          RightFootTmpFinalPos.dz = 0;
+          SetAnInterval(IntervalIndex,m_RightFootTrajectory,
+                        RightFootTmpFinalPos,
+                        RightFootTmpFinalPos);
+          IntervalIndex++;
+        }
 
-  }
+    }
 
 }
 
@@ -742,16 +742,16 @@ ComputeAbsoluteStepsFromRelativeSteps
   FootAbsolutePosition aSupportFootAbsolutePosition;
 
   if (RelativeFootPositions[0].sy>0)
-  {
-    // The flying foot is on the left, thus the support foot is on the right.
-    ODEBUG("Detect support foot on the right.");
-    aSupportFootAbsolutePosition = RightFootInitialPosition;
-  }
+    {
+      // The flying foot is on the left, thus the support foot is on the right.
+      ODEBUG("Detect support foot on the right.");
+      aSupportFootAbsolutePosition = RightFootInitialPosition;
+    }
   else
-  {
-    ODEBUG("Detect support foot on the left.");
-    aSupportFootAbsolutePosition = LeftFootInitialPosition;
-  }
+    {
+      ODEBUG("Detect support foot on the left.");
+      aSupportFootAbsolutePosition = LeftFootInitialPosition;
+    }
   aSupportFootAbsolutePosition.stepType=-1;
 
   ComputeAbsoluteStepsFromRelativeSteps(RelativeFootPositions,
@@ -766,7 +766,7 @@ ComputeAbsoluteStepsFromRelativeSteps
  deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions)
 {
   /*! Makes sure the size of the SupportFootAbsolutePositions is the same than
-   the relative foot positions. */
+    the relative foot positions. */
   if (SupportFootAbsoluteFootPositions.size()!=
       RelativeFootPositions.size())
     SupportFootAbsoluteFootPositions.resize(RelativeFootPositions.size());
@@ -815,63 +815,63 @@ ComputeAbsoluteStepsFromRelativeSteps
   ODEBUG("RelativeFootPositions: " << RelativeFootPositions.size());
 
   for(unsigned int i=0;i<RelativeFootPositions.size();i++)
-  {
+    {
 
-    ODEBUG( i << " : " <<
-            RelativeFootPositions[i].sx << " " <<
-            RelativeFootPositions[i].sy);
+      ODEBUG( i << " : " <<
+              RelativeFootPositions[i].sx << " " <<
+              RelativeFootPositions[i].sy);
 
-    /*! Compute Orientation matrix related to the relative orientation
-    of the support foot */
-    c = cos(RelativeFootPositions[i].theta*M_PI/180.0);
-    s = sin(RelativeFootPositions[i].theta*M_PI/180.0);
-    MM(0,0) = c;      MM(0,1) = -s;
-    MM(1,0) = s;      MM(1,1) = c;
+      /*! Compute Orientation matrix related to the relative orientation
+        of the support foot */
+      c = cos(RelativeFootPositions[i].theta*M_PI/180.0);
+      s = sin(RelativeFootPositions[i].theta*M_PI/180.0);
+      MM(0,0) = c;      MM(0,1) = -s;
+      MM(1,0) = s;      MM(1,1) = c;
 
-    /*! Update the orientation */
-    CurrentAbsTheta+= RelativeFootPositions[i].theta;
-    CurrentAbsTheta = fmod(CurrentAbsTheta,180.0);
+      /*! Update the orientation */
+      CurrentAbsTheta+= RelativeFootPositions[i].theta;
+      CurrentAbsTheta = fmod(CurrentAbsTheta,180.0);
 
-    /*! Extract the current absolute orientation matrix. */
-    for(int k=0;k<2;k++)
-      for(int l=0;l<2;l++)
-        Orientation(k,l) = CurrentSupportFootPosition(k,l);
+      /*! Extract the current absolute orientation matrix. */
+      for(int k=0;k<2;k++)
+        for(int l=0;l<2;l++)
+          Orientation(k,l) = CurrentSupportFootPosition(k,l);
 
-    /*! Put in a vector form the translation of the relative foot. */
-    v(0,0) = RelativeFootPositions[i].sx;
-    v(1,0) = RelativeFootPositions[i].sy;
+      /*! Put in a vector form the translation of the relative foot. */
+      v(0,0) = RelativeFootPositions[i].sx;
+      v(1,0) = RelativeFootPositions[i].sy;
 
-    /*! Compute the new orientation of the foot vector. */
-    Orientation = MM*Orientation;
-    v2 = Orientation*v;
+      /*! Compute the new orientation of the foot vector. */
+      Orientation = MM*Orientation;
+      v2 = Orientation*v;
 
-    /*! Update the world coordinates of the support foot. */
-    for(int k=0;k<2;k++)
-      for(int l=0;l<2;l++)
-        CurrentSupportFootPosition(k,l) = Orientation(k,l);
+      /*! Update the world coordinates of the support foot. */
+      for(int k=0;k<2;k++)
+        for(int l=0;l<2;l++)
+          CurrentSupportFootPosition(k,l) = Orientation(k,l);
 
-    for(int k=0;k<2;k++)
-      CurrentSupportFootPosition(k,2) += v2(k,0);
+      for(int k=0;k<2;k++)
+        CurrentSupportFootPosition(k,2) += v2(k,0);
 
-    CurrentSupportFootPosition(2,2) = SupportFootInitialAbsolutePosition.z ;
-    CurrentSupportFootPosition(2,2) += RelativeFootPositions[i].sz;
+      CurrentSupportFootPosition(2,2) = SupportFootInitialAbsolutePosition.z ;
+      CurrentSupportFootPosition(2,2) += RelativeFootPositions[i].sz;
 
-    AbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
-    AbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
-    AbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
-    AbsoluteFootPositions[i].theta = CurrentAbsTheta;
+      AbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
+      AbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
+      AbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
+      AbsoluteFootPositions[i].theta = CurrentAbsTheta;
 
-    ODEBUG("CSFP:" << CurrentSupportFootPosition(0,2) << " "
-	   << CurrentSupportFootPosition(1,2));
+      ODEBUG("CSFP:" << CurrentSupportFootPosition(0,2) << " "
+             << CurrentSupportFootPosition(1,2));
 
-    /* Populate the set of support foot absolute positions */
-    SupportFootAbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
-    SupportFootAbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
-    SupportFootAbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
-    SupportFootAbsoluteFootPositions[i].theta = CurrentAbsTheta;
-    SupportFootAbsoluteFootPositions[i].stepType = -1;
+      /* Populate the set of support foot absolute positions */
+      SupportFootAbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
+      SupportFootAbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
+      SupportFootAbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
+      SupportFootAbsoluteFootPositions[i].theta = CurrentAbsTheta;
+      SupportFootAbsoluteFootPositions[i].stepType = -1;
 
-  }
+    }
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::
@@ -882,10 +882,10 @@ ChangeRelStepsFromAbsSteps
  unsigned int ChangedInterval)
 {
   if (ChangedInterval>=SupportFootAbsoluteFootPositions.size())
-  {
-    LTHROW("Pb: ChangedInterval is after the size of absolute foot stack.");
-    return;
-  }
+    {
+      LTHROW("Pb: ChangedInterval is after the size of absolute foot stack.");
+      return;
+    }
 
   Eigen::Matrix3d KM1;
   KM1.setIdentity();
@@ -898,17 +898,17 @@ ChangeRelStepsFromAbsSteps
 
   // Change the previous relative position.
   if (ChangedInterval==0)
-  {
-    thetakm1= SupportFootInitialPosition.theta;
-    xkm1 = SupportFootInitialPosition.x;
-    ykm1 = SupportFootInitialPosition.y;
-  }
+    {
+      thetakm1= SupportFootInitialPosition.theta;
+      xkm1 = SupportFootInitialPosition.x;
+      ykm1 = SupportFootInitialPosition.y;
+    }
   else
-  {
-    thetakm1= SupportFootAbsoluteFootPositions[ChangedInterval-1].theta;
-    xkm1 = SupportFootAbsoluteFootPositions[ChangedInterval-1].x;
-    ykm1 = SupportFootAbsoluteFootPositions[ChangedInterval-1].y;
-  }
+    {
+      thetakm1= SupportFootAbsoluteFootPositions[ChangedInterval-1].theta;
+      xkm1 = SupportFootAbsoluteFootPositions[ChangedInterval-1].x;
+      ykm1 = SupportFootAbsoluteFootPositions[ChangedInterval-1].y;
+    }
   ODEBUG("Changed interval: " << ChangedInterval);
   ODEBUG("K-1 position: " << xkm1 << " " << ykm1 << " " << thetakm1 );
   c = cos(thetakm1*M_PI/180.0);
@@ -942,32 +942,32 @@ ChangeRelStepsFromAbsSteps
 
   // Change the next relative position
   if (ChangedInterval<SupportFootAbsoluteFootPositions.size()-1)
-  {
-    thetakp1= SupportFootAbsoluteFootPositions[ChangedInterval+1].theta;
-    xkp1 = SupportFootAbsoluteFootPositions[ChangedInterval+1].x;
-    ykp1 = SupportFootAbsoluteFootPositions[ChangedInterval+1].y;
+    {
+      thetakp1= SupportFootAbsoluteFootPositions[ChangedInterval+1].theta;
+      xkp1 = SupportFootAbsoluteFootPositions[ChangedInterval+1].x;
+      ykp1 = SupportFootAbsoluteFootPositions[ChangedInterval+1].y;
 
-    c = cos(thetakp1*M_PI/180.0);
-    s = sin(thetakp1*M_PI/180.0);
-    KP1(0,0) = c;      KP1(0,1) = -s; KP1(0,2) = xkp1;
-    KP1(1,0) = s;      KP1(1,1) = c;  KP1(1,2) = ykp1;
+      c = cos(thetakp1*M_PI/180.0);
+      s = sin(thetakp1*M_PI/180.0);
+      KP1(0,0) = c;      KP1(0,1) = -s; KP1(0,2) = xkp1;
+      KP1(1,0) = s;      KP1(1,1) = c;  KP1(1,2) = ykp1;
 
-    Eigen::Matrix3d iK;
-    iK=K.inverse();
-    Eigen::Matrix3d relMotionP1;
+      Eigen::Matrix3d iK;
+      iK=K.inverse();
+      Eigen::Matrix3d relMotionP1;
 
-    relMotionP1=iK+KP1;
+      relMotionP1=iK+KP1;
 
-    RelativeFootPositions[ChangedInterval+1].sx = relMotionP1(0,2);
-    RelativeFootPositions[ChangedInterval+1].sy = relMotionP1(1,2);
-    RelativeFootPositions[ChangedInterval+1].theta =
-      atan2(relMotionP1(1,0),relMotionP1(0,0));
+      RelativeFootPositions[ChangedInterval+1].sx = relMotionP1(0,2);
+      RelativeFootPositions[ChangedInterval+1].sy = relMotionP1(1,2);
+      RelativeFootPositions[ChangedInterval+1].theta =
+        atan2(relMotionP1(1,0),relMotionP1(0,0));
 
-  }
+    }
 
   ODEBUG("KP1 position: " << xkp1 << " " << ykp1 << " " << thetakp1 );
   ODEBUG("Changed intervals : " << ChangedInterval-1 << " "
-	 << ChangedInterval << " " << ChangedInterval + 1);
+         << ChangedInterval << " " << ChangedInterval + 1);
 }
 
 bool LeftAndRightFootTrajectoryGenerationMultiple::
@@ -980,32 +980,32 @@ ComputeAnAbsoluteFootPosition
   ODEBUG("Left (1) or right (-1) : " <<  LeftOrRight);
 
   if (LeftOrRight==1)
-  {
-    /*! Left or Right Foot Step - 0: Left Foot; 1: Right Foot*/
-    //aFAP.LeftOrRightFoot = 0; // Left Foot
-    bool r = m_LeftFootTrajectory->Compute(time,aFAP);
-    if (!r)
-      {
-	std::cerr << "Unable to compute left foot abs pos at time "
-		  <<time << std::endl;
-	LTHROW("Pb in computing absolute foot position");
-      }
-    return r;
-  }
+    {
+      /*! Left or Right Foot Step - 0: Left Foot; 1: Right Foot*/
+      //aFAP.LeftOrRightFoot = 0; // Left Foot
+      bool r = m_LeftFootTrajectory->Compute(time,aFAP);
+      if (!r)
+        {
+          std::cerr << "Unable to compute left foot abs pos at time "
+                    <<time << std::endl;
+          LTHROW("Pb in computing absolute foot position");
+        }
+      return r;
+    }
   else
-  {
-    /*! Left or Right Foot Step - 0: Left Foot; 1: Right Foot*/
-    //aFAP.LeftOrRightFoot = 1; // Right Foot
-    bool r = m_RightFootTrajectory->Compute(time,aFAP);
-    if (!r)
-      {
-	std::cerr
-	  << "Unable to compute right foot abs pos at time " <<time
-	  << std::endl;
-	LTHROW("Pb in computing absolute foot position");
-      }
-    return r;
-  }
+    {
+      /*! Left or Right Foot Step - 0: Left Foot; 1: Right Foot*/
+      //aFAP.LeftOrRightFoot = 1; // Right Foot
+      bool r = m_RightFootTrajectory->Compute(time,aFAP);
+      if (!r)
+        {
+          std::cerr
+            << "Unable to compute right foot abs pos at time " <<time
+            << std::endl;
+          LTHROW("Pb in computing absolute foot position");
+        }
+      return r;
+    }
 
   return false;
 }
@@ -1019,7 +1019,7 @@ ComputeAnAbsoluteFootPosition
 {
 
   ODEBUG(this << " " << m_LeftFootTrajectory << " "
-	 << m_RightFootTrajectory);
+         << m_RightFootTrajectory);
 
   if (LeftOrRight==1)
     return m_LeftFootTrajectory->Compute(time,aFAP,IndexInterval);
@@ -1029,23 +1029,23 @@ ComputeAnAbsoluteFootPosition
   return false;
 }
 /*
-bool LeftAndRightFootTrajectoryGenerationMultiple::
-ComputeAnAbsoluteFootPosition
-(int LeftOrRight,
-double time,
-deque<FootAbsolutePosition> & adFAP,
-unsigned int IndexInterval)
-{
+  bool LeftAndRightFootTrajectoryGenerationMultiple::
+  ComputeAnAbsoluteFootPosition
+  (int LeftOrRight,
+  double time,
+  deque<FootAbsolutePosition> & adFAP,
+  unsigned int IndexInterval)
+  {
 
   ODEBUG(this << " " << m_LeftFootTrajectory << " " << m_RightFootTrajectory);
 
   if (LeftOrRight==1)
-    return m_LeftFootTrajectory->Compute(time,adFAP,IndexInterval);
+  return m_LeftFootTrajectory->Compute(time,adFAP,IndexInterval);
   else
-    return m_RightFootTrajectory->Compute(time,adFAP,IndexInterval);
+  return m_RightFootTrajectory->Compute(time,adFAP,IndexInterval);
 
   return false;
-}*/
+  }*/
 
 void LeftAndRightFootTrajectoryGenerationMultiple::
 SetDeltaTj(vector<double> &aDeltaTj)

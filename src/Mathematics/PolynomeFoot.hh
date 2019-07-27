@@ -26,7 +26,7 @@
  */
 /** \file PolynomeFoot.h
     \brief Polynomes object for trajectories.
-   All references are from Kajita san's book. */
+    All references are from Kajita san's book. */
 
 
 #ifndef _POLYNOME_FOOT_H_
@@ -46,8 +46,8 @@ namespace PatternGeneratorJRL
   class PolynomeFoot : public Polynome
   {
   protected :
-      /*! Store final time */
-      double FT_;
+    /*! Store final time */
+    double FT_;
 
   public :
 
@@ -66,230 +66,230 @@ namespace PatternGeneratorJRL
     /*! Compute the value of the third derivative (jerk). */
     double ComputeJerk(double t);
 
-};
+  };
 
   /// Polynome used for X,Y and Theta trajectories.
   class  Polynome3 : public PolynomeFoot
-    {
-    public:
-      /** Constructor:
-       FT: Final time
-       FP: Final position */
-      Polynome3(double FT, double FP);
-      /** Additionnal Constructor:
-        */
-      Polynome3(double FT,
-                double IP, double IS,
-                double FP, double FS);
+  {
+  public:
+    /** Constructor:
+        FT: Final time
+        FP: Final position */
+    Polynome3(double FT, double FP);
+    /** Additionnal Constructor:
+     */
+    Polynome3(double FT,
+              double IP, double IS,
+              double FP, double FS);
 
-      /*!  Set the parameters
-    This method assumes implicitly a position
-    set to zero, and a speed equals to zero.
-    Final velocity is 0
-       */
-      void SetParameters(double FT, double FP);
+    /*!  Set the parameters
+      This method assumes implicitly a position
+      set to zero, and a speed equals to zero.
+      Final velocity is 0
+    */
+    void SetParameters(double FT, double FP);
 
-      /*!  Set the parameters
-       */
-      void SetParameters(double FT,
-                    double IP, double IS,
-                    double FP, double FS);
+    /*!  Set the parameters
+     */
+    void SetParameters(double FT,
+                       double IP, double IS,
+                       double FP, double FS);
 
-      /*! Set the parameters such that
-    the initial position, and initial speed
-    are different from zero.
-    Final velocity is 0
-       */
-      void SetParametersWithInitPosInitSpeed(double FT,
-               double FP,
-               double InitPos,
-               double InitSpeed);
+    /*! Set the parameters such that
+      the initial position, and initial speed
+      are different from zero.
+      Final velocity is 0
+    */
+    void SetParametersWithInitPosInitSpeed(double FT,
+                                           double FP,
+                                           double InitPos,
+                                           double InitSpeed);
 
-      void GetParametersWithInitPosInitSpeed(double &FT,
-                         double &FP,
-                         double &InitPos,
-                         double &InitSpeed);
-      /// Destructor.
-      ~Polynome3();
+    void GetParametersWithInitPosInitSpeed(double &FT,
+                                           double &FP,
+                                           double &InitPos,
+                                           double &InitSpeed);
+    /// Destructor.
+    ~Polynome3();
 
-    private:
-      /*! Store final time and final position. */
-      double FP_;
-    };
+  private:
+    /*! Store final time and final position. */
+    double FP_;
+  };
 
   /// Polynome used for Z trajectory.
   class  Polynome4 : public PolynomeFoot
-    {
-    public:
-      /** Constructor:
-       FT: Final time
-       MP: Middle position */
-      Polynome4(double FT, double MP, double FP=0.0);
+  {
+  public:
+    /** Constructor:
+        FT: Final time
+        MP: Middle position */
+    Polynome4(double FT, double MP, double FP=0.0);
 
-      /// Set the parameters
-      // Initial velocity and position are 0
-      // Final velocity and position are 0
-      void SetParameters(double FT, double MP, double FP=0.0);
+    /// Set the parameters
+    // Initial velocity and position are 0
+    // Final velocity and position are 0
+    void SetParameters(double FT, double MP, double FP=0.0);
 
-      /// Set the parameters
-      // time horizon
-      // Initial Position
-      // Initial velocity (IS)
-      // Initial Acceleration
-      // Final velocity
-      // Final Acceleration
-      void SetParameters(double FT,
-                         double InitPos,
-                         double InitSpeed,
-                         double InitAcc,
-                         double FinalSpeed,
-                         double FinalAcc);
+    /// Set the parameters
+    // time horizon
+    // Initial Position
+    // Initial velocity (IS)
+    // Initial Acceleration
+    // Final velocity
+    // Final Acceleration
+    void SetParameters(double FT,
+                       double InitPos,
+                       double InitSpeed,
+                       double InitAcc,
+                       double FinalSpeed,
+                       double FinalAcc);
 
-      /*! Set the parameters such that
-	the initial position, and initial speed
-	are different from zero.
-	Final velocity and position are 0
-       */
-      void SetParametersWithInitPosInitSpeed(double FT,
-					     double MP,
-					     double InitPos,
-					     double InitSpeed,
-					     double FP = 0.0);
+    /*! Set the parameters such that
+      the initial position, and initial speed
+      are different from zero.
+      Final velocity and position are 0
+    */
+    void SetParametersWithInitPosInitSpeed(double FT,
+                                           double MP,
+                                           double InitPos,
+                                           double InitSpeed,
+                                           double FP = 0.0);
 
 
-      /*! Get the parameters */
-      void GetParametersWithInitPosInitSpeed(double &FT,
-                                             double &MP,
-                                             double &FP,
-                                             double &InitPos,
-                                             double &InitSpeed);
+    /*! Get the parameters */
+    void GetParametersWithInitPosInitSpeed(double &FT,
+                                           double &MP,
+                                           double &FP,
+                                           double &InitPos,
+                                           double &InitSpeed);
 
-      /// Destructor.
-      ~Polynome4();
+    /// Destructor.
+    ~Polynome4();
 
-    private:
-      /*! Store final time and middle position. */
-      double MP_;
-      double FP_;
+  private:
+    /*! Store final time and middle position. */
+    double MP_;
+    double FP_;
 
-    };
+  };
 
   /// Polynome used for X,Y and Theta trajectories.
   class  Polynome5 : public PolynomeFoot
-    {
-    private:
-      double InitPos_, InitSpeed_, InitAcc_, FinalPos_, FinalSpeed_, FinalAcc_;
-    public:
-      /** Constructor:
-	  FT: Final time
-	  FP: Final position */
-      Polynome5(double FT, double FP);
+  {
+  private:
+    double InitPos_, InitSpeed_, InitAcc_, FinalPos_, FinalSpeed_, FinalAcc_;
+  public:
+    /** Constructor:
+        FT: Final time
+        FP: Final position */
+    Polynome5(double FT, double FP);
 
-      /// Set the parameters
-      void SetParameters(double FT, double FP);
+    /// Set the parameters
+    void SetParameters(double FT, double FP);
 
 
-      /*! Set the parameters such that
-        the initial position, and initial speed
-        are different from zero.
-       */
-      void SetParametersWithInitPosInitSpeed(double FT,
-                                             double FP,
-                                             double InitPos,
-                                             double InitSpeed);
-      /*! Set the parameters such that
-        the initial position, and initial speed
-        are different from zero.
-       */
-      void GetParametersWithInitPosInitSpeed(double &FT,
-                                             double &FP,
-                                             double &InitPos,
-                                             double &InitSpeed);
+    /*! Set the parameters such that
+      the initial position, and initial speed
+      are different from zero.
+    */
+    void SetParametersWithInitPosInitSpeed(double FT,
+                                           double FP,
+                                           double InitPos,
+                                           double InitSpeed);
+    /*! Set the parameters such that
+      the initial position, and initial speed
+      are different from zero.
+    */
+    void GetParametersWithInitPosInitSpeed(double &FT,
+                                           double &FP,
+                                           double &InitPos,
+                                           double &InitSpeed);
 
-      /// \brief Set parameters considering initial position, velocity, acceleration
-      void SetParameters(double FT, double FP,
-          double InitPos, double InitSpeed, double InitAcc, double InitJerk = 0.0);
+    /// \brief Set parameters considering initial position, velocity, acceleration
+    void SetParameters(double FT, double FP,
+                       double InitPos, double InitSpeed, double InitAcc, double InitJerk = 0.0);
 
-      /// \brief Set parameters considering initial position, velocity, acceleration,
-      /// and final poistion, velocity and acceleration
-      void SetParameters(double FT,
-                         double InitPos, double InitSpeed, double InitAcc,
-                         double FinalPos, double FinalSpeed, double FinalAcc);
+    /// \brief Set parameters considering initial position, velocity, acceleration,
+    /// and final poistion, velocity and acceleration
+    void SetParameters(double FT,
+                       double InitPos, double InitSpeed, double InitAcc,
+                       double FinalPos, double FinalSpeed, double FinalAcc);
 
-      /// Destructor.
-      ~Polynome5();
+    /// Destructor.
+    ~Polynome5();
 
-    };
+  };
 
   /// Polynome used for Z trajectory.
   class  Polynome6 : public PolynomeFoot
-    {
-    private:
-      double MP_, FP_, InitPos_, InitSpeed_,InitAcc_;
-    public:
-      /// Constructor:
-      /// FT: Final time
-      /// MP: Middle position
-      Polynome6(double FT, double MP, double FP=0.0);
+  {
+  private:
+    double MP_, FP_, InitPos_, InitSpeed_,InitAcc_;
+  public:
+    /// Constructor:
+    /// FT: Final time
+    /// MP: Middle position
+    Polynome6(double FT, double MP, double FP=0.0);
 
-      /// Set the parameters
-      // Initial acceleration, velocity and position by default 0
-      // Final acceleration, velocity and position are 0
-      void SetParameters(double FT, double MP, double FP = 0.0);
-      void SetParametersWithMiddlePos(double FT, double MP,
-                          double InitPos, double InitSpeed, double InitAcc=0.0, double FP = 0.0);
-      void GetParametersWithInitPosInitSpeed(double &TimeInterval,
-                                             double &MiddlePosition,
-                                             double &FinalPosition,
-                                             double &InitPosition,
-                                             double &InitSpeed);
-      /// Destructor.
-      ~Polynome6();
-    };
+    /// Set the parameters
+    // Initial acceleration, velocity and position by default 0
+    // Final acceleration, velocity and position are 0
+    void SetParameters(double FT, double MP, double FP = 0.0);
+    void SetParametersWithMiddlePos(double FT, double MP,
+                                    double InitPos, double InitSpeed, double InitAcc=0.0, double FP = 0.0);
+    void GetParametersWithInitPosInitSpeed(double &TimeInterval,
+                                           double &MiddlePosition,
+                                           double &FinalPosition,
+                                           double &InitPosition,
+                                           double &InitSpeed);
+    /// Destructor.
+    ~Polynome6();
+  };
 
   /// Polynome used for X,Y and Theta trajectories.
   class  Polynome7 : public PolynomeFoot
-    {
-    private:
-      double FP_, InitPos_, InitSpeed_,InitAcc_,InitJerk_;
-    public:
-      /** Constructor:
-    FT: Final time
-    FP: Final position */
-      Polynome7(double FT, double FP);
+  {
+  private:
+    double FP_, InitPos_, InitSpeed_,InitAcc_,InitJerk_;
+  public:
+    /** Constructor:
+        FT: Final time
+        FP: Final position */
+    Polynome7(double FT, double FP);
 
-      /// Set the parameters
-      void SetParameters(double FT, double FP);
+    /// Set the parameters
+    void SetParameters(double FT, double FP);
 
-      /*! Set the parameters such that
-        the initial position, and initial speed
-        are different from zero.
-       */
-      void SetParametersWithInitPosInitSpeed(double FT,
-                                             double FP,
-                                             double InitPos,
-                                             double InitSpeed);
+    /*! Set the parameters such that
+      the initial position, and initial speed
+      are different from zero.
+    */
+    void SetParametersWithInitPosInitSpeed(double FT,
+                                           double FP,
+                                           double InitPos,
+                                           double InitSpeed);
 
-      /// \brief Set parameters considering initial position, velocity, acceleration, jerk
-      void SetParameters(double FT, double FP,
-          double InitPos, double InitSpeed, double InitAcc, double InitJerk=0.0);
-
-
-      /*! Set the parameters such that
-        the initial position, and initial speed
-        are different from zero.
-       */
-      void GetParametersWithInitPosInitSpeed(double &FT,
-                                             double &FP,
-                                             double &InitPos,
-                                             double &InitSpeed);
+    /// \brief Set parameters considering initial position, velocity, acceleration, jerk
+    void SetParameters(double FT, double FP,
+                       double InitPos, double InitSpeed, double InitAcc, double InitJerk=0.0);
 
 
+    /*! Set the parameters such that
+      the initial position, and initial speed
+      are different from zero.
+    */
+    void GetParametersWithInitPosInitSpeed(double &FT,
+                                           double &FP,
+                                           double &InitPos,
+                                           double &InitSpeed);
 
-      /// Destructor.
-      ~Polynome7();
 
-    };
+
+    /// Destructor.
+    ~Polynome7();
+
+  };
 
 }
 #endif /* _POLYNOME_FOOT_H_ */

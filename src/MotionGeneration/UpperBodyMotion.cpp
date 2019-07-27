@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Francois Keith
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -37,7 +37,7 @@ UpperBodyMotion::UpperBodyMotion()
 
 UpperBodyMotion::~UpperBodyMotion()
 {
-  
+
 }
 
 
@@ -46,71 +46,71 @@ void UpperBodyMotion::GenerateDataFile(string aFileName, int LenghtDataArray)
 {
   ofstream aof;
 
- 	
+
 
   aof.open(aFileName.c_str(),ofstream::out);
   if (aof.is_open())
     {
-	
+
       for(int i=0;i<LenghtDataArray;i++)
-	{ 
-	
+        {
+
 #if 0
-	  aof 		<< 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "     										//chest
-			<< 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "											//head
-			<< 14.813*M_PI/180.0  << " " << -10.0*M_PI/180.0 << " "	
-			<< 0.0*M_PI/180.0 << " " << -30.0*M_PI/180.0 << " " 
-			<< 0.0*M_PI/180.0 << " "  <<  0.0*M_PI/180.0 << " " 
-			<< 10.0*M_PI/180.0 << " "	//rarm
-			<< 14.813*M_PI/180.0 << " " << 10.0*M_PI/180.0 << " "	
-			<< 0.0*M_PI/180.0 << " " << -30.0*M_PI/180.0 << " " 
-			<< 0.0*M_PI/180.0<< " "  <<  0.0*M_PI/180.0 << " " 
-			<< 10.0*M_PI/180.0<< " "	//larm
-			<< -10.0*M_PI/180.0 << " " << 10.0*M_PI/180.0 << " "	
-			<< -10.0*M_PI/180.0 << " " << 10.0*M_PI/180.0 << " " 
-			<< -10.0*M_PI/180.0 << " "  				
-	    //rhand
-			<< -10.0*M_PI/180.0  << " " << 10.0*M_PI/180.0 << " "	
-			<< -10.0*M_PI/180.0<< " " << 10.0*M_PI/180.0 << " " 
-			<< -10.0*M_PI/180.0<< " "					
-	    //lhand
-			<< endl;
+          aof         << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "                                                                      //chest
+                      << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "                                                                             //head
+                      << 14.813*M_PI/180.0  << " " << -10.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " " << -30.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " "  <<  0.0*M_PI/180.0 << " "
+                      << 10.0*M_PI/180.0 << " "   //rarm
+                      << 14.813*M_PI/180.0 << " " << 10.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " " << -30.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0<< " "  <<  0.0*M_PI/180.0 << " "
+                      << 10.0*M_PI/180.0<< " "    //larm
+                      << -10.0*M_PI/180.0 << " " << 10.0*M_PI/180.0 << " "
+                      << -10.0*M_PI/180.0 << " " << 10.0*M_PI/180.0 << " "
+                      << -10.0*M_PI/180.0 << " "
+            //rhand
+                      << -10.0*M_PI/180.0  << " " << 10.0*M_PI/180.0 << " "
+                      << -10.0*M_PI/180.0<< " " << 10.0*M_PI/180.0 << " "
+                      << -10.0*M_PI/180.0<< " "
+            //lhand
+                      << endl;
 #else
-	  aof 		<< 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "     										//chest
-			<< 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "											//head
-			<< 0.0*M_PI/180.0  << " " << 0.0*M_PI/180.0 << " "	
-			<< 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " " 
-			<< 0.0*M_PI/180.0 << " "  <<  0.0*M_PI/180.0 << " " 
-			<< 0.0*M_PI/180.0 << " "	//rarm
-			<< 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "	
-			<< 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " " 
-			<< 0.0*M_PI/180.0<< " "  <<  0.0*M_PI/180.0 << " " 
-			<< 0.0*M_PI/180.0<< " "	//larm
-			<< 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "	
-			<< 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " " 
-			<< 0.0*M_PI/180.0 << " "  				
-	    //rhand
-			<< 0.0*M_PI/180.0  << " " << 0.0*M_PI/180.0 << " "	
-			<< 0.0*M_PI/180.0<< " " << 0.0*M_PI/180.0 << " " 
-			<< 0.0*M_PI/180.0<< " "					
-	    //lhand
-			<< endl;
+          aof         << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "                                                                      //chest
+                      << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "                                                                             //head
+                      << 0.0*M_PI/180.0  << " " << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " "  <<  0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " "    //rarm
+                      << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0<< " "  <<  0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0<< " "     //larm
+                      << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " "
+            //rhand
+                      << 0.0*M_PI/180.0  << " " << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0<< " " << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0<< " "
+            //lhand
+                      << endl;
 #endif
-	}
-	
+        }
+
       aof.close();
     }
-  
+
 }
 
 
 void UpperBodyMotion::ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles)
 {
- 
+
   std::ifstream aif;
 
   unsigned int NumberRows, NumberColumns;
-   	
+
   NumberRows = UpperBodyAngles.rows();
   NumberColumns = UpperBodyAngles.cols();
 
@@ -120,18 +120,18 @@ void UpperBodyMotion::ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyA
   if (aif.is_open())
     {
       for (unsigned int i=0;i<NumberRows;i++)
-	{			
-	  for (unsigned int j=0;j<NumberColumns;j++)
-	    {	
-	      aif >> r;	
-	      UpperBodyAngles(i,j) = r;
-	    }
-	}		
+        {
+          for (unsigned int j=0;j<NumberColumns;j++)
+            {
+              aif >> r;
+              UpperBodyAngles(i,j) = r;
+            }
+        }
       aif.close();
     }
-  else 
+  else
     std::cerr << "UpperBodyMotion - Unable to open " << aFileName << endl;
-  
+
 }
 
 void UpperBodyMotion::WriteDataFile(string aFileName,Eigen::MatrixXd &UpperBodyAngles )
@@ -144,17 +144,17 @@ void UpperBodyMotion::WriteDataFile(string aFileName,Eigen::MatrixXd &UpperBodyA
   aof.open(aFileName.c_str(),ofstream::out);
   if (aof.is_open())
     {
-	
+
       for (unsigned int i=0;i<NumberRows;i++)
-	{			
-	  for (unsigned int j=0;j<NumberColumns;j++)
-	    {	
-	      aof << UpperBodyAngles(i,j)  << "\t";
-	    }
-	  aof << endl;
-	}		
+        {
+          for (unsigned int j=0;j<NumberColumns;j++)
+            {
+              aof << UpperBodyAngles(i,j)  << "\t";
+            }
+          aof << endl;
+        }
       aof.close();
     }
-  
+
 }
 

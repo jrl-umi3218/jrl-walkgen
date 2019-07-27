@@ -28,7 +28,7 @@ using namespace PatternGeneratorJRL;
 using namespace std;
 
 RigidBody::RigidBody():
-        T_(0),Tr_(0),Ta_(0),N_(16),Mass_(0)
+  T_(0),Tr_(0),Ta_(0),N_(16),Mass_(0)
 {
 
   PositionDynamics_.Type = POSITION;
@@ -66,9 +66,9 @@ int RigidBody::initialize()
 // TODO: RigidBody::interpolate RigidBody::increment_state
 //int
 //RigidBody::interpolate(deque<COMState> &COMStates,
-//						deque<ZMPPosition> &ZMPRefPositions,
-//						int CurrentPosition,
-//						double CX, double CY)
+//                                        deque<ZMPPosition> &ZMPRefPositions,
+//                                        int CurrentPosition,
+//                                        double CX, double CY)
 //{
 //
 //  return 0;
@@ -92,18 +92,18 @@ RigidBody::Dynamics( dynamics_e type ) const
 {
 
   switch(type)
-  {
-  case POSITION:
-    return PositionDynamics_;
-  case VELOCITY:
-    return VelocityDynamics_;
-  case ACCELERATION:
-    return AccelerationDynamics_;
-  case JERK:
-    return JerkDynamics_;
-  case COP_POSITION:
-    return CoPDynamics_;
-  }
+    {
+    case POSITION:
+      return PositionDynamics_;
+    case VELOCITY:
+      return VelocityDynamics_;
+    case ACCELERATION:
+      return AccelerationDynamics_;
+    case JERK:
+      return JerkDynamics_;
+    case COP_POSITION:
+      return CoPDynamics_;
+    }
 
   return VelocityDynamics_;
 
@@ -114,18 +114,18 @@ RigidBody::Dynamics( dynamics_e type )
 {
 
   switch(type)
-  {
-  case POSITION:
-    return PositionDynamics_;
-  case VELOCITY:
-    return VelocityDynamics_;
-  case ACCELERATION:
-    return AccelerationDynamics_;
-  case JERK:
-    return JerkDynamics_;
-  case COP_POSITION:
-    return CoPDynamics_;
-  }
+    {
+    case POSITION:
+      return PositionDynamics_;
+    case VELOCITY:
+      return VelocityDynamics_;
+    case ACCELERATION:
+      return AccelerationDynamics_;
+    case JERK:
+      return JerkDynamics_;
+    case COP_POSITION:
+      return CoPDynamics_;
+    }
 
   return VelocityDynamics_;
 
@@ -167,7 +167,7 @@ rigid_body_state_t::operator=(const rigid_body_state_s & RB)
 }
 
 
-void 
+void
 rigid_body_state_t::reset()
 {
 

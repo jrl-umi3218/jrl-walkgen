@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, 2009, 2010, 
+ * Copyright 2008, 2009, 2010,
  *
  * Olivier  Stasse
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file This object filters an analytical ZMP trajectory through preview control. */
@@ -53,21 +53,21 @@ FilteringAnalyticalTrajectoryByPreviewControl::FilteringAnalyticalTrajectoryByPr
 
   m_LocalBufferIndex=0;
 
-  std::string aMethodName[3] = 
+  std::string aMethodName[3] =
     {":samplingperiod",
      ":previewcontroltime",
      ":singlesupporttime"};
-  
+
   for(int i=0;i<3;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
-	{
-	  std::cerr << "Unable to register " << aMethodName << std::endl;
-	}
+        {
+          std::cerr << "Unable to register " << aMethodName << std::endl;
+        }
       else
-	{
-	  ODEBUG("Succeed in registering " << aMethodName[i]);
-	}
+        {
+          ODEBUG("Succeed in registering " << aMethodName[i]);
+        }
 
     }
 
@@ -96,12 +96,12 @@ void FilteringAnalyticalTrajectoryByPreviewControl::SetPreviewControl(PreviewCon
 void FilteringAnalyticalTrajectoryByPreviewControl::Resize()
 {
 #if 0
-  if ((m_SamplingPeriod!=0.0) && 
+  if ((m_SamplingPeriod!=0.0) &&
       (m_PreviewControlTime!=0.0) &&
       (m_Tsingle!=0.0))
     {
       unsigned int DataBufferSize = (unsigned int ) ((m_Tsingle +m_PreviewControlTime)/
-						     m_SamplingPeriod);
+                                                     m_SamplingPeriod);
       ODEBUG3("m_Tsingle: " << m_Tsingle << " DataBufferSize:" << DataBufferSize);
       m_DataBuffer.resize(DataBufferSize);
     }
@@ -113,10 +113,10 @@ FilteringAnalyticalTrajectoryByPreviewControl::~FilteringAnalyticalTrajectoryByP
 }
 
 bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double FirstValueofZMPProfil,
-								      double DeltaTj0 )
+                                                                      double DeltaTj0 )
 {
-  ODEBUG("m_PreviewControl : " << m_PreviewControl << 
-	 " m_AnalyticalZMPCOGTrajectory : " << m_AnalyticalZMPCOGTrajectory);
+  ODEBUG("m_PreviewControl : " << m_PreviewControl <<
+         " m_AnalyticalZMPCOGTrajectory : " << m_AnalyticalZMPCOGTrajectory);
 
   if ((m_PreviewControl==0) || (m_AnalyticalZMPCOGTrajectory==0))
     return false;
@@ -146,18 +146,18 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double Fir
       sprintf(Buffer,"Diff_%05d.dat",nbofmodifs++);
       aof.open(Buffer,ofstream::out);
     }
-  // On the interval of the newly changed first foot. 
+  // On the interval of the newly changed first foot.
   for( unsigned int lDataBufferIndex = 0;lDataBufferIndex<m_DataBuffer.size();t+=DeltaT,lDataBufferIndex++)
     {
       double r=0.0;
       if (t<DeltaTj0)
-	{
-	  m_AnalyticalZMPCOGTrajectory->ComputeZMP(t+m_StartingTime,lZMP);
-	  // The difference between the desired ZMP (FirstValueofZMPProfil)
-	  // and the analytical value is computed.
-	  r = FirstValueofZMPProfil - lZMP;
-	}
-      
+        {
+          m_AnalyticalZMPCOGTrajectory->ComputeZMP(t+m_StartingTime,lZMP);
+          // The difference between the desired ZMP (FirstValueofZMPProfil)
+          // and the analytical value is computed.
+          r = FirstValueofZMPProfil - lZMP;
+        }
+
       m_DataBuffer[lDataBufferIndex] = r;
       // aof << r << endl;
     }
@@ -167,7 +167,7 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double Fir
   m_ComState(0,0) = 0.0;
   m_ComState(1,0) = 0.0;
   m_ComState(2,0) = 0.0;
-  
+
   m_ZMPPCValue = 0;
 
   m_LocalBufferIndex = 0;
@@ -175,20 +175,20 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double Fir
 }
 
 bool FilteringAnalyticalTrajectoryByPreviewControl::UpdateOneStep(double t,
-								  double &ZMPValue,
-								  double &CoMValue,
-								  double &CoMSpeedValue)
+                                                                  double &ZMPValue,
+                                                                  double &CoMValue,
+                                                                  double &CoMSpeedValue)
 {
-  ODEBUG("time:" << t << " m_StartingTime: " << 
-	  m_StartingTime << " " << m_Duration + m_StartingTime << " ( " << m_Duration << " ) "
-	  << " LBI:" << m_LocalBufferIndex);
+  ODEBUG("time:" << t << " m_StartingTime: " <<
+         m_StartingTime << " " << m_Duration + m_StartingTime << " ( " << m_Duration << " ) "
+         << " LBI:" << m_LocalBufferIndex);
   if ((t<m_StartingTime) || (t>m_Duration+m_StartingTime) || (m_Duration==0.0))
     return false;
 
   double lsxzmp =0.0;
   m_PreviewControl->OneIterationOfPreview1D(m_ComState,lsxzmp,m_DataBuffer,m_LocalBufferIndex,
-					    m_ZMPPCValue,false);
-  
+                                            m_ZMPPCValue,false);
+
   ZMPValue = m_ZMPPCValue;
   CoMValue = m_ComState(0,0);
   CoMSpeedValue = m_ComState(1,0);
@@ -201,34 +201,34 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::UpdateOneStep(double t,
 
 /*! \brief Overloading method of SimplePlugin */
 void FilteringAnalyticalTrajectoryByPreviewControl::CallMethod(std::string &Method,
-							       std::istringstream &strm)
+                                                               std::istringstream &strm)
 {
-    if (Method==":samplingperiod")
+  if (Method==":samplingperiod")
     {
       std::string aws;
       if (strm.good())
-	{
-	  strm >> m_SamplingPeriod;
-	  Resize();
-	}
+        {
+          strm >> m_SamplingPeriod;
+          Resize();
+        }
     }
   else if (Method==":previewcontroltime")
     {
       std::string aws;
       if (strm.good())
-	{
-	  strm >> m_PreviewControlTime;
-	  Resize();
-	}
+        {
+          strm >> m_PreviewControlTime;
+          Resize();
+        }
     }
   else if (Method==":singlesupporttime")
     {
       std::string aws;
       if (strm.good())
-	{
-	  strm >> m_Tsingle;
-	  Resize();
-	}
+        {
+          strm >> m_Tsingle;
+          Resize();
+        }
     }
 
 }

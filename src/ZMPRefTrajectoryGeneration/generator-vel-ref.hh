@@ -70,8 +70,8 @@ namespace PatternGeneratorJRL
     /// \param[in] FinalRightFootTraj_deq
     /// \param[out] SupportStates_deq
     void preview_support_states( double Time, const SupportFSM * FSM,
-        const deque<FootAbsolutePosition> & FinalLeftFootTraj_deq, const deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-        deque<support_state_t> & SupportStates_deq );
+                                 const deque<FootAbsolutePosition> & FinalLeftFootTraj_deq, const deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+                                 deque<support_state_t> & SupportStates_deq );
 
     /// \brief Set the global reference from the local one and the orientation of the trunk frame
     /// for the whole preview window
@@ -122,27 +122,27 @@ namespace PatternGeneratorJRL
     inline void LastFootSol(const solution_t & Solution)
     {
       if(Solution.Solution_vec.size()>2*N_)
-      {
-        unsigned NbStepPrvw = Solution.SupportStates_deq.back().StepNumber ;
-        LastFootSolX_ = Solution.Solution_vec[2*N_];
-        LastFootSolY_ = Solution.Solution_vec[2*N_+NbStepPrvw];
-      }
+        {
+          unsigned NbStepPrvw = Solution.SupportStates_deq.back().StepNumber ;
+          LastFootSolX_ = Solution.Solution_vec[2*N_];
+          LastFootSolY_ = Solution.Solution_vec[2*N_+NbStepPrvw];
+        }
       else
-      {
-        LastFootSolX_ = 0.0 ;
-        LastFootSolY_ = 0.0 ;
-      }
+        {
+          LastFootSolX_ = 0.0 ;
+          LastFootSolY_ = 0.0 ;
+        }
     }
 
     /// \}
 
-		/// \brief Generate a queue of inequality constraints on
+    /// \brief Generate a queue of inequality constraints on
     /// the feet positions with respect to previous foot positions
     ///
     /// \param[out] Inequalities
     /// \param[in] SupportStates_deq
     void build_inequalities_feet(linear_inequality_t & Inequalities,
-        const std::deque<support_state_t> & SupportStates_deq) const;
+                                 const std::deque<support_state_t> & SupportStates_deq) const;
 
     //
     // Protected methods
@@ -159,7 +159,7 @@ namespace PatternGeneratorJRL
     /// \param[out] Inequalities
     /// \param[in] SupportStates_deq
     void build_inequalities_cop(linear_inequality_t & Inequalities,
-        const std::deque<support_state_t> & SupportStates_deq) const;
+                                const std::deque<support_state_t> & SupportStates_deq) const;
 
     /// \brief Generate a queue of inequality constraints on
     /// the feet positions with respect to previous foot positions
@@ -167,7 +167,7 @@ namespace PatternGeneratorJRL
     /// \param[out] Inequalities In matrix form
     /// \param[in] SupportStates_deq
     void build_inequalities_com(linear_inequality_t & Inequalities,
-        const std::deque<support_state_t> & SupportStates_deq) const;
+                                const std::deque<support_state_t> & SupportStates_deq) const;
 
     /// \brief Compute CoP constraints corresponding to the set of inequalities
     ///
@@ -175,7 +175,7 @@ namespace PatternGeneratorJRL
     /// \param[in] NbStepsPreviewed
     /// \param[out] Pb
     void build_constraints_cop( const linear_inequality_t & IneqCoP, unsigned int NbStepsPreviewed,
-        QPProblem & Pb );
+                                QPProblem & Pb );
 
     /// \brief Compute feet constraints corresponding to the set of inequalities
     ///
@@ -184,8 +184,8 @@ namespace PatternGeneratorJRL
     /// \param[in] nbStepsPreviewed
     /// \param[out] Pb
     void build_constraints_feet(const linear_inequality_t & IneqFeet,
-        const IntermedQPMat::state_variant_t & State,
-        int nbStepsPreviewed, QPProblem & Pb);
+                                const IntermedQPMat::state_variant_t & State,
+                                int nbStepsPreviewed, QPProblem & Pb);
 
     /// \brief Compute com<->feet constraints
     ///
@@ -200,7 +200,7 @@ namespace PatternGeneratorJRL
     /// \param[in] NbStepsPreviewed
     /// \param[out] Pb
     void build_eq_constraints_feet( const std::deque<support_state_t> & SupportStates_deq,
-        unsigned int NbStepsPreviewed, QPProblem & Pb );
+                                    unsigned int NbStepsPreviewed, QPProblem & Pb );
 
     /// \brief Compute feet equality constraints to restrain the previewed foot position
     /// some iteration before landing
@@ -215,29 +215,29 @@ namespace PatternGeneratorJRL
 
     /// \brief Scaled product\f$ weight*M*M \f$
     void compute_term(Eigen::MatrixXd&weightMM,
-		      double weight,
-		      const Eigen::MatrixXd&M1,
-		      const Eigen::MatrixXd&M2);
+                      double weight,
+                      const Eigen::MatrixXd&M1,
+                      const Eigen::MatrixXd&M2);
 
     /// \brief Scaled product \f$ weight*M*V \f$
     void compute_term(Eigen::VectorXd&weightMV,
-		      double weight,
-		      const Eigen::MatrixXd& M,
-		      const Eigen::VectorXd& V);
+                      double weight,
+                      const Eigen::MatrixXd& M,
+                      const Eigen::VectorXd& V);
 
     /// \brief Scaled product \f$ weight*M*V*scalar \f$
     void compute_term(Eigen::VectorXd &weightMV,
-		      double weight,
-		      const Eigen::MatrixXd& M,
-		      const Eigen::VectorXd& V,
-		      const double scalar);
+                      double weight,
+                      const Eigen::MatrixXd& M,
+                      const Eigen::VectorXd& V,
+                      const double scalar);
 
     /// \brief Scaled product \f$ weight*M*M*V \f$
     void compute_term(Eigen::VectorXd &weightMV,
-		      double weight,
-		      const Eigen::MatrixXd &M1,
-		      const Eigen::MatrixXd&M2,
-		      const Eigen::VectorXd &V2);
+                      double weight,
+                      const Eigen::MatrixXd &M1,
+                      const Eigen::MatrixXd&M2,
+                      const Eigen::VectorXd &V2);
 
 
     //

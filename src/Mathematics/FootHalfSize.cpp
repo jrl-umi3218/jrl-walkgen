@@ -1,8 +1,8 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Olivier    Stasse
- * 
+ *
  *
  * JRL, CNRS/AIST
  *
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -49,12 +49,12 @@ FootHalfSize::~FootHalfSize()
 }
 
 void FootHalfSize::setSize(double lWidth,
-			   double lHeight,
-			   double DSFeetDistance)
+                           double lHeight,
+                           double DSFeetDistance)
 {
   m_Height = lHeight;
   m_Width = lWidth;
-  
+
   updateHalfSize();
   updateHalfHeightDS(DSFeetDistance);
 }

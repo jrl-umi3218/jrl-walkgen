@@ -42,25 +42,25 @@ namespace PatternGeneratorJRL
 
   /*! @ingroup foottrajectorygeneration
 
-      This class generates a trajectory for a complete leg relying on a
-      set of description of the intervals.
-      More precisely this object handles a set of FootTrajectoryGenerationStandard
-      objects.
-      Thus it acts as a container, and allow a coherent interface to a set
-      of foot trajectory.
+    This class generates a trajectory for a complete leg relying on a
+    set of description of the intervals.
+    More precisely this object handles a set of FootTrajectoryGenerationStandard
+    objects.
+    Thus it acts as a container, and allow a coherent interface to a set
+    of foot trajectory.
 
-      Each interval is described by a time duration \f[ \Delta T_j \f],
-      its nature which can be double support and in  single support
-      two subcategories exist: support foot and flying.
+    Each interval is described by a time duration \f[ \Delta T_j \f],
+    its nature which can be double support and in  single support
+    two subcategories exist: support foot and flying.
 
 
-   */
+  */
   class  FootTrajectoryGenerationMultiple : public SimplePlugin
   {
   public :
 
     /*! \name Constants to define the nature of the foot trajectory.
-     @{
+      @{
     */
     /*! Double support foot. */
     const static int DOUBLE_SUPPORT=0;
@@ -77,7 +77,7 @@ namespace PatternGeneratorJRL
     /*! Constructor: In order to compute some appropriate strategies,
       this class needs to extract specific details from the humanoid model. */
     FootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
-                     PRFoot *aFoot);
+                                     PRFoot *aFoot);
 
     // Default destructor
     ~FootTrajectoryGenerationMultiple();
@@ -91,7 +91,7 @@ namespace PatternGeneratorJRL
 
     /*! \name Methods related to the handling of the intervals.
       @{
-     */
+    */
     /*! \brief Set number of intervals. */
     void SetNumberOfIntervals(int lNumberOfIntervals);
 
@@ -157,33 +157,33 @@ namespace PatternGeneratorJRL
       @param InitPosition: Initial position when computing the polynome at t= m_AbsoluteTimeReference.
       @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
     */
-   int SetParametersWithInitPosInitSpeed(unsigned int PolynomeIndex,
-                                         int AxisReference,
-                                         double TimeInterval,
-                                         double FinalPosition,
-                                         double InitPosition,
-                                         double InitSpeed,
-                                         vector<double> MiddlePos=vector<double>(3,-1));
+    int SetParametersWithInitPosInitSpeed(unsigned int PolynomeIndex,
+                                          int AxisReference,
+                                          double TimeInterval,
+                                          double FinalPosition,
+                                          double InitPosition,
+                                          double InitSpeed,
+                                          vector<double> MiddlePos=vector<double>(3,-1));
 
-   /*! This method specifies the parameters for each of the polynome used by this
-     object. In this case, as it is used for the 3rd order polynome. The polynome to
-     which those parameters are set is specified with PolynomeIndex.
-     @param PolynomeIndex: Set to which axis the parameters will be applied.
-     @param AxisReference: Index to the axis to be used.
-     @param TimeInterval: Set the time base of the polynome.
-     @param FinalPosition: Set the final position of the polynome at TimeInterval.
-     @param InitPosition: Initial position when computing the polynome at t= m_AbsoluteTimeReference.
-     @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
-     @param InitAcc: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
-   */
-   int SetParametersWithInitPosInitSpeedInitAcc(unsigned int PolynomeIndex,
-                                                int AxisReference,
-                                                double TimeInterval,
-                                                double FinalPosition,
-                                                double InitPosition,
-                                                double InitSpeed,
-                                                double InitAcc,
-                                                vector<double> middlePos = vector<double>(3,-1));
+    /*! This method specifies the parameters for each of the polynome used by this
+      object. In this case, as it is used for the 3rd order polynome. The polynome to
+      which those parameters are set is specified with PolynomeIndex.
+      @param PolynomeIndex: Set to which axis the parameters will be applied.
+      @param AxisReference: Index to the axis to be used.
+      @param TimeInterval: Set the time base of the polynome.
+      @param FinalPosition: Set the final position of the polynome at TimeInterval.
+      @param InitPosition: Initial position when computing the polynome at t= m_AbsoluteTimeReference.
+      @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
+      @param InitAcc: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
+    */
+    int SetParametersWithInitPosInitSpeedInitAcc(unsigned int PolynomeIndex,
+                                                 int AxisReference,
+                                                 double TimeInterval,
+                                                 double FinalPosition,
+                                                 double InitPosition,
+                                                 double InitSpeed,
+                                                 double InitAcc,
+                                                 vector<double> middlePos = vector<double>(3,-1));
 
     /*! This method gets the parameters for each of the polynome used by this
       object. In this case, as it is used for the 3rd order polynome. The polynome to
@@ -195,26 +195,26 @@ namespace PatternGeneratorJRL
       @param InitPosition: Initial position when computing the polynome at t= m_AbsoluteTimeReference.
       @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
     */
-   int GetParametersWithInitPosInitSpeed(unsigned int PolynomeIndex,
-					 int AxisReference,
-					 double &TimeInterval,
-					 double &FinalPosition,
-					 double &InitPosition,
-					 double &InitSpeed);
+    int GetParametersWithInitPosInitSpeed(unsigned int PolynomeIndex,
+                                          int AxisReference,
+                                          double &TimeInterval,
+                                          double &FinalPosition,
+                                          double &InitPosition,
+                                          double &InitSpeed);
 
-   /*! \name Methods related to the Absolute Time Reference.
-     This time specifies the beginning of the trajectory.
-     @{ */
+    /*! \name Methods related to the Absolute Time Reference.
+      This time specifies the beginning of the trajectory.
+      @{ */
 
-   /*! Returns the time when the trajectory starts. */
-   double GetAbsoluteTimeReference() const;
+    /*! Returns the time when the trajectory starts. */
+    double GetAbsoluteTimeReference() const;
 
-   /*! Set the time when the trajectory starts.  */
-   void SetAbsoluteTimeReference(double lAbsoluteTimeReference);
+    /*! Set the time when the trajectory starts.  */
+    void SetAbsoluteTimeReference(double lAbsoluteTimeReference);
 
-   /*! @} */
+    /*! @} */
 
-   FootTrajectoryGenerationMultiple & operator=(const FootTrajectoryGenerationMultiple & aFTGM);
+    FootTrajectoryGenerationMultiple & operator=(const FootTrajectoryGenerationMultiple & aFTGM);
 
   protected:
 

@@ -24,7 +24,7 @@
  */
 /*! \file FootTrajectoryGenerationStandard.h
   \brief This object generate all the values for the foot trajectories.
-   @ingroup foottrajectorygeneration */
+  @ingroup foottrajectorygeneration */
 
 
 #ifndef _FOOT_TRAJECTORY_GENERATION_STANDARD_H_
@@ -92,150 +92,150 @@ namespace PatternGeneratorJRL
       @param StepType: Type of steps (for book-keeping).
       @param LeftOrRight: Specify if it is left (1) or right (-1).
     */
-   virtual void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
-				   deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
-				   int CurrentAbsoluteIndex,
-				   int IndexInitial,
-				   double ModulatedSingleSupportTime,
-				   int StepType,int LeftOrRight);
+    virtual void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
+                                    deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
+                                    int CurrentAbsoluteIndex,
+                                    int IndexInitial,
+                                    double ModulatedSingleSupportTime,
+                                    int StepType,int LeftOrRight);
 
-   virtual void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
-				   deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
-				   int StartIndex, int k,
-				   double LocalInterpolationStartTime,
-				   double ModulatedSingleSupportTime,
-				   int StepType, int LeftOrRight);
+    virtual void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
+                                    deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
+                                    int StartIndex, int k,
+                                    double LocalInterpolationStartTime,
+                                    double ModulatedSingleSupportTime,
+                                    int StepType, int LeftOrRight);
 
 
-   /*! Initialize internal data structures.
-     In this specific case, it is in charge of creating the polynomial structures.
+    /*! Initialize internal data structures.
+      In this specific case, it is in charge of creating the polynomial structures.
     */
-   virtual void InitializeInternalDataStructures();
+    virtual void InitializeInternalDataStructures();
 
-   /*! Free internal data structures.
-     In this specific case, it is in charge of freeing the polynomial data structures.
+    /*! Free internal data structures.
+      In this specific case, it is in charge of freeing the polynomial data structures.
     */
-   virtual void FreeInternalDataStructures();
+    virtual void FreeInternalDataStructures();
 
-   /*! This method specifies the parameters for each of the polynome used by this
-     object. In this case, as it is used for the 3rd order polynome. The polynome to
-     which those parameters are set is specified with PolynomeIndex.
-     It assumes an initial position and an initial speed set to zero.
-     @param[in] AxisReference: Set to which axis the parameters will be applied.
-     @param[in] TimeInterval: Set the time base of the polynome.
-     @param[in] Position: Set the final position of the polynome at TimeInterval.
-   */
-   int SetParameters(int AxisReference,
-		     double TimeInterval,
-		     double Position);
+    /*! This method specifies the parameters for each of the polynome used by this
+      object. In this case, as it is used for the 3rd order polynome. The polynome to
+      which those parameters are set is specified with PolynomeIndex.
+      It assumes an initial position and an initial speed set to zero.
+      @param[in] AxisReference: Set to which axis the parameters will be applied.
+      @param[in] TimeInterval: Set the time base of the polynome.
+      @param[in] Position: Set the final position of the polynome at TimeInterval.
+    */
+    int SetParameters(int AxisReference,
+                      double TimeInterval,
+                      double Position);
 
-   /*! This method specifies the parameters for each of the polynome used by this
-     object. In this case, as it is used for the 3rd order polynome. The polynome to
-     which those parameters are set is specified with PolynomeIndex.
-     @param[in] AxisReference: Set to which axis the parameters will be applied.
-     @param[in] TimeInterval: Set the time base of the polynome.
-     @param[in] FinalPosition: Set the final position of the polynome at TimeInterval.
-     @param[in] InitPosition: Initial position when computing the polynome at t=0.0.
-     @param[in] InitSpeed: Initial speed when computing the polynome at t=0.0.
-   */
-   int SetParametersWithInitPosInitSpeed(int AxisReference,
-                                         double TimeInterval,
-                                         double FinalPosition,
-                                         double InitPosition,
-                                         double InitSpeed,
-                                         vector<double> MiddlePos=vector<double>(3,-1));
+    /*! This method specifies the parameters for each of the polynome used by this
+      object. In this case, as it is used for the 3rd order polynome. The polynome to
+      which those parameters are set is specified with PolynomeIndex.
+      @param[in] AxisReference: Set to which axis the parameters will be applied.
+      @param[in] TimeInterval: Set the time base of the polynome.
+      @param[in] FinalPosition: Set the final position of the polynome at TimeInterval.
+      @param[in] InitPosition: Initial position when computing the polynome at t=0.0.
+      @param[in] InitSpeed: Initial speed when computing the polynome at t=0.0.
+    */
+    int SetParametersWithInitPosInitSpeed(int AxisReference,
+                                          double TimeInterval,
+                                          double FinalPosition,
+                                          double InitPosition,
+                                          double InitSpeed,
+                                          vector<double> MiddlePos=vector<double>(3,-1));
 
-   /*! Overloading -- BSPlines Init Function
-    This method specifies the parameters for each of the Bsplines used by this object
-     @param PolynomeIndex: Set to which axis the parameters will be applied.
-     @param AxisReference: Index to the axis to be used.
-     @param TimeInterval: Set the time base of the polynome.
-     @param FinalTime: The final time of the BSpline
-     @param FinalPosition: Set the final position of the spline at FinalTime.
-     @param TimeMaxPosition: Set when the spline reaches the highest value.
-     @param MaxPosition: Max value of the function.
-   */
+    /*! Overloading -- BSPlines Init Function
+      This method specifies the parameters for each of the Bsplines used by this object
+      @param PolynomeIndex: Set to which axis the parameters will be applied.
+      @param AxisReference: Index to the axis to be used.
+      @param TimeInterval: Set the time base of the polynome.
+      @param FinalTime: The final time of the BSpline
+      @param FinalPosition: Set the final position of the spline at FinalTime.
+      @param TimeMaxPosition: Set when the spline reaches the highest value.
+      @param MaxPosition: Max value of the function.
+    */
 
-   int SetParametersWithInitPosInitSpeed(int AxisReference,
-                                       double TimeInterval,
-                                       double FinalTime,
-                                       double FinalPosition,
-                                       double TimeMaxPosition,
-                                       double MaxPosition,
-                                       double InitSpeed,
-                                       double InitPosition);
+    int SetParametersWithInitPosInitSpeed(int AxisReference,
+                                          double TimeInterval,
+                                          double FinalTime,
+                                          double FinalPosition,
+                                          double TimeMaxPosition,
+                                          double MaxPosition,
+                                          double InitSpeed,
+                                          double InitPosition);
 
-   /*! This method get the parameters for each of the polynome used by this
-     object. In this case, as it is used for the 3rd order polynome. The polynome to
-     which those parameters are set is specified with PolynomeIndex.
-     @param[in] AxisReference: Set to which axis the parameters will be applied.
-     @param[in] TimeInterval: Set the time base of the polynome.
-     @param[in] FinalPosition: Set the final position of the polynome at TimeInterval.
-     @param[in] InitPosition: Initial position when computing the polynome at t=0.0.
-     @param[in] InitSpeed: Initial speed when computing the polynome at t=0.0.
-   */
-   int GetParametersWithInitPosInitSpeed(int AxisReference,
-					 double &TimeInterval,
-					 double &FinalPosition,
-					 double &InitPosition,
-					 double &InitSpeed);
+    /*! This method get the parameters for each of the polynome used by this
+      object. In this case, as it is used for the 3rd order polynome. The polynome to
+      which those parameters are set is specified with PolynomeIndex.
+      @param[in] AxisReference: Set to which axis the parameters will be applied.
+      @param[in] TimeInterval: Set the time base of the polynome.
+      @param[in] FinalPosition: Set the final position of the polynome at TimeInterval.
+      @param[in] InitPosition: Initial position when computing the polynome at t=0.0.
+      @param[in] InitSpeed: Initial speed when computing the polynome at t=0.0.
+    */
+    int GetParametersWithInitPosInitSpeed(int AxisReference,
+                                          double &TimeInterval,
+                                          double &FinalPosition,
+                                          double &InitPosition,
+                                          double &InitSpeed);
 
 
 
-   /// \brief Set parameters considering initial position, speed, acceleration.
-   ///
-   /// \param[in] PolynomeIndex
-   /// \param[in] TimeInterval
-   /// \param[in] FinalPosition
-   /// \param[in] InitPosition
-   /// \param[in] InitSpeed
-   /// \param[in] InitAcc
-   int SetParameters(int PolynomeIndex, double TimeInterval,
-		     double FinalPosition,
-		     double InitPosition,
-		     double InitSpeed,
-		     double InitAcc,
-		     double InitJerk);
+    /// \brief Set parameters considering initial position, speed, acceleration.
+    ///
+    /// \param[in] PolynomeIndex
+    /// \param[in] TimeInterval
+    /// \param[in] FinalPosition
+    /// \param[in] InitPosition
+    /// \param[in] InitSpeed
+    /// \param[in] InitAcc
+    int SetParameters(int PolynomeIndex, double TimeInterval,
+                      double FinalPosition,
+                      double InitPosition,
+                      double InitSpeed,
+                      double InitAcc,
+                      double InitJerk);
 
-   /// \brief Set parameters considering initial position, speed, acceleration.
-   ///
-   /// \param[in] PolynomeIndex
-   /// \param[in] TimeInterval
-   /// \param[in] FinalPosition
-   /// \param[in] InitPosition
-   /// \param[in] InitSpeed
-   /// \param[in] InitAcc
-   int SetParameters(int PolynomeIndex, double TimeInterval,
-       double FinalPosition, double InitPosition, double InitSpeed, double InitAcc,
-       std::vector<double> MiddlePos=vector<double>(3,-1) );
+    /// \brief Set parameters considering initial position, speed, acceleration.
+    ///
+    /// \param[in] PolynomeIndex
+    /// \param[in] TimeInterval
+    /// \param[in] FinalPosition
+    /// \param[in] InitPosition
+    /// \param[in] InitSpeed
+    /// \param[in] InitAcc
+    int SetParameters(int PolynomeIndex, double TimeInterval,
+                      double FinalPosition, double InitPosition, double InitSpeed, double InitAcc,
+                      std::vector<double> MiddlePos=vector<double>(3,-1) );
 
-   /*! Fill an absolute foot position structure for a given time. */
-   // Using Polynoms
-   double ComputeAllWithPolynom(FootAbsolutePosition & aFootAbsolutePosition,
-		     double Time);
-
-   // Using BSplines
-   double ComputeAllWithBSplines(FootAbsolutePosition & aFootAbsolutePosition,
+    /*! Fill an absolute foot position structure for a given time. */
+    // Using Polynoms
+    double ComputeAllWithPolynom(FootAbsolutePosition & aFootAbsolutePosition,
                                  double Time);
 
-   /*! Compute the value for a given polynome. */
-   double Compute(unsigned int PolynomeIndex, double Time);
+    // Using BSplines
+    double ComputeAllWithBSplines(FootAbsolutePosition & aFootAbsolutePosition,
+                                  double Time);
 
-   /*! Compute the value for a given polynome's second derivative. */
-   double ComputeSecDerivative(unsigned int PolynomeIndex, double Time);
+    /*! Compute the value for a given polynome. */
+    double Compute(unsigned int PolynomeIndex, double Time);
 
-   /*! Compute the absolute foot position from the queue of relative positions.
-     There is not direct dependency with time.
+    /*! Compute the value for a given polynome's second derivative. */
+    double ComputeSecDerivative(unsigned int PolynomeIndex, double Time);
+
+    /*! Compute the absolute foot position from the queue of relative positions.
+      There is not direct dependency with time.
     */
-   void ComputingAbsFootPosFromQueueOfRelPos(deque<RelativeFootPosition> &RelativeFootPositions,
-					     deque<FootAbsolutePosition> &AbsoluteFootPositions);
+    void ComputingAbsFootPosFromQueueOfRelPos(deque<RelativeFootPosition> &RelativeFootPositions,
+                                              deque<FootAbsolutePosition> &AbsoluteFootPositions);
 
-   /*! Methods to compute a set of positions for the feet according to the discrete time given in parameters
-     and the phase of walking.
-     @{
-   */
+    /*! Methods to compute a set of positions for the feet according to the discrete time given in parameters
+      and the phase of walking.
+      @{
+    */
 
-   /*! @} */
+    /*! @} */
 
     void print();
 
@@ -243,34 +243,34 @@ namespace PatternGeneratorJRL
 
   protected:
 
-   /*! \brief Polynomes for X and Y axis positions*/
-   Polynome5 *m_PolynomeX,*m_PolynomeY;
+    /*! \brief Polynomes for X and Y axis positions*/
+    Polynome5 *m_PolynomeX,*m_PolynomeY;
 
-   /*! \brief Polynome for X-Y orientation */
-   Polynome5 *m_PolynomeTheta;
+    /*! \brief Polynome for X-Y orientation */
+    Polynome5 *m_PolynomeTheta;
 
-   /*! \brief Polynome for Y-Z orientation */
-   Polynome3 *m_PolynomeOmega, *m_PolynomeOmega2;
+    /*! \brief Polynome for Y-Z orientation */
+    Polynome3 *m_PolynomeOmega, *m_PolynomeOmega2;
 
-   /*! \brief Polynome for Z axis position. */
-   Polynome6 *m_PolynomeZ;
+    /*! \brief Polynome for Z axis position. */
+    Polynome6 *m_PolynomeZ;
 
-   /*! \brief Bsplines for Z axis position. */
-   BSplinesFoot *m_BsplinesZ;
+    /*! \brief Bsplines for Z axis position. */
+    BSplinesFoot *m_BsplinesZ;
 
-   /** Definition of BSplines X Y*/
-   BSplinesFoot *m_BsplinesX;
-   BSplinesFoot *m_BsplinesY;
+    /** Definition of BSplines X Y*/
+    BSplinesFoot *m_BsplinesX;
+    BSplinesFoot *m_BsplinesY;
 
 
-   /*! \brief Foot dimension. */
-   double m_FootB, m_FootH, m_FootF;
+    /*! \brief Foot dimension. */
+    double m_FootB, m_FootH, m_FootF;
 
-   /*! \brief Position of the ankle in the left foot. */
-   Eigen::Vector3d m_AnklePositionLeft;
+    /*! \brief Position of the ankle in the left foot. */
+    Eigen::Vector3d m_AnklePositionLeft;
 
-   /*! \brief Position of the ankle in the right foot. */
-   Eigen::Vector3d m_AnklePositionRight;
+    /*! \brief Position of the ankle in the right foot. */
+    Eigen::Vector3d m_AnklePositionRight;
 
 
   };

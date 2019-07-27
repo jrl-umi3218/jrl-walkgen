@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008, 2009, 2010, 
+ * Copyright 2007, 2008, 2009, 2010,
  *
  * Olivier Stasse
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /** \file ConvexHull.h
@@ -33,30 +33,30 @@ namespace PatternGeneratorJRL
 {
 
   /*! @struct CH_Point
-      @ingroup geometry
-      Structure to store points for the convex hull computation.
+    @ingroup geometry
+    Structure to store points for the convex hull computation.
   */
-  typedef struct 
+  typedef struct
   {
     double col,row;  /* col: x, row : y */
   } CH_Point;
-  
+
   typedef std::vector<CH_Point> ConvexHullList;
 
   /*! This class compute the convex hull in 2D. */
   class  ComputeConvexHull
   {
-  public: 
+  public:
     ComputeConvexHull();
     ~ComputeConvexHull();
 
     /*! Compute the convex hull
-      by applying Graham's algorithm. 
-    @param aVecOfPoints: The set of 2D points on which the convex hull is computed. 
-    @param TheConvexHull: The set of 2D points which give the convex hull. */
+      by applying Graham's algorithm.
+      @param aVecOfPoints: The set of 2D points on which the convex hull is computed.
+      @param TheConvexHull: The set of 2D points which give the convex hull. */
     void DoComputeConvexHull(std::vector<CH_Point> aVecOfPoints,
-		      std::vector<CH_Point> &TheConvexHull);
-    
+                             std::vector<CH_Point> &TheConvexHull);
+
   };
 }
 #endif

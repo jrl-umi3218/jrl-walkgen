@@ -165,10 +165,10 @@ UpdateFootPosition
       curr_NSFAP.omega   = m_PolynomeOmega->Compute(InterpolationTime);
       //TODO curr_NSFAP.domega  = m_PolynomeOmega->Compute(InterpolationTime);
       curr_NSFAP.domega  = m_PolynomeOmega->
-	ComputeDerivative(InterpolationTime);
+        ComputeDerivative(InterpolationTime);
       if(m_PolynomeOmega->Degree() > 4)
-	curr_NSFAP.ddomega = m_PolynomeOmega->
-	  ComputeSecDerivative(InterpolationTime);
+        curr_NSFAP.ddomega = m_PolynomeOmega->
+          ComputeSecDerivative(InterpolationTime);
 
       //ProtectionNeeded=true;
     }
@@ -176,17 +176,17 @@ UpdateFootPosition
   else if (LocalInterpolationStartTime+InterpolationTime<StartLanding)
     {
       curr_NSFAP.omega =
-	m_Omega - m_PolynomeOmega2->
-	Compute(LocalInterpolationStartTime+InterpolationTime-EndOfLiftOff)-
-	NoneSupportFootAbsolutePositions[StartIndex].omega2;
+        m_Omega - m_PolynomeOmega2->
+        Compute(LocalInterpolationStartTime+InterpolationTime-EndOfLiftOff)-
+        NoneSupportFootAbsolutePositions[StartIndex].omega2;
     }
   // Realize the landing.
   else
     {
       curr_NSFAP.omega =
-	m_PolynomeOmega->Compute
-	(LocalInterpolationStartTime+InterpolationTime - StartLanding) +
-	NoneSupportFootAbsolutePositions[StartIndex].omega - m_Omega;
+        m_PolynomeOmega->Compute
+        (LocalInterpolationStartTime+InterpolationTime - StartLanding) +
+        NoneSupportFootAbsolutePositions[StartIndex].omega - m_Omega;
       //ProtectionNeeded=true;
     }
 
@@ -205,21 +205,21 @@ UpdateFootPosition
 
     if (lOmega<0)
       {
-	X1 = B*cos(-lOmega);
-	X2 = H*sin(-lOmega);
-	Z1 = H*cos(-lOmega);
-	Z2 = B*sin(-lOmega);
-	dX = -(B - X1 + X2);
-	dFZ = Z1 + Z2 - H;
+        X1 = B*cos(-lOmega);
+        X2 = H*sin(-lOmega);
+        Z1 = H*cos(-lOmega);
+        Z2 = B*sin(-lOmega);
+        dX = -(B - X1 + X2);
+        dFZ = Z1 + Z2 - H;
       }
     else
       {
-	X1 = F*cos(lOmega);
-	X2 = H*sin(lOmega);
-	Z1 = H*cos(lOmega);
-	Z2 = F*sin(lOmega);
-	dX = (F - X1 + X2);
-	dFZ = Z1 + Z2 - H;
+        X1 = F*cos(lOmega);
+        X2 = H*sin(lOmega);
+        Z1 = H*cos(lOmega);
+        Z2 = F*sin(lOmega);
+        dX = (F - X1 + X2);
+        dFZ = Z1 + Z2 - H;
       }
     dFX = c*dX;
     dFY = s*dX;
@@ -258,9 +258,9 @@ interpret_solution
         }
       else if (CurrentSupport.TimeLimit-CurrentTime-QP_T_/2.0 > 0.0)
         {
-	 //The landing position is yet determined by the solver
-	 // because the robot finds himself still in the single support phase
-         //do nothing
+          //The landing position is yet determined by the solver
+          // because the robot finds himself still in the single support phase
+          //do nothing
         }
     }
   else
@@ -294,7 +294,7 @@ interpolate_feet_positions
     {
       unsigned int NbStepsPrwd = PrwSupportStates_deq.back().StepNumber;
       interpret_solution( Time, Solution, CurrentSupport,
-			  NbStepsPrwd, FPx, FPy );
+                          NbStepsPrwd, FPx, FPy );
     }
   double LocalInterpolationStartTime = Time-
     (CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));
@@ -315,9 +315,9 @@ interpolate_feet_positions
     }
 
   FinalLeftFootTraj_deq.resize((unsigned int)
-			       (QP_T_/m_SamplingPeriod)+CurrentIndex+1);
+                               (QP_T_/m_SamplingPeriod)+CurrentIndex+1);
   FinalRightFootTraj_deq.resize((unsigned int)
-				(QP_T_/m_SamplingPeriod)+CurrentIndex+1);
+                                (QP_T_/m_SamplingPeriod)+CurrentIndex+1);
 
   if(CurrentSupport.Phase == SS &&
      Time+1.5*QP_T_ < CurrentSupport.TimeLimit)
@@ -328,79 +328,79 @@ interpolate_feet_positions
       double EndOfLiftOff = (m_TSingle-UnlockedSwingPeriod)*0.5;
       double SwingTimePassed = 0.0;
       if(LocalInterpolationStartTime>EndOfLiftOff)
-	SwingTimePassed = LocalInterpolationStartTime-EndOfLiftOff;
+        SwingTimePassed = LocalInterpolationStartTime-EndOfLiftOff;
 
       //Set parameters for current polynomial
       double TimeInterval = UnlockedSwingPeriod-SwingTimePassed;
       SetParameters
-	(FootTrajectoryGenerationStandard::X_AXIS,
-	 TimeInterval,FPx,
-	 LastSFP->x, LastSFP->dx, LastSFP->ddx, LastSFP->dddx);
+        (FootTrajectoryGenerationStandard::X_AXIS,
+         TimeInterval,FPx,
+         LastSFP->x, LastSFP->dx, LastSFP->ddx, LastSFP->dddx);
       SetParameters
-	(FootTrajectoryGenerationStandard::Y_AXIS,
-	 TimeInterval,FPy,
-	 LastSFP->y, LastSFP->dy, LastSFP->ddy, LastSFP->dddy);
+        (FootTrajectoryGenerationStandard::Y_AXIS,
+         TimeInterval,FPy,
+         LastSFP->y, LastSFP->dy, LastSFP->ddy, LastSFP->dddy);
       if(CurrentSupport.StateChanged==true)
-	{
-	  SetParameters
-	    (FootTrajectoryGenerationStandard::Z_AXIS,
-	     m_TSingle,/*m_AnklePositionLeft[2]*/0.0,
-	     LastSFP->z, LastSFP->dz, LastSFP->ddz);
-	}
+        {
+          SetParameters
+            (FootTrajectoryGenerationStandard::Z_AXIS,
+             m_TSingle,/*m_AnklePositionLeft[2]*/0.0,
+             LastSFP->z, LastSFP->dz, LastSFP->ddz);
+        }
 
       int index_orientation = PrwSupportStates_deq[1].StepNumber ;
       SetParameters
-	(FootTrajectoryGenerationStandard::THETA_AXIS,
-	 TimeInterval, PreviewedSupportAngles_deq[index_orientation]*180.0/M_PI,
-	 LastSFP->theta, LastSFP->dtheta, LastSFP->ddtheta);
+        (FootTrajectoryGenerationStandard::THETA_AXIS,
+         TimeInterval, PreviewedSupportAngles_deq[index_orientation]*180.0/M_PI,
+         LastSFP->theta, LastSFP->dtheta, LastSFP->ddtheta);
 
       SetParametersWithInitPosInitSpeed
-	(FootTrajectoryGenerationStandard::OMEGA_AXIS,
-	 TimeInterval,0.0*180.0/M_PI,
-	 LastSFP->omega, LastSFP->domega);
+        (FootTrajectoryGenerationStandard::OMEGA_AXIS,
+         TimeInterval,0.0*180.0/M_PI,
+         LastSFP->omega, LastSFP->domega);
       SetParametersWithInitPosInitSpeed
-	(FootTrajectoryGenerationStandard::OMEGA2_AXIS,
-	 TimeInterval,2*0.0*180.0/M_PI,
-	 LastSFP->omega2, LastSFP->domega2);
+        (FootTrajectoryGenerationStandard::OMEGA2_AXIS,
+         TimeInterval,2*0.0*180.0/M_PI,
+         LastSFP->omega2, LastSFP->domega2);
 
       for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod);k++)
-	{
-	  if (CurrentSupport.Foot == LEFT)
-	    {
-	      UpdateFootPosition
-		(FinalLeftFootTraj_deq,
-		 FinalRightFootTraj_deq,
-		 CurrentIndex,k,
-		 LocalInterpolationStartTime,
-		 UnlockedSwingPeriod,
-		 StepType, -1);
-	    }
-	  else
-	    {
-	      UpdateFootPosition
-		(FinalRightFootTraj_deq,
-		 FinalLeftFootTraj_deq,
-		 CurrentIndex,k,
-		 LocalInterpolationStartTime,
-		 UnlockedSwingPeriod,
-		 StepType, 1);
-	    }
-	  FinalLeftFootTraj_deq[CurrentIndex+k].time =
-	    FinalRightFootTraj_deq[CurrentIndex+k].time =
-	    Time+k*m_SamplingPeriod;
-	}
+        {
+          if (CurrentSupport.Foot == LEFT)
+            {
+              UpdateFootPosition
+                (FinalLeftFootTraj_deq,
+                 FinalRightFootTraj_deq,
+                 CurrentIndex,k,
+                 LocalInterpolationStartTime,
+                 UnlockedSwingPeriod,
+                 StepType, -1);
+            }
+          else
+            {
+              UpdateFootPosition
+                (FinalRightFootTraj_deq,
+                 FinalLeftFootTraj_deq,
+                 CurrentIndex,k,
+                 LocalInterpolationStartTime,
+                 UnlockedSwingPeriod,
+                 StepType, 1);
+            }
+          FinalLeftFootTraj_deq[CurrentIndex+k].time =
+            FinalRightFootTraj_deq[CurrentIndex+k].time =
+            Time+k*m_SamplingPeriod;
+        }
     }
   else if (CurrentSupport.Phase == DS ||
-	   Time+3.0/2.0*QP_T_ > CurrentSupport.TimeLimit)
+           Time+3.0/2.0*QP_T_ > CurrentSupport.TimeLimit)
     {
       for(int k = 1;
-	  k<=(int)(QP_T_/m_SamplingPeriod);
-	  k++)
+          k<=(int)(QP_T_/m_SamplingPeriod);
+          k++)
         {
           FinalRightFootTraj_deq[CurrentIndex+k] =
-	    FinalRightFootTraj_deq[CurrentIndex+k-1];
+            FinalRightFootTraj_deq[CurrentIndex+k-1];
           FinalLeftFootTraj_deq [CurrentIndex+k] =
-	    FinalLeftFootTraj_deq [CurrentIndex+k-1];
+            FinalLeftFootTraj_deq [CurrentIndex+k-1];
 
           FinalLeftFootTraj_deq [CurrentIndex+k].dx      = 0.0 ;
           FinalLeftFootTraj_deq [CurrentIndex+k].dy      = 0.0 ;
@@ -431,9 +431,9 @@ interpolate_feet_positions
           FinalRightFootTraj_deq [CurrentIndex+k].ddtheta   = 0.0 ;
 
           FinalLeftFootTraj_deq[CurrentIndex+k].time =
-	    FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
+            FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
           FinalLeftFootTraj_deq[CurrentIndex+k].stepType =
-	    FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
+            FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
         }
     }
 
@@ -470,103 +470,103 @@ interpolate_feet_positions
       double EndOfLiftOff = (m_TSingle-UnlockedSwingPeriod)*0.5;
       double SwingTimePassed = 0.0;
       if(LocalInterpolationStartTime>EndOfLiftOff)
-	SwingTimePassed = LocalInterpolationStartTime-EndOfLiftOff;
+        SwingTimePassed = LocalInterpolationStartTime-EndOfLiftOff;
 
       //Set parameters for current polynomial
       double TimeInterval = UnlockedSwingPeriod-SwingTimePassed;
       SetParameters(FootTrajectoryGenerationStandard::X_AXIS,
-		    TimeInterval,FootStepX[CurrentSupport.StepNumber],
-		    LastSFP->x, LastSFP->dx, LastSFP->ddx);
+                    TimeInterval,FootStepX[CurrentSupport.StepNumber],
+                    LastSFP->x, LastSFP->dx, LastSFP->ddx);
       SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
-		    TimeInterval,FootStepY[CurrentSupport.StepNumber],
-		    LastSFP->y, LastSFP->dy, LastSFP->ddy);
+                    TimeInterval,FootStepY[CurrentSupport.StepNumber],
+                    LastSFP->y, LastSFP->dy, LastSFP->ddy);
       if(LocalInterpolationStartTime<0.001)
-	{
-	  SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
-			m_TSingle,/*m_AnklePositionLeft[2]*/0.0,
-			LastSFP->z, LastSFP->dz, LastSFP->ddz);
-	}
+        {
+          SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
+                        m_TSingle,/*m_AnklePositionLeft[2]*/0.0,
+                        LastSFP->z, LastSFP->dz, LastSFP->ddz);
+        }
 
       SetParameters
-	(FootTrajectoryGenerationStandard::THETA_AXIS,
-	 TimeInterval, FootStepYaw[CurrentSupport.StepNumber]*180.0/M_PI,
-	 LastSFP->theta, LastSFP->dtheta, LastSFP->ddtheta);
+        (FootTrajectoryGenerationStandard::THETA_AXIS,
+         TimeInterval, FootStepYaw[CurrentSupport.StepNumber]*180.0/M_PI,
+         LastSFP->theta, LastSFP->dtheta, LastSFP->ddtheta);
 
       SetParametersWithInitPosInitSpeed
-	(FootTrajectoryGenerationStandard::OMEGA_AXIS,
-	 TimeInterval,0.0*180.0/M_PI,
-	 LastSFP->omega, LastSFP->domega);
+        (FootTrajectoryGenerationStandard::OMEGA_AXIS,
+         TimeInterval,0.0*180.0/M_PI,
+         LastSFP->omega, LastSFP->domega);
       SetParametersWithInitPosInitSpeed
-	(FootTrajectoryGenerationStandard::OMEGA2_AXIS,
-	 TimeInterval,2*0.0*180.0/M_PI,
-	 LastSFP->omega2, LastSFP->domega2);
+        (FootTrajectoryGenerationStandard::OMEGA2_AXIS,
+         TimeInterval,2*0.0*180.0/M_PI,
+         LastSFP->omega2, LastSFP->domega2);
 
       for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod);k++)
-	{
-	  if (CurrentSupport.Foot == LEFT)
-	    {
-	      UpdateFootPosition(FinalLeftFootTraj_deq,
-				 FinalRightFootTraj_deq,
-				 CurrentIndex,k,
-				 LocalInterpolationStartTime,
-				 UnlockedSwingPeriod,
-				 StepType, -1);
-	    }
-	  else
-	    {
-	      UpdateFootPosition(FinalRightFootTraj_deq,
-				 FinalLeftFootTraj_deq,
-				 CurrentIndex,k,
-				 LocalInterpolationStartTime,
-				 UnlockedSwingPeriod,
-				 StepType, 1);
-	    }
-	  FinalLeftFootTraj_deq[CurrentIndex+k].time =
-	    FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
-	}
+        {
+          if (CurrentSupport.Foot == LEFT)
+            {
+              UpdateFootPosition(FinalLeftFootTraj_deq,
+                                 FinalRightFootTraj_deq,
+                                 CurrentIndex,k,
+                                 LocalInterpolationStartTime,
+                                 UnlockedSwingPeriod,
+                                 StepType, -1);
+            }
+          else
+            {
+              UpdateFootPosition(FinalRightFootTraj_deq,
+                                 FinalLeftFootTraj_deq,
+                                 CurrentIndex,k,
+                                 LocalInterpolationStartTime,
+                                 UnlockedSwingPeriod,
+                                 StepType, 1);
+            }
+          FinalLeftFootTraj_deq[CurrentIndex+k].time =
+            FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
+        }
     }
   else if (CurrentSupport.Phase == DS ||
-	   Time+m_TDouble >= CurrentSupport.TimeLimit)
+           Time+m_TDouble >= CurrentSupport.TimeLimit)
     {
       for(int k = 1; k<=(int)(m_TDouble/m_SamplingPeriod);k++)
-	{
-	  FinalRightFootTraj_deq[CurrentIndex+k] =
-	    FinalRightFootTraj_deq[CurrentIndex+k-1];
-	  FinalLeftFootTraj_deq [CurrentIndex+k] =
-	    FinalLeftFootTraj_deq [CurrentIndex+k-1];
+        {
+          FinalRightFootTraj_deq[CurrentIndex+k] =
+            FinalRightFootTraj_deq[CurrentIndex+k-1];
+          FinalLeftFootTraj_deq [CurrentIndex+k] =
+            FinalLeftFootTraj_deq [CurrentIndex+k-1];
 
-	  FinalLeftFootTraj_deq [CurrentIndex+k].dx      = 0.0 ;
-	  FinalLeftFootTraj_deq [CurrentIndex+k].dy      = 0.0 ;
-	  FinalLeftFootTraj_deq [CurrentIndex+k].dz      = 0.0 ;
-	  FinalLeftFootTraj_deq [CurrentIndex+k].domega  = 0.0 ;
-	  FinalLeftFootTraj_deq [CurrentIndex+k].domega2 = 0.0 ;
-	  FinalLeftFootTraj_deq [CurrentIndex+k].dtheta  = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dx      = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dy      = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dz      = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].domega  = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].domega2 = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dtheta  = 0.0 ;
 
-	  FinalLeftFootTraj_deq [CurrentIndex+k].ddx       = 0.0 ;
-	  FinalLeftFootTraj_deq [CurrentIndex+k].ddy       = 0.0 ;
-	  FinalLeftFootTraj_deq [CurrentIndex+k].ddz       = 0.0 ;
-	  FinalLeftFootTraj_deq [CurrentIndex+k].ddomega   = 0.0 ;
-	  FinalLeftFootTraj_deq [CurrentIndex+k].ddomega2  = 0.0 ;
-	  FinalLeftFootTraj_deq [CurrentIndex+k].ddtheta   = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddx       = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddy       = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddz       = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddomega   = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddomega2  = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddtheta   = 0.0 ;
 
-	  FinalRightFootTraj_deq [CurrentIndex+k].dx      = 0.0 ;
-	  FinalRightFootTraj_deq [CurrentIndex+k].dy      = 0.0 ;
-	  FinalRightFootTraj_deq [CurrentIndex+k].dz      = 0.0 ;
-	  FinalRightFootTraj_deq [CurrentIndex+k].domega  = 0.0 ;
-	  FinalRightFootTraj_deq [CurrentIndex+k].domega2 = 0.0 ;
-	  FinalRightFootTraj_deq [CurrentIndex+k].dtheta  = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dx      = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dy      = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dz      = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].domega  = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].domega2 = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dtheta  = 0.0 ;
 
-	  FinalRightFootTraj_deq [CurrentIndex+k].ddx       = 0.0 ;
-	  FinalRightFootTraj_deq [CurrentIndex+k].ddy       = 0.0 ;
-	  FinalRightFootTraj_deq [CurrentIndex+k].ddz       = 0.0 ;
-	  FinalRightFootTraj_deq [CurrentIndex+k].ddomega   = 0.0 ;
-	  FinalRightFootTraj_deq [CurrentIndex+k].ddomega2  = 0.0 ;
-	  FinalRightFootTraj_deq [CurrentIndex+k].ddtheta   = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddx       = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddy       = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddz       = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddomega   = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddomega2  = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddtheta   = 0.0 ;
 
-	  FinalLeftFootTraj_deq[CurrentIndex+k].time =
-	    FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
-	  FinalLeftFootTraj_deq[CurrentIndex+k].stepType =
-	    FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
-	}
+          FinalLeftFootTraj_deq[CurrentIndex+k].time =
+            FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
+          FinalLeftFootTraj_deq[CurrentIndex+k].stepType =
+            FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
+        }
     }
 }

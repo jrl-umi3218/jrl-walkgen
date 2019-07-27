@@ -1,8 +1,8 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Olivier    Stasse
- * 
+ *
  *
  * JRL, CNRS/AIST
  *
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -28,23 +28,23 @@
 
 namespace PatternGeneratorJRL
 {
-  
+
   /*! This class handles the size and the constraints related to the feet
    */
-  class FootHalfSize 
+  class FootHalfSize
   {
   public:
     FootHalfSize();
     ~FootHalfSize();
-    
+
     void setSize(double lWidth,
-		 double lHeight,
-		 double DSFeetDistance);
+                 double lHeight,
+                 double DSFeetDistance);
 
     void setConstraints(double OnX,
                         double OnY,
                         double DSFeetDistance);
-    
+
   protected:
     void updateHalfHeightDS(double DSFeetDistance);
     void updateHalfSize();
@@ -61,7 +61,7 @@ namespace PatternGeneratorJRL
     double m_ConstraintsOnY;
 
   public:
-    
+
     double getHalfHeight() const;
     double getHalfWidth() const;
     double getHalfHeightDS() const;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008, 2009, 2010, 
+ * Copyright 2007, 2008, 2009, 2010,
  *
  * Olivier  Stasse
  *
@@ -18,12 +18,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file DoubleStagePreviewControlStrategy.h
-  \brief This object defines a global strategy object to generate 
-  full body position every 5 ms over a preview window. 
+  \brief This object defines a global strategy object to generate
+  full body position every 5 ms over a preview window.
   It implements Kajita's algorithm presented in \ref Kajita2003 */
 
 
@@ -37,25 +37,25 @@ namespace PatternGeneratorJRL
 {
 
   /** @ingroup pgjrl
-      Implementation of the buffers handling for Kajita's 
+      Implementation of the buffers handling for Kajita's
       algorithm.
   */
   class  DoubleStagePreviewControlStrategy : public GlobalStrategyManager
   {
-    
+
   public:
     /*! Default constructor. */
     DoubleStagePreviewControlStrategy(SimplePluginManager *aSimplePluginManager);
 
     /*! Default destructor. */
     ~DoubleStagePreviewControlStrategy();
-    
+
     /*! Perform a 5 ms step to generate the necessary information.
       \note{The meaning and the way to use this method depends on the child class}.
 
       @param[out] LeftFootPosition: The position of the Left Foot position.
       @param[out] RightFootPosition: The position of the Right Foot position.
-      @param[out] ZMPRefPos: The ZMP position to be feed to the controller, in the waist 
+      @param[out] ZMPRefPos: The ZMP position to be feed to the controller, in the waist
       frame reference.
       @param[out] COMState: returns position, velocity and acceleration of the CoM.
       @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
@@ -63,15 +63,15 @@ namespace PatternGeneratorJRL
       @param[out] CurrentAcceleration: The results is a state vector containing the acceleration.
     */
     int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
-			       FootAbsolutePosition &RightFootPosition,
-			       Eigen::VectorXd & ZMPRefPos,
-			       COMState & COMState,
-			       Eigen::VectorXd & CurrentConfiguration,
-			       Eigen::VectorXd & CurrentVelocity,
-			       Eigen::VectorXd & CurrentAcceleration);
-    
+                               FootAbsolutePosition &RightFootPosition,
+                               Eigen::VectorXd & ZMPRefPos,
+                               COMState & COMState,
+                               Eigen::VectorXd & CurrentConfiguration,
+                               Eigen::VectorXd & CurrentVelocity,
+                               Eigen::VectorXd & CurrentAcceleration);
 
-    
+
+
     /*! Computes the COM of the robot with the Joint values given in BodyAngles,
       velocities set to zero, and returns the values of the COM in aStaringCOMState.
       Assuming that the waist is at (0,0,0)
@@ -88,11 +88,11 @@ namespace PatternGeneratorJRL
       in the waist coordinates frame.
     */
     int EvaluateStartingState(Eigen::VectorXd & BodyAngles,
-			      COMState & aStartingCOMState,
-			      Eigen::Vector3d & aStartingZMPPosition,
-			      Eigen::Matrix<double, 6, 1> & aStartingWaistPose,
-			      FootAbsolutePosition & InitLeftFootPosition,
-			      FootAbsolutePosition & InitRightFootPosition);
+                              COMState & aStartingCOMState,
+                              Eigen::Vector3d & aStartingZMPPosition,
+                              Eigen::Matrix<double, 6, 1> & aStartingWaistPose,
+                              FootAbsolutePosition & InitLeftFootPosition,
+                              FootAbsolutePosition & InitRightFootPosition);
 
     /*! \brief Setter for the stack handler. */
     void SetStepStackHandler(StepStackHandler *aSSH)
@@ -100,16 +100,16 @@ namespace PatternGeneratorJRL
 
     /*! \brief Initialization of the inter objects relationship. */
     int InitInterObjects(PinocchioRobot * aPR,
-			 ComAndFootRealization * aCFR,
-			 StepStackHandler * aSSH);
-    
+                         ComAndFootRealization * aCFR,
+                         StepStackHandler * aSSH);
+
     /*! This method returns :
-      \li -1 if there is no more motion to realize 
+      \li -1 if there is no more motion to realize
       (i.e. the stack of ZMP has a size \f$\le 2NL \f$),
       \li 0 if a new step is needed,
       (i.e. the stack of ZMP has a size $= 2NL$),
       \li 1 if there is still enough steps inside the internal stack.
-            (i.e. the stack of ZMP has a size \f$\geq 2NL\f$).
+      (i.e. the stack of ZMP has a size \f$\geq 2NL\f$).
     */
     int EndOfMotion();
 
@@ -118,23 +118,23 @@ namespace PatternGeneratorJRL
 
     /*! \brief This method specify the algorithm to use for generating
       a ZMP and/or a CoM trajectory. This has some impact on our class.
-     */
+    */
     void SetAlgoForZMPTraj(istringstream &strm);
 
     /*! \brief This method specifies the frame in which the ZMP is given.
      */
     void SetZMPFrame(istringstream &strm);
 
-    /*! \brief  Prepare the buffers at the beginning of the foot positions. 
+    /*! \brief  Prepare the buffers at the beginning of the foot positions.
       @param[out] aZMPositions: ZMP position reference
-      @param[out] aCOMBuffer: COM trajectory 
+      @param[out] aCOMBuffer: COM trajectory
       @param[out] aLeftFootAbsolutePositions: Trajectory of absolute positions for the left foot.
       @param[out] aRightFootAbsolutePositions: Trajectory of absolute positions for the right foot.
-     */
+    */
     void Setup(deque<ZMPPosition> & aZMPositions,
-	       deque<COMState> & aCOMBuffer,
-	       deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
-	       deque<FootAbsolutePosition> & aRightFootAbsolutePositions );
+               deque<COMState> & aCOMBuffer,
+               deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
+               deque<FootAbsolutePosition> & aRightFootAbsolutePositions );
 
     /*! \brief Get Waist state. */
     bool getWaistState(WaistState & aWaistState);
@@ -146,14 +146,14 @@ namespace PatternGeneratorJRL
 
     /*! Set the sampling period and update NL.*/
     void SetSamplingPeriod(double lSamplingPeriod);
-    
+
     /*! Set the preview control time and update NL. */
     void SetPreviewControlTime(double lPreviewControlTime);
-    
-    /*! \brief The object to be used to perform one step of control, 
+
+    /*! \brief The object to be used to perform one step of control,
       and generates the corrected CoM trajectory. */
     ZMPPreviewControlWithMultiBodyZMP *m_ZMPpcwmbz;
-    
+
     /*! \brief Pointer to the stack handler. */
     StepStackHandler *m_StepStackHandler;
 
@@ -165,7 +165,7 @@ namespace PatternGeneratorJRL
 
     /*! \brief The time of the preview control */
     double m_PreviewControlTime;
-        
+
     /*! ZMP reference frame. */
     unsigned int m_ZMPFrame;
   };

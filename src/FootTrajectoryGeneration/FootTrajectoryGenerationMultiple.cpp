@@ -72,10 +72,10 @@ SetNumberOfIntervals
       i++)
     {
       m_SetOfFootTrajectoryGenerationObjects[i] =
-	new FootTrajectoryGenerationStandard
-	(getSimplePluginManager(),m_Foot);
+        new FootTrajectoryGenerationStandard
+        (getSimplePluginManager(),m_Foot);
       m_SetOfFootTrajectoryGenerationObjects[i]->
-	InitializeInternalDataStructures();
+        InitializeInternalDataStructures();
     }
   m_NatureOfIntervals.resize(lNumberOfIntervals);
 }
@@ -98,9 +98,9 @@ SetTimeIntervals
   for(unsigned int li=0;li<m_DeltaTj.size();li++)
     {
       m_RefTime[li] = reftime;
-	  ODEBUG(" m_RefTime["<< li <<"]: " << setprecision(12)
-		 << m_RefTime[li] << " reftime: "
-		 << setprecision(12) << reftime );
+      ODEBUG(" m_RefTime["<< li <<"]: " << setprecision(12)
+             << m_RefTime[li] << " reftime: "
+             << setprecision(12) << reftime );
       reftime+=m_DeltaTj[li];
     }
 
@@ -121,27 +121,27 @@ Compute(int axis, double t, double &result)
   double reftime=0;
   ODEBUG(" ====== CoM ====== ");
   ODEBUG(" t: " << t << " reftime :" << reftime << " m_Sensitivity: "
-	 << m_Sensitivity <<" m_DeltaTj.size(): "<< m_DeltaTj.size() );
+         << m_Sensitivity <<" m_DeltaTj.size(): "<< m_DeltaTj.size() );
 
   for(unsigned int j=0;j<m_DeltaTj.size();j++)
     {
       ODEBUG(" t: " << t << " reftime :" << reftime
-	     << " Tj["<<j << "]= "<< m_DeltaTj[j]);
+             << " Tj["<<j << "]= "<< m_DeltaTj[j]);
 
       if (((t+m_Sensitivity)>=reftime) &&
-	  (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
-	{
-	  double deltaj=0.0;
-	  deltaj = t-reftime;
+          (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
+        {
+          double deltaj=0.0;
+          deltaj = t-reftime;
 
-	  if (m_SetOfFootTrajectoryGenerationObjects[j]!=0)
-	    {
-	      result =
-		m_SetOfFootTrajectoryGenerationObjects[j]->
-		Compute(axis,deltaj);
-	    }
-	  return true;
-	}
+          if (m_SetOfFootTrajectoryGenerationObjects[j]!=0)
+            {
+              result =
+                m_SetOfFootTrajectoryGenerationObjects[j]->
+                Compute(axis,deltaj);
+            }
+          return true;
+        }
 
       reftime+=m_DeltaTj[j];
     }
@@ -174,16 +174,16 @@ Compute
   aFootAbsolutePosition.stepType =
     m_NatureOfIntervals[IndexInterval];
 
- /*   ofstream aof;
-    string aFileName;
+  /*   ofstream aof;
+       string aFileName;
 
-    aFileName ="ex.dat";
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof << "deltaj " << deltaj << " t " << t << " m_Absoulute "
-    << m_AbsoluteTimeReference << " Ref " << m_RefTime[IndexInterval]
-    << " j " << IndexInterval << " foot  "<< aFootAbsolutePosition.x
-    << " "<< aFootAbsolutePosition.z << endl;
-    aof.close();*/
+       aFileName ="ex.dat";
+       aof.open(aFileName.c_str(),ofstream::app);
+       aof << "deltaj " << deltaj << " t " << t << " m_Absoulute "
+       << m_AbsoluteTimeReference << " Ref " << m_RefTime[IndexInterval]
+       << " j " << IndexInterval << " foot  "<< aFootAbsolutePosition.x
+       << " "<< aFootAbsolutePosition.z << endl;
+       aof.close();*/
 
   return true;
 }
@@ -197,71 +197,71 @@ Compute
   double reftime=0;
   ODEBUG(" ====== Foot ====== " << m_DeltaTj.size());
   ODEBUG("t: " << setprecision(12) << t
-	 << " reftime :" << reftime <<
-  	" m_Sensitivity: "<< m_Sensitivity
-	 <<" m_DeltaTj.size(): "<< m_DeltaTj.size() );
+         << " reftime :" << reftime <<
+         " m_Sensitivity: "<< m_Sensitivity
+         <<" m_DeltaTj.size(): "<< m_DeltaTj.size() );
 
   for(unsigned int j=0;j<m_DeltaTj.size();j++)
     {
       ODEBUG("t: " << t << " reftime :"
-	     << setprecision(12) << reftime <<
-	     " Tj["<<j << "]= " << setprecision(12)
-	     << m_DeltaTj[j]
-	     <<" max limit: " << setprecision(12)
-	     << (reftime+m_DeltaTj[j]+m_Sensitivity) );
+             << setprecision(12) << reftime <<
+             " Tj["<<j << "]= " << setprecision(12)
+             << m_DeltaTj[j]
+             <<" max limit: " << setprecision(12)
+             << (reftime+m_DeltaTj[j]+m_Sensitivity) );
 
       ODEBUG(" Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j] );
 
       if (((t+m_Sensitivity)>=reftime) &&
-	  (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
-	{
-	  double deltaj=0.0;
-	  deltaj = t-reftime;
+          (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
+        {
+          double deltaj=0.0;
+          deltaj = t-reftime;
 
-	  if (m_SetOfFootTrajectoryGenerationObjects[j]!=0)
-	  {
-	    //m_SetOfFootTrajectoryGenerationObjects[j]->
-	    //ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
-	    m_SetOfFootTrajectoryGenerationObjects[j]->
-	      ComputeAllWithBSplines(aFootAbsolutePosition,deltaj);
-	    aFootAbsolutePosition.stepType = m_NatureOfIntervals[j];
-	  }
-	  ODEBUG("t: " << t << " reftime :" << setprecision(12)
-		 << reftime
-		 << " AbsoluteTimeReference : "
-		 << m_AbsoluteTimeReference
-		 << " Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j]
-		 <<" max limit: " << setprecision(12)
-		 << (reftime+m_DeltaTj[j]+m_Sensitivity) );
-	  ODEBUG("X: " << aFootAbsolutePosition.x <<
-		  " Y: " << aFootAbsolutePosition.y <<
-		  " Z: " << aFootAbsolutePosition.z <<
-		  " Theta: " << aFootAbsolutePosition.theta <<
-		  " Omega: " << aFootAbsolutePosition.omega <<
-		  " stepType: " << aFootAbsolutePosition.stepType <<
-		  " NI: " << m_NatureOfIntervals[j] <<
-		  " interval : " << j);
+          if (m_SetOfFootTrajectoryGenerationObjects[j]!=0)
+            {
+              //m_SetOfFootTrajectoryGenerationObjects[j]->
+              //ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
+              m_SetOfFootTrajectoryGenerationObjects[j]->
+                ComputeAllWithBSplines(aFootAbsolutePosition,deltaj);
+              aFootAbsolutePosition.stepType = m_NatureOfIntervals[j];
+            }
+          ODEBUG("t: " << t << " reftime :" << setprecision(12)
+                 << reftime
+                 << " AbsoluteTimeReference : "
+                 << m_AbsoluteTimeReference
+                 << " Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j]
+                 <<" max limit: " << setprecision(12)
+                 << (reftime+m_DeltaTj[j]+m_Sensitivity) );
+          ODEBUG("X: " << aFootAbsolutePosition.x <<
+                 " Y: " << aFootAbsolutePosition.y <<
+                 " Z: " << aFootAbsolutePosition.z <<
+                 " Theta: " << aFootAbsolutePosition.theta <<
+                 " Omega: " << aFootAbsolutePosition.omega <<
+                 " stepType: " << aFootAbsolutePosition.stepType <<
+                 " NI: " << m_NatureOfIntervals[j] <<
+                 " interval : " << j);
 
-	  return true;
-	}
+          return true;
+        }
 
       reftime+=m_DeltaTj[j];
     }
   ODEBUG(" reftime :" << reftime <<
-	  " m_AbsoluteReferenceTime" << m_AbsoluteTimeReference);
+         " m_AbsoluteReferenceTime" << m_AbsoluteTimeReference);
   ODEBUG("t: " << setprecision(12) << t
-	 << " reftime :" << reftime
-	 << " m_Sensitivity: "<< m_Sensitivity
-	 << " m_DeltaTj.size(): "<< m_DeltaTj.size() );
+         << " reftime :" << reftime
+         << " m_Sensitivity: "<< m_Sensitivity
+         << " m_DeltaTj.size(): "<< m_DeltaTj.size() );
 
   return false;
 }
 
 /*! This method specifies the nature of the interval.
-*/
+ */
 int FootTrajectoryGenerationMultiple::
 SetNatureInterval(unsigned int IntervalIndex,
-		  int Nature)
+                  int Nature)
 {
   if (IntervalIndex>=m_NatureOfIntervals.size())
     return -1;
@@ -271,7 +271,7 @@ SetNatureInterval(unsigned int IntervalIndex,
 }
 
 /*! This method returns the nature of the interval.
-*/
+ */
 int FootTrajectoryGenerationMultiple::
 GetNatureInterval(unsigned int IntervalIndex) const
 {
@@ -479,14 +479,14 @@ FootTrajectoryGenerationMultiple::operator=
     {
       double TI, FP, IP, IS;
       for(lk=0;lk<6;lk++)
-	{
-	  GetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
-	  /*! Special case when TI is equal to zero */
-	  if (TI==0.0)
-	    SetParameters(li,lk,TI,FP);
-	  else
-	    SetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
-	}
+        {
+          GetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
+          /*! Special case when TI is equal to zero */
+          if (TI==0.0)
+            SetParameters(li,lk,TI,FP);
+          else
+            SetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
+        }
     }
   return *this;
 }

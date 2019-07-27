@@ -1,9 +1,9 @@
 /*
- * Copyright 2009, 2010, 
+ * Copyright 2009, 2010,
  *
  * Francois   Keith
  * Olivier    Stasse
- * 
+ *
  *
  * JRL, CNRS/AIST
  *
@@ -20,12 +20,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* This object generate matrix representation of linear
    constraint based on foot position.
-   It handles a stack of constraint on a sliding mode 
+   It handles a stack of constraint on a sliding mode
    for QP solving. */
 
 #ifndef _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_
@@ -45,63 +45,63 @@
 namespace PatternGeneratorJRL
 {
   /*! This class generates matrix representation of linear
-   constraint based on foot position.
-   It handles a stack of constraint on a sliding mode 
-   for QP solving.
-   */
+    constraint based on foot position.
+    It handles a stack of constraint on a sliding mode
+    for QP solving.
+  */
   class  FootConstraintsAsLinearSystem: public SimplePlugin
-    {
-    public:
+  {
+  public:
 
-      /*! Constructor */
-      FootConstraintsAsLinearSystem(SimplePluginManager *aSPM, 
-                    PinocchioRobot *aPR);
+    /*! Constructor */
+    FootConstraintsAsLinearSystem(SimplePluginManager *aSPM,
+                                  PinocchioRobot *aPR);
 
-      /*! Destructor */
-      ~FootConstraintsAsLinearSystem();
+    /*! Destructor */
+    ~FootConstraintsAsLinearSystem();
 
-      /*! Compute the linear system \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the 
-	set of points specified by aVecOfPoints. aVecOfPoints is supposed to represent
-	the convex hull of the robot contact points with the ground.
-       */
-      int ComputeLinearSystem(std::vector<CH_Point> aVecOfPoints,
-			      Eigen::MatrixXd &A,
-			      Eigen::MatrixXd &B,
-			      Eigen::VectorXd &C);
+    /*! Compute the linear system \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
+      set of points specified by aVecOfPoints. aVecOfPoints is supposed to represent
+      the convex hull of the robot contact points with the ground.
+    */
+    int ComputeLinearSystem(std::vector<CH_Point> aVecOfPoints,
+                            Eigen::MatrixXd &A,
+                            Eigen::MatrixXd &B,
+                            Eigen::VectorXd &C);
 
-      /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
-	Position.
-       */
-      int BuildLinearConstraintInequalities(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
-					    std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					    std::deque<LinearConstraintInequality_t *> &
-					    QueueOfLConstraintInequalities,
-					    double ConstraintOnX,
-					    double ConstraintOnY);
+    /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
+      Position.
+    */
+    int BuildLinearConstraintInequalities(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
+                                          std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+                                          std::deque<LinearConstraintInequality_t *> &
+                                          QueueOfLConstraintInequalities,
+                                          double ConstraintOnX,
+                                          double ConstraintOnY);
 
-      /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute Position.  */
-      int BuildLinearConstraintInequalities2(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
-					     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					     std::deque<LinearConstraintInequality_t *> &
-					     QueueOfLConstraintInequalities,
-					     double ConstraintOnX,
-					     double ConstraintOnY);
+    /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute Position.  */
+    int BuildLinearConstraintInequalities2(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
+                                           std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+                                           std::deque<LinearConstraintInequality_t *> &
+                                           QueueOfLConstraintInequalities,
+                                           double ConstraintOnX,
+                                           double ConstraintOnY);
 
-      /*! Find Similar Constraints */
-      int FindSimilarConstraints(Eigen::MatrixXd &A,
-				 std::vector<int> &SimilarConstraints);
+    /*! Find Similar Constraints */
+    int FindSimilarConstraints(Eigen::MatrixXd &A,
+                               std::vector<int> &SimilarConstraints);
 
-      /*! Reimplement the interface of SimplePluginManager 
-	\param[in] Method: The method to be called.
-	\param[in] Args: Arguments of the methods.
-       */
-      virtual void CallMethod(std::string & Method, std::istringstream &Args);
+    /*! Reimplement the interface of SimplePluginManager
+      \param[in] Method: The method to be called.
+      \param[in] Args: Arguments of the methods.
+    */
+    virtual void CallMethod(std::string & Method, std::istringstream &Args);
 
-    private:
+  private:
 
-      /* ! Reference on the Humanoid Specificities. */
-      PinocchioRobot * m_PR;
-      
-    };
+    /* ! Reference on the Humanoid Specificities. */
+    PinocchioRobot * m_PR;
+
+  };
 }
 #endif /* _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_ */

@@ -23,9 +23,9 @@
  */
 
 /*!\file FootTrajectoryGenerationAbstract.h
-   \brief This class determinate how it s generate all the values for the foot trajectories.
+  \brief This class determinate how it s generate all the values for the foot trajectories.
 
-   @ingroup foottrajectorygeneration
+  @ingroup foottrajectorygeneration
 */
 
 
@@ -84,7 +84,7 @@ namespace PatternGeneratorJRL
     /*! Constructor: In order to compute some appropriate strategies,
       this class needs to extract specific details from the humanoid model. */
     FootTrajectoryGenerationAbstract(SimplePluginManager *lSPM,
-                     PRFoot *inFoot) ;
+                                     PRFoot *inFoot) ;
 
 
     /*! Default destructor. */
@@ -106,18 +106,18 @@ namespace PatternGeneratorJRL
       @param LeftOrRight: Specify if it is left (1) or right (-1).
     */
     virtual void UpdateFootPosition(std::deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
-				    std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
-				    int CurrentAbsoluteIndex,
-				    int IndexInitial,
-				    double ModulatedSingleSupportTime,
-				    int StepType, int LeftOrRight);
+                                    std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
+                                    int CurrentAbsoluteIndex,
+                                    int IndexInitial,
+                                    double ModulatedSingleSupportTime,
+                                    int StepType, int LeftOrRight);
 
     virtual void UpdateFootPosition(std::deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
-				    std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
-				    int StartIndex, int k,
-				    double LocalInterpolationStartTime,
-				    double ModulatedSingleSupportTime,
-				    int StepType, int LeftOrRight);
+                                    std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
+                                    int StartIndex, int k,
+                                    double LocalInterpolationStartTime,
+                                    double ModulatedSingleSupportTime,
+                                    int StepType, int LeftOrRight);
 
     /*! Initialize internal data structures. */
     virtual void InitializeInternalDataStructures()=0;
@@ -127,7 +127,7 @@ namespace PatternGeneratorJRL
 
     /*! \name Setter and getter for parameters
       @{
-     */
+    */
 
     /*! \name Single Support Time
       @{

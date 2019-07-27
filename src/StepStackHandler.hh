@@ -24,8 +24,8 @@
  */
 /* \file StepStackHandler.h
    \brief This object handle the step stack of the pattern generator.
-    It allows also to create automatically stack of steps according to
-    some high level functionnalities.
+   It allows also to create automatically stack of steps according to
+   some high level functionnalities.
 */
 
 #ifndef _STEP_STACK_HANDLER_H_
@@ -48,7 +48,7 @@ namespace PatternGeneratorJRL
     the ZMP reference trajectory generator object, and created off-line.
     - An on-line mode, where one step at a time is send to
     the ZMP reference trajectory generator object.
-   */
+  */
   class  StepStackHandler : public SimplePlugin
   {
   public:
@@ -106,15 +106,15 @@ namespace PatternGeneratorJRL
     void FinishOnTheLastCorrectSupportFoot();
 
     /*! \brief Creates a copy of relative foot positions and reset the stack (or not).
-     \param[in] lRelativeFootPositions The stack of relative foot to be copied.
-     \param[in] PerformClean Reset the stack if PerformClean is true, otherwise does nothing.
+      \param[in] lRelativeFootPositions The stack of relative foot to be copied.
+      \param[in] PerformClean Reset the stack if PerformClean is true, otherwise does nothing.
     */
     void CopyRelativeFootPosition(std::deque<RelativeFootPosition> & lRelativeFootPositions,
-				  bool PerformClean);
+                                  bool PerformClean);
 
     /*! \name Method related to online stepping.
       @{
-     */
+    */
 
     /*! \brief Start On Line stepping. */
     void StartOnLineStep();
@@ -124,9 +124,9 @@ namespace PatternGeneratorJRL
 
     /*! \brief Add a standard step on the stack. */
     void AddStandardOnLineStep(bool NewStep,
-			       double NewStepX,
-			       double NewStepY,
-			       double Theta);
+                               double NewStepX,
+                               double NewStepY,
+                               double Theta);
 
 
     /*! \brief Returns current state for on line stepping. */
@@ -135,7 +135,7 @@ namespace PatternGeneratorJRL
 
     /*! \brief Methods to handle the stack.
       @{
-     */
+    */
 
     /*! \brief Remove the first step in the stack.
       @return Returns true if this is the end of the sequence. */
@@ -143,12 +143,12 @@ namespace PatternGeneratorJRL
 
     /*! \brief Add a step in the stack. */
     void AddStepInTheStack(double sx, double sy,
-			   double theta, double sstime,
-			   double dstime);
+                           double theta, double sstime,
+                           double dstime);
 
     void AddStepStairInTheStack(double sx, double sy, double sz,
-					 double theta, double sstime,
-					 double dstime);
+                                double theta, double sstime,
+                                double dstime);
 
     /*! \brief Push a step in front of the stack. */
     void PushFrontAStepInTheStack(RelativeFootPosition &aRFP);
@@ -166,27 +166,27 @@ namespace PatternGeneratorJRL
 
     /*! \name High level methods to create stack of steps for large motion.
       @{
-     */
+    */
     /*! \brief Create a sequence of step to realize an arc of rayon R,
-     for arc_deg degrees, starting with the support foot defined
-     by SupportFoot. The direction of the robot is towards
-     the  center of the arc.
+      for arc_deg degrees, starting with the support foot defined
+      by SupportFoot. The direction of the robot is towards
+      the  center of the arc.
     */
     void CreateArcCenteredInStepStack(  double R,
-					double arc_deg,
-					int SupportFoot);
+                                        double arc_deg,
+                                        int SupportFoot);
     /*! \brief Create a sequence of steps to realize an arc of rayon R,
       for arc_deg degrees, starting with the support foot defined
       by SupportFoot. The direction of the robot is tangent
       to the arc centered in x and y.
-     */
+    */
     void CreateArcInStepStack(  double x,double y, double R,
-				double arc_deg, int SupportFoot);
+                                double arc_deg, int SupportFoot);
     /*! @} */
 
     /*! \brief Handling methods for the plugin mecanism.
-     This method is a reimplementation of the interface inherited
-     by SimplePlugin.
+      This method is a reimplementation of the interface inherited
+      by SimplePlugin.
     */
     virtual void CallMethod(std::string &Method, std::istringstream &strm);
 

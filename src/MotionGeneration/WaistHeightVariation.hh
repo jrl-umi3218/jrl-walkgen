@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Florent Lamiraux
  * Alireza Nakhaei
@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /** \file WaistHeightVariation.h
@@ -31,9 +31,9 @@
     If you want to change the reference trajectories, and the planning
     of the foot, this is the object to modify.
 
-    Copyright (c) 2005-2009, 
-    @author Olivier Stasse,Ramzi Sellouati, Francois Keith, 
-   
+    Copyright (c) 2005-2009,
+    @author Olivier Stasse,Ramzi Sellouati, Francois Keith,
+
     JRL-Japan, CNRS/AIST
 
     All rights reserved.
@@ -65,12 +65,12 @@ namespace PatternGeneratorJRL
     /// Constructor:
     /// boundCond: the different boundary conditions begin, intermediate and end of polynomial
     /// timeDistr: vector with time instants for intermediate boundary conditions and end time
-    
+
     WaistPolynome();
-  
+
     /// Set the parameters
     void SetParameters( Eigen::VectorXd boundCond,
-			std::vector<double> timeDistr);
+                        std::vector<double> timeDistr);
 
     /// Destructor.
     ~WaistPolynome();
@@ -84,7 +84,7 @@ namespace PatternGeneratorJRL
   class WaistHeightVariation
   {
   public :
-     
+
     /// Constructor
     WaistHeightVariation();
 
@@ -93,30 +93,30 @@ namespace PatternGeneratorJRL
 
     ///call for polynomial planning of both steps during the obstacle stepover
     void PolyPlanner(deque<COMPosition> &aCOMBuffer,
-		     deque<RelativeFootPosition> &aFootHolds,
-		     deque<ZMPPosition> aZMPPosition);
-	
+                     deque<RelativeFootPosition> &aFootHolds,
+                     deque<ZMPPosition> aZMPPosition);
+
   protected:
 
     deque<RelativeFootPosition> m_FootHolds;
 
-    Eigen::MatrixXd mBoundCond;   
+    Eigen::MatrixXd mBoundCond;
     std::vector<double> mTimeDistr;
 
-    
-      
+
+
     WaistPolynome *m_PolynomeHip;
-	
-    ///extra COMPosition buffer calculated in ZMPMultibody class 
+
+    ///extra COMPosition buffer calculated in ZMPMultibody class
     std::vector<COMPosition> m_ExtraCOMBuffer;
 
-	
+
 
     /// buffers for first preview
     deque<COMPosition> m_COMBuffer;
     unsigned int m_ExtraBufferLength;
     double m_ModulationSupportCoefficient;
-    float m_Tsingle,m_TsingleStepOver; 
+    float m_Tsingle,m_TsingleStepOver;
     float m_Tdble;
     double m_DiffBetweenComAndWaist;
     /// Sampling Period.

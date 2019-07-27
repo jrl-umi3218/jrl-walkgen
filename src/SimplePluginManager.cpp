@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Paul       Evrard
  * Andrei     Herdt
@@ -22,12 +22,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
-/*! Abstract class to handle generic calls for the 
-   Pattern Generator Interface.*/
+/*! Abstract class to handle generic calls for the
+  Pattern Generator Interface.*/
 
 #include <iostream>
 
@@ -48,7 +48,7 @@ SimplePluginManager::SimplePluginManager()
 SimplePluginManager::~SimplePluginManager()
 {
   std::multimap<std::string, SimplePlugin * , ltstr>::iterator it_SP;
-  
+
 
   it_SP =m_SimplePlugins.begin();
   while(it_SP!=m_SimplePlugins.end())
@@ -69,22 +69,22 @@ void SimplePluginManager::UnregisterPlugin(SimplePlugin* aSimplePlugin)
     {
 
       if (it_SP->second==aSimplePlugin)
-	{
-	  it_ToBeRemoved = it_SP;
-	  it_SP++;
+        {
+          it_ToBeRemoved = it_SP;
+          it_SP++;
 
-	  m_SimplePlugins.erase(it_ToBeRemoved);
-	}
-      else 
-	it_SP++;
+          m_SimplePlugins.erase(it_ToBeRemoved);
+        }
+      else
+        it_SP++;
     }
-  
+
 }
 
 void SimplePluginManager::Print( )
-{ 
+{
   std::multimap<std::string, SimplePlugin * , ltstr>::iterator it_SP;
-  
+
 
   it_SP =m_SimplePlugins.begin();
   while(it_SP!=m_SimplePlugins.end())
@@ -105,29 +105,29 @@ bool SimplePluginManager::RegisterMethod(string &MethodName, SimplePlugin *aSP)
   m_SimplePlugins.insert(pair < string, SimplePlugin * > (MethodName,aSP));
 
   ODEBUG5("Registered method " << MethodName <<
-	  " for plugin " << aSP << endl,"PgDebug.txt");
+          " for plugin " << aSP << endl,"PgDebug.txt");
   //  Print();
-  return true;  
+  return true;
 }
 
 /*! \name Call the method from the Method name. */
 bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
 {
   pair <std::multimap<std::string, SimplePlugin * , ltstr>::iterator,
-    std::multimap<std::string, SimplePlugin * , ltstr>::iterator >
+        std::multimap<std::string, SimplePlugin * , ltstr>::iterator >
     RangeOfPlugins  = m_SimplePlugins.equal_range(MethodName);
-  
-  
+
+
   std::multimap<std::string, SimplePlugin * , ltstr>::iterator CurrentPlugin;
 
-  
+
   unsigned int NbPlugins=0;
   for (CurrentPlugin = RangeOfPlugins.first;
        CurrentPlugin != RangeOfPlugins.second;++NbPlugins,
-	 ++CurrentPlugin) ;
-  
-  ODEBUG5("Size of SimplePlugins: " << m_SimplePlugins.size() 
-	  << " Found for " << MethodName << " : " << NbPlugins, "PgDebug.txt");
+         ++CurrentPlugin) ;
+
+  ODEBUG5("Size of SimplePlugins: " << m_SimplePlugins.size()
+          << " Found for " << MethodName << " : " << NbPlugins, "PgDebug.txt");
   bool FoundAPlugin = false;
 
   stringbuf *pbuf;
@@ -141,7 +141,7 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
   for(int i=0;i<size;i++)
     aBuffer[i] = (char)pbuf->sbumpc();
   ODEBUG5(aBuffer,"PgDebug.txt");
-  
+
   pbuf->pubsetbuf(aBuffer,size);
 
   for (CurrentPlugin = RangeOfPlugins.first;
@@ -150,20 +150,20 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
     {
       istringstream iss(aBuffer);
       SimplePlugin * aSP = CurrentPlugin->second;
-      ODEBUG5("Found the method " << MethodName 
-	      << " for plugin :" << aSP << endl
-	      << " Buffer: " << aBuffer,"PgDebug.txt"); 
+      ODEBUG5("Found the method " << MethodName
+              << " for plugin :" << aSP << endl
+              << " Buffer: " << aBuffer,"PgDebug.txt");
       if (aSP!=0)
-	{
-	  aSP->CallMethod(MethodName,iss);
-	  FoundAPlugin = true;
-	}
+        {
+          aSP->CallMethod(MethodName,iss);
+          FoundAPlugin = true;
+        }
       else
-	{
-	  cout << "SimplePlugin empty " << endl;
-	}
+        {
+          cout << "SimplePlugin empty " << endl;
+        }
     }
 
   return FoundAPlugin;
-  
+
 }

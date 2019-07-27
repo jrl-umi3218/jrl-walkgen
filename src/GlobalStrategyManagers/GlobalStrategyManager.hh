@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008, 2009, 2010, 
+ * Copyright 2007, 2008, 2009, 2010,
  *
  * Olivier  Stasse
  *
@@ -18,13 +18,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file GlobalStrategyManager.h
   \brief This object defines a global strategy abstract object to generate an output
   handled by the PatternGeneratorInterface object. */
-#include <deque> 
+#include <deque>
 
 
 /*! JRL inclusion */
@@ -46,13 +46,13 @@ namespace PatternGeneratorJRL
 {
 
   /** @ingroup pgjrl
-      
-  Abstract interface to the object handling the global strategy
-  to generate the output of the pattern generator.
+
+      Abstract interface to the object handling the global strategy
+      to generate the output of the pattern generator.
   */
   class  GlobalStrategyManager : public SimplePlugin
   {
-    
+
   public:
     static const int MOTION_FINISHED = -1;
     static const int NEW_STEP_NEEDED =0;
@@ -62,8 +62,8 @@ namespace PatternGeneratorJRL
 
     /*! Default destructor. */
     virtual ~GlobalStrategyManager()
-      {};
-    
+    {};
+
     /*! Set the link to the preview control. */
     void SetPreviewControl(PreviewControl *aPC);
 
@@ -81,15 +81,15 @@ namespace PatternGeneratorJRL
       @param[out] CurrentAcceleration: The results is a state vector containing the acceleration.
     */
     virtual int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
-				       FootAbsolutePosition &RightFootPosition,
-				       Eigen::VectorXd & ZMPRefPos,
-				       COMState & aCOMState,
-				       Eigen::VectorXd & CurrentConfiguration,
-				       Eigen::VectorXd & CurrentVelocity,
-				       Eigen::VectorXd & CurrentAcceleration)=0;
+                                       FootAbsolutePosition &RightFootPosition,
+                                       Eigen::VectorXd & ZMPRefPos,
+                                       COMState & aCOMState,
+                                       Eigen::VectorXd & CurrentConfiguration,
+                                       Eigen::VectorXd & CurrentVelocity,
+                                       Eigen::VectorXd & CurrentAcceleration)=0;
 
 
-    
+
     /*! Computes the COM of the robot with the Joint values given in BodyAngles,
       velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
       Assuming that the waist is at (0,0,0)
@@ -106,11 +106,11 @@ namespace PatternGeneratorJRL
       in the waist coordinates frame.
     */
     virtual int EvaluateStartingState(Eigen::VectorXd & BodyAngles,
-				      COMState & aStartingCOMState,
-				      Eigen::Vector3d & aStartingZMPPosition,
-				      Eigen::Matrix<double, 6, 1> & aStartingWaistPose,
-				      FootAbsolutePosition & InitLeftFootPosition,
-				      FootAbsolutePosition & InitRightFootPosition)=0;
+                                      COMState & aStartingCOMState,
+                                      Eigen::Vector3d & aStartingZMPPosition,
+                                      Eigen::Matrix<double, 6, 1> & aStartingWaistPose,
+                                      FootAbsolutePosition & InitLeftFootPosition,
+                                      FootAbsolutePosition & InitRightFootPosition)=0;
 
 
     /*! \brief Method to detect the status regarding the end of the motion.
@@ -121,7 +121,7 @@ namespace PatternGeneratorJRL
     */
     virtual int EndOfMotion()=0;
 
-    /*! \brief Setting the pointers towards buffers of positions. 
+    /*! \brief Setting the pointers towards buffers of positions.
       \param[in] aZMPositions: Absolute frame positions buffer of the Zero Momentum Point reference.
       \param[in] aCOMBuffer: Absolute frame positions buffer of the CoM trajectory related to the previous
       ZMP reference trajectory.
@@ -129,22 +129,22 @@ namespace PatternGeneratorJRL
       \param[in] aRightFootAbsolutePositions: Absolute frame positions buffer of the right foot.
     */
     void SetBufferPositions(deque<ZMPPosition> * aZMPositions,
-			    deque<COMState> * aCOMBuffer,
-			    deque<FootAbsolutePosition> *aLeftFootAbsolutePositions,
-			    deque<FootAbsolutePosition> *aRightFootAbsolutePositions );
+                            deque<COMState> * aCOMBuffer,
+                            deque<FootAbsolutePosition> *aLeftFootAbsolutePositions,
+                            deque<FootAbsolutePosition> *aRightFootAbsolutePositions );
 
     /*! Prepare the buffers at the beginning of the foot positions. */
     virtual void Setup(deque<ZMPPosition> & aZMPositions,
-		       deque<COMState> & aCOMBuffer,
-		       deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
-		       deque<FootAbsolutePosition> & aRightFootAbsolutePositions )=0;
-      
+                       deque<COMState> & aCOMBuffer,
+                       deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
+                       deque<FootAbsolutePosition> & aRightFootAbsolutePositions )=0;
+
   protected:
 
     /*! \name Positions buffers.
       @{
-     */
-    
+    */
+
     /*! Buffer of ZMP positions */
     deque<ZMPPosition> * m_ZMPPositions;
 
@@ -153,9 +153,9 @@ namespace PatternGeneratorJRL
 
     /*! Buffer of absolute foot position. */
     deque<FootAbsolutePosition> * m_LeftFootPositions, *m_RightFootPositions;
-    
+
     /* @} */
-    
+
 
     /*! Sampling Period. */
     double m_SamplingPeriod;
@@ -172,12 +172,12 @@ namespace PatternGeneratorJRL
     /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
     inline  bool setHumanoidDynamicRobot(PinocchioRobot *aHumanoidDynamicRobot)
-      { m_PinocchioRobot = aHumanoidDynamicRobot;
-	return true;}
-    
+    { m_PinocchioRobot = aHumanoidDynamicRobot;
+      return true;}
+
     /*! \brief Returns the object able to compute the dynamic parameters of the robot. */
     inline PinocchioRobot * getHumanoidDynamicRobot() const
-      { return m_PinocchioRobot;}
+    { return m_PinocchioRobot;}
 
     /** @} */
 

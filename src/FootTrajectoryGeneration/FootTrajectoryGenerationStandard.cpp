@@ -209,11 +209,11 @@ SetParameters
 
     case Z_AXIS:
       ODEBUG("Position: " << Position <<
-	     " m_StepHeight: " << m_StepHeight);
+             " m_StepHeight: " << m_StepHeight);
       m_PolynomeZ->SetParameters
-	(TimeInterval,Position+m_StepHeight,Position);
+        (TimeInterval,Position+m_StepHeight,Position);
       m_BsplinesZ->SetParameters
-	(TimeInterval,0.0,Position,ToMP,MP);
+        (TimeInterval,0.0,Position,ToMP,MP);
       break;
 
     case THETA_AXIS:
@@ -258,7 +258,7 @@ SetParametersWithInitPosInitSpeed
     WayPoint_x != WayPoint_y &&
     WayPoint_y != WayPoint_z &&
     WayPoint_x != WayPoint_z ;
-  
+
   bool isFootMoving =
     abs(m_BsplinesY->FP() - m_BsplinesY->IP())>epsilon ||
     abs(m_BsplinesX->FP() - m_BsplinesX->IP())>epsilon ;
@@ -269,41 +269,41 @@ SetParametersWithInitPosInitSpeed
       ODEBUG2("Initspeed: " << InitSpeed << " ");
       // Init polynom
       m_PolynomeX->SetParameters
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
       // Init BSpline
       if( isWayPointSet )
-	{
-	  ToMP.push_back(0.20*TimeInterval);
-	  ToMP.push_back(0.75*TimeInterval);
-	  MP.push_back(InitPosition) ;
-	  MP.push_back(FinalPosition) ;
-	}
+        {
+          ToMP.push_back(0.20*TimeInterval);
+          ToMP.push_back(0.75*TimeInterval);
+          MP.push_back(InitPosition) ;
+          MP.push_back(FinalPosition) ;
+        }
       else
-	{
+        {
           ToMP.clear();
           MP.clear();
-	}
+        }
       m_BsplinesX->SetParameters
-	(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed);
+        (TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed);
       break;
 
     case Y_AXIS:
       m_PolynomeY->SetParameters
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
       if(isWayPointSet)
-	{
-	  ToMP.push_back(0.20*TimeInterval);
-	  ToMP.push_back(0.75*TimeInterval);
-	  MP.push_back(WayPoint_y);
-	  MP.push_back(WayPoint_y);
-	}
+        {
+          ToMP.push_back(0.20*TimeInterval);
+          ToMP.push_back(0.75*TimeInterval);
+          MP.push_back(WayPoint_y);
+          MP.push_back(WayPoint_y);
+        }
       else
-	{
-	  ToMP.clear();
-	  MP.clear();
-	}
+        {
+          ToMP.clear();
+          MP.clear();
+        }
       m_BsplinesY->SetParameters
-	(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed);
+        (TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed);
       break;
 
     case Z_AXIS:
@@ -312,8 +312,8 @@ SetParametersWithInitPosInitSpeed
           WayPoint_z = 0.0;
         }
       m_PolynomeZ->SetParametersWithMiddlePos
-	(TimeInterval, FinalPosition+m_StepHeight,
-	 InitPosition, InitSpeed, 0.0, FinalPosition);
+        (TimeInterval, FinalPosition+m_StepHeight,
+         InitPosition, InitSpeed, 0.0, FinalPosition);
 
       // Check the final and the initial position to decide what to do
       if (FinalPosition - InitPosition > epsilon )
@@ -322,7 +322,7 @@ SetParametersWithInitPosInitSpeed
           MP.push_back(FinalPosition+WayPoint_z);
         }
       else if (FinalPosition - InitPosition <= epsilon &&
-	       FinalPosition - InitPosition >= -epsilon )
+               FinalPosition - InitPosition >= -epsilon )
         {
           ToMP.push_back(0.5*TimeInterval);
           MP.push_back(FinalPosition+WayPoint_z);
@@ -333,25 +333,25 @@ SetParametersWithInitPosInitSpeed
           MP.push_back(InitPosition+WayPoint_z);
         }
       m_BsplinesZ->SetParameters
-	(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed);
+        (TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed);
       break;
 
     case THETA_AXIS:
       m_PolynomeTheta->
-	SetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        SetParametersWithInitPosInitSpeed
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     case OMEGA_AXIS:
       m_PolynomeOmega->
-	SetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        SetParametersWithInitPosInitSpeed
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     case OMEGA2_AXIS:
       m_PolynomeOmega2->
-	SetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        SetParametersWithInitPosInitSpeed
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     default:
@@ -384,7 +384,7 @@ SetParameters
     WayPoint_y!=WayPoint_x &&
     (WayPoint_x*WayPoint_x >= epsilon ||
      WayPoint_y*WayPoint_y >= epsilon) ;
-  
+
   bool isFootMoving =
     abs(m_BsplinesY->FP() - m_BsplinesY->IP())>epsilon ||
     abs(m_BsplinesX->FP() - m_BsplinesX->IP())>epsilon ;
@@ -395,41 +395,41 @@ SetParameters
       ODEBUG2("Initspeed: " << InitSpeed << " ");
       // Init polynom
       m_PolynomeX->SetParameters
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
       // Init BSpline
       if( isWayPointSet )
-	{
-	  ToMP.push_back(0.20*TimeInterval);
-	  ToMP.push_back(0.75*TimeInterval);
-	  MP.push_back(InitPosition) ;
-	  MP.push_back(FinalPosition) ;
-	}
+        {
+          ToMP.push_back(0.20*TimeInterval);
+          ToMP.push_back(0.75*TimeInterval);
+          MP.push_back(InitPosition) ;
+          MP.push_back(FinalPosition) ;
+        }
       else
-	{
+        {
           ToMP.clear();
           MP.clear();
-	}
+        }
       m_BsplinesX->SetParametersWithInitFinalPose
-	(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
+        (TimeInterval,InitPosition,FinalPosition,ToMP,MP);
       break;
 
     case Y_AXIS:
       m_PolynomeY->SetParameters
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
       if(isWayPointSet)
-	{
-	  ToMP.push_back(0.20*TimeInterval);
-	  ToMP.push_back(0.75*TimeInterval);
-	  MP.push_back(WayPoint_y);
-	  MP.push_back(WayPoint_y);
-	}
+        {
+          ToMP.push_back(0.20*TimeInterval);
+          ToMP.push_back(0.75*TimeInterval);
+          MP.push_back(WayPoint_y);
+          MP.push_back(WayPoint_y);
+        }
       else
-	{
-	  ToMP.clear();
-	  MP.clear();
-	}
+        {
+          ToMP.clear();
+          MP.clear();
+        }
       m_BsplinesY->SetParametersWithInitFinalPose
-	(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
+        (TimeInterval,InitPosition,FinalPosition,ToMP,MP);
       break;
 
     case Z_AXIS:
@@ -438,55 +438,55 @@ SetParameters
           WayPoint_z = 0.0;
         }
       m_PolynomeZ->SetParametersWithMiddlePos
-	(TimeInterval, FinalPosition+m_StepHeight,
-	 InitPosition, InitSpeed, InitAcc, FinalPosition);
+        (TimeInterval, FinalPosition+m_StepHeight,
+         InitPosition, InitSpeed, InitAcc, FinalPosition);
 
       // Check the final and the initial position to decide what to do
       if(InitSpeed*InitSpeed > 0.00001)
-	{
-	  ToMP.clear();
-	  MP.clear();
-	}
+        {
+          ToMP.clear();
+          MP.clear();
+        }
       else if (FinalPosition - InitPosition > epsilon )
         {
           ToMP.push_back(0.4*TimeInterval);
           MP.push_back(FinalPosition+WayPoint_z);
           m_BsplinesZ->SetParametersWithInitFinalPose
-	    (TimeInterval,InitPosition,FinalPosition,ToMP,MP);
+            (TimeInterval,InitPosition,FinalPosition,ToMP,MP);
 
           m_BsplinesZ->GenerateDegree();
-	  
-	  if (0)
-	    {
-	      m_BsplinesZ->PrintControlPoints();
-	      m_BsplinesZ->PrintDegree();
-	      m_BsplinesZ->PrintKnotVector();
-	    }
+
+          if (0)
+            {
+              m_BsplinesZ->PrintControlPoints();
+              m_BsplinesZ->PrintDegree();
+              m_BsplinesZ->PrintKnotVector();
+            }
         }
       else if ( sqrt((FinalPosition - InitPosition)*
-		     (FinalPosition - InitPosition)) <= epsilon )
+                     (FinalPosition - InitPosition)) <= epsilon )
         {
           ToMP.push_back(0.5*TimeInterval);
           MP.push_back(FinalPosition+WayPoint_z);
           m_BsplinesZ->SetParameters
-	    (TimeInterval,InitPosition,
-	     FinalPosition,ToMP,MP,InitSpeed,InitAcc);
+            (TimeInterval,InitPosition,
+             FinalPosition,ToMP,MP,InitSpeed,InitAcc);
         }
       else if (FinalPosition - InitPosition < -epsilon )
         {
           ToMP.push_back(0.65*TimeInterval);
           MP.push_back(InitPosition+WayPoint_z*0.45);
           m_BsplinesZ->
-	    SetParametersWithInitFinalPose
-	    (TimeInterval,InitPosition,FinalPosition,ToMP,MP);
+            SetParametersWithInitFinalPose
+            (TimeInterval,InitPosition,FinalPosition,ToMP,MP);
 
           m_BsplinesZ->GenerateDegree();
-	  if (0)
-	    {
-	      m_BsplinesZ->PrintControlPoints();
-	      m_BsplinesZ->PrintDegree();
-	      m_BsplinesZ->PrintKnotVector();
-	    }
+          if (0)
+            {
+              m_BsplinesZ->PrintControlPoints();
+              m_BsplinesZ->PrintDegree();
+              m_BsplinesZ->PrintKnotVector();
+            }
         }
       //m_BsplinesZ->SetParameters(TimeInterval,
       // InitPosition,FinalPosition,ToMP,MP,InitSpeed,InitAcc);
@@ -494,17 +494,17 @@ SetParameters
 
     case THETA_AXIS:
       m_PolynomeTheta->SetParameters
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
       break;
 
     case OMEGA_AXIS:
       m_PolynomeOmega->SetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     case OMEGA2_AXIS:
       m_PolynomeOmega2->SetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     default:
@@ -531,37 +531,37 @@ SetParameters
 
     case X_AXIS:
       m_PolynomeX->SetParameters
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc,InitJerk);
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc,InitJerk);
       break;
 
     case Y_AXIS:
       m_PolynomeY->SetParameters
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc,InitJerk);
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc,InitJerk);
       break;
 
     case Z_AXIS:
       m_PolynomeZ->
-	SetParametersWithMiddlePos
-	(TimeInterval,FinalPosition+m_StepHeight,InitPosition,InitSpeed,
-	 InitAcc,FinalPosition);
+        SetParametersWithMiddlePos
+        (TimeInterval,FinalPosition+m_StepHeight,InitPosition,InitSpeed,
+         InitAcc,FinalPosition);
       break;
 
     case THETA_AXIS:
       m_PolynomeTheta->
-	SetParameters
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
+        SetParameters
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
       break;
 
     case OMEGA_AXIS:
       m_PolynomeOmega->
-	SetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        SetParametersWithInitPosInitSpeed
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     case OMEGA2_AXIS:
       m_PolynomeOmega2->
-	SetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        SetParametersWithInitPosInitSpeed
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     default:
@@ -586,39 +586,39 @@ GetParametersWithInitPosInitSpeed
     case X_AXIS:
       ODEBUG2("Initspeed: " << InitSpeed << " ");
       m_PolynomeX->
-	GetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        GetParametersWithInitPosInitSpeed
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     case Y_AXIS:
       m_PolynomeY->
-	GetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        GetParametersWithInitPosInitSpeed
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     case Z_AXIS:
       m_PolynomeZ->
-	GetParametersWithInitPosInitSpeed
-	(TimeInterval,MiddlePosition,FinalPosition,InitPosition,InitSpeed);
+        GetParametersWithInitPosInitSpeed
+        (TimeInterval,MiddlePosition,FinalPosition,InitPosition,InitSpeed);
 
       break;
 
     case THETA_AXIS:
       m_PolynomeTheta->
-	GetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        GetParametersWithInitPosInitSpeed
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     case OMEGA_AXIS:
       m_PolynomeOmega->
-	GetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        GetParametersWithInitPosInitSpeed
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     case OMEGA2_AXIS:
       m_PolynomeOmega2->
-	GetParametersWithInitPosInitSpeed
-	(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+        GetParametersWithInitPosInitSpeed
+        (TimeInterval,FinalPosition,InitPosition,InitSpeed);
       break;
 
     default:
@@ -694,17 +694,17 @@ ComputeAllWithBSplines
   else
     {
       if(Time < EndOfLiftOff)
-	{
-	  timeOfInterpolation = 0.0 ;
-	}
+        {
+          timeOfInterpolation = 0.0 ;
+        }
       else if (Time < StartLanding)
-	{
-	  timeOfInterpolation = Time - EndOfLiftOff ;
-	}
+        {
+          timeOfInterpolation = Time - EndOfLiftOff ;
+        }
       else
-	{
-	  timeOfInterpolation = UnlockedSwingPeriod ;
-	}
+        {
+          timeOfInterpolation = UnlockedSwingPeriod ;
+        }
     }
 
   // Trajectory of the foot compute in the X domain (plane X of t)
@@ -875,26 +875,26 @@ UpdateFootPosition
     {
       // DO MODIFY x, y and theta the remaining time.
       curr_NSFAP.x     = init_NSFAP.x     +
-	m_PolynomeX->Compute(LocalTime - EndOfLiftOff);
+        m_PolynomeX->Compute(LocalTime - EndOfLiftOff);
       curr_NSFAP.y     = init_NSFAP.y     +
-	m_PolynomeY->Compute(LocalTime - EndOfLiftOff);
+        m_PolynomeY->Compute(LocalTime - EndOfLiftOff);
       curr_NSFAP.theta = init_NSFAP.theta +
-	m_PolynomeTheta->Compute(LocalTime - EndOfLiftOff);
+        m_PolynomeTheta->Compute(LocalTime - EndOfLiftOff);
     }
   else
     {
       // Do not modify x, y and theta while landing.
       curr_NSFAP.x     = init_NSFAP.x     +
-	m_PolynomeX->Compute(ModulatedSingleSupportTime);
+        m_PolynomeX->Compute(ModulatedSingleSupportTime);
       curr_NSFAP.y     = init_NSFAP.y     +
-	m_PolynomeY->Compute(ModulatedSingleSupportTime);
+        m_PolynomeY->Compute(ModulatedSingleSupportTime);
       curr_NSFAP.theta = init_NSFAP.theta +
-	m_PolynomeTheta->Compute(ModulatedSingleSupportTime);
+        m_PolynomeTheta->Compute(ModulatedSingleSupportTime);
     }
 
   curr_NSFAP.z = init_NSFAP.z + m_PolynomeZ->Compute(LocalTime);
   ODEBUG2("x:" << curr_NSFAP.x << " LocalTime - EndOfLiftOff"
-	  << LocalTime - EndOfLiftOff
+          << LocalTime - EndOfLiftOff
           << " " << m_PolynomeX->Compute(LocalTime - EndOfLiftOff));
   //  m_PolynomeX->print();
 
@@ -995,11 +995,11 @@ UpdateFootPosition
 #endif
 
   ODEBUG4( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift
-	   << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )"
-	   << curr_NSFAP.x << " "
-	   << curr_NSFAP.y << " "
-	   << curr_NSFAP.z << " "
-	   ,"GeneratedFoot.dat");
+           << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )"
+           << curr_NSFAP.x << " "
+           << curr_NSFAP.y << " "
+           << curr_NSFAP.z << " "
+           ,"GeneratedFoot.dat");
 
 }
 
@@ -1029,7 +1029,7 @@ UpdateFootPosition
 
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = StepType;
   ODEBUG("LocalInterpolationStartTime+InterpolationTime: "<<
-	 LocalInterpolationStartTime+InterpolationTime);
+         LocalInterpolationStartTime+InterpolationTime);
   if (LocalInterpolationStartTime +InterpolationTime <= EndOfLiftOff ||
       LocalInterpolationStartTime +InterpolationTime >= StartLanding)
     {
@@ -1045,44 +1045,44 @@ UpdateFootPosition
         NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].theta;
     }
   else if (LocalInterpolationStartTime < EndOfLiftOff &&
-	   LocalInterpolationStartTime +InterpolationTime > EndOfLiftOff)
+           LocalInterpolationStartTime +InterpolationTime > EndOfLiftOff)
     {
       // cout<<"rest changes"<<endl;
       // DO MODIFY x, y and theta the remaining time.
       // x, dx
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x =
         m_PolynomeX->
-	Compute
-	(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
+        Compute
+        (LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
       // NoneSupportFootAbsolutePositions[StartIndex-1].x;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dx =
         m_PolynomeX->
-	ComputeDerivative
-	(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
+        ComputeDerivative
+        (LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
       // NoneSupportFootAbsolutePositions[StartIndex-1].dx;
       //y, dy
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y =
         m_PolynomeY->
-	Compute
-	(LocalInterpolationStartTime +
-	 InterpolationTime - EndOfLiftOff);//  +
+        Compute
+        (LocalInterpolationStartTime +
+         InterpolationTime - EndOfLiftOff);//  +
       // NoneSupportFootAbsolutePositions[StartIndex-1].y;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy =
         m_PolynomeY->
-	ComputeDerivative
-	(LocalInterpolationStartTime +
-	 InterpolationTime - EndOfLiftOff); // +
+        ComputeDerivative
+        (LocalInterpolationStartTime +
+         InterpolationTime - EndOfLiftOff); // +
       // NoneSupportFootAbsolutePositions[StartIndex-1].dy;
       //theta, dtheta
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta =
         m_PolynomeTheta->
-	Compute
-	(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
+        Compute
+        (LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
       //NoneSupportFootAbsolutePositions[StartIndex].theta;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dtheta =
         m_PolynomeTheta->
-	ComputeDerivative
-	(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+        ComputeDerivative
+        (LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
       // +NoneSupportFootAbsolutePositions[StartIndex].dtheta;
     }
   else
@@ -1140,8 +1140,8 @@ UpdateFootPosition
     {
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega =
         m_Omega - m_PolynomeOmega2->
-	Compute
-	(LocalInterpolationStartTime+InterpolationTime-EndOfLiftOff)-
+        Compute
+        (LocalInterpolationStartTime+InterpolationTime-EndOfLiftOff)-
         NoneSupportFootAbsolutePositions[StartIndex-1].omega2;
     }
   // Realize the landing.
@@ -1149,8 +1149,8 @@ UpdateFootPosition
     {
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega =
         m_PolynomeOmega->
-	Compute
-	(LocalInterpolationStartTime+InterpolationTime - StartLanding) +
+        Compute
+        (LocalInterpolationStartTime+InterpolationTime - StartLanding) +
         NoneSupportFootAbsolutePositions[StartIndex-1].omega - m_Omega;
       //ProtectionNeeded=true;
     }
@@ -1234,11 +1234,11 @@ UpdateFootPosition
 #endif
 
   ODEBUG4( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift
-	   << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )"
-	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x << " "
-	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y << " "
-	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z << " "
-	   ,"GeneratedFoot.dat");
+           << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )"
+           << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x << " "
+           << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y << " "
+           << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z << " "
+           ,"GeneratedFoot.dat");
 
 }
 
@@ -1263,7 +1263,7 @@ ComputingAbsFootPosFromQueueOfRelPos
   for(unsigned int i=0;i<RelativeFootPositions.size();i++)
     {
       /*! Compute Orientation matrix related to the relative orientation
-	of the support foot */
+        of the support foot */
       c = cos(RelativeFootPositions[i].theta*M_PI/180.0);
       s = sin(RelativeFootPositions[i].theta*M_PI/180.0);
       MM(0,0) = c;      MM(0,1) = -s;
@@ -1275,8 +1275,8 @@ ComputingAbsFootPosFromQueueOfRelPos
 
       /*! Extract the current absolute orientation matrix. */
       for(int k=0;k<2;k++)
-	for(int l=0;l<2;l++)
-	  Orientation(k,l) = CurrentSupportFootPosition(k,l);
+        for(int l=0;l<2;l++)
+          Orientation(k,l) = CurrentSupportFootPosition(k,l);
 
       /*! Put in a vector form the translation of the relative foot. */
       v(0,0) = RelativeFootPositions[i].sx;
@@ -1288,11 +1288,11 @@ ComputingAbsFootPosFromQueueOfRelPos
 
       /*! Update the world coordinates of the support foot. */
       for(int k=0;k<2;k++)
-	for(int l=0;l<2;l++)
-	  CurrentSupportFootPosition(k,l) = Orientation(k,l);
+        for(int l=0;l<2;l++)
+          CurrentSupportFootPosition(k,l) = Orientation(k,l);
 
       for(int k=0;k<2;k++)
-	CurrentSupportFootPosition(k,2) += v2(k,0);
+        CurrentSupportFootPosition(k,2) += v2(k,0);
 
       AbsoluteFootPositions[i].x = v2(0,0);
       AbsoluteFootPositions[i].y = v2(1,0);

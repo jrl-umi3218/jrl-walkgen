@@ -141,24 +141,24 @@ namespace PatternGeneratorJRL
   {
     aos << "AnalyticalMorisawaCompact:";
     for(unsigned int li=0;
-	li < m_DeltaTj.size();
-	li++)
+        li < m_DeltaTj.size();
+        li++)
       {
-	aos << m_DeltaTj[li] ;
-	if (li < m_DeltaTj.size()-1)
-	  aos << " ";
+        aos << m_DeltaTj[li] ;
+        if (li < m_DeltaTj.size()-1)
+          aos << " ";
       }
     aos << endl;
   }
 
   void AnalyticalMorisawaAbstract::GetIsStepStairOn(int &isStepStairOn)
   {
-      isStepStairOn = m_isStepStairOn;
+    isStepStairOn = m_isStepStairOn;
   }
 
   void AnalyticalMorisawaAbstract::SetIsStepStairOn(int isStepStairOn)
   {
-      m_isStepStairOn = isStepStairOn;
+    m_isStepStairOn = isStepStairOn;
   }
 
 }

@@ -115,7 +115,7 @@ RigidBodySystem::initialize_trajectories()
   std::deque<rigid_body_state_t>::iterator FTIt;
   FTIt = FlyingFootTrajectory_deq_.begin();
   OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS,
-			SSPeriod/2.0, OFTG_->GetStepHeight() );
+                        SSPeriod/2.0, OFTG_->GetStepHeight() );
   double LocalStartTime = 0.0;
   for( unsigned int i = 0; i < NbInstantsSS; i++)
     {
@@ -123,16 +123,16 @@ RigidBodySystem::initialize_trajectories()
         {
           LocalStartTime = SSPeriod/2.0;
           OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS,
-				SSPeriod/2.0, 0.0,
-              OFTG_->GetStepHeight(), 0.0, 0.0 );
+                                SSPeriod/2.0, 0.0,
+                                OFTG_->GetStepHeight(), 0.0, 0.0 );
         }
 
       FTIt->Z(0) =
-	OFTG_->Compute( FootTrajectoryGenerationStandard::Z_AXIS,
-			i*T_-LocalStartTime );
+        OFTG_->Compute( FootTrajectoryGenerationStandard::Z_AXIS,
+                        i*T_-LocalStartTime );
       FTIt->Z(2) =
-	OFTG_->ComputeSecDerivative
-	( FootTrajectoryGenerationStandard::Z_AXIS,i*T_-LocalStartTime );
+        OFTG_->ComputeSecDerivative
+        ( FootTrajectoryGenerationStandard::Z_AXIS,i*T_-LocalStartTime );
       FTIt++;
     }
 
@@ -206,8 +206,8 @@ precompute_trajectories
       // TODO: enhance this correction (find its origin).
 
       unsigned int endLoop =
-	std::min<unsigned>(SS_it->NbInstants,(unsigned int)
-			    FlyingFootTrajectory_deq_.size());
+        std::min<unsigned>(SS_it->NbInstants,(unsigned int)
+                           FlyingFootTrajectory_deq_.size());
       for(unsigned int j = 0; j < endLoop; j++)
         FFTraj_it++;
       if(SS_it->StateChanged)
@@ -245,8 +245,8 @@ precompute_trajectories
 
 int
 RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
-    const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
-    const std::deque<FootAbsolutePosition> & RightFootTraj_deq )
+                         const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
+                         const std::deque<FootAbsolutePosition> & RightFootTraj_deq )
 {
 
   unsigned nbStepsPreviewed = SupportStates_deq.back().StepNumber;
@@ -254,11 +254,11 @@ RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
     {
 
       compute_foot_pol_dynamics
-	( SupportStates_deq, LeftFoot_.Dynamics(POSITION),
-	  RightFoot_.Dynamics(POSITION) );
+        ( SupportStates_deq, LeftFoot_.Dynamics(POSITION),
+          RightFoot_.Dynamics(POSITION) );
       compute_foot_pol_dynamics
-	( SupportStates_deq, LeftFoot_.Dynamics(ACCELERATION),
-	  RightFoot_.Dynamics(ACCELERATION) );
+        ( SupportStates_deq, LeftFoot_.Dynamics(ACCELERATION),
+          RightFoot_.Dynamics(ACCELERATION) );
 
       precompute_trajectories( SupportStates_deq );
       compute_dyn_cop( nbStepsPreviewed );
@@ -286,10 +286,10 @@ RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
 /* TODO : Move this function on another file
  *
  * Matrix inversion routine.
-   Uses lu_factorize and lu_substitute in uBLAS to invert a matrix */
+ Uses lu_factorize and lu_substitute in uBLAS to invert a matrix */
 template<class T> bool
 invertMatrix (const Eigen::Matrix<T,Dynamic,Dynamic>& input,
-	      Eigen::Matrix<T,Dynamic,Dynamic>& inverse) {
+              Eigen::Matrix<T,Dynamic,Dynamic>& inverse) {
   using namespace boost::numeric::ublas;
   typedef permutation_matrix<std::size_t> pmatrix;
   // create a working copy of the input
@@ -341,8 +341,8 @@ RigidBodySystem::compute_dyn_cop( unsigned nbSteps )
   for(unsigned int i = 0; i < N_; i++)
     {
       GRF = CoM_.Mass()*(CoMTraj_it->Z[2]+GRAVITY)+
-          LeftFoot_.Mass()*(LFTraj_it->Z[2]+GRAVITY)+
-          RightFoot_.Mass()*(RFTraj_it->Z[2]+GRAVITY);
+        LeftFoot_.Mass()*(LFTraj_it->Z[2]+GRAVITY)+
+        RightFoot_.Mass()*(RFTraj_it->Z[2]+GRAVITY);
 
       CoPDynamicsJerk_.S.row( i )     += CoM_.Dynamics(POSITION).S.row( i ) *     CoM_.Mass()*( CoMTraj_it->Z[2]+GRAVITY )/GRF;
       CoPDynamicsJerk_.U.row(i )      += CoM_.Dynamics(POSITION).U.row( i ) *     CoM_.Mass()*( CoMTraj_it->Z[2]+GRAVITY )/GRF;
@@ -355,17 +355,17 @@ RigidBodySystem::compute_dyn_cop( unsigned nbSteps )
         {
           LeftFoot_.Dynamics(COP_POSITION).S.row( i )  +=  LeftFoot_.Dynamics(POSITION).S.row( i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
           LeftFoot_.Dynamics(COP_POSITION).U.row( i )  +=  LeftFoot_.Dynamics(POSITION).U.row( i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
-	  LeftFoot_.Dynamics(COP_POSITION).UT.col( i ) +=  LeftFoot_.Dynamics(POSITION).U.row( i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
+          LeftFoot_.Dynamics(COP_POSITION).UT.col( i ) +=  LeftFoot_.Dynamics(POSITION).U.row( i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
           LeftFoot_.Dynamics(COP_POSITION).S.row( i )  -=  LeftFoot_.Dynamics(ACCELERATION).S.row( i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
           LeftFoot_.Dynamics(COP_POSITION).U.row( i )  -=  LeftFoot_.Dynamics(ACCELERATION).U.row( i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
-	  LeftFoot_.Dynamics(COP_POSITION).UT.col( i ) -=  LeftFoot_.Dynamics(ACCELERATION).U.row( i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
+          LeftFoot_.Dynamics(COP_POSITION).UT.col( i ) -=  LeftFoot_.Dynamics(ACCELERATION).U.row( i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
 
           RightFoot_.Dynamics(COP_POSITION).S.row( i )  +=  RightFoot_.Dynamics(POSITION).S.row( i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
           RightFoot_.Dynamics(COP_POSITION).U.row( i )  +=  RightFoot_.Dynamics(POSITION).U.row( i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
-	  RightFoot_.Dynamics(COP_POSITION).UT.col( i ) +=  RightFoot_.Dynamics(POSITION).U.row( i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
+          RightFoot_.Dynamics(COP_POSITION).UT.col( i ) +=  RightFoot_.Dynamics(POSITION).U.row( i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
           RightFoot_.Dynamics(COP_POSITION).S.row( i )  -=  RightFoot_.Dynamics(ACCELERATION).S.row( i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
           RightFoot_.Dynamics(COP_POSITION).U.row( i )  -=  RightFoot_.Dynamics(ACCELERATION).U.row( i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
-  	  RightFoot_.Dynamics(COP_POSITION).UT.col( i ) -=  RightFoot_.Dynamics(ACCELERATION).U.row( i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
+          RightFoot_.Dynamics(COP_POSITION).UT.col( i ) -=  RightFoot_.Dynamics(ACCELERATION).U.row( i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
         }
 
       CoMTraj_it++;
@@ -410,66 +410,66 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
   Dynamics.S.setZero();
 
   switch(Dynamics.Type)
-  {
-  case POSITION:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 1; Dynamics.S(i,1) =(i+1)*T_; Dynamics.S(i,2) = ((i+1)*T_)*((i+1)*T_)/2;
-        for(unsigned int j=0;j<N_;j++)
-          if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) =(1+3*(i-j)+3*(i-j)*(i-j))*(T_*T_*T_)/6 ;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
-    break;
-  case VELOCITY:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 1.0; Dynamics.S(i,2) = (i+1)*T_;
-        for(unsigned int j=0;j<N_;j++)
-          if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = (2*(i-j)+1)*T_*T_*0.5 ;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
-    break;
-  case ACCELERATION:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 0.0; Dynamics.S(i,2) = 1.0;
-        for(unsigned int j=0;j<N_;j++)
-          if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = T_;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
-    break;
-  case JERK:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 0.0; Dynamics.S(i,2) = 0.0;
-        for(unsigned int j=0;j<N_;j++)
-          if (j==i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 1.0;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
-    break;
-  case COP_POSITION:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 1.0; Dynamics.S(i,1) = (i+1)*T_; Dynamics.S(i,2) = (i+1)*(i+1)*T_*T_*0.5-CoMHeight_/9.81;
-        for(unsigned int j=0;j<N_;j++)
-          if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T_*T_*T_/6.0 - T_*CoMHeight_/9.81;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
-    break;
-    //    compute_dyn_cop( 0 );
-    break;
+    {
+    case POSITION:
+      for(unsigned int i=0;i<N_;i++)
+        {
+          Dynamics.S(i,0) = 1; Dynamics.S(i,1) =(i+1)*T_; Dynamics.S(i,2) = ((i+1)*T_)*((i+1)*T_)/2;
+          for(unsigned int j=0;j<N_;j++)
+            if (j<=i)
+              Dynamics.U(i,j) = Dynamics.UT(j,i) =(1+3*(i-j)+3*(i-j)*(i-j))*(T_*T_*T_)/6 ;
+            else
+              Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
+        }
+      break;
+    case VELOCITY:
+      for(unsigned int i=0;i<N_;i++)
+        {
+          Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 1.0; Dynamics.S(i,2) = (i+1)*T_;
+          for(unsigned int j=0;j<N_;j++)
+            if (j<=i)
+              Dynamics.U(i,j) = Dynamics.UT(j,i) = (2*(i-j)+1)*T_*T_*0.5 ;
+            else
+              Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
+        }
+      break;
+    case ACCELERATION:
+      for(unsigned int i=0;i<N_;i++)
+        {
+          Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 0.0; Dynamics.S(i,2) = 1.0;
+          for(unsigned int j=0;j<N_;j++)
+            if (j<=i)
+              Dynamics.U(i,j) = Dynamics.UT(j,i) = T_;
+            else
+              Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
+        }
+      break;
+    case JERK:
+      for(unsigned int i=0;i<N_;i++)
+        {
+          Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 0.0; Dynamics.S(i,2) = 0.0;
+          for(unsigned int j=0;j<N_;j++)
+            if (j==i)
+              Dynamics.U(i,j) = Dynamics.UT(j,i) = 1.0;
+            else
+              Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
+        }
+      break;
+    case COP_POSITION:
+      for(unsigned int i=0;i<N_;i++)
+        {
+          Dynamics.S(i,0) = 1.0; Dynamics.S(i,1) = (i+1)*T_; Dynamics.S(i,2) = (i+1)*(i+1)*T_*T_*0.5-CoMHeight_/9.81;
+          for(unsigned int j=0;j<N_;j++)
+            if (j<=i)
+              Dynamics.U(i,j) = Dynamics.UT(j,i) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T_*T_*T_/6.0 - T_*CoMHeight_/9.81;
+            else
+              Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
+        }
+      break;
+      //    compute_dyn_cop( 0 );
+      break;
 
-  }
+    }
 
   return 0;
 
@@ -478,7 +478,7 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
 
 int
 RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> & SupportStates_deq,
-    linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics )
+                                             linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics )
 {
 
   // Resize the matrices:
@@ -503,7 +503,7 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
   double Spbar[3]={0.0,0.0,0.0};//, Sabar[3];
   double Upbar[2]={0.0,0.0};//, Uabar[2];
   std::deque<support_state_t>::const_iterator SS_it =
-      SupportStates_deq.begin();
+    SupportStates_deq.begin();
   SS_it++;
   for(unsigned int i=0;i<N_;i++)
     {
@@ -532,19 +532,19 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
           if(i>0)
             {
               SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
-	      FFDynamics->S(i,0) = FFDynamics->S(i-1,0);
+              FFDynamics->S(i,0) = FFDynamics->S(i-1,0);
               SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
-	      FFDynamics->S(i,1) = FFDynamics->S(i-1,1);
+              FFDynamics->S(i,1) = FFDynamics->S(i-1,1);
               SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
-	      FFDynamics->S(i,2) = FFDynamics->S(i-1,2);
+              FFDynamics->S(i,2) = FFDynamics->S(i-1,2);
               for(unsigned int SNb = 0; SNb < nbSteps; SNb++)
                 {
                   SFDynamics->U(i,SNb)
-		    = SFDynamics->UT(SNb,i)
-		    = SFDynamics->U(i-1,SNb);
+                    = SFDynamics->UT(SNb,i)
+                    = SFDynamics->U(i-1,SNb);
                   FFDynamics->U(i,SNb)
-		    = FFDynamics->UT(SNb,i)
-		    = FFDynamics->U(i-1,SNb);
+                    = FFDynamics->UT(SNb,i)
+                    = FFDynamics->U(i-1,SNb);
                 }
             }
         }
@@ -558,9 +558,9 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
                   SFDynamics->S(i,1) = 0.0;
                   SFDynamics->S(i,2) = 0.0;
                   FFDynamics->U(i,SS_it->StepNumber) =
-		    FFDynamics->UT(SS_it->StepNumber,i) = 0.0;
+                    FFDynamics->UT(SS_it->StepNumber,i) = 0.0;
                   SFDynamics->U(i,SS_it->StepNumber) =
-		    SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
+                    SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
                 }
             }
           else if(SS_it->StepNumber == 1 && SS_it->StepNumber < nbSteps)
@@ -571,27 +571,27 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
                   FFDynamics->S(i,1) = Spbar[1];
                   FFDynamics->S(i,2) = Spbar[2];
                   FFDynamics->U(i,SS_it->StepNumber) =
-		    FFDynamics->UT(SS_it->StepNumber,i) = Upbar[0];
+                    FFDynamics->UT(SS_it->StepNumber,i) = Upbar[0];
                   SFDynamics->U(i,SS_it->StepNumber-1) =
-		    SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
+                    SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
                 }
             }
           else if(SS_it->StepNumber == 2)
             {
               FFDynamics->S(i,0) = FFDynamics->S(i-1,0);
-	      SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
+              SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
               FFDynamics->S(i,1) = FFDynamics->S(i-1,1);
-	      SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
+              SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
               FFDynamics->S(i,2) = FFDynamics->S(i-1,2);
-	      SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
+              SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
               for(unsigned int j = 0; j<nbSteps; j++)
                 {
                   FFDynamics->U(i,j)
-		    = FFDynamics->UT(j,i)
-		    = FFDynamics->U(i-1,j);
+                    = FFDynamics->UT(j,i)
+                    = FFDynamics->U(i-1,j);
                   SFDynamics->U(i,j)
-		    = SFDynamics->UT(j,i)
-		    = SFDynamics->U(i-1,j);
+                    = SFDynamics->UT(j,i)
+                    = SFDynamics->U(i-1,j);
                 }
             }
         }
@@ -604,7 +604,7 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
 
 int
 RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & SupportStates_deq,
-    linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics )
+                                            linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics )
 {
 
   // Resize the matrices:
@@ -629,7 +629,7 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
   double Spbar[3], Sabar[3];
   double Upbar[2], Uabar[2];
   std::deque<support_state_t>::const_iterator SS_it =
-      SupportStates_deq.begin();
+    SupportStates_deq.begin();
   SS_it++;
   for(unsigned int i=0;i<N_;i++)
     {
@@ -899,13 +899,13 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
 
 int
 RigidBodySystem::generate_trajectories( double Time, const solution_t & Solution,
-    const std::deque<support_state_t> & PrwSupportStates_deq, const std::deque<double> & PreviewedSupportAngles_deq,
-    std::deque<FootAbsolutePosition> & LeftFootTraj_deq, std::deque<FootAbsolutePosition> & RightFootTraj_deq )
+                                        const std::deque<support_state_t> & PrwSupportStates_deq, const std::deque<double> & PreviewedSupportAngles_deq,
+                                        std::deque<FootAbsolutePosition> & LeftFootTraj_deq, std::deque<FootAbsolutePosition> & RightFootTraj_deq )
 {
 
   OFTG_->interpolate_feet_positions(Time, PrwSupportStates_deq,
-      Solution, PreviewedSupportAngles_deq,
-      LeftFootTraj_deq, RightFootTraj_deq);
+                                    Solution, PreviewedSupportAngles_deq,
+                                    LeftFootTraj_deq, RightFootTraj_deq);
 
   return 0;
 

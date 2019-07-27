@@ -73,9 +73,9 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
   for(int i=0;i<1;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
-	{
-	  std::cerr << "Unable to register " << aMethodName << std::endl;
-	}
+        {
+          std::cerr << "Unable to register " << aMethodName << std::endl;
+        }
     }
 
 }
@@ -190,7 +190,7 @@ RelativeFeetInequalities::set_feet_dimensions( PinocchioRobot *aPR )
 
 void
 RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
-    const support_state_t & Support, ineq_e type)
+                                        const support_state_t & Support, ineq_e type)
 {
 
   edges_s * ConvexHull_p = 0;
@@ -242,7 +242,7 @@ RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
 
 void
 RelativeFeetInequalities::set_inequalities( convex_hull_t & ConvexHull,
-    const support_state_t &, ineq_e type)
+                                            const support_state_t &, ineq_e type)
 {
 
   convex_hull_t * ConvexHull_p = 0;
@@ -269,7 +269,7 @@ RelativeFeetInequalities::set_inequalities( convex_hull_t & ConvexHull,
 
 void
 RelativeFeetInequalities::compute_linear_system ( convex_hull_t & ConvexHull,
-    const support_state_t & PrwSupport ) const
+                                                  const support_state_t & PrwSupport ) const
 {
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned int nbRows = (unsigned int)ConvexHull.X_vec.size();
@@ -339,9 +339,9 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
           Args >> SecurityMarginY_;
 
           RightFootSize_.setConstraints
-	    ( SecurityMarginX_, SecurityMarginY_ , DSFeetDistance_ );
+            ( SecurityMarginX_, SecurityMarginY_ , DSFeetDistance_ );
           LeftFootSize_.setConstraints
-	    ( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
+            ( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
           init_convex_hulls();
         }
     }

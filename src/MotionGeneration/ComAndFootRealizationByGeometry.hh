@@ -52,7 +52,7 @@ namespace PatternGeneratorJRL
      The different strategies can by modified by changing the walking mode
      parameter.
 
-   */
+  */
   class  ComAndFootRealizationByGeometry: public ComAndFootRealization
   {
 
@@ -106,7 +106,7 @@ namespace PatternGeneratorJRL
 
     /*! \name Initialization of the walking.
       @{
-     */
+    */
 
 
     /*! \brief Initialize the humanoid model considering the current
@@ -115,7 +115,7 @@ namespace PatternGeneratorJRL
       \param[out] lStartingWaistPose: The waist pose according to the user configuration vector.
     */
     bool InitializationHumanoid(Eigen::VectorXd &BodyAnglesIni,
-				Eigen::Matrix<double, 6, 1> &lStartingWaistPose);
+                                Eigen::Matrix<double, 6, 1> &lStartingWaistPose);
 
     /*! \brief Initialize the foot position.
       \param[in] aFoot: Pointer to the foot to be updated.
@@ -124,8 +124,8 @@ namespace PatternGeneratorJRL
       free flyer (set to 0.0 0.0 0.0)
     */
     bool InitializationFoot(PRFoot * aFoot,
-			    Eigen::Vector3d &m_AnklePosition,
-			    FootAbsolutePosition & InitFootPosition);
+                            Eigen::Vector3d &m_AnklePosition,
+                            FootAbsolutePosition & InitFootPosition);
 
     /*! This initialization phase does the following:
       1/ we take the current state of the robot
@@ -137,17 +137,17 @@ namespace PatternGeneratorJRL
 
     */
     bool InitializationCoM(Eigen::VectorXd &BodyAnglesIni,
-			   Eigen::Vector3d & lStartingCOMPosition,
-			   Eigen::Matrix<double,6,1> & lStartingWaistPosition,
-			   FootAbsolutePosition & InitLeftFootAbsPos,
-			   FootAbsolutePosition & InitRightFootAbsPos);
+                           Eigen::Vector3d & lStartingCOMPosition,
+                           Eigen::Matrix<double,6,1> & lStartingWaistPosition,
+                           FootAbsolutePosition & InitLeftFootAbsPos,
+                           FootAbsolutePosition & InitRightFootAbsPos);
 
     /*! This initialization phase, make sure that the needed buffers
       for the upper body motion are correctly setup.
     */
     bool InitializationUpperBody(deque<ZMPPosition> &inZMPPositions,
-				 deque<COMPosition> &inCOMBuffer,
-				 deque<RelativeFootPosition> lRelativeFootPositions);
+                                 deque<COMPosition> &inCOMBuffer,
+                                 deque<RelativeFootPosition> lRelativeFootPositions);
 
     /* @} */
 
@@ -159,32 +159,32 @@ namespace PatternGeneratorJRL
       It returns the associate initial values for the left and right foot.
     */
     int EvaluateCOMForStartingPosition(Eigen::VectorXd &BodyAngles,
-				       double omega, double theta,
-				       Eigen::Vector3d &lCOMPosition,
-				       FootAbsolutePosition & LeftFootPosition,
-				       FootAbsolutePosition & RightFootPosition);
+                                       double omega, double theta,
+                                       Eigen::Vector3d &lCOMPosition,
+                                       FootAbsolutePosition & LeftFootPosition,
+                                       FootAbsolutePosition & RightFootPosition);
 
     /*! Evaluate CoM for a given position.
       Assuming that the waist is at (0,0,0)
       It returns the associate initial values for the left and right foot.*/
 
     int EvaluateStartingCoM(Eigen::VectorXd &BodyAngles,
-			    Eigen::Vector3d & aStartingCOMPosition,
-			    FootAbsolutePosition & InitLeftFootPosition,
-			    FootAbsolutePosition & InitRightFootPosition);
+                            Eigen::Vector3d & aStartingCOMPosition,
+                            FootAbsolutePosition & InitLeftFootPosition,
+                            FootAbsolutePosition & InitRightFootPosition);
 
     int EvaluateStartingCoM(Eigen::VectorXd &BodyAngles,
-			    Eigen::Vector3d &aStartingCOMPosition,
-			    Eigen::Matrix<double, 6, 1> &aWaistPose,
-			    FootAbsolutePosition & InitLeftFootPosition,
-			    FootAbsolutePosition & InitRightFootPosition);
+                            Eigen::Vector3d &aStartingCOMPosition,
+                            Eigen::Matrix<double, 6, 1> &aWaistPose,
+                            FootAbsolutePosition & InitLeftFootPosition,
+                            FootAbsolutePosition & InitRightFootPosition);
 
     /*! Method to compute the heuristic for the arms. */
     void ComputeUpperBodyHeuristicForNormalWalking(Eigen::VectorXd & qArmr,
-						   Eigen::VectorXd & qArml,
-						   Eigen::VectorXd & aCOMPosition,
-						   Eigen::VectorXd & RFP,
-						   Eigen::VectorXd &  LFP);
+                                                   Eigen::VectorXd & qArml,
+                                                   Eigen::VectorXd & aCOMPosition,
+                                                   Eigen::VectorXd & RFP,
+                                                   Eigen::VectorXd &  LFP);
 
     /*! This method returns the final COM pose matrix after the second stage of control. */
     Eigen::MatrixXd GetFinalDesiredCOMPose();
@@ -206,16 +206,16 @@ namespace PatternGeneratorJRL
       @param[in] ToTheHip: Vector to go from the Waist to the Hip.
       @param[in] LeftOrRight: -1 for the right leg, 1 for the left.
       @param[out] lq : Values of the leg which realize the position asked for.
-     */
+    */
     bool KinematicsForOneLeg(Eigen::Matrix3d & Body_R,
-			     Eigen::Vector3d & Body_P,
-			     Eigen::VectorXd &aFoot,
-			     Eigen::Vector3d &lDt,
-			     Eigen::VectorXd &aCoMPosition,
-			     Eigen::Vector3d &ToTheHip,
-			     int LeftOrRight,
-			     Eigen::VectorXd &lq,
-			     int Stage);
+                             Eigen::Vector3d & Body_P,
+                             Eigen::VectorXd &aFoot,
+                             Eigen::Vector3d &lDt,
+                             Eigen::VectorXd &aCoMPosition,
+                             Eigen::Vector3d &ToTheHip,
+                             int LeftOrRight,
+                             Eigen::VectorXd &lq,
+                             int Stage);
 
     /*! Compute the angles values considering two 6DOF legs for a given configuration
       of the waist and of the feet:
@@ -226,18 +226,18 @@ namespace PatternGeneratorJRL
       @param ql: Angles for the left leg to achieve the positions.
       @param qr: Angles for the right leg to achieve the positions.
       @param AbsoluteWaistPosition: The waist position.
-     */
+    */
     bool KinematicsForTheLegs(Eigen::VectorXd & aCoMPosition,
-			      Eigen::VectorXd & aLeftFoot,
-			      Eigen::VectorXd & aRightFoot,
-			      int Stage,
-			      Eigen::VectorXd & ql,
-			      Eigen::VectorXd & qr,
-			      Eigen::Vector3d & AbsoluteWaistPosition);
+                              Eigen::VectorXd & aLeftFoot,
+                              Eigen::VectorXd & aRightFoot,
+                              int Stage,
+                              Eigen::VectorXd & ql,
+                              Eigen::VectorXd & qr,
+                              Eigen::Vector3d & AbsoluteWaistPosition);
 
     /*! \brief Implement the Plugin part to receive information from
       PatternGeneratorInterface.
-     */
+    */
     void CallMethod(string &Method, istringstream &istrm);
 
     /*! Get the current position of the waist in the COM reference frame
@@ -246,37 +246,37 @@ namespace PatternGeneratorJRL
     */
     Eigen::Matrix4d GetCurrentPositionofWaistInCOMFrame();
 
-		/*! \brief Getter and setter for the previous configurations and velocities */
-		inline void SetPreviousConfigurationStage0(Eigen::VectorXd & prev_Configuration)
-		{ m_prev_Configuration = prev_Configuration ;}
-		inline void SetPreviousVelocityStage0(Eigen::VectorXd & prev_Velocity)
-		{ m_prev_Velocity = prev_Velocity ;}
+    /*! \brief Getter and setter for the previous configurations and velocities */
+    inline void SetPreviousConfigurationStage0(Eigen::VectorXd & prev_Configuration)
+    { m_prev_Configuration = prev_Configuration ;}
+    inline void SetPreviousVelocityStage0(Eigen::VectorXd & prev_Velocity)
+    { m_prev_Velocity = prev_Velocity ;}
 
-		inline void SetPreviousConfigurationStage1(Eigen::VectorXd & prev_Configuration)
-		{ m_prev_Configuration1 = prev_Configuration ;}
-		inline void SetPreviousVelocityStage1(Eigen::VectorXd & prev_Velocity)
-		{ m_prev_Velocity1 = prev_Velocity ;}
+    inline void SetPreviousConfigurationStage1(Eigen::VectorXd & prev_Configuration)
+    { m_prev_Configuration1 = prev_Configuration ;}
+    inline void SetPreviousVelocityStage1(Eigen::VectorXd & prev_Velocity)
+    { m_prev_Velocity1 = prev_Velocity ;}
 
-		inline void SetPreviousConfigurationStage2(Eigen::VectorXd & prev_Configuration)
-		{ m_prev_Configuration2 = prev_Configuration ;}
-		inline void SetPreviousVelocityStage2(Eigen::VectorXd & prev_Velocity)
-		{ m_prev_Velocity2 = prev_Velocity ;}
+    inline void SetPreviousConfigurationStage2(Eigen::VectorXd & prev_Configuration)
+    { m_prev_Configuration2 = prev_Configuration ;}
+    inline void SetPreviousVelocityStage2(Eigen::VectorXd & prev_Velocity)
+    { m_prev_Velocity2 = prev_Velocity ;}
 
-		/*! \brief Getter and setter for the previous configurations and velocities */
-		inline void SetPreviousConfigurationStage0(const Eigen::VectorXd & prev_Configuration)
-		{ m_prev_Configuration = prev_Configuration ;}
-		inline void SetPreviousVelocityStage0(const Eigen::VectorXd & prev_Velocity)
-		{ m_prev_Velocity = prev_Velocity ;}
+    /*! \brief Getter and setter for the previous configurations and velocities */
+    inline void SetPreviousConfigurationStage0(const Eigen::VectorXd & prev_Configuration)
+    { m_prev_Configuration = prev_Configuration ;}
+    inline void SetPreviousVelocityStage0(const Eigen::VectorXd & prev_Velocity)
+    { m_prev_Velocity = prev_Velocity ;}
 
-		inline void SetPreviousConfigurationStage1(const Eigen::VectorXd & prev_Configuration)
-		{ m_prev_Configuration1 = prev_Configuration ;}
-		inline void SetPreviousVelocityStage1(const Eigen::VectorXd & prev_Velocity)
-		{ m_prev_Velocity1 = prev_Velocity ;}
+    inline void SetPreviousConfigurationStage1(const Eigen::VectorXd & prev_Configuration)
+    { m_prev_Configuration1 = prev_Configuration ;}
+    inline void SetPreviousVelocityStage1(const Eigen::VectorXd & prev_Velocity)
+    { m_prev_Velocity1 = prev_Velocity ;}
 
-		inline void SetPreviousConfigurationStage2(const Eigen::VectorXd & prev_Configuration)
-		{ m_prev_Configuration2 = prev_Configuration ;}
-		inline void SetPreviousVelocityStage2(const Eigen::VectorXd & prev_Velocity)
-		{ m_prev_Velocity2 = prev_Velocity;}
+    inline void SetPreviousConfigurationStage2(const Eigen::VectorXd & prev_Configuration)
+    { m_prev_Configuration2 = prev_Configuration ;}
+    inline void SetPreviousVelocityStage2(const Eigen::VectorXd & prev_Velocity)
+    { m_prev_Velocity2 = prev_Velocity;}
 
     /*! \brief Getter and setter for the previous configurations and velocities */
     inline Eigen::VectorXd & GetPreviousConfigurationStage0()
@@ -327,25 +327,25 @@ namespace PatternGeneratorJRL
 
     /*! \brief Initialization of internal maps of indexes */
     void InitializationMaps(std::vector<pinocchio::JointIndex> &FromRootToFoot,
-                pinocchio::JointModelVector & ActuatedJoints,
-                std::vector<int> &IndexinConfiguration,
-                std::vector<int> &IndexinVelocity);
+                            pinocchio::JointModelVector & ActuatedJoints,
+                            std::vector<int> &IndexinConfiguration,
+                            std::vector<int> &IndexinVelocity);
 
     /*! Map shoulders and wrist
-     \param[in] aHand: The hand to be used for extraction of data.
-     \param[in] ActuatedJoints: The vector of actuated joints.
-     \param[out] IndexesInVRML: The kinematic chain from the shoulder
-     to the hand given with the VRML indexes.
-     \param[out] IndexesInConfiguration: The kinematic chain
-     from the shoulder given with the depth-first ordering.
-     \param[out] associateShoulder: The shoulder extracted from
-     the kinematic chain.
+      \param[in] aHand: The hand to be used for extraction of data.
+      \param[in] ActuatedJoints: The vector of actuated joints.
+      \param[out] IndexesInVRML: The kinematic chain from the shoulder
+      to the hand given with the VRML indexes.
+      \param[out] IndexesInConfiguration: The kinematic chain
+      from the shoulder given with the depth-first ordering.
+      \param[out] associateShoulder: The shoulder extracted from
+      the kinematic chain.
     */
     void InitializeMapsForAHand(pinocchio::JointIndex aWrist,
-                pinocchio::JointModelVector &  ActuatedJoints,
-				vector<int> & IndexesInConfiguration,
-                vector<int> & IndexesInVelocity,
-                pinocchio::JointIndex & associateShoulder);
+                                pinocchio::JointModelVector &  ActuatedJoints,
+                                vector<int> & IndexesInConfiguration,
+                                vector<int> & IndexesInVelocity,
+                                pinocchio::JointIndex & associateShoulder);
 
     /*! Create the map of indexes for the shoulders and wrist */
     void InitializeMapForChest(pinocchio::JointModelVector & ActuatedJoints);
@@ -357,7 +357,7 @@ namespace PatternGeneratorJRL
 
     /*! \name Objects for stepping over.
       @{
-     */
+    */
 
     /*! Planner for the waist variation for stepping
       over an obstacle. */
@@ -446,7 +446,7 @@ namespace PatternGeneratorJRL
     std::vector<int> m_ConversionForUpperBodyFromLocalIndexToRobotDOFs;
 
     /*! \name Keep the indexes into the Configuration numbering system.
-     @{
+      @{
     */
     /*! \brief For the left leg, Specific for the Inverse Kinematics. */
     std::vector<int> m_LeftLegIndexinConfiguration ;
@@ -482,7 +482,7 @@ namespace PatternGeneratorJRL
 
     /*! COG of the ankles in the waist reference frame
       when evaluating the initial position.
-     */
+    */
     Eigen::Vector3d m_COGInitialAnkles;
 
     /*! Store the position of the left and right shoulders. */

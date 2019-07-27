@@ -42,7 +42,7 @@ StepOverPolynomeFoot::StepOverPolynomeFoot() :Polynome(8)
 }
 
 void StepOverPolynomeFoot::SetParameters(Eigen::VectorXd boundCond,
-					 vector<double> timeDistr)
+                                         vector<double> timeDistr)
 {
   Eigen::Matrix<double,8,8> Base;;
   Eigen::Matrix<double,8,8> Temp;;
@@ -85,7 +85,7 @@ void StepOverPolynomeFoot::SetParameters(Eigen::VectorXd boundCond,
     {
       Temp=Base;
       for(unsigned int j=0;j<Temp.rows();j++)
-	Temp(j,i) = boundCond(j);
+        Temp(j,i) = boundCond(j);
       m_Coefficients[i] = Temp.determinant()/detBase;
     };
 
@@ -102,7 +102,7 @@ StepOverPolynomeFootZtoX::StepOverPolynomeFootZtoX() :Polynome(3)
 }
 
 void StepOverPolynomeFootZtoX::SetParameters(Eigen::VectorXd Zpos,
-					     vector<double> Xpos)
+                                             vector<double> Xpos)
 {
   Eigen::Matrix<double,4,4> Base;;
   Eigen::Matrix<double,4,4> Temp;;
@@ -116,17 +116,17 @@ void StepOverPolynomeFootZtoX::SetParameters(Eigen::VectorXd Zpos,
   x3 = Xpos[2];
 
 
-  x1s2=x1*x1;	x1s3=x1s2*x1;
-  x2s2=x2*x2;	x2s3=x2s2*x2;
-  x3s2=x3*x3;	x3s3=x3s2*x3;
+  x1s2=x1*x1; x1s3=x1s2*x1;
+  x2s2=x2*x2; x2s3=x2s2*x2;
+  x3s2=x3*x3; x3s3=x3s2*x3;
 
 
 
 
-  Base(0,0)=1.0;	Base(0,1)=0.0;	Base(0,2)=0.0;	Base(0,3)=0.0;
-  Base(1,0)=1.0;	Base(1,1)=x1  ;	Base(1,2)=x1s2;	Base(1,3)=x1s3;
-  Base(2,0)=1.0;	Base(2,1)=x2  ;	Base(2,2)=x2s2;	Base(2,3)=x2s3;
-  Base(3,0)=1.0;	Base(3,1)=x3  ;	Base(3,2)=x3s2;	Base(3,3)=x3s3;
+  Base(0,0)=1.0;     Base(0,1)=0.0;       Base(0,2)=0.0;       Base(0,3)=0.0;
+  Base(1,0)=1.0;     Base(1,1)=x1  ;      Base(1,2)=x1s2;      Base(1,3)=x1s3;
+  Base(2,0)=1.0;     Base(2,1)=x2  ;      Base(2,2)=x2s2;      Base(2,3)=x2s3;
+  Base(3,0)=1.0;     Base(3,1)=x3  ;      Base(3,2)=x3s2;      Base(3,3)=x3s3;
 
 
   double detBase;
@@ -137,7 +137,7 @@ void StepOverPolynomeFootZtoX::SetParameters(Eigen::VectorXd Zpos,
     {
       Temp=Base;
       for(unsigned int j=0;j<Zpos.size();j++)
-	Temp(j,i) = Zpos(j);
+        Temp(j,i) = Zpos(j);
       m_Coefficients[i] = Temp.determinant()/detBase;
     };
 
@@ -155,7 +155,7 @@ StepOverPolynomeFootXtoTime::StepOverPolynomeFootXtoTime() :Polynome(4)
 }
 
 void StepOverPolynomeFootXtoTime::SetParameters(Eigen::VectorXd Xbound,
-						vector<double> timeDistr)
+                                                vector<double> timeDistr)
 {
   Eigen::Matrix<double,5,5> Base;;
   Eigen::Matrix<double,5,5> Temp;;
@@ -189,7 +189,7 @@ void StepOverPolynomeFootXtoTime::SetParameters(Eigen::VectorXd Xbound,
     {
       Temp=Base;
       for (unsigned int j=0;j<Xbound.size();j++)
-	Temp(j,i) = Xbound(j);
+        Temp(j,i) = Xbound(j);
       m_Coefficients[i] = Temp.determinant()/detBase;
     };
 
@@ -210,7 +210,7 @@ StepOverPolynomeHip4::StepOverPolynomeHip4() :Polynome(4)
 }
 
 void StepOverPolynomeHip4::SetParameters(Eigen::VectorXd boundCond,
-					 vector<double> timeDistr)
+                                         vector<double> timeDistr)
 {
   Eigen::Matrix<double,4,4> Base;;
   Eigen::Matrix<double,4,4> Temp;;
@@ -248,7 +248,7 @@ void StepOverPolynomeHip4::SetParameters(Eigen::VectorXd boundCond,
     {
       Temp=Base;
       for(unsigned int j=0;j<Temp.rows();j++)
-	Temp(j,i) = boundCond(j);
+        Temp(j,i) = boundCond(j);
       m_Coefficients[i] =Temp.determinant()/detBase;
     };
 
@@ -286,7 +286,7 @@ void StepOverSpline::SetParameters(Eigen::VectorXd Points)
   for (unsigned int i=0;i<m_number;i++)
     {
       for (unsigned int j=0;j<m_number;j++)
-	LhSide(i,j)=0.0;
+        LhSide(i,j)=0.0;
     }
 
   for (unsigned int i=1;i<m_number-1;i++)
@@ -323,7 +323,7 @@ void StepOverSpline::SetParameters(Eigen::VectorXd Points)
 
 // TimePoints has to be defined [t1=O, t2, t3,....,tm_number]
 double StepOverSpline::GetValueSpline(Eigen::VectorXd TimePoints,
-				      double CurrentLocalTime)
+                                      double CurrentLocalTime)
 {
   double ValueSpline =0.0;
   long unsigned int numberComp;
@@ -338,18 +338,18 @@ double StepOverSpline::GetValueSpline(Eigen::VectorXd TimePoints,
   for (unsigned int i=0;i<m_number-1;i++)
     {
       if (CurrentLocalTime<TimePoints(i+1))
-	{
-	  double Time0to1 =0.0;double Time0to1_2 =0.0;double Time0to1_3 =0.0;
-	  Time0to1=(CurrentLocalTime-TimePoints(i))/
-	    (TimePoints(i+1)-TimePoints(i));
-	  Time0to1_2=Time0to1*Time0to1;
-	  Time0to1_3=Time0to1_2*Time0to1;
-	  ValueSpline = m_Coefficients(0,i)
-	    +m_Coefficients(1,i)*Time0to1
-	    +m_Coefficients(2,i)*Time0to1_2
-	    +m_Coefficients(3,i)*Time0to1_3;
-	  break;
-	} //if
+        {
+          double Time0to1 =0.0;double Time0to1_2 =0.0;double Time0to1_3 =0.0;
+          Time0to1=(CurrentLocalTime-TimePoints(i))/
+            (TimePoints(i+1)-TimePoints(i));
+          Time0to1_2=Time0to1*Time0to1;
+          Time0to1_3=Time0to1_2*Time0to1;
+          ValueSpline = m_Coefficients(0,i)
+            +m_Coefficients(1,i)*Time0to1
+            +m_Coefficients(2,i)*Time0to1_2
+            +m_Coefficients(3,i)*Time0to1_3;
+          break;
+        } //if
 
     } // for
 
@@ -358,12 +358,12 @@ double StepOverSpline::GetValueSpline(Eigen::VectorXd TimePoints,
   if (CurrentLocalTime>=TimePoints(m_number-1))
     {
       ValueSpline = m_Coefficients(0,(m_number-1))
-	+ m_Coefficients(1,(m_number-1))
-	+ m_Coefficients(2,(m_number-1))
-	+ m_Coefficients(3,(m_number-1));
+        + m_Coefficients(1,(m_number-1))
+        + m_Coefficients(2,(m_number-1))
+        + m_Coefficients(3,(m_number-1));
       std::cerr
-	<< "NCS: timevalue is beyond the range of given time intervals,"
-	<< "last position is returned" << endl;
+        << "NCS: timevalue is beyond the range of given time intervals,"
+        << "last position is returned" << endl;
     }
 
   if (CurrentLocalTime<=TimePoints(0))
@@ -372,7 +372,7 @@ double StepOverSpline::GetValueSpline(Eigen::VectorXd TimePoints,
     {
       ValueSpline = m_Coefficients(0,0);
       std::cerr << "NCS: timevalue falls before the range of given"
-		<< " time intervals, first position is returned" << endl;
+                << " time intervals, first position is returned" << endl;
     }
 
   return ValueSpline;
@@ -387,9 +387,9 @@ void StepOverSpline::print()
   for (unsigned int i=0;i<m_number-1;i++)
     {
 
-      cout << "		Spline m_number " << i+1 << ":" << endl << "		";
+      cout << "             Spline m_number " << i+1 << ":" << endl << "            ";
       for (unsigned int j=0;j<4;j++)
-	cout << m_Coefficients(j,i) << "		" ;
+        cout << m_Coefficients(j,i) << "          " ;
       cout << endl;
     }
 }
@@ -411,8 +411,8 @@ StepOverClampedCubicSpline::StepOverClampedCubicSpline()
   // SetParameters(boundCond,timeDistr);
 }
 void StepOverClampedCubicSpline::SetParameters(Eigen::VectorXd Points,
-					       Eigen::VectorXd TimePoints,
-					       Eigen::VectorXd DerivativeEndPoints)
+                                               Eigen::VectorXd TimePoints,
+                                               Eigen::VectorXd DerivativeEndPoints)
 {
   Eigen::Matrix<double,4,4> LhSide;;
   Eigen::Matrix<double,4,1> RhSide;;
@@ -434,7 +434,7 @@ void StepOverClampedCubicSpline::SetParameters(Eigen::VectorXd Points,
   for (unsigned int i=0;i<m_number+1;i++)
     {
       for (unsigned int j=0;j<m_number+1;j++)
-	LhSide(i,j)=0.0;
+        LhSide(i,j)=0.0;
     }
 
   for (unsigned int i=1;i<m_number;i++)
@@ -466,7 +466,7 @@ void StepOverClampedCubicSpline::SetParameters(Eigen::VectorXd Points,
     {
       m_Coefficients(0,i) = Points(i);
       m_Coefficients(1,i) = (Points(i+1)-Points(i)-(2.0*TempSol(i,0)+TempSol(i+1,0))
-			   *h(i)*h(i)/3.0)/h(i);
+                             *h(i)*h(i)/3.0)/h(i);
       m_Coefficients(2,i) = TempSol(i,0);
       m_Coefficients(3,i) = (TempSol(i+1,0)-TempSol(i,0))/(3.0*h(i));
     }
@@ -490,15 +490,15 @@ GetValueSpline
   for (unsigned int i=0;i<m_number;i++)
     {
       if (CurrentLocalTime<TimePoints(i+1))
-	{
-	  double Time0to1 =0.0;double Time0to1_2 =0.0;double Time0to1_3 =0.0;
-	  Time0to1=(CurrentLocalTime-TimePoints(i));
-	  Time0to1_2=Time0to1*Time0to1;
-	  Time0to1_3=Time0to1_2*Time0to1;
-	  ValueSpline = m_Coefficients(0,i)+m_Coefficients(1,i)*Time0to1+
-	    m_Coefficients(2,i)*Time0to1_2+m_Coefficients(3,i)*Time0to1_3;
-	  break;
-	} //if
+        {
+          double Time0to1 =0.0;double Time0to1_2 =0.0;double Time0to1_3 =0.0;
+          Time0to1=(CurrentLocalTime-TimePoints(i));
+          Time0to1_2=Time0to1*Time0to1;
+          Time0to1_3=Time0to1_2*Time0to1;
+          ValueSpline = m_Coefficients(0,i)+m_Coefficients(1,i)*Time0to1+
+            m_Coefficients(2,i)*Time0to1_2+m_Coefficients(3,i)*Time0to1_3;
+          break;
+        } //if
 
     } // for
 
@@ -511,7 +511,7 @@ GetValueSpline
       Time0to1_3=Time0to1_2*Time0to1;
 
       ValueSpline = m_Coefficients(0,m_number-1)+m_Coefficients(1,m_number-1)*Time0to1
-	+m_Coefficients(2,m_number-1)*Time0to1_2+m_Coefficients(3,m_number-1)*Time0to1_3;
+        +m_Coefficients(2,m_number-1)*Time0to1_2+m_Coefficients(3,m_number-1)*Time0to1_3;
       // cout << "CCS: timevalue is beyond the range of given time intervals,
       // last position is returned" << endl;
     }
@@ -537,7 +537,7 @@ void StepOverClampedCubicSpline::print()
 
       cout << "  Spline m_number " << i+1 << ":" << endl << "  ";
       for (unsigned int j=0;j<4;j++)
-	cout << m_Coefficients(j,i) << "  " ;
+        cout << m_Coefficients(j,i) << "  " ;
       cout << endl;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Andrei Herdt
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 #include <privatepgtypes.hh>
@@ -82,14 +82,14 @@ namespace PatternGeneratorJRL
 
     for(unsigned int i=0;i<3;i++)
       {
-	x[i] = aCS.x[i];
-	y[i] = aCS.y[i];
-	z[i] = aCS.z[i];
+        x[i] = aCS.x[i];
+        y[i] = aCS.y[i];
+        z[i] = aCS.z[i];
       };
     return *this;
 
   }
-      
+
 
   void com_t::reset()
   {
@@ -161,34 +161,34 @@ namespace PatternGeneratorJRL
   {
 
     switch(axis)
-    {
-    case YAW:
-      double xOld, yOld;
-      for( unsigned int j=0; j<X_vec.size(); j++ )
-        {
-          xOld = X_vec[j];
-          yOld = Y_vec[j];
-          X_vec[j] = ( xOld*cos(angle) - yOld*sin(angle) );
-          Y_vec[j] = ( xOld*sin(angle) + yOld*cos(angle) );
-        }
-      break;
-    case PITCH:
-      break;
-    case ROLL:
-      break;
-    case X_AXIS:
-      break;
-    case  Y_AXIS:
-      break;
-    case Z_AXIS:
-      break;
-    }
+      {
+      case YAW:
+        double xOld, yOld;
+        for( unsigned int j=0; j<X_vec.size(); j++ )
+          {
+            xOld = X_vec[j];
+            yOld = Y_vec[j];
+            X_vec[j] = ( xOld*cos(angle) - yOld*sin(angle) );
+            Y_vec[j] = ( xOld*sin(angle) + yOld*cos(angle) );
+          }
+        break;
+      case PITCH:
+        break;
+      case ROLL:
+        break;
+      case X_AXIS:
+        break;
+      case  Y_AXIS:
+        break;
+      case Z_AXIS:
+        break;
+      }
 
   }
 
 
   convex_hull_t::convex_hull_t( unsigned nbVert, unsigned nbIneq ):
-      nbIneq_(0), nbVert_(0)
+    nbIneq_(0), nbVert_(0)
   {
     clear();
     resize( nbVert, nbIneq );
@@ -285,9 +285,9 @@ namespace PatternGeneratorJRL
     std::cout<<"Inequalities: "<<nbIneq_<<std::endl;
     for(unsigned i=0; i<nbIneq_; ++i)
       std::cout << A_vec[i] << " "
-		<< B_vec[i] << " "
-		<< C_vec[i] << " "
-		<< D_vec[i] << std::endl;
+                << B_vec[i] << " "
+                << C_vec[i] << " "
+                << D_vec[i] << std::endl;
     std::cout<<std::endl;
 
   }
@@ -318,9 +318,9 @@ namespace PatternGeneratorJRL
 
 
   solution_t::solution_t():
-      NbVariables(0),NbConstraints(0),Fail(0),Print(0),
-      Solution_vec(0),SupportOrientations_deq(0),SupportStates_deq(0),
-      ConstrLagr_vec(0),LBoundsLagr_vec(0),UBoundsLagr_vec(0)
+    NbVariables(0),NbConstraints(0),Fail(0),Print(0),
+    Solution_vec(0),SupportOrientations_deq(0),SupportStates_deq(0),
+    ConstrLagr_vec(0),LBoundsLagr_vec(0),UBoundsLagr_vec(0)
   {  }
 
 
@@ -391,7 +391,7 @@ namespace PatternGeneratorJRL
     X(0), Y(0), Yaw(0),
     X_vec(), Y_vec(), Yaw_vec()
   {   }
-  
+
   reference_t::frame_t::
   frame_t(const frame_t & F):
     X(F.X), Y(F.Y), Yaw(F.Yaw),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Medhi  Benallegue
  * Andrei Herdt
@@ -19,14 +19,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file PLDPSolverHerdt.cpp
   \brief This file implements the optimized QP solver proposed by Dimitar 2009.
-    On the Application of Linear Model Predictive Control 
-    for Walking Pattern Generation in the Presence of Strong Disturbances
-    D. Dimitrov and P.-B. Wieber and H. Diedam and O. Stasse
+  On the Application of Linear Model Predictive Control
+  for Walking Pattern Generation in the Presence of Strong Disturbances
+  D. Dimitrov and P.-B. Wieber and H. Diedam and O. Stasse
 */
 
 #ifndef _PLDP_SOLVER_H_HERDT
@@ -39,208 +39,208 @@
 namespace Optimization
 {
   namespace Solver
+  {
+    /*! This class implements a two stage strategy to solve the following optimal problem:
+     */
+    class PLDPSolverHerdt
     {
-      /*! This class implements a two stage strategy to solve the following optimal problem:
+    public:
+      /*! \brief Constructor */
+      PLDPSolverHerdt(unsigned int CardU,
+                      double * iPu,
+                      double * Px,
+                      double * Pu,
+                      double * iLQ);
+
+      /*! \brief Destructor */
+      ~PLDPSolverHerdt();
+
+      /*! \brief Solve the optimization problem
        */
-      class PLDPSolverHerdt
-	{
-	public:
-	  /*! \brief Constructor */
-	  PLDPSolverHerdt(unsigned int CardU,
-			  double * iPu,
-			  double * Px,
-			  double * Pu,
-			  double * iLQ);
+      int SolveProblem(std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
+                       std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet,
+                       double *CstPartOfTheCostFunction,
+                       unsigned int NbOfConstraints,
+                       double *LinearPartOfConstraints,
+                       double *CstPartOfConstraints,
+                       double *XkYk,
+                       double *X,
+                       unsigned int NumberOfRemovedConstraints, unsigned int NbRemovedFootCstr,
+                       bool StartingSequence, unsigned int NumberSteps, bool CurrentStateChanged, double time);
+    protected:
 
-	  /*! \brief Destructor */
-	  ~PLDPSolverHerdt();
+      /*! \name Initial solution methods related
+        @{
+      */
+      /*! Compute the initial solution */
+      int ComputeInitialSolution(std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
+                                 std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet, unsigned int NumberSteps,
+                                 double *XkYk);
 
-	  /*! \brief Solve the optimization problem 
-	   */
-	  int SolveProblem(std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, 
-			   std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet,
-			   double *CstPartOfTheCostFunction,
-			   unsigned int NbOfConstraints,
-			   double *LinearPartOfConstraints,
-			   double *CstPartOfConstraints,
-			   double *XkYk,
-			   double *X,
-			   unsigned int NumberOfRemovedConstraints, unsigned int NbRemovedFootCstr,
-			   bool StartingSequence, unsigned int NumberSteps, bool CurrentStateChanged, double time);
-	protected:
-	  
-	  /*! \name Initial solution methods related 
-	    @{
-	   */
-	  /*! Compute the initial solution */
-	  int ComputeInitialSolution(std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, 
-				     std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet, unsigned int NumberSteps,
-				     double *XkYk);
-
-	  /*! Precompite iPuPx */
-	  int PrecomputeiPuPx(unsigned int NumberSteps); 
-	  /*! @} */
+      /*! Precompite iPuPx */
+      int PrecomputeiPuPx(unsigned int NumberSteps);
+      /*! @} */
 
 
-	  /*! Initialize the internal variables of
-	    the class. */
-	  void InitializeSolver(unsigned int NumberSteps);
+      /*! Initialize the internal variables of
+        the class. */
+      void InitializeSolver(unsigned int NumberSteps);
 
-	  /*! Allocate memory for solver. */
-	  void AllocateMemoryForSolver(unsigned int NumberSteps);
+      /*! Allocate memory for solver. */
+      void AllocateMemoryForSolver(unsigned int NumberSteps);
 
-	  /*! \name Projected descent direction methods related 
-	    @{
-	   */
-	  /*! \brief Compute Projected descent direction. */
-	  int ComputeProjectedDescentDirection(unsigned int NumberSteps);
+      /*! \name Projected descent direction methods related
+        @{
+      */
+      /*! \brief Compute Projected descent direction. */
+      int ComputeProjectedDescentDirection(unsigned int NumberSteps);
 
-	  /*! \brief Forward substitution. 
-	      First Phase
-	      EE^t v2 = v1 <-> LL^t v2 = v1
-	      Now solving L y = v1
+      /*! \brief Forward substitution.
+        First Phase
+        EE^t v2 = v1 <-> LL^t v2 = v1
+        Now solving L y = v1
 
-	   */
-	  int ForwardSubstitution();
+      */
+      int ForwardSubstitution();
 
-	  /*! \brief Compute v2 q (14b) in Dimitrov 2009.
-	  Second phase a
-	   Now solving
-	   LL^t v2 = v1 <-> L y = v1 with L^t v2 = y
-	   y solved with first phase.
-	   So now we are looking for v2.
-	  */
-	  int BackwardSubstitution();
+      /*! \brief Compute v2 q (14b) in Dimitrov 2009.
+        Second phase a
+        Now solving
+        LL^t v2 = v1 <-> L y = v1 with L^t v2 = y
+        y solved with first phase.
+        So now we are looking for v2.
+      */
+      int BackwardSubstitution();
 
-	  /*! @} */
+      /*! @} */
 
-	  /*! Detecting violated constraints */
-	  double ComputeAlpha(vector<unsigned int> &NewActivatedConstraints,
-			      unsigned int NumberSteps);
+      /*! Detecting violated constraints */
+      double ComputeAlpha(vector<unsigned int> &NewActivatedConstraints,
+                          unsigned int NumberSteps);
 
-/* 	  /\*! Store the current ZMP solution for hot start purposes. *\/ */
-/* 	  void StoreCurrentZMPSolution(double *XkYk); */
+      /*       /\*! Store the current ZMP solution for hot start purposes. *\/ */
+      /*       void StoreCurrentZMPSolution(double *XkYk); */
 
-	  /*! Write current ZMP ref trajectory associated with 
-	    current value of m_Vk. */
-	  void WriteCurrentZMPSolution(string filename,
-				       double *XkYk);
+      /*! Write current ZMP ref trajectory associated with
+        current value of m_Vk. */
+      void WriteCurrentZMPSolution(string filename,
+                                   double *XkYk);
 
-	  /*! \name Methods related to a limited amount of computational time 
-	    @{ */
-	    
-	private:
-	  
-	  bool m_NoCholesky; 
-	  /*! \brief Store Pu */
-	  double *m_Pu;
+      /*! \name Methods related to a limited amount of computational time
+        @{ */
 
-	  /*! Store the inverse of Pu. */
-	  double * m_iPu;
+    private:
 
-	  /*! Store Px. */
-	  double * m_Px;
-	  
-	  /*! Store the inverse of Pu. */
-	  double * m_iPuPx;
-	  
-	  /*! Store Vk */
-	  double *m_Vk;
+      bool m_NoCholesky;
+      /*! \brief Store Pu */
+      double *m_Pu;
 
-	  /*! Store the constart part of the cost function. */
-	  double *m_CstPartOfCostFunction;
+      /*! Store the inverse of Pu. */
+      double * m_iPu;
 
-	  /*! Store the unconstrained descent direction. */
-	  double *m_UnconstrainedDescentDirection;
-	  
-	  /*! Store the cholesky decomposition of EE^t. */
-	  double * m_L;
-	  
-	  /*! Store the inverse of the cholesky decomposition. */
-	  double *m_iL;
+      /*! Store Px. */
+      double * m_Px;
 
-	  /*! Store iLQ for debuggin purposes. */
-	  double *m_iLQ;
+      /*! Store the inverse of Pu. */
+      double * m_iPuPx;
 
-	  /*! Store the projector of descent  */
-	  double *m_d;
+      /*! Store Vk */
+      double *m_Vk;
 
-	  /*! Store some temporary variables  */
-	  double *m_v1, *m_v2, *m_y;
+      /*! Store the constart part of the cost function. */
+      double *m_CstPartOfCostFunction;
 
-	  /*! Store some temporary variables  */
-	  double *m_tmp1, *m_tmp2;
-	  
-	  /*! Store the linear part of the constraints. */
-	  double * m_A;
+      /*! Store the unconstrained descent direction. */
+      double *m_UnconstrainedDescentDirection;
 
-	  /*! Store the cst part of the constraints. */
-	  double * m_b;
+      /*! Store the cholesky decomposition of EE^t. */
+      double * m_L;
 
+      /*! Store the inverse of the cholesky decomposition. */
+      double *m_iL;
 
-	  /*! Store if the A*Vk values has been computed  */
-	  bool * m_ConstraintsValueComputed;
+      /*! Store iLQ for debuggin purposes. */
+      double *m_iLQ;
+
+      /*! Store the projector of descent  */
+      double *m_d;
+
+      /*! Store some temporary variables  */
+      double *m_v1, *m_v2, *m_y;
+
+      /*! Store some temporary variables  */
+      double *m_tmp1, *m_tmp2;
+
+      /*! Store the linear part of the constraints. */
+      double * m_A;
+
+      /*! Store the cst part of the constraints. */
+      double * m_b;
 
 
-	  /*! Store the maximum number of Constraints.
-	    It is also the dimension of L in its maximal storage
-	    form. */
-	  unsigned int m_NbMaxOfConstraints;
+      /*! Store if the A*Vk values has been computed  */
+      bool * m_ConstraintsValueComputed;
 
-	  /*! Distance of the feet centers of the initial solution */
-	  double m_DistanceFeetCenters;
-	  /*! Store the current number of Constraints of matrix A. */
-	  unsigned int m_NbOfConstraints;
 
-	  /*! Store the size of the control vector. */
-	  unsigned int m_CardV;
+      /*! Store the maximum number of Constraints.
+        It is also the dimension of L in its maximal storage
+        form. */
+      unsigned int m_NbMaxOfConstraints;
 
-	  /*! Number of steps previewed */
-	  unsigned int * m_NbSteps;
+      /*! Distance of the feet centers of the initial solution */
+      double m_DistanceFeetCenters;
+      /*! Store the current number of Constraints of matrix A. */
+      unsigned int m_NbOfConstraints;
 
-	  /*! \name Debugging fields 
-	    @{
-	   */
-	  /*! Level of verbosity */
-	  unsigned int m_DebugMode;
+      /*! Store the size of the control vector. */
+      unsigned int m_CardV;
 
-	  /*! Number of iterations */
-	  int m_ItNb;
-	  /*! @} */
+      /*! Number of steps previewed */
+      unsigned int * m_NbSteps;
 
-	  /*! Cholesky decomposition optimized for QP solving 
-	   ( specifically this one). */
-	  PatternGeneratorJRL::OptCholesky * m_OptCholesky;
+      /*! \name Debugging fields
+        @{
+      */
+      /*! Level of verbosity */
+      unsigned int m_DebugMode;
 
-	  /*! List of activated constraints. */
-	  vector<unsigned int> m_ActivatedConstraints;
+      /*! Number of iterations */
+      int m_ItNb;
+      /*! @} */
 
-	  /*! List of previously activated constraints. */
-	  vector<unsigned int> m_PreviouslyActivatedConstraints;
+      /*! Cholesky decomposition optimized for QP solving
+        ( specifically this one). */
+      PatternGeneratorJRL::OptCholesky * m_OptCholesky;
 
-	  /*! Boolean to perform a hotstart */
-	  bool m_HotStart;
+      /*! List of activated constraints. */
+      vector<unsigned int> m_ActivatedConstraints;
 
-	  /*! Store the current ZMP solution. */
-	  double * m_InitialZMPSolution;
+      /*! List of previously activated constraints. */
+      vector<unsigned int> m_PreviouslyActivatedConstraints;
 
-	  /*! Double internal time. */
-	  double m_InternalTime;
+      /*! Boolean to perform a hotstart */
+      bool m_HotStart;
 
-	  /*! Tolerance for zero value */
-	  double m_tol;
+      /*! Store the current ZMP solution. */
+      double * m_InitialZMPSolution;
 
-	  /*! \name Data related to a limited amount of computational time 
-	    @{
-	   */
-	  /*! Is the algorithm limited in time. */
-	  bool m_LimitedComputationTime;
+      /*! Double internal time. */
+      double m_InternalTime;
 
-	  /*! Amount of limited */
-	  double m_AmountOfLimitedComputationTime;
-	  
-	  /*! @} */
-	};
-    }
+      /*! Tolerance for zero value */
+      double m_tol;
+
+      /*! \name Data related to a limited amount of computational time
+        @{
+      */
+      /*! Is the algorithm limited in time. */
+      bool m_LimitedComputationTime;
+
+      /*! Amount of limited */
+      double m_AmountOfLimitedComputationTime;
+
+      /*! @} */
+    };
+  }
 }
 #endif /* _PLDPSOLVER_H_*/

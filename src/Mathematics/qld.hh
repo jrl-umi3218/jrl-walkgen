@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2006, 2007, 2008, 2009, 2010,
  *
  * Olivier    Stasse
  *
@@ -18,16 +18,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 #ifndef _QLD_H_
 #define _QLD_H_
 
 extern int ql0001_(int *m,int *me,int *mmax,int *n,int *nmax,int *mnn,
-		   double *c,double *d,double *a,double *b,double *xl,
-		   double *xu,double *x,double *u,int *iout,int *ifail,
-		   int *iprint,double *war,int *lwar,int *iwar,int *liwar,
-		   double *eps1);
+                   double *c,double *d,double *a,double *b,double *xl,
+                   double *xu,double *x,double *u,int *iout,int *ifail,
+                   int *iprint,double *war,int *lwar,int *iwar,int *liwar,
+                   double *eps1);
 
 #endif

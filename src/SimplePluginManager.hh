@@ -1,10 +1,10 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Florent    Lamiraux
  * Nicolas    Perrin
  * Olivier    Stasse
- * Eiichi     Yoshida 
+ * Eiichi     Yoshida
  *
  * JRL, CNRS/AIST
  *
@@ -21,10 +21,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/* Abstract class to handle generic calls for the 
+/* Abstract class to handle generic calls for the
    Pattern Generator Interface. */
 
 #ifndef _PGI_SIMPLE_PLUGIN_MANAGER_H_
@@ -43,14 +43,14 @@ namespace PatternGeneratorJRL
 {
   class SimplePlugin;
 
-  
-  /*! This class takes care of dispatching the call 
+
+  /*! This class takes care of dispatching the call
     appropriatly.
-    
+
   */
   class SimplePluginManager
   {
-    
+
 
   public:
 
@@ -58,7 +58,7 @@ namespace PatternGeneratorJRL
     {
       bool operator()(const std::string s1, const std::string s2) const
       {
-	return strcmp(s1.c_str(), s2.c_str()) < 0;
+        return strcmp(s1.c_str(), s2.c_str()) < 0;
       }
     };
 
@@ -68,15 +68,15 @@ namespace PatternGeneratorJRL
     /*! Set of plugins sorted by names */
     std::multimap<std::string, SimplePlugin *, ltstr>  m_SimplePlugins;
 
-  public: 
-    
+  public:
+
     /*! \brief Pointer towards the PGI which is handling this object. */
     SimplePluginManager();
     virtual ~SimplePluginManager();
-    
+
     /*! Get the map of plugins. */
     const std::multimap<std::string, SimplePlugin *, ltstr>  & getSimplePlugins() const
-      { return m_SimplePlugins;};
+    { return m_SimplePlugins;};
 
     /*! \name Register the method for which this object can be called
       by a higher parser. */
@@ -90,7 +90,7 @@ namespace PatternGeneratorJRL
 
     /*! \name Operator to display in cout. */
     void Print();
-    
+
   };
 }
 

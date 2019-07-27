@@ -1,7 +1,7 @@
 /*
- * Copyright 2010, 
- *					       
- * Paul Evrard 
+ * Copyright 2010,
+ *
+ * Paul Evrard
  * Francois Keith
  * Olivier Stasse
  *
@@ -20,7 +20,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file ZMPRefTrajectoryGeneration.cpp
@@ -46,24 +46,24 @@ ZMPRefTrajectoryGeneration::ZMPRefTrajectoryGeneration(SimplePluginManager *lSPM
 {
 
   ODEBUG("Identification: " << this);
-  std::string aMethodName[6] = 
+  std::string aMethodName[6] =
     {":omega",
      ":stepheight",
      ":singlesupporttime",
      ":doublesupporttime",
      ":comheight",
      ":samplingperiod"};
-  
+
   for(int i=0;i<6;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
-	{
-	  std::cerr << "Unable to register " << aMethodName << std::endl;
-	}
+        {
+          std::cerr << "Unable to register " << aMethodName << std::endl;
+        }
       else
-	{
-	  ODEBUG("Succeed in registering " << aMethodName[i]);
-	}
+        {
+          ODEBUG("Succeed in registering " << aMethodName[i]);
+        }
 
     }
 }
@@ -101,7 +101,7 @@ void ZMPRefTrajectoryGeneration::CallMethod(std::string & Method, std::istringst
       strm >> m_SamplingPeriod;
       ODEBUG(":samplingperiod" << m_SamplingPeriod << " ID: " << this);
     }
-  
+
 }
 
 bool ZMPRefTrajectoryGeneration::GetOnLineMode()

@@ -35,7 +35,7 @@ namespace PatternGeneratorJRL
 
   /*! \brief Final optimization problem to handle velocity reference.
     This object store a standardized optimization quadratic problem.
-   */
+  */
   struct ProblemVelRef_s
   {
     int m, me, mmax, n, nmax, mnn;
@@ -51,15 +51,15 @@ namespace PatternGeneratorJRL
     ~ProblemVelRef_s();
 
     /// \brief Set the dimensions of the problem.
-    /// This method has an internal logic to 
+    /// This method has an internal logic to
     /// allocate the memory. It is done only
     /// when the problem gets bigger. When it shrinks
     /// down the memory is kept to avoid overhead.
     void setDimensions(int NbOfConstraints,
-		       int NbOfEqConstraints,
-		       int StepNumber,
-		       int QP_N);
-    
+                       int NbOfEqConstraints,
+                       int StepNumber,
+                       int QP_N);
+
     /// \brief Dump on disk a problem.
     void dumpProblem(const char *filename);
     void dumpProblem(std::ostream &);
@@ -81,7 +81,7 @@ namespace PatternGeneratorJRL
     const static int VECTOR_XL=4;
     const static int VECTOR_XU=5;
     const static int VECTOR_DS=6;
-    
+
   protected:
 
     /// The method doing the real job of releasing the memory.

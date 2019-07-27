@@ -71,8 +71,8 @@ void ProblemVelRef_s::ReleaseMemory()
 
   if (XL!=0)
     delete [] XL;
-  
-  if (XU!=0) 
+
+  if (XU!=0)
     delete [] XU;
 
   if (X!=0)
@@ -83,7 +83,7 @@ void ProblemVelRef_s::ReleaseMemory()
 
   if (iwar!=0)
     delete [] iwar;
-  
+
   if (war!=0)
     delete [] war;
 
@@ -114,9 +114,9 @@ void ProblemVelRef_s::AllocateMemory()
 }
 
 void ProblemVelRef_s::setDimensions(int NbOfConstraints,
-			      int NbOfEqConstraints,
-			      int QP_N,
-			      int StepNumber)
+                                    int NbOfEqConstraints,
+                                    int QP_N,
+                                    int StepNumber)
 {
   bool reallocationNeeded = true;
 
@@ -141,7 +141,7 @@ void ProblemVelRef_s::setDimensions(int NbOfConstraints,
   lwar=3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
   liwar=n;
   Eps=1e-8;
-  
+
   if(reallocationNeeded)
     {
       ReleaseMemory();
@@ -156,7 +156,7 @@ void ProblemVelRef_s::initializeProblem()
 }
 
 void ProblemVelRef_s::dumpMatrix(std::ostream & aos,
-			   int type)
+                                 int type)
 {
 
   int lnbrows=0, lnbcols=0;
@@ -176,17 +176,17 @@ void ProblemVelRef_s::dumpMatrix(std::ostream & aos,
     }
 
   aos << "["<<lnbcols << ","<< lnbrows << "]" << std::endl;
-  
+
   for(int i=0;i<lnbrows;i++)
     {
       for(int j=0;j<lnbcols;j++)
-	aos << aMatrix[j*lnbrows+i] << " ";
+        aos << aMatrix[j*lnbrows+i] << " ";
       aos << std::endl;
     }
 }
 
 void ProblemVelRef_s::dumpVector(std::ostream & aos,
-			   int type)
+                                 int type)
 {
 
   int lsize=0;
@@ -220,11 +220,11 @@ void ProblemVelRef_s::dumpVector(std::ostream & aos,
       aos << aVector[i] << " ";
     }
   aos << std::endl;
-	
+
 }
 
 void ProblemVelRef_s::dumpVector(const char * filename,
-			   int type)
+                                 int type)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
@@ -234,7 +234,7 @@ void ProblemVelRef_s::dumpVector(const char * filename,
 
 
 void ProblemVelRef_s::dumpMatrix(const char * filename,
-			   int type)
+                                 int type)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
@@ -246,9 +246,9 @@ void ProblemVelRef_s::dumpProblem(std::ostream &aos)
 {
   dumpMatrix(aos,MATRIX_Q);
   dumpMatrix(aos,MATRIX_DU);
-  
+
   dumpVector(aos,VECTOR_D);
-  dumpVector(aos,VECTOR_DL);  
+  dumpVector(aos,VECTOR_DL);
   dumpVector(aos,VECTOR_XL);
   dumpVector(aos,VECTOR_XU);
   dumpVector(aos,VECTOR_DS);

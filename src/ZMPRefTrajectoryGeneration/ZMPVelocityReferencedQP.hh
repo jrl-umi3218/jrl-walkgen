@@ -80,14 +80,14 @@ namespace PatternGeneratorJRL
       the queue of ZMP, and foot positions.
     */
     std::size_t InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-			   deque<COMState> & FinalCoMPositions_deq,
-			   deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-			   deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-			   FootAbsolutePosition & InitLeftFootAbsolutePosition,
-			   FootAbsolutePosition & InitRightFootAbsolutePosition,
-			   deque<RelativeFootPosition> &RelativeFootPositions,
-			   COMState & lStartingCOMState,
-			   Eigen::Vector3d & lStartingZMPPosition);
+                           deque<COMState> & FinalCoMPositions_deq,
+                           deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+                           deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+                           FootAbsolutePosition & InitLeftFootAbsolutePosition,
+                           FootAbsolutePosition & InitRightFootAbsolutePosition,
+                           deque<RelativeFootPosition> &RelativeFootPositions,
+                           COMState & lStartingCOMState,
+                           Eigen::Vector3d & lStartingZMPPosition);
 
 
     /// \brief Update the stacks on-line
@@ -318,23 +318,23 @@ namespace PatternGeneratorJRL
 
     /// \brief Interpolation form the com jerk the position of the com and the zmp corresponding to the kart table model
     void CoMZMPInterpolation(
-        std::deque<ZMPPosition> & ZMPPositions,                    	 // OUTPUT
-        std::deque<COMState> & COMTraj_deq ,                       	 // OUTPUT
-        const std::deque<FootAbsolutePosition> & LeftFootTraj_deq, 	// INPUT
-        const std::deque<FootAbsolutePosition> & RightFootTraj_deq,	// INPUT
-        const solution_t * Solution,                               	// INPUT
-        LinearizedInvertedPendulum2D * LIPM,                       	 // INPUT/OUTPUT
-        const unsigned numberOfSample,                             	// INPUT
-        const int IterationNumber,                                      // INPUT
-        const unsigned int currentIndex);                                // INPUT
+                             std::deque<ZMPPosition> & ZMPPositions,                        // OUTPUT
+                             std::deque<COMState> & COMTraj_deq ,                           // OUTPUT
+                             const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,    // INPUT
+                             const std::deque<FootAbsolutePosition> & RightFootTraj_deq,   // INPUT
+                             const solution_t * Solution,                                  // INPUT
+                             LinearizedInvertedPendulum2D * LIPM,                           // INPUT/OUTPUT
+                             const unsigned numberOfSample,                                // INPUT
+                             const int IterationNumber,                                      // INPUT
+                             const unsigned int currentIndex);                                // INPUT
 
     /// \brief Interpolate just enough data to pilot the robot (period of interpolation = QP_T_)
     void ControlInterpolation(
-        std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
-        std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
-        std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,     // OUTPUT
-        std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,    // OUTPUT
-        double time);                                          			// INPUT
+                              std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
+                              std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
+                              std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,     // OUTPUT
+                              std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,    // OUTPUT
+                              double time);                                                               // INPUT
 
     /// \brief Interpolation everything on the whole preview
     void DynamicFilterInterpolation(double time);

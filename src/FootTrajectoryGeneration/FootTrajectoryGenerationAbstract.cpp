@@ -24,10 +24,10 @@
  */
 
 /*!\file FootTrajectoryGenerationAbstract.h
-   \brief This class determinate how it s generate all the values
-   for the foot trajectories.
+  \brief This class determinate how it s generate all the values
+  for the foot trajectories.
 
-   @ingroup foottrajectorygeneration
+  @ingroup foottrajectorygeneration
 */
 #include <Debug.hh>
 #include "FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.hh"
@@ -60,15 +60,15 @@ FootTrajectoryGenerationAbstract
   for (int i=0;i<5;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
-	{
-	  std::cerr << "Unable to register " << aMethodName << std::endl;
-	}
+        {
+          std::cerr << "Unable to register " << aMethodName << std::endl;
+        }
     }
 
 }
 
 void FootTrajectoryGenerationAbstract::CallMethod(std::string &Method,
-					     std::istringstream &strm)
+                                                  std::istringstream &strm)
 {
   if (Method==":omega")
     {

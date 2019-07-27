@@ -51,7 +51,7 @@ namespace PatternGeneratorJRL
   public:
 
     ZMPVelocityReferencedSQP(SimplePluginManager *SPM, string DataFile,
-                            PinocchioRobot *aPR=0 );
+                             PinocchioRobot *aPR=0 );
 
     ~ZMPVelocityReferencedSQP();
 
@@ -73,14 +73,14 @@ namespace PatternGeneratorJRL
       the queue of ZMP, and foot positions.
     */
     std::size_t InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-			   deque<COMState> & FinalCoMPositions_deq,
-			   deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-			   deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-			   FootAbsolutePosition & InitLeftFootAbsolutePosition,
-			   FootAbsolutePosition & InitRightFootAbsolutePosition,
-			   deque<RelativeFootPosition> &RelativeFootPositions,
-			   COMState & lStartingCOMState,
-			   Eigen::Vector3d & lStartingZMPPosition);
+                           deque<COMState> & FinalCoMPositions_deq,
+                           deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+                           deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+                           FootAbsolutePosition & InitLeftFootAbsolutePosition,
+                           FootAbsolutePosition & InitRightFootAbsolutePosition,
+                           deque<RelativeFootPosition> &RelativeFootPositions,
+                           COMState & lStartingCOMState,
+                           Eigen::Vector3d & lStartingZMPPosition);
 
     int UpdateCurrentPos(ZMPPosition initZMP,
                          COMState initCOM,
@@ -111,8 +111,8 @@ namespace PatternGeneratorJRL
     {
       initCOM_.x[0] = initCOM.x[0] ;
       initCOM_.y[0] = initCOM.y[0] ;
-//      initCOM_.x[1] = initCOM.x[1] ;
-//      initCOM_.y[1] = initCOM.y[1] ;
+      //      initCOM_.x[1] = initCOM.x[1] ;
+      //      initCOM_.y[1] = initCOM.y[1] ;
       initCOM_.y[2] = initCOM.y[2] ;
       initCOM_.x[2] = initCOM.x[2] ;
 
@@ -282,10 +282,10 @@ namespace PatternGeneratorJRL
     double InterpolationPeriod_ ;
     /// \brief Step Period of the robot
     double StepPeriod_ ;
-//    /// \brief Period where the robot is on ONE feet
-//    double SSPeriod_ ;
-//    /// \brief Period where the robot is on TWO feet
-//    double DSPeriod_ ;
+    //    /// \brief Period where the robot is on ONE feet
+    //    double SSPeriod_ ;
+    //    /// \brief Period where the robot is on TWO feet
+    //    double DSPeriod_ ;
     /// \brief Maximum distance between the feet
     double FeetDistance_ ;
     /// \brief Maximum height of the feet
@@ -333,13 +333,13 @@ namespace PatternGeneratorJRL
     void FullTrajectoryInterpolation(double time); // INPUT
     /// \brief Interpolation form the com jerk the position of the com and the zmp corresponding to the kart table model
     void CoMZMPInterpolation(
-        std::vector<double> &JerkX,           // INPUT
-        std::vector<double> &JerkY,           // INPUT
-        LinearizedInvertedPendulum2D * LIPM, // INPUT/OUTPUT
-        const unsigned numberOfSample,       // INPUT
-        const int IterationNumber,           // INPUT
-        const unsigned int currentIndex,     // INPUT
-        const std::deque<support_state_t> & SupportStates_deq );// INPUT
+                             std::vector<double> &JerkX,           // INPUT
+                             std::vector<double> &JerkY,           // INPUT
+                             LinearizedInvertedPendulum2D * LIPM, // INPUT/OUTPUT
+                             const unsigned numberOfSample,       // INPUT
+                             const int IterationNumber,           // INPUT
+                             const unsigned int currentIndex,     // INPUT
+                             const std::deque<support_state_t> & SupportStates_deq );// INPUT
   };
 }
 

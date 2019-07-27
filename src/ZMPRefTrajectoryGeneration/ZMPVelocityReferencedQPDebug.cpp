@@ -73,7 +73,7 @@ void ZMPVelocityReferencedQP::debugConstructor()
 }
 
 void ZMPVelocityReferencedQP::debugMatrix(const char * filename,
-					  enum MatrixType type)
+                                          enum MatrixType type)
 {
   ofstream aof;
   aof.open(filename, ofstream::out);
@@ -82,7 +82,7 @@ void ZMPVelocityReferencedQP::debugMatrix(const char * filename,
 }
 
 void ZMPVelocityReferencedQP::debugMatrix(ostream &aos,
-					  enum MatrixType type)
+                                          enum MatrixType type)
 {
   MAL_MATRIX_TYPE(double) * aMalMatrix=0;
   int lnbcols=0,lnbrows=0;
@@ -131,16 +131,16 @@ void ZMPVelocityReferencedQP::debugMatrix(ostream &aos,
       lnbrows = 2*m_QP_N;
       lnbcols = 2*m_QP_N;
       aMalMatrix = & m_iLQ;
-      break;      
+      break;
     }
-  
+
   for(int i=0;i<lnbrows;i++)
     {
       for(int j=0;j<lnbcols;j++)
-	aos << (*aMalMatrix)(i,j) << " ";
+        aos << (*aMalMatrix)(i,j) << " ";
       aos << std::endl;
     }
-  
+
 }
 
 

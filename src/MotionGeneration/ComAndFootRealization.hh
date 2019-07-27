@@ -50,7 +50,7 @@ namespace PatternGeneratorJRL
       Mostly they have to provide a ZMP multibody after the first
       preview loop of the class \a ZMPPreviewControlWithMultiBodyZMP class.
 
-   */
+  */
   class  ComAndFootRealization : public SimplePlugin
   {
   private:
@@ -80,8 +80,8 @@ namespace PatternGeneratorJRL
       ,m_HeightOfCoM(0)
       ,m_SamplingPeriod(0.005)
       ,m_StepStackHandler(0)
-      {
-      };
+    {
+    };
 
     /*! \brief virtual destructor */
     inline virtual ~ComAndFootRealization() {};
@@ -138,7 +138,7 @@ namespace PatternGeneratorJRL
 
     /*! Returns the object able to compute dynamic parametersof the robot. */
     inline PinocchioRobot * getPinocchioRobot() const
-      { return m_PinocchioRobot;}
+    { return m_PinocchioRobot;}
 
     /** @} */
 
@@ -153,17 +153,17 @@ namespace PatternGeneratorJRL
 
     */
     virtual bool InitializationCoM(Eigen::VectorXd &BodyAnglesIni,
-				   Eigen::Vector3d & lStartingCOMPosition,
-				   Eigen::Matrix<double,6,1> & lStartingWaistPose,
-				   FootAbsolutePosition & InitLeftFootAbsPos,
-				   FootAbsolutePosition & InitRightFootAbsPos)=0;
+                                   Eigen::Vector3d & lStartingCOMPosition,
+                                   Eigen::Matrix<double,6,1> & lStartingWaistPose,
+                                   FootAbsolutePosition & InitLeftFootAbsPos,
+                                   FootAbsolutePosition & InitRightFootAbsPos)=0;
 
     /*! This initialization phase, make sure that the needed buffers
       for the upper body motion are correctly setup.
     */
     virtual    bool InitializationUpperBody(deque<ZMPPosition> &inZMPPositions,
-					    deque<COMPosition> &inCOMBuffer,
-					    deque<RelativeFootPosition> lRelativeFootPositions)=0;
+                                            deque<COMPosition> &inCOMBuffer,
+                                            deque<RelativeFootPosition> lRelativeFootPositions)=0;
 
     /* @} */
 
@@ -175,24 +175,24 @@ namespace PatternGeneratorJRL
 
     /*! \name Setter and getter for the height of the CoM.
       @{
-     */
+    */
 
     void SetHeightOfTheCoM(double theHeightOfTheCoM)
     { m_HeightOfCoM = theHeightOfTheCoM; }
 
     const double & GetHeightOfTheCoM() const
-      {return m_HeightOfCoM;}
+    {return m_HeightOfCoM;}
     /*! @} */
 
     /*! \name Setter and getter for the sampling period.
       @{
-     */
+    */
     /*! Setter for the sampling period. */
     inline void setSamplingPeriod(double  aSamplingPeriod)
-      { m_SamplingPeriod = aSamplingPeriod; }
+    { m_SamplingPeriod = aSamplingPeriod; }
     /*! Getter for the sampling period. */
     inline const double & getSamplingPeriod() const
-      { return m_SamplingPeriod;}
+    { return m_SamplingPeriod;}
     /* @} */
 
 
@@ -201,7 +201,7 @@ namespace PatternGeneratorJRL
     { m_StepStackHandler = lStepStackHandler;}
 
     StepStackHandler *  GetStepStackHandler() const
-      { return m_StepStackHandler; }
+    { return m_StepStackHandler; }
     /*! @} */
 
     /*! Get the current position of the waist in the COM reference frame
