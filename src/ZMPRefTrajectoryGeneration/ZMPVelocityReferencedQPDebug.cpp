@@ -134,9 +134,9 @@ void ZMPVelocityReferencedQP::debugMatrix(ostream &aos,
       break;
     }
 
-  for(int i=0;i<lnbrows;i++)
+  for(int i=0; i<lnbrows; i++)
     {
-      for(int j=0;j<lnbcols;j++)
+      for(int j=0; j<lnbcols; j++)
         aos << (*aMalMatrix)(i,j) << " ";
       aos << std::endl;
     }

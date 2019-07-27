@@ -94,7 +94,7 @@ namespace PatternGeneratorJRL
     CH_Point p0 = aVecOfPoints[0];
 
     // Detects the point with the smallest value for y.
-    for(unsigned int i=0;i<aVecOfPoints.size();i++)
+    for(unsigned int i=0; i<aVecOfPoints.size(); i++)
       if (aVecOfPoints[i].row < p0.row)
         p0 = aVecOfPoints[i];
 
@@ -105,7 +105,7 @@ namespace PatternGeneratorJRL
 
     ODEBUG2(" VecOfPoints : " << aVecOfPoints.size());
     set<CH_Point, ltCH_Point> ListOfPointinPolarCoord;
-    for(unsigned int i=0;i<aVecOfPoints.size();i++)
+    for(unsigned int i=0; i<aVecOfPoints.size(); i++)
       {
         unsigned char bInsert=1;
 
@@ -128,7 +128,8 @@ namespace PatternGeneratorJRL
                 else
                   bInsert=0;
               }
-            set<CH_Point, ltCH_Point>::iterator it_ToBeDeleted = it_PtinPolarCoord;
+            set<CH_Point, ltCH_Point>::iterator it_ToBeDeleted =
+              it_PtinPolarCoord;
 
             it_PtinPolarCoord++;
             if(ToBeDeleted)

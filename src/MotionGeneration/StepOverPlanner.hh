@@ -88,10 +88,12 @@ namespace PatternGeneratorJRL
                      deque<ZMPPosition> & aZMPPositions);
 
     /*! function which calculates the polynomial coeficients for the first step*/
-    void PolyPlannerFirstStep(deque<FootAbsolutePosition> &aFirstStepOverFootBuffer);
+    void PolyPlannerFirstStep(deque<FootAbsolutePosition>
+                              &aFirstStepOverFootBuffer);
 
     /*! function which calculates the polynomial coeficients for the first step*/
-    void PolyPlannerSecondStep(deque<FootAbsolutePosition> &aSecondStepOverFootBuffer);
+    void PolyPlannerSecondStep(deque<FootAbsolutePosition>
+                               &aSecondStepOverFootBuffer);
 
     /*! function which calculates the polynomial coeficients for the changing COM height*/
     void PolyPlannerHip();

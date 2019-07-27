@@ -67,7 +67,7 @@ namespace PatternGeneratorJRL
           }
 
         m_IndexFromKWToRobot.resize(m_NbOfDOFsFromKW);
-        for(int i=0;i<m_NbOfDOFsFromKW;i++)
+        for(int i=0; i<m_NbOfDOFsFromKW; i++)
           {
             aif >> m_IndexFromKWToRobot[i];
           }
@@ -133,28 +133,30 @@ namespace PatternGeneratorJRL
             return -1;
           }
 
-        do {
-          aif >> atmp;
+        do
+          {
+            aif >> atmp;
 
-          if (atmp[0]=='(')
-            {
-              string FirstJt = atmp.substr(1,atmp.length()-1);
-              KWNode aNode;
-              aNode.Joints.resize(m_NbOfDOFsFromKW);
-              aNode.Joints[0] = atof(FirstJt.c_str());
-              for(int j=1;j<m_NbOfDOFsFromKW;j++)
-                {
-                  aif >> aNode.Joints[j];
-                }
-              aif >> atmp; // read ")"
-              if (atmp !=")")
-                {
-                  cerr << " ) expected. Aborted. " << atmp << endl;
-                  return -1;
-                }
-              m_Path.insert(m_Path.end(),aNode);
-            }
-        } while (atmp!="]");
+            if (atmp[0]=='(')
+              {
+                string FirstJt = atmp.substr(1,atmp.length()-1);
+                KWNode aNode;
+                aNode.Joints.resize(m_NbOfDOFsFromKW);
+                aNode.Joints[0] = atof(FirstJt.c_str());
+                for(int j=1; j<m_NbOfDOFsFromKW; j++)
+                  {
+                    aif >> aNode.Joints[j];
+                  }
+                aif >> atmp; // read ")"
+                if (atmp !=")")
+                  {
+                    cerr << " ) expected. Aborted. " << atmp << endl;
+                    return -1;
+                  }
+                m_Path.insert(m_Path.end(),aNode);
+              }
+          }
+        while (atmp!="]");
 
         aif >> atmp;
 
@@ -175,23 +177,24 @@ namespace PatternGeneratorJRL
     cout << "Partial model " << endl;
     cout << "Nb of DOFs: " << m_NbOfDOFsFromKW << endl;
     cout << "Correspondance between local DOFs and robot's ones." << endl;
-    for(unsigned int i=0;i<m_IndexFromKWToRobot.size();i++)
+    for(unsigned int i=0; i<m_IndexFromKWToRobot.size(); i++)
       {
         cout << i << " : " << m_IndexFromKWToRobot[i] << endl;
       }
 
     cout << "KW Path " << endl;
     cout << "Steering Path "<< m_SteeringMethod << endl;
-    for(unsigned int i=0;i<m_Path.size();i++)
+    for(unsigned int i=0; i<m_Path.size(); i++)
       {
-        for(unsigned int j=0;j<m_Path[i].Joints.size();j++)
+        for(unsigned int j=0; j<m_Path[i].Joints.size(); j++)
           cout << m_Path[i].Joints[j] << " " ;
         cout << endl;
       }
   }
 
 
-  void GenerateMotionFromKineoWorks::CreateBufferFirstPreview(deque<ZMPPosition> &ZMPRefBuffer)
+  void GenerateMotionFromKineoWorks::CreateBufferFirstPreview(
+                                                              deque<ZMPPosition> &ZMPRefBuffer)
   {
     deque<ZMPPosition> aFIFOZMPRefPositions;
     Eigen::MatrixXd aPC1x;
@@ -200,7 +203,7 @@ namespace PatternGeneratorJRL
     double aZmpx2, aZmpy2;
 
     // Initialize local and object scope buffers.
-    for (unsigned int i=0;i<m_NL;i++)
+    for (unsigned int i=0; i<m_NL; i++)
       aFIFOZMPRefPositions.push_back(ZMPRefBuffer[i]);
 
     m_COMBuffer.resize(ZMPRefBuffer.size()-m_NL);
@@ -209,10 +212,15 @@ namespace PatternGeneratorJRL
     aSxzmp = 0.0;//m_sxzmp;
     aSyzmp = 0.0;//m_syzmp;
 
-    aPC1x.resize(3,1);  aPC1y.resize(3,1);
+    aPC1x.resize(3,1);
+    aPC1y.resize(3,1);
 
-    aPC1x(0,0)= 0;    aPC1x(1,0)= 0;    aPC1x(2,0)= 0;
-    aPC1y(0,0)= 0;    aPC1y(1,0)= 0;    aPC1y(2,0)= 0;
+    aPC1x(0,0)= 0;
+    aPC1x(1,0)= 0;
+    aPC1x(2,0)= 0;
+    aPC1y(0,0)= 0;
+    aPC1y(1,0)= 0;
+    aPC1y(2,0)= 0;
 
     //create the extra COMbuffer
 
@@ -232,7 +240,7 @@ namespace PatternGeneratorJRL
       FirstCall = 0;
 #endif
 
-    for (unsigned int i=0;i<ZMPRefBuffer.size()-m_NL;i++)
+    for (unsigned int i=0; i<ZMPRefBuffer.size()-m_NL; i++)
       {
 
         aFIFOZMPRefPositions.push_back(ZMPRefBuffer[i+m_NL]);
@@ -242,7 +250,7 @@ namespace PatternGeneratorJRL
                                     aFIFOZMPRefPositions,0,
                                     aZmpx2, aZmpy2, true);
 
-        for(unsigned j=0;j<3;j++)
+        for(unsigned j=0; j<3; j++)
           {
             m_COMBuffer[i].x[j] = aPC1x(j,0);
             m_COMBuffer[i].y[j] = aPC1y(j,0);
@@ -287,7 +295,8 @@ namespace PatternGeneratorJRL
       m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
   }
 
-  void GenerateMotionFromKineoWorks::ComputeUpperBodyPosition(deque< KWNode >&     UpperBodyPositionsBuffer,
+  void GenerateMotionFromKineoWorks::ComputeUpperBodyPosition(
+                                                              deque< KWNode >&     UpperBodyPositionsBuffer,
                                                               vector<int> &ConversionFromLocalToRobotDOFsIndex)
   {
     vector<int> ConversionFromLocalToKW;
@@ -297,7 +306,7 @@ namespace PatternGeneratorJRL
     int NbOfUsedDOFs=0;
     KWNode deltaJoints;
 
-    for(unsigned int i=0;i<m_IndexFromKWToRobot.size();i++)
+    for(unsigned int i=0; i<m_IndexFromKWToRobot.size(); i++)
       if (m_IndexFromKWToRobot[i]!=-1)
         NbOfUsedDOFs ++;
     ConversionFromLocalToRobotDOFsIndex.resize(NbOfUsedDOFs);
@@ -306,7 +315,7 @@ namespace PatternGeneratorJRL
 
     //! Second dimension: directly the number of elements inside the COM's buffer of position.
     UpperBodyPositionsBuffer.resize(m_COMBuffer.size());
-    for(unsigned int i=0;i<UpperBodyPositionsBuffer.size();i++)
+    for(unsigned int i=0; i<UpperBodyPositionsBuffer.size(); i++)
       {
         UpperBodyPositionsBuffer[i].Joints.resize(NbOfUsedDOFs);
       }
@@ -314,7 +323,7 @@ namespace PatternGeneratorJRL
     //! First initialize the first upper body position at the beginning of the motion.
     //! and fill the conversion array.
     int k=0;
-    for(unsigned int i=0;i<m_Path[0].Joints.size();i++)
+    for(unsigned int i=0; i<m_Path[0].Joints.size(); i++)
       {
         int IdDOF=0;
         if ((IdDOF=m_IndexFromKWToRobot[i])!=-1)
@@ -330,7 +339,7 @@ namespace PatternGeneratorJRL
     count ++;
 
     //! For each way-point of the path
-    for(unsigned int IdWayPoint=1;IdWayPoint<m_Path.size();IdWayPoint++)
+    for(unsigned int IdWayPoint=1; IdWayPoint<m_Path.size(); IdWayPoint++)
       {
         int CountTarget=-1;
         double lX=0.0,lY=0.0,lZ=0.0, dist=1000000.0;
@@ -341,7 +350,7 @@ namespace PatternGeneratorJRL
         lZ = m_Path[IdWayPoint].Joints[8];
 
         //! Find the closest (X,Y,Z) position in the remaining part of the CoM buffer.
-        for(unsigned int i=count;i<m_COMBuffer.size();i++)
+        for(unsigned int i=count; i<m_COMBuffer.size(); i++)
           {
             double ldist= (lX-m_COMBuffer[i].x[0])*(lX - m_COMBuffer[i].x[0])
               /*+
@@ -361,7 +370,7 @@ namespace PatternGeneratorJRL
           reference value and the newly found. */
 
         //! Computes the delta for each joint and for each 0.005 ms
-        for(unsigned int i=0;i<ConversionFromLocalToRobotDOFsIndex.size();i++)
+        for(unsigned int i=0; i<ConversionFromLocalToRobotDOFsIndex.size(); i++)
           {
             // int j = ConversionFromLocalToRobotDOFsIndex[i];
             int k = ConversionFromLocalToKW[i];
@@ -373,7 +382,7 @@ namespace PatternGeneratorJRL
         //! Fill the buffer with linear interpolation.
         while(count<=CountTarget)
           {
-            for(unsigned int i=0;i<ConversionFromLocalToRobotDOFsIndex.size();i++)
+            for(unsigned int i=0; i<ConversionFromLocalToRobotDOFsIndex.size(); i++)
               {
                 UpperBodyPositionsBuffer[count].Joints[i]=
                   UpperBodyPositionsBuffer[count-1].Joints[i]

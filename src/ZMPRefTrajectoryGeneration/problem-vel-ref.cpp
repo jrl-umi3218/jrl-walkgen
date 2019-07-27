@@ -96,15 +96,18 @@ void ProblemVelRef_s::AllocateMemory()
   war= new double[lwar];
   iwar = new int[liwar]; // The Cholesky decomposition is done internally.
 
-  U = (double *)malloc( sizeof(double)*(unsigned int)mnn); // Returns the Lagrange multipliers.;
+  U = (double *)malloc( sizeof(double)*(unsigned int)
+                        mnn); // Returns the Lagrange multipliers.;
 
   DS = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
 
   DU = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
 
 
-  Q=new double[4*(m_QP_N+m_stepNumber)*(m_QP_N+m_stepNumber)];  //Quadratic part of the objective function
-  D=new double[2*(m_QP_N+m_stepNumber)];   // Linear part of the objective function
+  Q=new double[4*(m_QP_N+m_stepNumber)*(m_QP_N
+                                        +m_stepNumber)];  //Quadratic part of the objective function
+  D=new double[2*(m_QP_N
+                  +m_stepNumber)];   // Linear part of the objective function
   XL=new double[2*(m_QP_N+m_stepNumber)];  // Lower bound of the jerk.
   XU=new double[2*(m_QP_N+m_stepNumber)];  // Upper bound of the jerk.
   X=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the system.
@@ -177,9 +180,9 @@ void ProblemVelRef_s::dumpMatrix(std::ostream & aos,
 
   aos << "["<<lnbcols << ","<< lnbrows << "]" << std::endl;
 
-  for(int i=0;i<lnbrows;i++)
+  for(int i=0; i<lnbrows; i++)
     {
-      for(int j=0;j<lnbcols;j++)
+      for(int j=0; j<lnbcols; j++)
         aos << aMatrix[j*lnbrows+i] << " ";
       aos << std::endl;
     }
@@ -215,7 +218,7 @@ void ProblemVelRef_s::dumpVector(std::ostream & aos,
       break;
     }
 
-  for(int i=0;i<lsize;i++)
+  for(int i=0; i<lsize; i++)
     {
       aos << aVector[i] << " ";
     }

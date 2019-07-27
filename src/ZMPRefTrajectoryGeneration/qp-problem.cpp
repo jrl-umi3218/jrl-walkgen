@@ -126,15 +126,17 @@ QPProblem::resize_all()
   if (ok)
     {
       U_.resize(2*(NbConstraints_+2*NbVariables_), 1,true);
-      war_.resize(2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000), 1,true);
+      war_.resize(2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*
+                     (NbConstraints_+1)+20000), 1,true);
     }
 
-  if (istate_!=0x0){
-    delete [] istate_;
-    delete [] kx_;
-    delete [] b_;
-    delete [] clamda_;
-  }
+  if (istate_!=0x0)
+    {
+      delete [] istate_;
+      delete [] kx_;
+      delete [] b_;
+      delete [] clamda_;
+    }
 
   istate_     = new int [(NbVariables_+NbConstraints_+2)*10];
   kx_          = new int [(NbVariables_+1)*10];
@@ -194,9 +196,11 @@ int
 QPProblem::reset_variant()
 {
 
-  unsigned firstRow = (nbInvariantRows_ < Q_.NbRows_) ? nbInvariantRows_ : Q_.NbRows_;
+  unsigned firstRow = (nbInvariantRows_ < Q_.NbRows_) ? nbInvariantRows_ :
+    Q_.NbRows_;
   unsigned firstCol = 0;
-  unsigned lastCol = (nbInvariantCols_ < Q_.NbCols_) ? nbInvariantCols_ : Q_.NbCols_;
+  unsigned lastCol = (nbInvariantCols_ < Q_.NbCols_) ? nbInvariantCols_ :
+    Q_.NbCols_;
   if( (firstRow >= Q_.NbRows_) || (firstCol >= Q_.NbCols_) )
     return 0;
 
@@ -254,7 +258,8 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
 
   iout_ = 0;
   iprint_ = 1;
-  lwar_ = 2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000);
+  lwar_ = 2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*
+             (NbConstraints_+1)+20000);
   liwar_ = 2*NbVariables_+1000;
   eps_ = 1e-8;
 
@@ -272,7 +277,8 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
     case QLD:
 
       ql0001_(&m_, &me_, &mmax_, &n_, &nmax_, &mnn_,
-              Q_dense_.Array_, D_.Array_, DU_dense_.Array_, DS_.Array_, XL_.Array_, XU_.Array_,
+              Q_dense_.Array_, D_.Array_, DU_dense_.Array_, DS_.Array_, XL_.Array_,
+              XU_.Array_,
               X_.Array_, U_.Array_, &iout_, &ifail_, &iprint_,
               war_.Array_, &lwar_, iwar_.Array_, &liwar_, &eps_);
 
@@ -293,15 +299,18 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
 
 
 
-      if (tests==ITT || tests==ALL){
-        int nb_itt_approx=0;
-        for(int i = 0; i < m_; i++){
-          if (Result.ConstrLagr_vec(i)!=0){
-            nb_itt_approx++;
-          }
+      if (tests==ITT || tests==ALL)
+        {
+          int nb_itt_approx=0;
+          for(int i = 0; i < m_; i++)
+            {
+              if (Result.ConstrLagr_vec(i)!=0)
+                {
+                  nb_itt_approx++;
+                }
+            }
+          std::cout << "nb iterations : " << nb_itt_approx << std::endl;
         }
-        std::cout << "nb iterations : " << nb_itt_approx << std::endl;
-      }
 
       break;
     case LSSOL:
@@ -314,54 +323,67 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
       double *bl=new double[n_+m_];
       double *bu=new double[n_+m_];
       int size1=n_;
-      for(int i=0;i<size1;++i){
-        bl[i]=XL_.Array_[i];
-        bu[i]=XU_.Array_[i];
-      }
+      for(int i=0; i<size1; ++i)
+        {
+          bl[i]=XL_.Array_[i];
+          bu[i]=XU_.Array_[i];
+        }
       int size2=size1+me_;
-      for(int i=size1;i<size2;++i){
-        bl[i]=-DS_.Array_[i-size1];
-        bu[i]=bl[i];
-      }
+      for(int i=size1; i<size2; ++i)
+        {
+          bl[i]=-DS_.Array_[i-size1];
+          bu[i]=bl[i];
+        }
       int size3=size1+m_;
-      for(int i=size2;i<size3;++i){
-        bl[i]=-DS_.Array_[i-size1];
-        bu[i]=10e10;
-      }
-
-      if (Result.useWarmStart){
-        for(unsigned i=0;i<NbVariables_;++i){
-          X_.Array_[i]=Result.initialSolution(i);
-        }
-      }
-
-      if (tests==CTR || tests==ALL){
-        // Check if initial solution respect all the constraints
-        Eigen::MatrixXd DU(NbConstraints_, NbVariables_);
-        Eigen::VectorXd XX(NbVariables_);
-        Eigen::VectorXd DS(NbConstraints_);
-        Eigen::VectorXd tmp;
-        for(unsigned i=0;i<NbConstraints_;++i){
-          for(unsigned j=0;j<NbVariables_;++j){
-            DU(i,j)=DU_.Array_[i+DU_.NbRows_*j];
-          }
-          DS(i)=DS_.Array_[i];
+      for(int i=size2; i<size3; ++i)
+        {
+          bl[i]=-DS_.Array_[i-size1];
+          bu[i]=10e10;
         }
 
-        for(unsigned i=0;i<NbVariables_;++i){
-          XX(i)=X_.Array_[i];
+      if (Result.useWarmStart)
+        {
+          for(unsigned i=0; i<NbVariables_; ++i)
+            {
+              X_.Array_[i]=Result.initialSolution(i);
+            }
         }
 
-        tmp=prod(DU,XX);
-        int nb_ctr=0;
-        for(unsigned i=0;i<NbConstraints_;++i){
-          if (tmp(i)+DS(i)<-1e-6){
-            std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " < " << -DS(i)  << std::endl;
-            ++nb_ctr;
-          }
+      if (tests==CTR || tests==ALL)
+        {
+          // Check if initial solution respect all the constraints
+          Eigen::MatrixXd DU(NbConstraints_, NbVariables_);
+          Eigen::VectorXd XX(NbVariables_);
+          Eigen::VectorXd DS(NbConstraints_);
+          Eigen::VectorXd tmp;
+          for(unsigned i=0; i<NbConstraints_; ++i)
+            {
+              for(unsigned j=0; j<NbVariables_; ++j)
+                {
+                  DU(i,j)=DU_.Array_[i+DU_.NbRows_*j];
+                }
+              DS(i)=DS_.Array_[i];
+            }
+
+          for(unsigned i=0; i<NbVariables_; ++i)
+            {
+              XX(i)=X_.Array_[i];
+            }
+
+          tmp=prod(DU,XX);
+          int nb_ctr=0;
+          for(unsigned i=0; i<NbConstraints_; ++i)
+            {
+              if (tmp(i)+DS(i)<-1e-6)
+                {
+                  std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " < " << -DS(
+                                                                                                 i)  << std::endl;
+                  ++nb_ctr;
+                }
+            }
+          std::cout << std::endl << "Nb unrespected constraints : " << nb_ctr <<
+            std::endl;
         }
-        std::cout << std::endl << "Nb unrespected constraints : " << nb_ctr << std::endl;
-      }
 
 
       lssol_(&n_, &n_,
@@ -391,9 +413,10 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
 
 
 
-      if (tests==ITT || tests==ALL){
-        std::cout << "nb iterations : " << iter_ << std::endl;
-      }
+      if (tests==ITT || tests==ALL)
+        {
+          std::cout << "nb iterations : " << iter_ << std::endl;
+        }
 
 #else
       std::cerr << " LSSOL_FOUND not available" << std::endl;
@@ -417,13 +440,16 @@ QPProblem::add_term_to( qp_element_e Type, const Eigen::MatrixXd &Mat,
     {
     case MATRIX_Q:
       Array_p = &Q_;
-      NbVariables_ = (unsigned int)((col+Mat.cols()>NbVariables_) ? col+Mat.cols() : NbVariables_);
+      NbVariables_ = (unsigned int)((col+Mat.cols()>NbVariables_) ? col+Mat.cols() :
+                                    NbVariables_);
       break;
 
     case MATRIX_DU:
       Array_p = &DU_;
-      NbConstraints_ = (unsigned int)(( row+Mat.rows() > NbConstraints_ ) ? row+Mat.rows() : NbConstraints_);
-      NbVariables_ = (unsigned int)(( col+Mat.cols() > NbVariables_ ) ? col+Mat.cols() : NbVariables_);
+      NbConstraints_ = (unsigned int)(( row+Mat.rows() > NbConstraints_ ) ? row
+                                      +Mat.rows() : NbConstraints_);
+      NbVariables_ = (unsigned int)(( col+Mat.cols() > NbVariables_ ) ? col+Mat.cols()
+                                    : NbVariables_);
       row++;//The first rows of DU,DS are empty
       break;
 
@@ -435,7 +461,8 @@ QPProblem::add_term_to( qp_element_e Type, const Eigen::MatrixXd &Mat,
       break;
     case VECTOR_DS:
       Array_p = &DS_;
-      NbConstraints_ = (unsigned int)( (row+Mat.rows()>NbConstraints_) ? row+Mat.rows() : NbConstraints_);
+      NbConstraints_ = (unsigned int)( (row+Mat.rows()>NbConstraints_) ? row
+                                       +Mat.rows() : NbConstraints_);
       row++;//The first rows of DU,DS are empty
       break;
     }
@@ -456,7 +483,8 @@ QPProblem::add_term_to( qp_element_e Type, const Eigen::MatrixXd &Mat,
   if( U_.NbRows_ < NbConstraints_+2*NbVariables_ )
     U_.resize( NbConstraints_+2*NbVariables_, 1, true );
 
-  unsigned warsize = 3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000;
+  unsigned warsize = 3*NbVariables_*NbVariables_/2+10*NbVariables_+2*
+    (NbConstraints_+1)+20000;
   if( warsize> war_.NbRows_ )
     war_.resize( warsize, 1, true );
 
@@ -486,22 +514,26 @@ QPProblem::add_term_to( qp_element_e Type, const Eigen::VectorXd &Vec,
     {
     case VECTOR_D:
       Array_p = &D_;
-      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() : NbVariables_);
+      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() :
+                                    NbVariables_);
       break;
 
     case VECTOR_XL:
       Array_p = &XL_;
-      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() : NbVariables_);
+      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() :
+                                    NbVariables_);
       break;
 
     case VECTOR_XU:
       Array_p = &XU_;
-      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() : NbVariables_);
+      NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() :
+                                    NbVariables_);
       break;
 
     case VECTOR_DS:
       Array_p = &DS_;
-      NbConstraints_ = (unsigned int)((row+Vec.size()>NbConstraints_) ? row+Vec.size() : NbConstraints_);
+      NbConstraints_ = (unsigned int)((row+Vec.size()>NbConstraints_) ? row+Vec.size()
+                                      : NbConstraints_);
       row++;//The first rows of DU,DS are empty
       break;
 
@@ -606,9 +638,9 @@ QPProblem::dump( qp_element_e Type, std::ostream & aos)
     }
   aos << Name <<"["<<NbRows<< ","<< NbCols << "]" << std::endl;
 
-  for(unsigned int i=0;i<NbRows;i++)
+  for(unsigned int i=0; i<NbRows; i++)
     {
-      for(unsigned int j=0;j<NbCols;j++)
+      for(unsigned int j=0; j<NbCols; j++)
         aos << std::scientific << Array[i+j*NbRows] << " ";
       aos << std::endl;
     }

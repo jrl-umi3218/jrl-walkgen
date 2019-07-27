@@ -1,9 +1,9 @@
 /*
- * Copyright 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2006, 2007, 2008, 2009, 2010,
  *
  * Florent    Lamiraux
  * Alireza    Nakhaei
- * Mathieu    Poirier 
+ * Mathieu    Poirier
  * Olivier    Stasse
  *
  * JRL, CNRS/AIST
@@ -21,11 +21,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /** \file Polynome.h
-    \brief Polynomes object for trajectories. 
+    \brief Polynomes object for trajectories.
     Initial polynome. */
 
 #ifndef _POLYNOME_H_
@@ -41,48 +41,50 @@ namespace PatternGeneratorJRL
 
   /** Class for computing trajectories */
   class  Polynome
+  {
+
+  public:
+
+    /*! Constructor */
+    Polynome(int Degree);
+
+    /*! Destructor */
+    ~Polynome();
+
+    /*! Compute the value. */
+    double Compute(double t);
+
+    /*! Compute the value of the derivative. */
+    double ComputeDerivative(double t);
+
+    /*! Compute the value of the second derivative. */
+    double ComputeSecDerivative(double t);
+
+    /*! Compute the value of the third derivative (jerk). */
+    double ComputeJerk(double t);
+
+    /*! Get the coefficients. */
+    void GetCoefficients(std::vector<double> &lCoefficients) const;
+
+    /*! Set the coefficients. */
+    void SetCoefficients(const std::vector<double> &lCoefficients);
+
+    inline int Degree()
     {
-
-    public:
-
-      /*! Constructor */
-      Polynome(int Degree);
-
-      /*! Destructor */
-      ~Polynome();
-
-      /*! Compute the value. */
-      double Compute(double t);
-
-      /*! Compute the value of the derivative. */
-      double ComputeDerivative(double t);
-      
-      /*! Compute the value of the second derivative. */
-      double ComputeSecDerivative(double t);
-
-      /*! Compute the value of the third derivative (jerk). */
-      double ComputeJerk(double t);
-
-      /*! Get the coefficients. */
-      void GetCoefficients(std::vector<double> &lCoefficients) const;
-
-      /*! Set the coefficients. */
-      void SetCoefficients(const std::vector<double> &lCoefficients);
-
-      inline int Degree()
-      { return m_Degree; };
-
-
-      /*! Print the coefficient. */
-      void print() const;
-
-    protected:
-
-      /// Degree of the polynome
-      int m_Degree;
-
-      /// Vector of coefficients.
-      std::vector<double> m_Coefficients;
+      return m_Degree;
     };
+
+
+    /*! Print the coefficient. */
+    void print() const;
+
+  protected:
+
+    /// Degree of the polynome
+    int m_Degree;
+
+    /// Vector of coefficients.
+    std::vector<double> m_Coefficients;
+  };
 }
 #endif /* _POLYNOME_H_*/

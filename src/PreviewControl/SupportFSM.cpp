@@ -55,38 +55,54 @@ SupportFSM::~SupportFSM()
 
 
 void
-SupportFSM::update_vel_reference(reference_t & Ref, const support_state_t & CurrentSupport){
+SupportFSM::update_vel_reference(reference_t & Ref,
+                                 const support_state_t & CurrentSupport)
+{
   // Check the reference type of the robot (rotation, translation)
-  if(fabs(Ref.Local.X)>2*EPS_||fabs(Ref.Local.Y)>2*EPS_){
-    InTranslation_ = true;
-  }else{
-    InTranslation_ = false;
-  }
-  if(fabs(Ref.Local.Yaw)>EPS_){
-    InRotation_ = true;
-  }else{
-    // make two step to avoid the robot's fall
-    if (InRotation_ && !InTranslation_){
-      Ref.Local.X=2*EPS_;
-      Ref.Local.Y=2*EPS_;
-      if (!PostRotationPhase_){
-        CurrentSupportFoot_ = CurrentSupport.Foot;
-        NbStepsAfterRotation_ = 0;
-        PostRotationPhase_ = true;
-      }else{
-        if (CurrentSupportFoot_ != CurrentSupport.Foot){
-          CurrentSupportFoot_ = CurrentSupport.Foot;
-          ++NbStepsAfterRotation_;
-        }
-        if (NbStepsAfterRotation_>2){
-          InRotation_ = false;
-          PostRotationPhase_ = false;
-        }
-      }
-    }else{
-      InRotation_ = false;
+  if(fabs(Ref.Local.X)>2*EPS_||fabs(Ref.Local.Y)>2*EPS_)
+    {
+      InTranslation_ = true;
     }
-  }
+  else
+    {
+      InTranslation_ = false;
+    }
+  if(fabs(Ref.Local.Yaw)>EPS_)
+    {
+      InRotation_ = true;
+    }
+  else
+    {
+      // make two step to avoid the robot's fall
+      if (InRotation_ && !InTranslation_)
+        {
+          Ref.Local.X=2*EPS_;
+          Ref.Local.Y=2*EPS_;
+          if (!PostRotationPhase_)
+            {
+              CurrentSupportFoot_ = CurrentSupport.Foot;
+              NbStepsAfterRotation_ = 0;
+              PostRotationPhase_ = true;
+            }
+          else
+            {
+              if (CurrentSupportFoot_ != CurrentSupport.Foot)
+                {
+                  CurrentSupportFoot_ = CurrentSupport.Foot;
+                  ++NbStepsAfterRotation_;
+                }
+              if (NbStepsAfterRotation_>2)
+                {
+                  InRotation_ = false;
+                  PostRotationPhase_ = false;
+                }
+            }
+        }
+      else
+        {
+          InRotation_ = false;
+        }
+    }
 }
 
 
@@ -103,7 +119,8 @@ SupportFSM::set_support_state(double time, unsigned int pi,
     ReferenceGiven = true;
 
   // Update time limit for double support phase
-  if(ReferenceGiven && Support.Phase == DS && (Support.TimeLimit-time-EPS_) > DSSSPeriod_)
+  if(ReferenceGiven && Support.Phase == DS
+     && (Support.TimeLimit-time-EPS_) > DSSSPeriod_)
     {
       Support.TimeLimit = time+DSSSPeriod_;
       Support.NbStepsLeft = NbStepsSSDS_;

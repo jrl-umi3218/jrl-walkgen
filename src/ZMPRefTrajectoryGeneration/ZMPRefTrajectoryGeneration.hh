@@ -100,59 +100,87 @@ namespace PatternGeneratorJRL
 
     /* ! \brief Set the Preview control time window. */
     inline void SetTimeWindowPreviewControl(const double & aTW)
-    { m_PreviewControlTime = aTW;};
+    {
+      m_PreviewControlTime = aTW;
+    };
 
     /* ! \brief Get the preview control time window. */
     inline const double & GetTimeWindowPreviewControl( ) const
-    { return m_PreviewControlTime; };
+    {
+      return m_PreviewControlTime;
+    };
 
     /* ! \brief Set for the foot angle on landing and taking off. */
     inline void SetOmega(const double & anOmega)
-    { m_Omega = anOmega;};
+    {
+      m_Omega = anOmega;
+    };
 
     /* ! \brief Get the foot angle on landing and taking off. */
     inline const double & GetOmega(void) const
-    { return m_Omega;};
+    {
+      return m_Omega;
+    };
 
     /* ! \brief Returns the Com Height. */
     inline const double & GetComHeight() const
-    { return m_ComHeight; };
+    {
+      return m_ComHeight;
+    };
 
     /* ! \brief Returns the Com Height. */
     inline void SetComHeight(const double & aComHeight)
-    { m_ComHeight = aComHeight; };
+    {
+      m_ComHeight = aComHeight;
+    };
 
     /* ! \brief Returns the single support time. */
     inline const double & GetTSingleSupport() const
-    { return m_Tsingle; };
+    {
+      return m_Tsingle;
+    };
 
     /* ! \brief Set the single support time. */
     inline void SetTSingleSupport(const double & aTSingleSupport)
-    { m_Tsingle = aTSingleSupport; };
+    {
+      m_Tsingle = aTSingleSupport;
+    };
 
     /* ! \brief Returns the double support time. */
     inline const double & GetTDoubleSupport() const
-    {return m_Tdble;};
+    {
+      return m_Tdble;
+    };
 
     /* ! \brief Set the double support time. */
     inline void SetTDoubleSupport(const double & aTdble)
-    { m_Tdble = aTdble;};
+    {
+      m_Tdble = aTdble;
+    };
 
     /* ! \brief Get the sampling period for the control, set to 0.005 by default. */
     inline const double & GetSamplingPeriod() const
-    { return m_SamplingPeriod; };
+    {
+      return m_SamplingPeriod;
+    };
 
     /* ! \brief Set the sampling period for the control. */
     inline void SetSamplingPeriod(const double &aSamplingPeriod)
-    { m_SamplingPeriod = aSamplingPeriod;};
+    {
+      m_SamplingPeriod = aSamplingPeriod;
+    };
 
     /* ! \brief Returns the step height. */
     inline const double & GetStepHeight() const
-    { return m_StepHeight;};
+    {
+      return m_StepHeight;
+    };
 
     /* ! \brief Specify the step height. */
     inline void SetStepHeight(const double & aSSH)
-    { m_StepHeight = aSSH;};
+    {
+      m_StepHeight = aSSH;
+    };
 
     /* ! \brief Returns the ModulationSupportCoefficient. */
     inline const double &GetModulationSupportCoefficient() const
@@ -333,11 +361,15 @@ namespace PatternGeneratorJRL
 
     /*! Set the current time. */
     void SetCurrentTime(const double & aTime)
-    { m_CurrentTime = aTime;}
+    {
+      m_CurrentTime = aTime;
+    }
 
     /*! Get the current time. */
     double GetCurrentTime()
-    { return m_CurrentTime;}
+    {
+      return m_CurrentTime;
+    }
     /*! @} */
 
     /*! \name Methods related to the on line status generation of the ZMP.

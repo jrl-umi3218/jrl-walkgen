@@ -20,7 +20,7 @@
  *
  */
 
-/// \doc Simulate a rigid body 
+/// \doc Simulate a rigid body
 
 
 #ifndef _RIGID_BODY_SYSTEM_
@@ -42,7 +42,8 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    RigidBodySystem( SimplePluginManager *SPM, PinocchioRobot *aPR, SupportFSM * FSM );
+    RigidBodySystem( SimplePluginManager *SPM, PinocchioRobot *aPR,
+                     SupportFSM * FSM );
 
     ~RigidBodySystem();
 
@@ -59,10 +60,10 @@ namespace PatternGeneratorJRL
     ///
     /// \return 0
     int interpolate( solution_t Result,
-        std::deque<ZMPPosition> & FinalZMPTraj_deq,
-        std::deque<COMState> & FinalCOMTraj_deq,
-        std::deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-        std::deque<FootAbsolutePosition> &FinalRightFootTraj_deq );
+                     std::deque<ZMPPosition> & FinalZMPTraj_deq,
+                     std::deque<COMState> & FinalCOMTraj_deq,
+                     std::deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+                     std::deque<FootAbsolutePosition> &FinalRightFootTraj_deq );
 
     /// \brief Update feet matrices
     ///
@@ -72,8 +73,8 @@ namespace PatternGeneratorJRL
     ///
     /// \return 0
     int update( const std::deque<support_state_t> & SupportStates_deq,
-        const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
-        const std::deque<FootAbsolutePosition> & RightFootTraj_deq );
+                const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
+                const std::deque<FootAbsolutePosition> & RightFootTraj_deq );
 
     /// \brief Initialize dynamics of the body center
     /// Suppose a piecewise constant jerk
@@ -93,70 +94,118 @@ namespace PatternGeneratorJRL
     ///
     /// return 0
     int generate_trajectories( double time, const solution_t & Result,
-        const std::deque<support_state_t> & SupportStates_deq, const std::deque<double> & PreviewedSupportAngles_deq,
-              std::deque<FootAbsolutePosition> & LeftFootTraj_deq, std::deque<FootAbsolutePosition> & RightFootTraj_deq);
+                               const std::deque<support_state_t> & SupportStates_deq,
+                               const std::deque<double> & PreviewedSupportAngles_deq,
+                               std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
+                               std::deque<FootAbsolutePosition> & RightFootTraj_deq);
 
     /// \name Accessors and mutators
     /// \{
     linear_dynamics_t const & DynamicsCoPJerk() const
-    { return CoPDynamicsJerk_; }
+    {
+      return CoPDynamicsJerk_;
+    }
     linear_dynamics_t & DynamicsCoPJerk()
-    { return CoPDynamicsJerk_; }
+    {
+      return CoPDynamicsJerk_;
+    }
 
     inline RigidBody const & CoM() const
-    {return CoM_;};
+    {
+      return CoM_;
+    };
     inline void CoM( const RigidBody & CoM )
-    {CoM_ = CoM;};
+    {
+      CoM_ = CoM;
+    };
 
     inline RigidBody const & LeftFoot() const
-    {return LeftFoot_;};
+    {
+      return LeftFoot_;
+    };
     inline RigidBody & LeftFoot()
-    {return LeftFoot_;};
+    {
+      return LeftFoot_;
+    };
     inline void LeftFoot( const RigidBody & LeftFoot )
-    {LeftFoot_ = LeftFoot;};
+    {
+      LeftFoot_ = LeftFoot;
+    };
 
     inline RigidBody const & RightFoot() const
-    {return RightFoot_;};
+    {
+      return RightFoot_;
+    };
     inline RigidBody & RightFoot()
-    {return RightFoot_;};
+    {
+      return RightFoot_;
+    };
     inline void RightFoot( const RigidBody & RightFoot )
-    {RightFoot_ = RightFoot;};
+    {
+      RightFoot_ = RightFoot;
+    };
 
     inline double SamplingPeriodSim( ) const
-    { return T_; }
+    {
+      return T_;
+    }
     inline void SamplingPeriodSim( double T )
-    { T_ = T; }
+    {
+      T_ = T;
+    }
 
     inline double SamplingPeriodAct( ) const
-    { return Ta_; }
+    {
+      return Ta_;
+    }
     inline void SamplingPeriodAct( double Ta )
-    { Ta_ = Ta; }
+    {
+      Ta_ = Ta;
+    }
 
     inline unsigned NbSamplingsPreviewed( ) const
-    { return N_; }
+    {
+      return N_;
+    }
     inline void NbSamplingsPreviewed( unsigned N )
-    { N_ = N; }
+    {
+      N_ = N;
+    }
 
     inline double Mass( ) const
-    { return mass_; }
+    {
+      return mass_;
+    }
     inline void Mass( double Mass )
-    { mass_ = Mass; }
+    {
+      mass_ = Mass;
+    }
 
     inline double CoMHeight( ) const
-    { return CoMHeight_; }
+    {
+      return CoMHeight_;
+    }
     inline void CoMHeight( double Height )
-    { CoMHeight_ = Height; }
+    {
+      CoMHeight_ = Height;
+    }
 
     inline bool multiBody( ) const
-    { return multiBody_; }
+    {
+      return multiBody_;
+    }
     inline void multiBody( bool multiBody )
-    { multiBody_ = multiBody; }
+    {
+      multiBody_ = multiBody;
+    }
 
     std::deque<support_state_t> & SupportTrajectory()
-    { return SupportTrajectory_deq_; }
+    {
+      return SupportTrajectory_deq_;
+    }
     /// \}
 
-    
+
     //
     // Private methods
     //
@@ -183,8 +232,9 @@ namespace PatternGeneratorJRL
     /// \param[out] RightFootDynamics
     ///
     /// return 0
-    int compute_foot_zero_dynamics( const std::deque<support_state_t> & SupportStates_deq,
-        linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
+    int compute_foot_zero_dynamics( const std::deque<support_state_t> &
+                                    SupportStates_deq,
+                                    linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
 
     /// \brief Compute foot dynamics based on polynomial interpolation
     ///
@@ -193,8 +243,9 @@ namespace PatternGeneratorJRL
     /// \param[out] RightFootDynamics
     ///
     /// return 0
-    int compute_foot_pol_dynamics( const std::deque<support_state_t> & SupportStates_deq,
-        linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
+    int compute_foot_pol_dynamics( const std::deque<support_state_t> &
+                                   SupportStates_deq,
+                                   linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
 
     /// \brief Compute foot dynamics based on "piecewise constant jerk" splines
     ///
@@ -203,15 +254,17 @@ namespace PatternGeneratorJRL
     /// \param[out] RightFootDynamics
     ///
     /// return 0
-    int compute_foot_cjerk_dynamics( const std::deque<support_state_t> & SupportStates_deq,
-        linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
+    int compute_foot_cjerk_dynamics( const std::deque<support_state_t> &
+                                     SupportStates_deq,
+                                     linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
 
     /// \brief Initialize static trajectories
     int initialize_trajectories();
 
     /// \brief Compute predefined trajectories
     /// \param[in] SupportStates_deq Previewed support states
-    int precompute_trajectories( const std::deque<support_state_t> & SupportStates_deq );
+    int precompute_trajectories( const std::deque<support_state_t> &
+                                 SupportStates_deq );
 
     /// \brief Compute a row of the dynamic matrices Sp and Sa
     /// \param[out] Spbar
@@ -240,10 +293,10 @@ namespace PatternGeneratorJRL
     /// \brief Bodies
     RigidBody
     CoM_,
-    LeftFoot_,
-    RightFoot_,
-    LeftWrist_,
-    RightWrist_;
+      LeftFoot_,
+      RightFoot_,
+      LeftWrist_,
+      RightWrist_;
 
     /// \brief Center of Pressure dynamics
     /// Divided into two parts to reflect the two different
@@ -275,10 +328,10 @@ namespace PatternGeneratorJRL
     /// \brief Recalculation period
     /// The state is incremented with respect to this parameter
     double Tr_;
-    
+
     /// \brief Sampling period actuators
     double Ta_;
-    
+
     /// \brief Nb previewed samples
     unsigned int N_;
 

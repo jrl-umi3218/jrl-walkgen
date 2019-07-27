@@ -9,7 +9,7 @@ DynamicFilter::DynamicFilter(
                              SimplePluginManager *SPM,
                              PinocchioRobot *aPR):
   SimplePlugin(SPM),
-  stage0_(0) , stage1_(1),
+  stage0_(0), stage1_(1),
   MODE_PC_(OptimalControllerSolver::MODE_WITH_INITIALPOS)
 {
   controlPeriod_       = 0.0 ;
@@ -21,7 +21,8 @@ DynamicFilter::DynamicFilter(
 
   PR_ = aPR ;
 
-  comAndFootRealization_ = new ComAndFootRealizationByGeometry((PatternGeneratorInterfacePrivate*) SPM );
+  comAndFootRealization_ = new ComAndFootRealizationByGeometry((
+                                                                PatternGeneratorInterfacePrivate*) SPM );
   comAndFootRealization_->setPinocchioRobot(PR_);
   comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
   comAndFootRealization_->ShiftFoot(true);
@@ -66,7 +67,7 @@ DynamicFilter::DynamicFilter(
   const unsigned int NbMethods = 1;
   const char *lMethodNames[NbMethods] =
     {":useDynamicFilter"};
-  for(unsigned int i=0;i<NbMethods;i++)
+  for(unsigned int i=0; i<NbMethods; i++)
     {
       std::string aMethodName(lMethodNames[i]);
       if (!RegisterMethod(aMethodName))
@@ -79,14 +80,16 @@ DynamicFilter::DynamicFilter(
 
 DynamicFilter::~DynamicFilter()
 {
-  if (PC_!=0){
-    delete PC_;
-    PC_ = 0 ;
-  }
-  if (comAndFootRealization_!=0){
-    delete comAndFootRealization_;
-    comAndFootRealization_ = 0 ;
-  }
+  if (PC_!=0)
+    {
+      delete PC_;
+      PC_ = 0 ;
+    }
+  if (comAndFootRealization_!=0)
+    {
+      delete comAndFootRealization_;
+      comAndFootRealization_ = 0 ;
+    }
 }
 
 void DynamicFilter::CallMethod(string &Method, istringstream &strm)
@@ -205,10 +208,10 @@ void DynamicFilter::init(
   comAndFootRealization_->SetPreviousConfigurationStage2(ZMPMBConfiguration_);
   comAndFootRealization_->SetPreviousVelocityStage2(ZMPMBVelocity_);
 
-  sxzmp_.resize( (int)round(controlWindowSize_/controlPeriod_) ,0.0);
-  syzmp_.resize( (int)round(controlWindowSize_/controlPeriod_) ,0.0);
-  deltaZMPx_.resize( (int)round(controlWindowSize_/controlPeriod_) ,0.0);
-  deltaZMPy_.resize( (int)round(controlWindowSize_/controlPeriod_) ,0.0);
+  sxzmp_.resize( (int)round(controlWindowSize_/controlPeriod_),0.0);
+  syzmp_.resize( (int)round(controlWindowSize_/controlPeriod_),0.0);
+  deltaZMPx_.resize( (int)round(controlWindowSize_/controlPeriod_),0.0);
+  deltaZMPy_.resize( (int)round(controlWindowSize_/controlPeriod_),0.0);
 
   comAndFootRealization_->leftLegIndexinConfiguration(llegIdxq_);
   comAndFootRealization_->rightLegIndexinConfiguration(rlegIdxq_);
@@ -243,8 +246,9 @@ int DynamicFilter::OffLinefilter(
 
       for(unsigned int i = 0 ; i < N ; ++i )
         {
-          ComputeZMPMB(interpolationPeriod_,inputCOMTraj_deq_[i],inputLeftFootTraj_deq_[i],
-                       inputRightFootTraj_deq_[i], ZMPMB_vec_[i] , 1 , i);
+          ComputeZMPMB(interpolationPeriod_,inputCOMTraj_deq_[i],
+                       inputLeftFootTraj_deq_[i],
+                       inputRightFootTraj_deq_[i], ZMPMB_vec_[i], 1, i);
         }
       for (unsigned int i = 0 ; i < N ; ++i)
         {
@@ -343,8 +347,10 @@ int DynamicFilter::OnLinefilter(
             {
               Polynome5 polyX(1.0,0.0) ;
               Polynome5 polyY(1.0,0.0) ;
-              polyX.SetParameters(inc,ZMPMB_vec_[i][0],dZMPMB_vec[i][0],0.0,ZMPMB_vec_[i+1][0],dZMPMB_vec[i+1][0],0.0);
-              polyY.SetParameters(inc,ZMPMB_vec_[i][1],dZMPMB_vec[i][1],0.0,ZMPMB_vec_[i+1][1],dZMPMB_vec[i+1][1],0.0);
+              polyX.SetParameters(inc,ZMPMB_vec_[i][0],dZMPMB_vec[i][0],0.0,
+                                  ZMPMB_vec_[i+1][0],dZMPMB_vec[i+1][0],0.0);
+              polyY.SetParameters(inc,ZMPMB_vec_[i][1],dZMPMB_vec[i][1],0.0,
+                                  ZMPMB_vec_[i+1][1],dZMPMB_vec[i+1][1],0.0);
 
               for(int j = 1 ; j < inc ; ++j)
                 {
@@ -361,14 +367,15 @@ int DynamicFilter::OnLinefilter(
           deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - zmpmb_i_[i][1] ;
         }
     }
-  else{
-    deltaZMP_deq_.resize(N1);
-    for (unsigned int i = 0 ; i < N1 ; ++i)
-      {
-        deltaZMP_deq_[i].px = 0.0 ;
-        deltaZMP_deq_[i].py = 0.0 ;
-      }
-  }
+  else
+    {
+      deltaZMP_deq_.resize(N1);
+      for (unsigned int i = 0 ; i < N1 ; ++i)
+        {
+          deltaZMP_deq_[i].px = 0.0 ;
+          deltaZMP_deq_[i].py = 0.0 ;
+        }
+    }
 
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
 
@@ -401,18 +408,29 @@ void DynamicFilter::InverseKinematics(
 {
 
   // lower body !!!!! the angular quantities are set in degree !!!!!!
-  aCoMState_(0) = inputCoMState.x[0];       aCoMSpeed_(0) = inputCoMState.x[1];
-  aCoMState_(1) = inputCoMState.y[0];       aCoMSpeed_(1) = inputCoMState.y[1];
-  aCoMState_(2) = inputCoMState.z[0];       aCoMSpeed_(2) = inputCoMState.z[1];
-  aCoMState_(3) = inputCoMState.roll[0];    aCoMSpeed_(3) = inputCoMState.roll[1];
-  aCoMState_(4) = inputCoMState.pitch[0];   aCoMSpeed_(4) = inputCoMState.pitch[1];
-  aCoMState_(5) = inputCoMState.yaw[0];     aCoMSpeed_(5) = inputCoMState.yaw[1];
+  aCoMState_(0) = inputCoMState.x[0];
+  aCoMSpeed_(0) = inputCoMState.x[1];
+  aCoMState_(1) = inputCoMState.y[0];
+  aCoMSpeed_(1) = inputCoMState.y[1];
+  aCoMState_(2) = inputCoMState.z[0];
+  aCoMSpeed_(2) = inputCoMState.z[1];
+  aCoMState_(3) = inputCoMState.roll[0];
+  aCoMSpeed_(3) = inputCoMState.roll[1];
+  aCoMState_(4) = inputCoMState.pitch[0];
+  aCoMSpeed_(4) = inputCoMState.pitch[1];
+  aCoMState_(5) = inputCoMState.yaw[0];
+  aCoMSpeed_(5) = inputCoMState.yaw[1];
 
-  aCoMAcc_(0) = inputCoMState.x[2];         aLeftFootPosition_(0) = inputLeftFoot.x;
-  aCoMAcc_(1) = inputCoMState.y[2];         aLeftFootPosition_(1) = inputLeftFoot.y;
-  aCoMAcc_(2) = inputCoMState.z[2];         aLeftFootPosition_(2) = inputLeftFoot.z;
-  aCoMAcc_(3) = inputCoMState.roll[2];      aLeftFootPosition_(3) = inputLeftFoot.theta;
-  aCoMAcc_(4) = inputCoMState.pitch[2];     aLeftFootPosition_(4) = inputLeftFoot.omega;
+  aCoMAcc_(0) = inputCoMState.x[2];
+  aLeftFootPosition_(0) = inputLeftFoot.x;
+  aCoMAcc_(1) = inputCoMState.y[2];
+  aLeftFootPosition_(1) = inputLeftFoot.y;
+  aCoMAcc_(2) = inputCoMState.z[2];
+  aLeftFootPosition_(2) = inputLeftFoot.z;
+  aCoMAcc_(3) = inputCoMState.roll[2];
+  aLeftFootPosition_(3) = inputLeftFoot.theta;
+  aCoMAcc_(4) = inputCoMState.pitch[2];
+  aLeftFootPosition_(4) = inputLeftFoot.omega;
   aCoMAcc_(5) = inputCoMState.yaw[2];
 
   aRightFootPosition_(0) = inputRightFoot.x;
@@ -527,7 +545,7 @@ int DynamicFilter::OptimalControl(
                                  inputdeltaZMP_deq,i,
                                  deltaZMPx, deltaZMPy,
                                  false);
-      for(int j=0;j<3;++j)
+      for(int j=0; j<3; ++j)
         {
           outputDeltaCOMTraj_deq_[i].x[j] = deltax_(j,0);
           outputDeltaCOMTraj_deq_[i].y[j] = deltay_(j,0);
@@ -536,21 +554,22 @@ int DynamicFilter::OptimalControl(
   // test to verify if the Kajita PC diverged
   for (std::size_t i = 0 ; i < Nctrl ; ++i)
     {
-      for(int j=0;j<3;++j)
+      for(int j=0; j<3; ++j)
         {
           if ( (outputDeltaCOMTraj_deq_[i].x[j] ==
                 outputDeltaCOMTraj_deq_[i].x[j]) ||
                (outputDeltaCOMTraj_deq_[i].y[j] ==
                 outputDeltaCOMTraj_deq_[i].y[j]) )
             {}
-          else{
-            cout << "kajita2003 preview control diverged "
-                 << outputDeltaCOMTraj_deq_[i].x[j] << " "
-                 << outputDeltaCOMTraj_deq_[i].y[j] << " "
-                 << deltaZMPx << " "
-                 << deltaZMPy << "\n" ;
-            return -1 ;
-          }
+          else
+            {
+              cout << "kajita2003 preview control diverged "
+                   << outputDeltaCOMTraj_deq_[i].x[j] << " "
+                   << outputDeltaCOMTraj_deq_[i].y[j] << " "
+                   << deltaZMPx << " "
+                   << deltaZMPy << "\n" ;
+              return -1 ;
+            }
         }
     }
   return 0 ;
@@ -742,7 +761,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
 
   for (int i = 0 ; i < Nctrl ; ++i)
     {
-      for(int j=0;j<3;j++)
+      for(int j=0; j<3; j++)
         {
           CoM_tmp[i].x[j] += outputDeltaCOMTraj_deq_[i].x[j] ;
           CoM_tmp[i].y[j] += outputDeltaCOMTraj_deq_[i].y[j] ;
@@ -853,13 +872,19 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
       aof << inputRightFootTraj_deq_[i].dz << " " ;     // 39
       aof << inputRightFootTraj_deq_[i].ddz << " " ;    // 40
 
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[0] << " " ; // 41
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[1] << " " ; // 42
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[2] << " " ; // 43
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[0] << " "
+        ; // 41
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[1] << " "
+        ; // 42
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[2] << " "
+        ; // 43
 
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[0] << " " ; // 44
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[1] << " " ; // 45
-      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[2] << " " ; // 46
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[0] << " "
+        ; // 44
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[1] << " "
+        ; // 45
+      aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[2] << " "
+        ; // 46
 
       //47
       int it_subsample = i*(int)round(interpolationPeriod_/controlPeriod_) ;

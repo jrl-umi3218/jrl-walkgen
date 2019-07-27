@@ -45,7 +45,8 @@
 #include <patterngeneratorinterfaceprivate.hh>
 #include <Debug.hh>
 
-namespace PatternGeneratorJRL {
+namespace PatternGeneratorJRL
+{
 
   PatternGeneratorInterfacePrivate::
   PatternGeneratorInterfacePrivate(PinocchioRobot *aPinocchioRobotRobot)
@@ -121,9 +122,9 @@ namespace PatternGeneratorJRL {
     m_ZMPShift[2] = 0.02;
     m_ZMPShift[3] = 0.02;
 
-    for(int i=0;i<4;i++)
+    for(int i=0; i<4; i++)
       {
-        for(int j=0;j<4;j++)
+        for(int j=0; j<4; j++)
           if (i==j)
             m_MotionAbsPos(i,j) =
               m_MotionAbsOrientation(i,j) =
@@ -170,7 +171,7 @@ namespace PatternGeneratorJRL {
     m_AbsMotionTheta = 0;
     m_InternalClock = 0.0;
 
-    for(unsigned int i=0;i<3;i++)
+    for(unsigned int i=0; i<3; i++)
       m_ZMPInitialPoint(i)=0.0;
     m_ZMPInitialPointSet = false;
 
@@ -186,7 +187,8 @@ namespace PatternGeneratorJRL {
   {
 #define number_of_method 18
     std::string aMethodName[number_of_method] =
-      {":LimitsFeasibility",
+      {
+       ":LimitsFeasibility",
        ":ZMPShiftParameters",
        ":TimeDistributionParameters",
        ":stepseq",
@@ -203,9 +205,10 @@ namespace PatternGeneratorJRL {
        ":NaveauOnline",
        ":setVelReference",
        ":setCoMPerturbationForce",
-       ":feedBackControl"};
+       ":feedBackControl"
+      };
 
-    for(int i=0;i<number_of_method;i++)
+    for(int i=0; i<number_of_method; i++)
       {
         if (!SimplePlugin::RegisterMethod(aMethodName[i]))
           {
@@ -505,8 +508,8 @@ namespace PatternGeneratorJRL {
       case 2:
         {
           ODEBUG( "Walk Mode with Obstacle StepOver Selected \
-                (obstacle parameters have to be set first, \
-                 if not standard dimensions are used)" );
+              (obstacle parameters have to be set first, \
+               if not standard dimensions are used)" );
           m_StOvPl->SetObstacleInformation(m_ObstaclePars);
           m_StOvPl->SetDeltaStepOverCOMHeightMax(m_DeltaFeasibilityLimit);
 
@@ -518,9 +521,9 @@ namespace PatternGeneratorJRL {
       default:
         {
           std::cerr<<  "Please select proper walk mode. \
-                 (0 for normal walking ; \
-                  1 for walking with waistheight variation ; \
-                  2 for walking with obstacle stepover)"
+               (0 for normal walking ; \
+                1 for walking with waistheight variation ; \
+                2 for walking with obstacle stepover)"
                    << std::endl;
           return;
         }
@@ -744,7 +747,9 @@ namespace PatternGeneratorJRL {
     CoMPos(1,1) =  coscomyaw;
     CoMPos(1,2) = lStartingCOMState.y[0];
 
-    CoMPos(2,0) = 0.0;CoMPos(2,1) = 0.0;CoMPos(2,2) = 1.0;
+    CoMPos(2,0) = 0.0;
+    CoMPos(2,1) = 0.0;
+    CoMPos(2,2) = 1.0;
 
     ODEBUG("InitLeftFoot:" <<  InitLeftFootAbsPos.x
            << " " << InitLeftFootAbsPos.y
@@ -801,7 +806,8 @@ namespace PatternGeneratorJRL {
     // Create from the rigid motion the step to be added to the list of steps.
     RelativeFootPosition aRFP;
     memset(&aRFP,0,sizeof(aRFP));
-    aRFP.sx = InitialMotion(0,2); aRFP.sy = InitialMotion(1,2);
+    aRFP.sx = InitialMotion(0,2);
+    aRFP.sy = InitialMotion(1,2);
     aRFP.theta = atan2(InitialMotion(1,0),InitialMotion(0,0));
     ODEBUG("Initial motion: " << InitialMotion);
     ODEBUG("lRelativeFootPositions:"<<lRelativeFootPositions.size());
@@ -831,13 +837,13 @@ namespace PatternGeneratorJRL {
 
     lCurrentJointValues.resize(m_CurrentActuatedJointValues.size());
 
-    for(unsigned int i=0;i<m_CurrentActuatedJointValues.size();i++)
+    for(unsigned int i=0; i<m_CurrentActuatedJointValues.size(); i++)
       lCurrentJointValues[i] = m_CurrentActuatedJointValues[i];
 
     m_DOF = (int)m_CurrentActuatedJointValues.size();
     BodyAnglesIni.resize(m_CurrentActuatedJointValues.size());
 
-    for(int j=0; j<m_DOF;j++)
+    for(int j=0; j<m_DOF; j++)
       {
         BodyAnglesIni(j) = lCurrentJointValues[j];
       }
@@ -847,7 +853,7 @@ namespace PatternGeneratorJRL {
       CopyRelativeFootPosition
       (lRelativeFootPositions,ClearStepStackHandler);
 
-    for(unsigned int i=0;i<lRelativeFootPositions.size();i++)
+    for(unsigned int i=0; i<lRelativeFootPositions.size(); i++)
       {
         ODEBUG(lRelativeFootPositions[i].sx << " " <<
                lRelativeFootPositions[i].sy << " " <<
@@ -902,7 +908,7 @@ namespace PatternGeneratorJRL {
         aof.open("/tmp/output.txt", ofstream::out);
         if (aof.is_open())
           {
-            for(unsigned int i=0;i<lRelativeFootPositions.size();i++)
+            for(unsigned int i=0; i<lRelativeFootPositions.size(); i++)
               {
                 aof << lRelativeFootPositions[i].sx <<" "
                     << lRelativeFootPositions[i].sy <<" "
@@ -943,7 +949,7 @@ namespace PatternGeneratorJRL {
 
     if (m_ZMPInitialPointSet)
       {
-        for(unsigned int i=0;i<3;i++)
+        for(unsigned int i=0; i<3; i++)
           lStartingZMPPosition(i) = m_ZMPInitialPoint(i);
       }
 
@@ -996,11 +1002,11 @@ namespace PatternGeneratorJRL {
                << " " << m_RightFootPositions.size());
       }
     // Keep the last one to be removed at the next insertion.
-    for(std::size_t i=0;i<NbOfStepsToRemoveFromTheStack-1;i++)
+    for(std::size_t i=0; i<NbOfStepsToRemoveFromTheStack-1; i++)
       m_StepStackHandler->RemoveFirstStepInTheStack();
 
     // Initialization of the first preview.
-    for(int j=0; j<m_DOF;j++)
+    for(int j=0; j<m_DOF; j++)
       {
         BodyAnglesIni(j) = lCurrentJointValues[j];
       }
@@ -1307,9 +1313,10 @@ namespace PatternGeneratorJRL {
     else if (aCmd==":readfilefromkw")
       m_ReadFileFromKineoWorks(strm);
 
-    else if (aCmd==":SetAlgoForZmpTrajectory"){
-      m_SetAlgoForZMPTraj(strm);
-    }
+    else if (aCmd==":SetAlgoForZmpTrajectory")
+      {
+        m_SetAlgoForZMPTraj(strm);
+      }
 
     else if (aCmd==":SetAutoFirstStep")
       {
@@ -1654,7 +1661,8 @@ namespace PatternGeneratorJRL {
               ReturnFrontFootPosition(lRelativeFootPositions);
             if ((!EnoughSteps)&& (!EndSequence))
               {
-                std::cerr << "You don't have enough steps in the step stack handler."
+                std::cerr << "You don't have enough steps in the"
+                          << " step stack handler."
                           << std::endl;
                 std::cerr << "And this is not an end sequence."
                           << std::endl;
@@ -1746,7 +1754,7 @@ namespace PatternGeneratorJRL {
                    <<m_InternalClock << ")");
           }
 
-        ODEBUG4("*** TAG *** " , "DebugDataIK.dat");
+        ODEBUG4("*** TAG *** ", "DebugDataIK.dat");
 
       }
 
@@ -1798,7 +1806,7 @@ namespace PatternGeneratorJRL {
        m_CurrentActuatedJointValues.size())
       m_CurrentActuatedJointValues.resize(lCurrentJointValues.size());
 
-    for(unsigned int i=0;i<lCurrentJointValues.size();i++)
+    for(unsigned int i=0; i<lCurrentJointValues.size(); i++)
       {
         m_CurrentActuatedJointValues[i] = lCurrentJointValues(i);
       }
@@ -1842,7 +1850,7 @@ namespace PatternGeneratorJRL {
 
     // TO DO: take the joint specific to the legs
     // and create the appropriate vector.
-    for(int i=0;i<6;i++)
+    for(int i=0; i<6; i++)
       {
         dqr(i) = m_dqr(i);
         dql(i) = m_dql(i);
@@ -1854,7 +1862,7 @@ namespace PatternGeneratorJRL {
     COMState aCOMPos;
     KWNode anUpperBodyPos;
 
-    for(int i=0;i<aNumber;i++)
+    for(int i=0; i<aNumber; i++)
       {
         // Add COM value set at a default value.
         aCOMPos.z[0] = m_PC->GetHeightOfCoM();
@@ -2032,18 +2040,22 @@ namespace PatternGeneratorJRL {
 
   }
 
-  void PatternGeneratorInterfacePrivate::getWaistVelocity(double & dx,
-                                                          double & dy,
-                                                          double & omega) const
+  void PatternGeneratorInterfacePrivate::
+  getWaistVelocity
+  (double & dx,
+   double & dy,
+   double & omega) const
   {
     dx = m_AbsLinearVelocity(0);
     dy = m_AbsLinearVelocity(1);
     omega = m_AbsAngularVelocity(2);
   }
 
-  void PatternGeneratorInterfacePrivate::setVelocityReference(double x,
-                                                              double y,
-                                                              double yaw)
+  void PatternGeneratorInterfacePrivate::
+  setVelocityReference
+  (double x,
+   double y,
+   double yaw)
   {
     m_ZMPVRQP->Reference(x,y,yaw);
 #if USE_QUADPROG
@@ -2051,8 +2063,10 @@ namespace PatternGeneratorJRL {
 #endif
   }
 
-  void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(double x,
-                                                                 double y)
+  void PatternGeneratorInterfacePrivate::
+  setCoMPerturbationForce
+  (double x,
+   double y)
   {
     m_ZMPVRQP->setCoMPerturbationForce(x,y);
 #if USE_QUADPROG

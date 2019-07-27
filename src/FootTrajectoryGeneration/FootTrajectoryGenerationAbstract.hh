@@ -88,7 +88,7 @@ namespace PatternGeneratorJRL
 
 
     /*! Default destructor. */
-    virtual ~FootTrajectoryGenerationAbstract(){};
+    virtual ~FootTrajectoryGenerationAbstract() {};
 
     /*! This method computes the position of the swinging foot during single support phase,
       and maintian a constant position for the support foot.
@@ -105,14 +105,16 @@ namespace PatternGeneratorJRL
       @param StepType: Type of steps (for book-keeping).
       @param LeftOrRight: Specify if it is left (1) or right (-1).
     */
-    virtual void UpdateFootPosition(std::deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
+    virtual void UpdateFootPosition(std::deque<FootAbsolutePosition>
+                                    &SupportFootAbsolutePositions,
                                     std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
                                     int CurrentAbsoluteIndex,
                                     int IndexInitial,
                                     double ModulatedSingleSupportTime,
                                     int StepType, int LeftOrRight);
 
-    virtual void UpdateFootPosition(std::deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
+    virtual void UpdateFootPosition(std::deque<FootAbsolutePosition>
+                                    &SupportFootAbsolutePositions,
                                     std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
                                     int StartIndex, int k,
                                     double LocalInterpolationStartTime,
@@ -135,11 +137,15 @@ namespace PatternGeneratorJRL
 
     /*! \brief Set single support time */
     void SetSingleSupportTime(double aTSingle)
-    { m_TSingle =aTSingle;};
+    {
+      m_TSingle =aTSingle;
+    };
 
     /*! \brief Get single support time */
     double GetSingleSupportTime() const
-    { return m_TSingle;};
+    {
+      return m_TSingle;
+    };
     /*! @} */
 
     /*! \name Double Support Time
@@ -148,11 +154,15 @@ namespace PatternGeneratorJRL
 
     /*! \brief Set double support time */
     void SetDoubleSupportTime(double aTDouble)
-    { m_TDouble =aTDouble;};
+    {
+      m_TDouble =aTDouble;
+    };
 
     /*! \brief Get single support time */
     double GetDoubleSupportTime() const
-    { return m_TDouble;};
+    {
+      return m_TDouble;
+    };
 
     /*! @}*/
 
@@ -162,11 +172,15 @@ namespace PatternGeneratorJRL
 
     /*! \brief Set single support time */
     void SetSamplingPeriod(double aSamplingPeriod)
-    { m_SamplingPeriod = aSamplingPeriod;};
+    {
+      m_SamplingPeriod = aSamplingPeriod;
+    };
 
     /*! \brief Get single support time */
     double GetSamplingPeriod() const
-    { return m_SamplingPeriod;};
+    {
+      return m_SamplingPeriod;
+    };
 
     /*!@}*/
 
@@ -175,11 +189,15 @@ namespace PatternGeneratorJRL
 
     /*! Get Omega */
     double GetOmega() const
-    { return m_Omega; };
+    {
+      return m_Omega;
+    };
 
     /*! Set Omega */
     void SetOmega(double anOmega)
-    { m_Omega = anOmega; };
+    {
+      m_Omega = anOmega;
+    };
 
 
     /*! \name StepHeight.
@@ -187,11 +205,15 @@ namespace PatternGeneratorJRL
 
     /*! Get StepHeight */
     double GetStepHeight() const
-    { return m_StepHeight; };
+    {
+      return m_StepHeight;
+    };
 
     /*! Set Omega */
     void SetStepHeight(double aStepHeight)
-    { m_StepHeight = aStepHeight; };
+    {
+      m_StepHeight = aStepHeight;
+    };
 
 
     /*! \name isStepStairOn.
@@ -199,11 +221,15 @@ namespace PatternGeneratorJRL
 
     /*! Get isStepStairOn */
     int GetSetStepStairOn() const
-    { return  m_isStepStairOn; };
+    {
+      return  m_isStepStairOn;
+    };
 
     /*! Set isStepStairOn */
     void SetStepStairOn(int aSSO)
-    {  m_isStepStairOn= aSSO;};
+    {
+      m_isStepStairOn= aSSO;
+    };
 
     /*! @} */
     /*! @} */

@@ -20,7 +20,7 @@
  *
  */
 
-/// \doc Simulate a rigid body 
+/// \doc Simulate a rigid body
 
 
 #ifndef _RIGID_BODY_
@@ -101,9 +101,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Interpolate
     int interpolate(std::deque<COMState> &COMStates,
-        std::deque<ZMPPosition> &ZMPRefPositions,
-        int CurrentPosition,
-        double CX, double CY);
+                    std::deque<ZMPPosition> &ZMPRefPositions,
+                    int CurrentPosition,
+                    double CX, double CY);
 
     /// \brief Initialize
     ///
@@ -129,32 +129,54 @@ namespace PatternGeneratorJRL
     linear_dynamics_t & Dynamics( dynamics_e );
 
     inline double const & SamplingPeriodSim( ) const
-    { return T_; }
+    {
+      return T_;
+    }
     inline void SamplingPeriodSim( double T )
-    { T_ = T; }
+    {
+      T_ = T;
+    }
 
     inline double const & SamplingPeriodAct( ) const
-    { return Ta_; }
+    {
+      return Ta_;
+    }
     inline void SamplingPeriodAct( double Ta )
-    { Ta_ = Ta; }
+    {
+      Ta_ = Ta;
+    }
 
     inline unsigned const & NbSamplingsPreviewed( ) const
-    { return N_; }
+    {
+      return N_;
+    }
     inline void NbSamplingsPreviewed( unsigned N )
-    { N_ = N; }
+    {
+      N_ = N;
+    }
 
     inline double const & Mass( ) const
-    { return Mass_; }
+    {
+      return Mass_;
+    }
     inline void Mass( double Mass )
-    { Mass_ = Mass; }
+    {
+      Mass_ = Mass;
+    }
 
     inline std::deque<rigid_body_state_t> & Trajectory()
-    { return Trajectory_; }
+    {
+      return Trajectory_;
+    }
 
     inline rigid_body_state_t & State()
-    { return State_; }
+    {
+      return State_;
+    }
     inline rigid_body_state_t const & State() const
-    { return State_; }
+    {
+      return State_;
+    }
     /// \}
 
 
@@ -178,10 +200,10 @@ namespace PatternGeneratorJRL
     /// \{
     linear_dynamics_t
     PositionDynamics_,
-    VelocityDynamics_,
-    AccelerationDynamics_,
-    JerkDynamics_,
-    CoPDynamics_;
+      VelocityDynamics_,
+      AccelerationDynamics_,
+      JerkDynamics_,
+      CoPDynamics_;
     /// \}
 
     /// \brief Sampling period simulation

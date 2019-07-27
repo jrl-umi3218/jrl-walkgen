@@ -363,7 +363,7 @@ interpolate_feet_positions
          TimeInterval,2*0.0*180.0/M_PI,
          LastSFP->omega2, LastSFP->domega2);
 
-      for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod);k++)
+      for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod); k++)
         {
           if (CurrentSupport.Foot == LEFT)
             {
@@ -501,7 +501,7 @@ interpolate_feet_positions
          TimeInterval,2*0.0*180.0/M_PI,
          LastSFP->omega2, LastSFP->domega2);
 
-      for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod);k++)
+      for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod); k++)
         {
           if (CurrentSupport.Foot == LEFT)
             {
@@ -528,7 +528,7 @@ interpolate_feet_positions
   else if (CurrentSupport.Phase == DS ||
            Time+m_TDouble >= CurrentSupport.TimeLimit)
     {
-      for(int k = 1; k<=(int)(m_TDouble/m_SamplingPeriod);k++)
+      for(int k = 1; k<=(int)(m_TDouble/m_SamplingPeriod); k++)
         {
           FinalRightFootTraj_deq[CurrentIndex+k] =
             FinalRightFootTraj_deq[CurrentIndex+k-1];

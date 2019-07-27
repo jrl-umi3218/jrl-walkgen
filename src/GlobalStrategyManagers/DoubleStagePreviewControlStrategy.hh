@@ -96,7 +96,9 @@ namespace PatternGeneratorJRL
 
     /*! \brief Setter for the stack handler. */
     void SetStepStackHandler(StepStackHandler *aSSH)
-    { m_StepStackHandler = aSSH; }
+    {
+      m_StepStackHandler = aSSH;
+    }
 
     /*! \brief Initialization of the inter objects relationship. */
     int InitInterObjects(PinocchioRobot * aPR,

@@ -51,7 +51,7 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
   double DefaultFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
   double DefaultFPosEdgesY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
 
-  for(int i=0;i<5;i++)
+  for(int i=0; i<5; i++)
     {
       LeftFPosEdgesX_[i] = DefaultFPosEdgesX[i];
       LeftFPosEdgesY_[i] = DefaultFPosEdgesY[i];
@@ -66,11 +66,13 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
 
   // Register method to handle
   string aMethodName[] =
-    {":setfeetconstraint",
+    {
+     ":setfeetconstraint",
      ":setDSFeetDistance",
-     ":setFPosEdges"};
+     ":setFPosEdges"
+    };
 
-  for(int i=0;i<1;i++)
+  for(int i=0; i<1; i++)
     {
       if (!RegisterMethod(aMethodName[i]))
         {
@@ -127,10 +129,12 @@ RelativeFeetInequalities::init_convex_hulls()
       ZMPPosEdges_.RightSS.Y_vec[j] = lycoefsRight[j]*RightFootSize_.getHalfHeight();
       //Left DS phase
       ZMPPosEdges_.LeftDS.X_vec[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
-      ZMPPosEdges_.LeftDS.Y_vec[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeightDS()-DSFeetDistance_/2.0;
+      ZMPPosEdges_.LeftDS.Y_vec[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeightDS()
+        -DSFeetDistance_/2.0;
       //Right DS phase
       ZMPPosEdges_.RightDS.X_vec[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
-      ZMPPosEdges_.RightDS.Y_vec[j] = lycoefsRight[j]*RightFootSize_.getHalfHeightDS()+DSFeetDistance_/2.0;
+      ZMPPosEdges_.RightDS.Y_vec[j] = lycoefsRight[j]*RightFootSize_.getHalfHeightDS()
+        +DSFeetDistance_/2.0;
     }
 
 
@@ -279,7 +283,7 @@ RelativeFeetInequalities::compute_linear_system ( convex_hull_t & ConvexHull,
     sign = 1.0;
   else
     sign = -1.0;
-  for( unsigned i=0; i<nbRows-1;i++ )//first n-1 inequalities
+  for( unsigned i=0; i<nbRows-1; i++ ) //first n-1 inequalities
     {
       y1 = ConvexHull.Y_vec[i];
       y2 = ConvexHull.Y_vec[i+1];
@@ -295,7 +299,8 @@ RelativeFeetInequalities::compute_linear_system ( convex_hull_t & ConvexHull,
       dy = sign*dy;
       dc = sign*dc;
 
-      ConvexHull.A_vec[i] = dx; ConvexHull.B_vec[i]= dy;
+      ConvexHull.A_vec[i] = dx;
+      ConvexHull.B_vec[i]= dy;
       ConvexHull.D_vec[i] = dc;
     }
 
@@ -317,7 +322,8 @@ RelativeFeetInequalities::compute_linear_system ( convex_hull_t & ConvexHull,
     dy = sign*dy;
     dc = sign*dc;
 
-    ConvexHull.A_vec[i] = dx; ConvexHull.B_vec[i]= dy;
+    ConvexHull.A_vec[i] = dx;
+    ConvexHull.B_vec[i]= dy;
     ConvexHull.D_vec[i] = dc;
   }
 
@@ -325,7 +331,8 @@ RelativeFeetInequalities::compute_linear_system ( convex_hull_t & ConvexHull,
 
 
 void
-RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &Args )
+RelativeFeetInequalities::CallMethod( std::string &Method,
+                                      std::istringstream &Args )
 {
 
   if ( Method==":setfeetconstraint" )
@@ -339,7 +346,7 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
           Args >> SecurityMarginY_;
 
           RightFootSize_.setConstraints
-            ( SecurityMarginX_, SecurityMarginY_ , DSFeetDistance_ );
+            ( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
           LeftFootSize_.setConstraints
             ( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
           init_convex_hulls();
@@ -359,7 +366,7 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
       if (lCmd == "X")
         {
           ODEBUG("LeftFeftFPosEdgesX = ");
-          for(int i=0;i<5;i++)
+          for(int i=0; i<5; i++)
             {
               Args >> LeftFPosEdgesX_[i];
               RightFPosEdgesX_[i] = LeftFPosEdgesX_[i];
@@ -370,7 +377,7 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
       else if (lCmd == "Y")
         {
           ODEBUG("LeftFeftFPosEdgesY = ");
-          for(int i=0;i<5;i++)
+          for(int i=0; i<5; i++)
             {
               Args >> LeftFPosEdgesY_[i];
               RightFPosEdgesY_[i] = -LeftFPosEdgesY_[i];
@@ -382,7 +389,8 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
 }
 
 void
-RelativeFeetInequalities::getFeetSize(FootHalfSize & leftFootSize, FootHalfSize & rightFootSize)
+RelativeFeetInequalities::getFeetSize(FootHalfSize & leftFootSize,
+                                      FootHalfSize & rightFootSize)
 {
   leftFootSize  = LeftFootSize_  ;
   rightFootSize = RightFootSize_ ;

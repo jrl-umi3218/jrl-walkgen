@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2006, 2007, 2008, 2009, 2010,
  *
  * Florent    Lamiraux
  * Olivier    Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* Polynomes object for trajectories. */
@@ -44,44 +44,44 @@ Polynome::~Polynome()
 double Polynome::Compute(double t)
 {
   double r=0.0,pt=1.0;
-  for(unsigned int i=0;i<m_Coefficients.size();i++)
-  {
-    r += m_Coefficients[i]*pt;
-    pt *=t;
-  }
+  for(unsigned int i=0; i<m_Coefficients.size(); i++)
+    {
+      r += m_Coefficients[i]*pt;
+      pt *=t;
+    }
   return r;
 }
 
 double Polynome::ComputeDerivative(double t)
 {
   double r=0,pt=1;
-  for(unsigned int i=1;i<m_Coefficients.size();i++)
-  {
-    r += i*m_Coefficients[i]*pt;
-    pt *=t;
-  }
+  for(unsigned int i=1; i<m_Coefficients.size(); i++)
+    {
+      r += i*m_Coefficients[i]*pt;
+      pt *=t;
+    }
   return r;
 }
 
 double Polynome::ComputeSecDerivative(double t)
 {
   double r=0,pt=1;
-  for(unsigned int i=2;i<m_Coefficients.size();i++)
-  {
-    r += i*(i-1)*m_Coefficients[i]*pt;
-    pt *=t;
-  }
+  for(unsigned int i=2; i<m_Coefficients.size(); i++)
+    {
+      r += i*(i-1)*m_Coefficients[i]*pt;
+      pt *=t;
+    }
   return r;
 }
 
 double Polynome::ComputeJerk(double t)
 {
   double r=0,pt=1;
-  for(unsigned int i=3;i<m_Coefficients.size();i++)
-  {
-    r += i*(i-1)*(i-2)*m_Coefficients[i]*pt;
-    pt *=t;
-  }
+  for(unsigned int i=3; i<m_Coefficients.size(); i++)
+    {
+      r += i*(i-1)*(i-2)*m_Coefficients[i]*pt;
+      pt *=t;
+    }
   return r;
 }
 
@@ -98,7 +98,7 @@ void Polynome::SetCoefficients(const vector<double> &lCoefficients)
 
 void Polynome::print() const
 {
-  for(unsigned int i=0;i<m_Coefficients.size();i++)
+  for(unsigned int i=0; i<m_Coefficients.size(); i++)
     cout << m_Coefficients[i] << " " ;
   cout << endl;
 }

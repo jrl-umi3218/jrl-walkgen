@@ -1,10 +1,10 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Mehdi      Benallegue
  * Andrei     Herdt
  * Olivier    Stasse
- * 
+ *
  *
  * JRL, CNRS/AIST
  *
@@ -21,12 +21,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* This object generate matrix representation of linear
    constraint based on foot position.
-   It handles a stack of constraint on a sliding mode 
+   It handles a stack of constraint on a sliding mode
    for QP solving. */
 
 #ifndef _RELATIVE_FEET_INEQUALITIES_
@@ -62,7 +62,7 @@ namespace PatternGeneratorJRL
     /// \name Constructors and destructors.
     /// \{
     RelativeFeetInequalities (SimplePluginManager * aSPM,
-        PinocchioRobot * aPR);
+                              PinocchioRobot * aPR);
     ~RelativeFeetInequalities ();
     /// \}
 
@@ -72,8 +72,8 @@ namespace PatternGeneratorJRL
     /// \param[in] SupportState Corresponding support state
     /// \param[in] Type CoP/Feet
     void set_vertices( convex_hull_t & ConvexHull,
-        const support_state_t & SupportState,
-        ineq_e type);
+                       const support_state_t & SupportState,
+                       ineq_e type);
 
     /// \brief Adapt inequalities to the support foot and its orientation
     ///
@@ -81,7 +81,7 @@ namespace PatternGeneratorJRL
     /// \param[in] SupportState
     /// \param[in] Type CoP/Feet/CoM
     void set_inequalities( convex_hull_t & ConvexHull,
-        const support_state_t & Support, ineq_e type);
+                           const support_state_t & Support, ineq_e type);
 
     /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.
@@ -89,7 +89,7 @@ namespace PatternGeneratorJRL
     /// \param[out] aVecOfPoints a vector of vertices
     /// \param[in] PrwSupport previewed support state
     void compute_linear_system ( convex_hull_t & ConvexHull,
-        const support_state_t & PrwSupport) const;
+                                 const support_state_t & PrwSupport) const;
 
     /// \brief Reimplement the interface of SimplePluginManager
     ///
@@ -105,7 +105,9 @@ namespace PatternGeneratorJRL
     void getFeetSize(FootHalfSize & leftFootSize, FootHalfSize & rightFootSize);
 
     inline double DSFeetDistance()
-    {return DSFeetDistance_;}
+    {
+      return DSFeetDistance_;
+    }
 
     //
     // Private member functions
@@ -137,9 +139,9 @@ namespace PatternGeneratorJRL
     {
       convex_hull_t
       LeftSS,
-      RightSS,
-      RightDS,
-      LeftDS;
+        RightSS,
+        RightDS,
+        LeftDS;
     };
     struct edges_s FootPosEdges_, ZMPPosEdges_;
 

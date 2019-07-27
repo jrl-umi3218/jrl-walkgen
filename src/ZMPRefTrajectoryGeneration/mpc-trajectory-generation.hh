@@ -107,92 +107,134 @@ namespace PatternGeneratorJRL
 
     /*! Set the current time. */
     void CurrentTime(double Time)
-    { CurrentTime_ = Time;}
+    {
+      CurrentTime_ = Time;
+    }
 
     /*! Get the current time. */
     double CurrentTime()
-    { return CurrentTime_;}
+    {
+      return CurrentTime_;
+    }
 
     /// \brief Set the length of the preview window.
     inline void PreviewLength(double aPP)
-    { PreviewControlTime_ = aPP;};
+    {
+      PreviewControlTime_ = aPP;
+    };
 
     /// \brief Get the preview control time window.
     inline const double & PreviewLength( ) const
-    { return PreviewControlTime_; };
+    {
+      return PreviewControlTime_;
+    };
 
     /// \brief Return the Com Height.
     inline const double & ComHeight() const
-    { return CoMHeight_; };
+    {
+      return CoMHeight_;
+    };
 
     /// \brief Return the Com Height.
     inline void ComHeight(double ComHeight)
-    { CoMHeight_ = ComHeight; };
+    {
+      CoMHeight_ = ComHeight;
+    };
 
     /// \brief Return the single support time.
     inline const double & TSingleSupport() const
-    { return Tsingle_; };
+    {
+      return Tsingle_;
+    };
 
     /// \brief Set the single support time.
     inline void TSingleSupport(double TSingleSupport)
-    { Tsingle_ = TSingleSupport; };
+    {
+      Tsingle_ = TSingleSupport;
+    };
 
     /// \brief Return the double support time.
     inline const double & TDoubleSupport() const
-    {return Tdble_;};
+    {
+      return Tdble_;
+    };
 
     /// \brief Set the double support time. */
     inline void TDoubleSupport(double Tdble)
-    { Tdble_ = Tdble;};
+    {
+      Tdble_ = Tdble;
+    };
 
     /// \brief Get the sampling period for the control, set to 0.005 by default. */
     inline const double & SamplingPeriodControl() const
-    { return Tctr_; };
+    {
+      return Tctr_;
+    };
 
     /// \brief Set the sampling period for the control. */
     inline void SamplingPeriodControl(double SamplingPeriod)
-    { Tctr_ = SamplingPeriod;};
+    {
+      Tctr_ = SamplingPeriod;
+    };
 
     /// \brief Get the sampling period for the preview, set to 0.100 by default.
     inline const double & SamplingPeriodPreview() const
-    { return Tprw_; };
+    {
+      return Tprw_;
+    };
 
     /// \brief Set the sampling period for the preview.
     inline void SamplingPeriodPreview(double SamplingPeriod)
-    { Tprw_ = SamplingPeriod;};
+    {
+      Tprw_ = SamplingPeriod;
+    };
 
     /// \brief Get the sampling period for the preview, set to 0.100 by default.
     inline const unsigned int & NbPrwSamplings() const
-    { return N_; };
+    {
+      return N_;
+    };
 
     /// \brief Set the sampling period for the preview.
     inline void NbPrwSamplings(int NbSamplings)
-    { N_ = NbSamplings;};
+    {
+      N_ = NbSamplings;
+    };
 
     /// \brief Set the number of optimization parameters.
     inline void NbVariables(int NbVariables)
-    { NbVariables_ = NbVariables;};
+    {
+      NbVariables_ = NbVariables;
+    };
 
     /// \brief Set the number of optimization parameters.
     inline const int & NbVariables() const
-    { return NbVariables_;};
+    {
+      return NbVariables_;
+    };
 
     /// \brief Set the security margin for the zmp
     ///
     /// \param Margin
     inline void SecurityMargin(double Margin)
-    {SecurityMargin_ = Margin; };
+    {
+      SecurityMargin_ = Margin;
+    };
 
 
     /// \name Methods related to the generation of feet trajectories.
     /// @{
     /// \brief Returns the step height.
     inline const double & StepHeight() const
-    { return StepHeight_;};
+    {
+      return StepHeight_;
+    };
 
     /// \brief Specify the step height.
     inline void StepHeight(double aSSH)
-    { StepHeight_ = aSSH;};
+    {
+      StepHeight_ = aSSH;
+    };
 
     /// \brief Returns the ModulationSupportCoefficient.
     inline const double &ModulationSupportCoefficient() const
@@ -208,11 +250,15 @@ namespace PatternGeneratorJRL
 
     /// \brief Set the pitch angle of foot when landing and taking off.
     inline void setOmega(double anOmega)
-    { Omega_ = anOmega;};
+    {
+      Omega_ = anOmega;
+    };
 
     /// \brief Get the pitch angle of foot when landing and taking off.
     inline const double & getOmega(void) const
-    { return Omega_;};
+    {
+      return Omega_;
+    };
     /// @}
 
 

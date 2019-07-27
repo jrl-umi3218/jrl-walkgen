@@ -105,11 +105,14 @@ namespace PatternGeneratorJRL
     /*! \brief To force the last generated support foot. */
     void FinishOnTheLastCorrectSupportFoot();
 
-    /*! \brief Creates a copy of relative foot positions and reset the stack (or not).
+    /*! \brief Creates a copy of relative foot positions 
+      and reset the stack (or not).
       \param[in] lRelativeFootPositions The stack of relative foot to be copied.
-      \param[in] PerformClean Reset the stack if PerformClean is true, otherwise does nothing.
+      \param[in] PerformClean Reset the stack if PerformClean is true, 
+      otherwise does nothing.
     */
-    void CopyRelativeFootPosition(std::deque<RelativeFootPosition> & lRelativeFootPositions,
+    void CopyRelativeFootPosition(std::deque<RelativeFootPosition> &
+                                  lRelativeFootPositions,
                                   bool PerformClean);
 
     /*! \name Method related to online stepping.

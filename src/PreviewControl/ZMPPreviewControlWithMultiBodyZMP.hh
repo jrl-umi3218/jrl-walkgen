@@ -449,9 +449,14 @@ namespace PatternGeneratorJRL
 
     /*! \name Setter and getter for the ComAndZMPTrajectoryGeneration. */
     inline bool setComAndFootRealization(ComAndFootRealization * aCFR)
-    { m_ComAndFootRealization = aCFR; return true;};
+    {
+      m_ComAndFootRealization = aCFR;
+      return true;
+    };
     inline ComAndFootRealization * getComAndFootRealization()
-    { return m_ComAndFootRealization;};
+    {
+      return m_ComAndFootRealization;
+    };
 
     /*! Call To CoM And Foot Realization object,
       the last values in the stack for the CoM
@@ -486,13 +491,17 @@ namespace PatternGeneratorJRL
     /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
     inline  bool setPinocchioRobot(PinocchioRobot *aPinocchioRobot)
-    { m_PinocchioRobot = aPinocchioRobot;
-      return true;}
+    {
+      m_PinocchioRobot = aPinocchioRobot;
+      return true;
+    }
 
     /*! Returns the object able to compute the dynamic parameters
       of the robot. */
     inline PinocchioRobot * getPinocchioRobot() const
-    { return m_PinocchioRobot;}
+    {
+      return m_PinocchioRobot;
+    }
 
     /*! Set the strategy to handle the preview control stages. */
     void SetStrategyForPCStages(int Strategy);

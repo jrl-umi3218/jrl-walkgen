@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Olivier Stasse
  *
@@ -18,20 +18,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file Clock.cpp
   \brief This object allows to make time measurement on the code.
 
-   Copyright (c) 2008, 
-   Olivier Stasse,
-   
-   JRL-Japan, CNRS/AIST
+  Copyright (c) 2008,
+  Olivier Stasse,
 
-   All rights reserved.
+  JRL-Japan, CNRS/AIST
 
-   Please see license.txt for more information on license.
+  All rights reserved.
+
+  Please see license.txt for more information on license.
 */
 
 #include <iostream>
@@ -81,8 +81,10 @@ void Clock::StopTiming()
   m_MaximumTime = m_MaximumTime < ltime ? ltime : m_MaximumTime;
   m_TotalTime += ltime;
 
-  m_DataBuffer[(m_NbOfIterations*2)%3000000]=m_BeginTimeStamp.tv_sec +
-    0.000001 * m_BeginTimeStamp.tv_usec - m_StartingTime;
+  m_DataBuffer[(m_NbOfIterations*2)%3000000]=
+                                  m_BeginTimeStamp.tv_sec +
+                                  0.000001 * m_BeginTimeStamp.tv_usec -
+                                  m_StartingTime;
   m_DataBuffer[(m_NbOfIterations*2+1)%3000000]=ltime;
 }
 
@@ -94,7 +96,7 @@ void Clock::IncIteration(int lNbOfIts)
 void Clock::RecordDataBuffer(std::string filename)
 {
   std::ofstream aof(filename.c_str());
-  for(unsigned int i=0;i<2*m_NbOfIterations%300000;i+=2)
+  for(unsigned int i=0; i<2*m_NbOfIterations%300000; i+=2)
     aof << m_DataBuffer[i]<< " " << m_DataBuffer[i+1] << std::endl;
   aof.close();
 }
@@ -126,5 +128,5 @@ void Clock::Display()
   std::cout << "Total Time : " << TotalTime() << std::endl;
   std::cout << "Max Time : " << MaxTime() << std::endl;
   std::cout << "Nb of iterations: " << NbOfIterations() << std::endl;
-  
+
 }

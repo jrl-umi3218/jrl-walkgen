@@ -972,9 +972,15 @@ UpdateFootPosition
   // COM Orientation
   Eigen::Matrix3d Foot_R;
 
-  Foot_R(0,0) = c*co;        Foot_R(0,1) = -s;      Foot_R(0,2) = c*so;
-  Foot_R(1,0) = s*co;        Foot_R(1,1) =  c;      Foot_R(1,2) = s*so;
-  Foot_R(2,0) = -so;         Foot_R(2,1) = 0;       Foot_R(2,2) = co;
+  Foot_R(0,0) = c*co;
+  Foot_R(0,1) = -s;
+  Foot_R(0,2) = c*so;
+  Foot_R(1,0) = s*co;
+  Foot_R(1,1) =  c;
+  Foot_R(1,2) = s*so;
+  Foot_R(2,0) = -so;
+  Foot_R(2,1) = 0;
+  Foot_R(2,2) = co;
 
   if (LeftOrRight==-1)
     {
@@ -1011,7 +1017,8 @@ UpdateFootPosition
  double LocalInterpolationStartTime,
  double ModulatedSingleSupportTime,
  int StepType, int /* LeftOrRight */)
-{//TODO 0:Update foot position needs to be verified and cleaned
+{
+  //TODO 0:Update foot position needs to be verified and cleaned
 
   // unsigned int k = CurrentAbsoluteIndex - IndexInitial;
   // Local time
@@ -1208,9 +1215,15 @@ UpdateFootPosition
   // COM Orientation
   Eigen::Matrix3d Foot_R;
 
-  Foot_R(0,0) = c*co;        Foot_R(0,1) = -s;      Foot_R(0,2) = c*so;
-  Foot_R(1,0) = s*co;        Foot_R(1,1) =  c;      Foot_R(1,2) = s*so;
-  Foot_R(2,0) = -so;         Foot_R(2,1) = 0;       Foot_R(2,2) = co;
+  Foot_R(0,0) = c*co;
+  Foot_R(0,1) = -s;
+  Foot_R(0,2) = c*so;
+  Foot_R(1,0) = s*co;
+  Foot_R(1,1) =  c;
+  Foot_R(1,2) = s*so;
+  Foot_R(2,0) = -so;
+  Foot_R(2,1) = 0;
+  Foot_R(2,2) = co;
 
   if (LeftOrRight==-1)
     {
@@ -1260,22 +1273,24 @@ ComputingAbsFootPosFromQueueOfRelPos
   Eigen::Matrix<double,2,1> v;;
   Eigen::Matrix<double,2,1> v2;;
 
-  for(unsigned int i=0;i<RelativeFootPositions.size();i++)
+  for(unsigned int i=0; i<RelativeFootPositions.size(); i++)
     {
       /*! Compute Orientation matrix related to the relative orientation
         of the support foot */
       c = cos(RelativeFootPositions[i].theta*M_PI/180.0);
       s = sin(RelativeFootPositions[i].theta*M_PI/180.0);
-      MM(0,0) = c;      MM(0,1) = -s;
-      MM(1,0) = s;      MM(1,1) = c;
+      MM(0,0) = c;
+      MM(0,1) = -s;
+      MM(1,0) = s;
+      MM(1,1) = c;
 
       /*! Update the orientation */
       CurrentAbsTheta+= RelativeFootPositions[i].theta;
       CurrentAbsTheta = fmod(CurrentAbsTheta,180.0);
 
       /*! Extract the current absolute orientation matrix. */
-      for(int k=0;k<2;k++)
-        for(int l=0;l<2;l++)
+      for(int k=0; k<2; k++)
+        for(int l=0; l<2; l++)
           Orientation(k,l) = CurrentSupportFootPosition(k,l);
 
       /*! Put in a vector form the translation of the relative foot. */
@@ -1287,11 +1302,11 @@ ComputingAbsFootPosFromQueueOfRelPos
       v2 = Orientation*v;
 
       /*! Update the world coordinates of the support foot. */
-      for(int k=0;k<2;k++)
-        for(int l=0;l<2;l++)
+      for(int k=0; k<2; k++)
+        for(int l=0; l<2; l++)
           CurrentSupportFootPosition(k,l) = Orientation(k,l);
 
-      for(int k=0;k<2;k++)
+      for(int k=0; k<2; k++)
         CurrentSupportFootPosition(k,2) += v2(k,0);
 
       AbsoluteFootPositions[i].x = v2(0,0);

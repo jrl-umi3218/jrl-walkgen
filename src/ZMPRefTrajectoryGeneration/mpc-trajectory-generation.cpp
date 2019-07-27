@@ -50,14 +50,16 @@ MPCTrajectoryGeneration::MPCTrajectoryGeneration(SimplePluginManager *lSPM)
 {
 
   std::string aMethodName[6] =
-    {":omega",
+    {
+     ":omega",
      ":stepheight",
      ":singlesupporttime",
      ":doublesupporttime",
      ":comheight",
-     ":samplingperiod"};
+     ":samplingperiod"
+    };
 
-  for(int i=0;i<6;i++)
+  for(int i=0; i<6; i++)
     {
       if (!RegisterMethod(aMethodName[i]))
         {
@@ -72,7 +74,8 @@ MPCTrajectoryGeneration::MPCTrajectoryGeneration(SimplePluginManager *lSPM)
 }
 
 
-void MPCTrajectoryGeneration::CallMethod(std::string & Method, std::istringstream &strm)
+void MPCTrajectoryGeneration::CallMethod(std::string & Method,
+                                         std::istringstream &strm)
 {
   ODEBUG("Calling me (" << this << ") with Method: " << Method);
   if (Method==":omega")

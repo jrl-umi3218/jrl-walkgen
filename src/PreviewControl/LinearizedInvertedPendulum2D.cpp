@@ -108,8 +108,12 @@ void LinearizedInvertedPendulum2D::SetRobotControlPeriod(const double & aT)
 void LinearizedInvertedPendulum2D::GetState(Eigen::VectorXd &lxk)
 {
   //For compability reasons
-  m_xk[0] = m_CoM.x[0];m_xk[1] = m_CoM.x[1];m_xk[2] = m_CoM.x[2];
-  m_xk[3] = m_CoM.y[0];m_xk[4] = m_CoM.y[1];m_xk[5] = m_CoM.y[2];
+  m_xk[0] = m_CoM.x[0];
+  m_xk[1] = m_CoM.x[1];
+  m_xk[2] = m_CoM.x[2];
+  m_xk[3] = m_CoM.y[0];
+  m_xk[4] = m_CoM.y[1];
+  m_xk[5] = m_CoM.y[2];
   lxk = m_xk;
 }
 
@@ -155,17 +159,23 @@ int LinearizedInvertedPendulum2D::InitializeSystem()
   if (m_ComHeight==-1.0)
     return -2;
 
-  for(int i=0;i<3;i++)
+  for(int i=0; i<3; i++)
     {
       m_B(i,0) = 0.0;
       m_C(0,i) = 0.0;
-      for(int j=0;j<3;j++)
+      for(int j=0; j<3; j++)
         m_A(i,j)=0.0;
     }
 
-  m_A(0,0) = 1.0; m_A(0,1) =   m_T; m_A(0,2) = m_T*m_T/2.0;
-  m_A(1,0) = 0.0; m_A(1,1) =   1.0; m_A(1,2) = m_T;
-  m_A(2,0) = 0.0; m_A(2,1) =   0.0; m_A(2,2) = 1.0;
+  m_A(0,0) = 1.0;
+  m_A(0,1) =   m_T;
+  m_A(0,2) = m_T*m_T/2.0;
+  m_A(1,0) = 0.0;
+  m_A(1,1) =   1.0;
+  m_A(1,2) = m_T;
+  m_A(2,0) = 0.0;
+  m_A(2,1) =   0.0;
+  m_A(2,2) = 1.0;
 
   m_B(0,0) = m_T*m_T*m_T/6.0;
   m_B(1,0) = m_T*m_T/2.0;
@@ -192,8 +202,9 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
   // Is it the same for the other PG ? Please check.
   // TODO: with TestHerdt, it is mandatory to use m_InterpolationInterval-1 to interpolate correctly
   // along the whole preview window will it be still fine with the reste of the PG?
-  int loopEnd = std::min<int>( m_InterpolationInterval-1, ((int)COMStates.size())-1-CurrentPosition);
-  for(int lk=0;lk<=loopEnd;lk++,lCurrentPosition++)
+  int loopEnd = std::min<int>( m_InterpolationInterval-1,
+                               ((int)COMStates.size())-1-CurrentPosition);
+  for(int lk=0; lk<=loopEnd; lk++,lCurrentPosition++)
     {
       ODEBUG("lCurrentPosition: "<< lCurrentPosition);
       COMState & aCOMPos = COMStates[lCurrentPosition];
@@ -250,7 +261,7 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
               aCOMPos.yaw << " " <<
               aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta << " " <<
               CX << " " << CY << " " <<
-              lkSP << " " << m_T , "DebugInterpol.dat");
+              lkSP << " " << m_T, "DebugInterpol.dat");
     }
   return 0;
 }
@@ -282,7 +293,7 @@ com_t LinearizedInvertedPendulum2D::OneIteration(double ux, double uy)
            m_zk[0] << " " << m_zk[1] << " " <<
            Bux[0] << " " << Bux[1] << " " << Bux[2] << " " <<
            Buy[0] << " " << Buy[1] << " " << Buy[2] << " " <<
-           m_B(0,0) << " " << m_B(1,0) << " " << m_B(2,0) << " " ,
+           m_B(0,0) << " " << m_B(1,0) << " " << m_B(2,0) << " ",
            "Debug2DLIPM.dat");
 
 

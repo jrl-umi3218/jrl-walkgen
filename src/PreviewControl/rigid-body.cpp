@@ -152,7 +152,7 @@ struct rigid_body_state_s &
 rigid_body_state_t::operator=(const rigid_body_state_s & RB)
 {
 
-  for(unsigned int i=0;i<3;i++)
+  for(unsigned int i=0; i<3; i++)
     {
       X[i] = RB.X[i];
       Y[i] = RB.Y[i];

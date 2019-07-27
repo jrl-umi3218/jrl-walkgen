@@ -57,7 +57,9 @@ namespace Optimization
 
       /*! \brief Solve the optimization problem
        */
-      int SolveProblem(std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
+      int SolveProblem(
+                       std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> &
+                       QueueOfLConstraintInequalitiesFreeFeet,
                        std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet,
                        double *CstPartOfTheCostFunction,
                        unsigned int NbOfConstraints,
@@ -66,15 +68,19 @@ namespace Optimization
                        double *XkYk,
                        double *X,
                        unsigned int NumberOfRemovedConstraints, unsigned int NbRemovedFootCstr,
-                       bool StartingSequence, unsigned int NumberSteps, bool CurrentStateChanged, double time);
+                       bool StartingSequence, unsigned int NumberSteps, bool CurrentStateChanged,
+                       double time);
     protected:
 
       /*! \name Initial solution methods related
         @{
       */
       /*! Compute the initial solution */
-      int ComputeInitialSolution(std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
-                                 std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet, unsigned int NumberSteps,
+      int ComputeInitialSolution(
+                                 std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> &
+                                 QueueOfLConstraintInequalitiesFreeFeet,
+                                 std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet,
+                                 unsigned int NumberSteps,
                                  double *XkYk);
 
       /*! Precompite iPuPx */

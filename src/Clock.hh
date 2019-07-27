@@ -24,7 +24,7 @@
  */
 
 /*! \file Clock.h
-    \brief Defines an object for measuring the time spend in some code part.
+  \brief Defines an object for measuring the time spend in some code part.
 */
 #ifndef _HWPG_CLOCK_H_
 # define _HWPG_CLOCK_H_

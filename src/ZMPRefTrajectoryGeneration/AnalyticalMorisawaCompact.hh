@@ -106,7 +106,7 @@ namespace PatternGeneratorJRL
     const static unsigned int RELATIVE_FRAME = 1;
     /*! @} */
     /*! Constructor */
-    AnalyticalMorisawaCompact(SimplePluginManager * lSPM , PinocchioRobot *aPR);
+    AnalyticalMorisawaCompact(SimplePluginManager * lSPM, PinocchioRobot *aPR);
 
     /*! Destructor */
     virtual ~AnalyticalMorisawaCompact();
@@ -268,7 +268,8 @@ namespace PatternGeneratorJRL
       @param[in] lCoMZ: Profile of the CoM's height trajectory for each interval.
       @param[in] lZMPZ: Profile of the ZMP's height trajectory for each interval.
     */
-    void BuildingTheZMatrix(std::vector<double> &lCoMZ, std::vector<double> &lZMPZ );
+    void BuildingTheZMatrix(std::vector<double> &lCoMZ,
+                            std::vector<double> &lZMPZ );
 
     /*! \brief Building the Z matrix to be inverted. */
     void BuildingTheZMatrix();
@@ -409,14 +410,17 @@ namespace PatternGeneratorJRL
     /*! \name Feet Trajectory Generator methods
       @{ */
     /*! Set the feet trajectory generator */
-    void SetFeetTrajectoryGenerator(LeftAndRightFootTrajectoryGenerationMultiple * aFeetTrajectoryGenerator);
+    void SetFeetTrajectoryGenerator(LeftAndRightFootTrajectoryGenerationMultiple *
+                                    aFeetTrajectoryGenerator);
 
     /*! Get the feet trajectory generator */
     LeftAndRightFootTrajectoryGenerationMultiple * GetFeetTrajectoryGenerator();
 
     /*!  Setter and getter for the ComAndZMPTrajectoryGeneration.  */
     inline ComAndFootRealization * getComAndFootRealization()
-    { return m_kajitaDynamicFilter->getComAndFootRealization();};
+    {
+      return m_kajitaDynamicFilter->getComAndFootRealization();
+    };
 
     /*! @} */
 
@@ -484,7 +488,8 @@ namespace PatternGeneratorJRL
                            StepStackHandler *aStepStackHandler=0);
 
     /*! \brief Compute the time to compensate for the ZMP fluctuation. */
-    double TimeCompensationForZMPFluctuation(FluctuationParameters &aFluctuationParameters,
+    double TimeCompensationForZMPFluctuation(FluctuationParameters
+                                             &aFluctuationParameters,
                                              double DeltaTInit);
 
     /*! @} */
@@ -615,7 +620,8 @@ namespace PatternGeneratorJRL
 
     /*! \brief Foot Trajectory Generator */
     LeftAndRightFootTrajectoryGenerationMultiple * m_FeetTrajectoryGenerator;
-    LeftAndRightFootTrajectoryGenerationMultiple * m_BackUpm_FeetTrajectoryGenerator;
+    LeftAndRightFootTrajectoryGenerationMultiple *
+    m_BackUpm_FeetTrajectoryGenerator;
     /*! @} */
 
     /*! @} */
@@ -660,7 +666,8 @@ namespace PatternGeneratorJRL
     unsigned int m_OnLineChangeStepMode;
 
     /*! \brief Filtering the axis through a preview control. */
-    FilteringAnalyticalTrajectoryByPreviewControl * m_FilterXaxisByPC, * m_FilterYaxisByPC;
+    FilteringAnalyticalTrajectoryByPreviewControl * m_FilterXaxisByPC,
+      * m_FilterYaxisByPC;
     DynamicFilter * m_kajitaDynamicFilter ;
     // deque sampled at m_SamplingPeriod
     deque<FootAbsolutePosition> ctrlLF_ ;

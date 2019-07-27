@@ -170,7 +170,8 @@ namespace PatternGeneratorJRL
 
   protected:
 
-    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,Eigen::RowMajor> MatrixRXd;
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,Eigen::RowMajor>
+    MatrixRXd;
     /*! The matrices needed for the dynamical system such as
       \f{eqnarray*}
 

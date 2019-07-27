@@ -71,15 +71,15 @@ namespace PatternGeneratorJRL
 
     // Build Time Variant Matrices
     //////////////////////////////
-//    void updateFinalStateMachine(double time,
-//        FootAbsolutePosition &FinalLeftFoot,
-//        FootAbsolutePosition &FinalRightFoot);
+    //    void updateFinalStateMachine(double time,
+    //        FootAbsolutePosition &FinalLeftFoot,
+    //        FootAbsolutePosition &FinalRightFoot);
     void updateCurrentSupport(double time,
-        FootAbsolutePosition &FinalLeftFoot,
-        FootAbsolutePosition &FinalRightFoot);
+                              FootAbsolutePosition &FinalLeftFoot,
+                              FootAbsolutePosition &FinalRightFoot);
     void updateSupportdeque(double time,
-        FootAbsolutePosition &FinalLeftFoot,
-        FootAbsolutePosition &FinalRightFoot);
+                            FootAbsolutePosition &FinalLeftFoot,
+                            FootAbsolutePosition &FinalRightFoot);
     void computeFootSelectionMatrix();
     void updateInitialConditionDependentMatrices();
     void guessWarmStart();
@@ -102,15 +102,15 @@ namespace PatternGeneratorJRL
     void initializeObstacleConstraint();
     void updateObstacleConstraint();
     void initializeStandingConstraint();
-    void updateStandingConstraint();    
+    void updateStandingConstraint();
 
     // tools to check if foot is close to land
     void updateIterationBeforeLanding();
     bool isFootCloseToLand()
     {
-//      std::cout << itBeforeLanding_ << std::endl;
+      //      std::cout << itBeforeLanding_ << std::endl;
       return ((itBeforeLanding_ < 2) && useItBeforeLanding_);
-//      return false ;
+      //      return false ;
     }
 
     // build the cost function
@@ -139,11 +139,17 @@ namespace PatternGeneratorJRL
     void setGlobalVelocityReference(reference_t global_vel_ref);
 
     inline support_state_t const & currentSupport() const
-    { return currentSupport_; }
+    {
+      return currentSupport_;
+    }
     inline support_state_t & currentSupport()
-    { return currentSupport_; }
+    {
+      return currentSupport_;
+    }
     inline void setNbStepsLeft(unsigned NbStepsLeft)
-    { currentSupport_.NbStepsLeft=NbStepsLeft; }
+    {
+      currentSupport_.NbStepsLeft=NbStepsLeft;
+    }
 
     void getSolution(std::vector<double> &JerkX,
                      std::vector<double> &JerkY,
@@ -151,7 +157,9 @@ namespace PatternGeneratorJRL
                      std::vector<double> &FootStepY,
                      std::vector<double> &FootStepYaw);
     inline std::deque<support_state_t> const & SupportStates_deq() const
-    { return SupportStates_deq_ ; }
+    {
+      return SupportStates_deq_ ;
+    }
 
     inline void addOneObstacle(double x, double y, double r)
     {
@@ -164,50 +172,74 @@ namespace PatternGeneratorJRL
     }
 
     inline void deleteAllObstacles()
-    {obstacles_.clear();}
+    {
+      obstacles_.clear();
+    }
 
     inline void updateOneObstacle(unsigned int id, double x, double y, double r)
     {
       if(id <= obstacles_.size())
-      {
-        obstacles_[id-1].x_0 = x ;
-        obstacles_[id-1].y_0 = y ;
-        obstacles_[id-1].r   = r ;
-      }
+        {
+          obstacles_[id-1].x_0 = x ;
+          obstacles_[id-1].y_0 = y ;
+          obstacles_[id-1].r   = r ;
+        }
     }
 
     RelativeFeetInequalities * RFI()
-    {return RFI_;}
+    {
+      return RFI_;
+    }
 
     // Sampling period of the SQP preview
     inline double T()
-    {return T_;}
+    {
+      return T_;
+    }
     inline void T(double T)
-    {T_=T;}
+    {
+      T_=T;
+    }
 
     inline double Tfirst()
-    {return Tfirst_ ;}
+    {
+      return Tfirst_ ;
+    }
 
     // Number of sample in the SQP preview
     inline double N()
-    {return N_;}
+    {
+      return N_;
+    }
     inline void N(unsigned N)
-    {N_=N;}
+    {
+      N_=N;
+    }
 
     // Number of planned foot step in the SQP preview
     inline double nf()
-    {return nf_;}
+    {
+      return nf_;
+    }
     inline void nf(unsigned nf)
-    {nf_=nf;}
+    {
+      nf_=nf;
+    }
 
     // Step Period :
     inline double T_step()
-    {return T_step_;}
+    {
+      return T_step_;
+    }
     inline void T_step(double T_step)
-    {T_step_=T_step;}
+    {
+      T_step_=T_step;
+    }
 
     std::deque <RelativeFootPosition> & relativeSupportDeque()
-    {return desiredNextSupportFootRelativePosition;}
+    {
+      return desiredNextSupportFootRelativePosition;
+    }
 
 
   private:
@@ -225,9 +257,9 @@ namespace PatternGeneratorJRL
     Eigen::VectorXd c_k_y_;
 
     /**
-    NOTE number of foot steps in prediction horizon changes between
-    nf and nf+1, because when robot takes first step nf steps are
-    planned on the prediction horizon, which makes a total of nf+1 steps.
+       NOTE number of foot steps in prediction horizon changes between
+       nf and nf+1, because when robot takes first step nf steps are
+       planned on the prediction horizon, which makes a total of nf+1 steps.
     */
     Eigen::VectorXd v_kp1_ ;
     Eigen::MatrixXd V_kp1_ ;
@@ -314,7 +346,7 @@ namespace PatternGeneratorJRL
     Eigen::VectorXd Uxy_  ;
     Eigen::VectorXd gU_cop_, gU_vel_ ;
     Eigen::VectorXd gU_foot_ ;
-    Eigen::VectorXd gU_obs_, gU_rot_ , gU_stan_ ;
+    Eigen::VectorXd gU_obs_, gU_rot_, gU_stan_ ;
 
     // Cost Function
     unsigned nv_ ; // number of degrees of freedom
@@ -324,7 +356,7 @@ namespace PatternGeneratorJRL
     // decomposition of p_xy_
     // p_xy_ = ( p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ )
     Eigen::VectorXd p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ ;
-    Eigen::VectorXd Pvsc_x_ , Pvsc_y_ ;
+    Eigen::VectorXd Pvsc_x_, Pvsc_y_ ;
 
     // decomposition of Q_x_=Q_y_
     // Q_x = ( Q_x_XX Q_x_XF ) = Q_y
@@ -334,7 +366,7 @@ namespace PatternGeneratorJRL
 
     // Line Search
     bool useLineSearch_ ;
-    Eigen::VectorXd p_ , U_n_, selectActiveConstraint ;
+    Eigen::VectorXd p_, U_n_, selectActiveConstraint ;
     Eigen::VectorXd JdU_, contraintValue ;
     Eigen::VectorXd HUn_ ;
     double lineStep_, lineStep0_, stepParam_ ; // step searched
@@ -463,15 +495,15 @@ namespace PatternGeneratorJRL
   };
 
 
-// See if a derivation of a constraint class can simplify the code
-//  class Constraint
-//  {
-//  public:
-//    Constraint();
-//    void buildConstantMatrix();
-//    void buildUnconstantPart();
-//    void jacobian();
-//  };
+  // See if a derivation of a constraint class can simplify the code
+  //  class Constraint
+  //  {
+  //  public:
+  //    Constraint();
+  //    void buildConstantMatrix();
+  //    void buildUnconstantPart();
+  //    void jacobian();
+  //  };
 
 }//End Namespace
 

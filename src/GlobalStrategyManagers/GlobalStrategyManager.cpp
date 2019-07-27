@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, 2010, 
+ * Copyright 2009, 2010,
  *
  * Olivier  Stasse
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file GlobalStrategyManager.cpp
@@ -27,7 +27,7 @@
 */
 
 #include <Debug.hh>
-#include <deque> 
+#include <deque>
 #include <GlobalStrategyManagers/GlobalStrategyManager.hh>
 
 using namespace PatternGeneratorJRL;
@@ -39,8 +39,8 @@ GlobalStrategyManager
 {
 }
 
-  
-  
+
+
 void GlobalStrategyManager::
 SetBufferPositions
 (deque<ZMPPosition> * aZMPPositions,

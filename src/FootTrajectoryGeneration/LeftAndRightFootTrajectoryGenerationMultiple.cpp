@@ -55,7 +55,7 @@ LeftAndRightFootTrajectoryGenerationMultiple
   string aMethodName[4] =
     {":omega",":stepheight", ":singlesupporttime",":doublesupporttime"};
 
-  for (int i=0;i<4;i++)
+  for (int i=0; i<4; i++)
     {
       if (!RegisterMethod(aMethodName[i]))
         {
@@ -63,9 +63,11 @@ LeftAndRightFootTrajectoryGenerationMultiple
         }
     }
 
-  { for(unsigned int i=0;
+  {
+    for(unsigned int i=0;
         i<m_MiddleWayPoint.size();
-        m_MiddleWayPoint[i++]=0.0);} ;
+        m_MiddleWayPoint[i++]=0.0);
+  } ;
 
   wayPoint.resize(2,0.0);
 
@@ -302,14 +304,16 @@ InitializeFromRelativeSteps
   // Initial Position of the current support foot.
   c = cos(CurrentAbsTheta*M_PI/180.0);
   s = sin(CurrentAbsTheta*M_PI/180.0);
-  MM(0,0) = Orientation(0,0) = c;      MM(0,1) = Orientation(0,1) = -s;
-  MM(1,0) = Orientation(1,0) = s;      MM(1,1) = Orientation(1,1) = c;
+  MM(0,0) = Orientation(0,0) = c;
+  MM(0,1) = Orientation(0,1) = -s;
+  MM(1,0) = Orientation(1,0) = s;
+  MM(1,1) = Orientation(1,1) = c;
   // MM(2,0) = Orientation(1,0) = 0;      MM(2,1) = Orientation(1,1) = 0;
-  for(int k=0;k<2;k++)
-    for(int l=0;l<2;l++)
+  for(int k=0; k<2; k++)
+    for(int l=0; l<2; l++)
       CurrentSupportFootPosition(k,l) = MM(k,l);
 
-  for(int k=0;k<2;k++)
+  for(int k=0; k<2; k++)
     CurrentSupportFootPosition(k,2) = v2(k,0);
 
   /*! Initialize the temporary initial position. */
@@ -341,7 +345,7 @@ InitializeFromRelativeSteps
 
   ODEBUG("CurrentSupportFootPosition: " << CurrentSupportFootPosition);
   ODEBUG("RelativeFootPositions: " << RelativeFootPositions.size());
-  for(unsigned int i=0;i<RelativeFootPositions.size();i++)
+  for(unsigned int i=0; i<RelativeFootPositions.size(); i++)
     {
       if ((i!=0) || (FirstIntervalIsSingleSupport==false))
         {
@@ -397,15 +401,17 @@ InitializeFromRelativeSteps
         of the support foot */
       c = cos(RelativeFootPositions[i].theta*M_PI/180.0);
       s = sin(RelativeFootPositions[i].theta*M_PI/180.0);
-      MM(0,0) = c;      MM(0,1) = -s;
-      MM(1,0) = s;      MM(1,1) = c;
+      MM(0,0) = c;
+      MM(0,1) = -s;
+      MM(1,0) = s;
+      MM(1,1) = c;
       // MM(2,0) = 0;      MM(2,1) = 0; MM(2,2) = 0;
       /*! Update the orientation */
       CurrentAbsTheta+= RelativeFootPositions[i].theta;
 
       /*! Extract the current absolute orientation matrix. */
-      for(int k=0;k<2;k++)
-        for(int l=0;l<2;l++)
+      for(int k=0; k<2; k++)
+        for(int l=0; l<2; l++)
           Orientation(k,l) = CurrentSupportFootPosition(k,l);
 
       /*! Put in a vector form the translation of the relative foot. */
@@ -420,11 +426,11 @@ InitializeFromRelativeSteps
       /*! Update the world coordinates of the support foot. */
       if ((!IgnoreFirst) || (i>0))
         {
-          for(int k=0;k<2;k++)
-            for(int l=0;l<2;l++)
+          for(int k=0; k<2; k++)
+            for(int l=0; l<2; l++)
               CurrentSupportFootPosition(k,l) = Orientation(k,l);
 
-          for(int k=0;k<2;k++)
+          for(int k=0; k<2; k++)
             CurrentSupportFootPosition(k,2) += v2(k,0);
 
           CurrentSupportFootPosition(2,2) += RelativeFootPositions[i].sz;
@@ -517,7 +523,8 @@ InitializeFromRelativeSteps
 
       if ((i!=0)|| (Continuity))
         {
-          {// verify auto collision
+          {
+            // verify auto collision
             Eigen::Matrix<double,2,1> currSupp;
             Eigen::Matrix<double,2,1> InitPos;
             Eigen::Matrix<double,2,1> FinalPos;
@@ -545,13 +552,15 @@ InitializeFromRelativeSteps
                 relWayPoint(1)=m_StepCurving;
               }
 
-            double dx , dy , dc , distSquareToLine ;
+            double dx, dy, dc, distSquareToLine ;
             dx = InitPos(1) - FinalPos(1) ;
             dy = FinalPos(0) - InitPos(0) ;
             m_MiddleWayPoint.resize(2);
-            { for(unsigned int i=0;
+            {
+              for(unsigned int i=0;
                   i<m_MiddleWayPoint.size();
-                  m_MiddleWayPoint[i++]=0.0);};
+                  m_MiddleWayPoint[i++]=0.0);
+            };
             if ( dx*dx>=1e-6 || dy*dy>=1e-6 )// not moving implies no collision
               {
                 dc = -(dx * InitPos(0) + dy *InitPos(1)) ;
@@ -658,7 +667,7 @@ InitializeFromRelativeSteps
           if (i==RelativeFootPositions.size()-1)
             limitk=2;
 
-          for(unsigned int lk=0;lk<limitk;lk++)
+          for(unsigned int lk=0; lk<limitk; lk++)
             {
               LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
               LeftFootTmpFinalPos.dz = 0;
@@ -713,7 +722,7 @@ InitializeFromRelativeSteps
   */
   if ((Continuity) && (IntervalIndex==(int)(m_DeltaTj.size()-2)))
     {
-      for(unsigned int lk=0;lk<2;lk++)
+      for(unsigned int lk=0; lk<2; lk++)
         {
           LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
           LeftFootTmpFinalPos.dz = 0;
@@ -797,14 +806,16 @@ ComputeAbsoluteStepsFromRelativeSteps
   // Initial Position of the current support foot.
   c = cos(CurrentAbsTheta*M_PI/180.0);
   s = sin(CurrentAbsTheta*M_PI/180.0);
-  MM(0,0) = Orientation(0,0) = c;      MM(0,1) = Orientation(0,1) = -s;
-  MM(1,0) = Orientation(1,0) = s;      MM(1,1) = Orientation(1,1) = c;
+  MM(0,0) = Orientation(0,0) = c;
+  MM(0,1) = Orientation(0,1) = -s;
+  MM(1,0) = Orientation(1,0) = s;
+  MM(1,1) = Orientation(1,1) = c;
 
-  for(int k=0;k<2;k++)
-    for(int l=0;l<2;l++)
+  for(int k=0; k<2; k++)
+    for(int l=0; l<2; l++)
       CurrentSupportFootPosition(k,l) = MM(k,l);
 
-  for(int k=0;k<2;k++)
+  for(int k=0; k<2; k++)
     CurrentSupportFootPosition(k,2) = v2(k,0);
 
 
@@ -814,7 +825,7 @@ ComputeAbsoluteStepsFromRelativeSteps
   ODEBUG("CurrentSupportFootPosition: " << CurrentSupportFootPosition);
   ODEBUG("RelativeFootPositions: " << RelativeFootPositions.size());
 
-  for(unsigned int i=0;i<RelativeFootPositions.size();i++)
+  for(unsigned int i=0; i<RelativeFootPositions.size(); i++)
     {
 
       ODEBUG( i << " : " <<
@@ -825,16 +836,18 @@ ComputeAbsoluteStepsFromRelativeSteps
         of the support foot */
       c = cos(RelativeFootPositions[i].theta*M_PI/180.0);
       s = sin(RelativeFootPositions[i].theta*M_PI/180.0);
-      MM(0,0) = c;      MM(0,1) = -s;
-      MM(1,0) = s;      MM(1,1) = c;
+      MM(0,0) = c;
+      MM(0,1) = -s;
+      MM(1,0) = s;
+      MM(1,1) = c;
 
       /*! Update the orientation */
       CurrentAbsTheta+= RelativeFootPositions[i].theta;
       CurrentAbsTheta = fmod(CurrentAbsTheta,180.0);
 
       /*! Extract the current absolute orientation matrix. */
-      for(int k=0;k<2;k++)
-        for(int l=0;l<2;l++)
+      for(int k=0; k<2; k++)
+        for(int l=0; l<2; l++)
           Orientation(k,l) = CurrentSupportFootPosition(k,l);
 
       /*! Put in a vector form the translation of the relative foot. */
@@ -846,11 +859,11 @@ ComputeAbsoluteStepsFromRelativeSteps
       v2 = Orientation*v;
 
       /*! Update the world coordinates of the support foot. */
-      for(int k=0;k<2;k++)
-        for(int l=0;l<2;l++)
+      for(int k=0; k<2; k++)
+        for(int l=0; l<2; l++)
           CurrentSupportFootPosition(k,l) = Orientation(k,l);
 
-      for(int k=0;k<2;k++)
+      for(int k=0; k<2; k++)
         CurrentSupportFootPosition(k,2) += v2(k,0);
 
       CurrentSupportFootPosition(2,2) = SupportFootInitialAbsolutePosition.z ;
@@ -913,8 +926,12 @@ ChangeRelStepsFromAbsSteps
   ODEBUG("K-1 position: " << xkm1 << " " << ykm1 << " " << thetakm1 );
   c = cos(thetakm1*M_PI/180.0);
   s = sin(thetakm1*M_PI/180.0);
-  KM1(0,0) = c;      KM1(0,1) = -s; KM1(0,2) = xkm1;
-  KM1(1,0) = s;      KM1(1,1) = c;  KM1(1,2) = ykm1;
+  KM1(0,0) = c;
+  KM1(0,1) = -s;
+  KM1(0,2) = xkm1;
+  KM1(1,0) = s;
+  KM1(1,1) = c;
+  KM1(1,2) = ykm1;
 
   double thetak,xk,yk;
   thetak= SupportFootAbsoluteFootPositions[ChangedInterval].theta;
@@ -924,8 +941,12 @@ ChangeRelStepsFromAbsSteps
   ODEBUG("K position: " << xk << " " << yk << " " << thetak );
   c = cos(thetak*M_PI/180.0);
   s = sin(thetak*M_PI/180.0);
-  K(0,0) = c;      K(0,1) = -s; K(0,2) = xk;
-  K(1,0) = s;      K(1,1) = c;  K(1,2) = yk;
+  K(0,0) = c;
+  K(0,1) = -s;
+  K(0,2) = xk;
+  K(1,0) = s;
+  K(1,1) = c;
+  K(1,2) = yk;
 
   Eigen::Matrix3d iKM1;
   iKM1=KM1.inverse();
@@ -949,8 +970,12 @@ ChangeRelStepsFromAbsSteps
 
       c = cos(thetakp1*M_PI/180.0);
       s = sin(thetakp1*M_PI/180.0);
-      KP1(0,0) = c;      KP1(0,1) = -s; KP1(0,2) = xkp1;
-      KP1(1,0) = s;      KP1(1,1) = c;  KP1(1,2) = ykp1;
+      KP1(0,0) = c;
+      KP1(0,1) = -s;
+      KP1(0,2) = xkp1;
+      KP1(1,0) = s;
+      KP1(1,1) = c;
+      KP1(1,2) = ykp1;
 
       Eigen::Matrix3d iK;
       iK=K.inverse();

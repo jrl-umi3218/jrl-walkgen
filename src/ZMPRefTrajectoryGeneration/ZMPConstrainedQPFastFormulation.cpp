@@ -44,7 +44,8 @@
 using namespace std;
 using namespace PatternGeneratorJRL;
 
-ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginManager *lSPM,
+ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(
+                                                                 SimplePluginManager *lSPM,
                                                                  string DataFile,
                                                                  PinocchioRobot *aPR) :
   ZMPRefTrajectoryGeneration(lSPM)
@@ -67,7 +68,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   string aMethodName[1] =
     {":setdimitrovconstraint"};
 
-  for(int i=0;i<1;i++)
+  for(int i=0; i<1; i++)
     {
       if (!RegisterMethod(aMethodName[i]))
         {
@@ -162,21 +163,37 @@ int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
   m_PPx.resize(2*m_QP_N,6);
   m_VPx.resize(2*m_QP_N,6);
 
-  for(unsigned int i=0;i<m_QP_N;i++)
+  for(unsigned int i=0; i<m_QP_N; i++)
     {
       // Compute VPx and PPx
-      m_VPx(i,0)   = 0.0;   m_VPx(i,1) =     1.0; m_VPx(i,2)   = (i+1)*m_QP_T;
-      m_VPx(i,3)   = 0.0;   m_VPx(i,4) =     0.0; m_VPx(i,5)   = 0.0;
-      m_VPx(i+m_QP_N,0) = 0.0;   m_VPx(i+m_QP_N,1) =   0.0; m_VPx(i+m_QP_N,2) = 0.0;
-      m_VPx(i+m_QP_N,3) = 0.0;   m_VPx(i+m_QP_N,4) =   1.0; m_VPx(i+m_QP_N,5) = (i+1)*m_QP_T;
+      m_VPx(i,0)   = 0.0;
+      m_VPx(i,1) =     1.0;
+      m_VPx(i,2)   = (i+1)*m_QP_T;
+      m_VPx(i,3)   = 0.0;
+      m_VPx(i,4) =     0.0;
+      m_VPx(i,5)   = 0.0;
+      m_VPx(i+m_QP_N,0) = 0.0;
+      m_VPx(i+m_QP_N,1) =   0.0;
+      m_VPx(i+m_QP_N,2) = 0.0;
+      m_VPx(i+m_QP_N,3) = 0.0;
+      m_VPx(i+m_QP_N,4) =   1.0;
+      m_VPx(i+m_QP_N,5) = (i+1)*m_QP_T;
 
-      m_PPx(i,0) = 1.0; m_PPx(i,1)     = (i+1)*m_QP_T; m_PPx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
-      m_PPx(i,3) = 0.0; m_PPx(i,4)     =       0; m_PPx(i,5) = 0.;
-      m_PPx(i+m_QP_N,0) = 0.0; m_PPx(i+m_QP_N,1) =     0.0; m_PPx(i+m_QP_N,2) = 0.0;
-      m_PPx(i+m_QP_N,3) = 1.0; m_PPx(i+m_QP_N,4) = (i+1)*m_QP_T; m_PPx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
+      m_PPx(i,0) = 1.0;
+      m_PPx(i,1)     = (i+1)*m_QP_T;
+      m_PPx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
+      m_PPx(i,3) = 0.0;
+      m_PPx(i,4)     =       0;
+      m_PPx(i,5) = 0.;
+      m_PPx(i+m_QP_N,0) = 0.0;
+      m_PPx(i+m_QP_N,1) =     0.0;
+      m_PPx(i+m_QP_N,2) = 0.0;
+      m_PPx(i+m_QP_N,3) = 1.0;
+      m_PPx(i+m_QP_N,4) = (i+1)*m_QP_T;
+      m_PPx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
 
 
-      for(unsigned int j=0;j<m_QP_N;j++)
+      for(unsigned int j=0; j<m_QP_N; j++)
         {
           m_PPu(i,j)=0;
 
@@ -190,7 +207,8 @@ int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
 
 
               m_PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
-              m_PPu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
+              m_PPu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) *
+                m_QP_T*m_QP_T*m_QP_T/6.0;
               m_PPu(i,j+m_QP_N)=0.0;
               m_PPu(i+m_QP_N,j)=0.0;
 
@@ -216,7 +234,7 @@ int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
   // Build m_Px.
   m_Px.resize(m_QP_N,3);
 
-  for(unsigned int li=0;li<m_QP_N;li++)
+  for(unsigned int li=0; li<m_QP_N; li++)
     {
       m_Px(li,0) = 1.0;
       m_Px(li,1) = (double)(1.0+li)*m_QP_T;
@@ -245,7 +263,8 @@ int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
   return 0;
 }
 
-int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double * &DPu,
+int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,
+                                                           double * &DPu,
                                                            int NbOfConstraints,
                                                            deque<LinearConstraintInequality_t *> &
                                                            QueueOfLConstraintInequalities,
@@ -255,9 +274,11 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double
                                                            )
 {
   double lSizeMat = QueueOfLConstraintInequalities.back()->EndingTime/m_QP_T;
-  Eigen::MatrixXd vnlPx; Eigen::MatrixXd vnlPu;
+  Eigen::MatrixXd vnlPx;
+  Eigen::MatrixXd vnlPu;
   Eigen::MatrixXd vnlValConstraint;
-  Eigen::MatrixXd vnlX;Eigen::MatrixXd vnlStorePx;
+  Eigen::MatrixXd vnlX;
+  Eigen::MatrixXd vnlStorePx;
   Eigen::MatrixXd vnlStoreX;
   Eigen::Matrix<int,Eigen::Dynamic,1> ConstraintNb;
 
@@ -265,16 +286,16 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double
   vnlStorePx.resize(NbOfConstraints,
                     1+(unsigned int)lSizeMat);
 
-  for(unsigned int i=0;i<vnlStorePx.rows();i++)
+  for(unsigned int i=0; i<vnlStorePx.rows(); i++)
     {
-      for(unsigned int j=0;j<vnlStorePx.cols();j++)
+      for(unsigned int j=0; j<vnlStorePx.cols(); j++)
         {
           vnlStorePx(i,j) =0.0;
         }
     }
   vnlStoreX.resize(2*m_QP_N,1+(unsigned int)lSizeMat);
 
-  for(unsigned int i=0;i<2*m_QP_N;i++)
+  for(unsigned int i=0; i<2*m_QP_N; i++)
     vnlStoreX(i,0) = 0.0;
 
   ConstraintNb.resize(1+(unsigned int)lSizeMat,1);
@@ -284,17 +305,17 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double
   vnlPx.resize(NbOfConstraints,1);
 
 
-  for(int i=0; i<NbOfConstraints;i++)
+  for(int i=0; i<NbOfConstraints; i++)
     {
       vnlPx(i,0) =
         vnlStorePx(i,li) = DPx[i];
     }
 
-  for(int i=0; i<NbOfConstraints;i++)
-    for(unsigned int j=0; j<2*m_QP_N;j++)
+  for(int i=0; i<NbOfConstraints; i++)
+    for(unsigned int j=0; j<2*m_QP_N; j++)
       vnlPu(i,j) = DPu[j*(NbOfConstraints+1)+i];
 
-  for(unsigned int i=0; i<2*m_QP_N;i++)
+  for(unsigned int i=0; i<2*m_QP_N; i++)
     {
       vnlStoreX(i,li) = X[i];
       vnlX(i,0) = X[i];
@@ -310,7 +331,7 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double
     }
 
 
-  for(int i=0;i<NbOfConstraints;i++)
+  for(int i=0; i<NbOfConstraints; i++)
     {
       unsigned int pbOnCurrent=0;
       if (vnlValConstraint(i,0)<-1e-8)
@@ -342,9 +363,9 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double
       ofstream aof;
       aof.open("StorePx.dat",ofstream::out);
 
-      for(unsigned int i=0;i<vnlStorePx.rows();i++)
+      for(unsigned int i=0; i<vnlStorePx.rows(); i++)
         {
-          for(unsigned int j=0;j<vnlStorePx.cols();j++)
+          for(unsigned int j=0; j<vnlStorePx.cols(); j++)
             {
               aof << vnlStorePx(i,j) << " ";
             }
@@ -357,9 +378,9 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double
       sprintf(lBuffer,"StoreX.dat");
       aof.open(lBuffer,ofstream::out);
 
-      for(unsigned int i=0;i<vnlStoreX.rows();i++)
+      for(unsigned int i=0; i<vnlStoreX.rows(); i++)
         {
-          for(unsigned int j=0;j<vnlStoreX.cols();j++)
+          for(unsigned int j=0; j<vnlStoreX.cols(); j++)
             {
               aof << vnlStoreX(i,j) << " ";
             }
@@ -368,7 +389,7 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double
       aof.close();
 
       aof.open("Cnb.dat",ofstream::out);
-      for(unsigned int i=0;i<ConstraintNb.size();i++)
+      for(unsigned int i=0; i<ConstraintNb.size(); i++)
         {
           aof << ConstraintNb[i]<<endl;
         }
@@ -376,15 +397,17 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double
     }
   return 0;
 }
-int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLD(Eigen::MatrixXd &OptA)
+int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLD(
+                                                                                   Eigen::MatrixXd &OptA)
 {
-  for(unsigned int i=0;i<2*m_QP_N;i++)
-    for(unsigned int j=0;j<2*m_QP_N;j++)
+  for(unsigned int i=0; i<2*m_QP_N; i++)
+    for(unsigned int j=0; j<2*m_QP_N; j++)
       m_Q[i*m_QP_N*2+j] = OptA(j,i);
 
   return 0;
 }
-int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(Eigen::MatrixXd &OptA)
+int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(
+                                                                                        Eigen::MatrixXd &OptA)
 {
 
   /*! Build cholesky matrix of the optimum
@@ -392,8 +415,8 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
     because we know its specific structure.
   */
   double *localQ=new double[m_QP_N*m_QP_N];
-  for(unsigned int i=0;i<m_QP_N;i++)
-    for(unsigned int j=0;j<m_QP_N;j++)
+  for(unsigned int i=0; i<m_QP_N; i++)
+    for(unsigned int j=0; j<m_QP_N; j++)
       localQ[i*m_QP_N+j] = OptA(i,j);
 
   double *localLQ=new double[m_QP_N*m_QP_N];
@@ -416,9 +439,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
       char Buffer[1024];
       sprintf(Buffer,"localQ.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<m_QP_N;i++)
+      for(unsigned int i=0; i<m_QP_N; i++)
         {
-          for(unsigned int j=0;j<m_QP_N;j++)
+          for(unsigned int j=0; j<m_QP_N; j++)
             aof << localQ[i*m_QP_N+j] << " ";
           aof<<endl;
         }
@@ -426,9 +449,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
 
       sprintf(Buffer,"localLQ.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<m_QP_N;i++)
+      for(unsigned int i=0; i<m_QP_N; i++)
         {
-          for(unsigned int j=0;j<m_QP_N;j++)
+          for(unsigned int j=0; j<m_QP_N; j++)
             aof << localLQ[i*m_QP_N+j] << " ";
           aof << endl;
         }
@@ -436,9 +459,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
 
       sprintf(Buffer,"localiLQ.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<m_QP_N;i++)
+      for(unsigned int i=0; i<m_QP_N; i++)
         {
-          for(unsigned int j=0;j<m_QP_N;j++)
+          for(unsigned int j=0; j<m_QP_N; j++)
             aof << localiLQ[i*m_QP_N+j] << " ";
           aof << endl;
         }
@@ -451,9 +474,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
   m_iLQ.resize(2*m_QP_N,2*m_QP_N);
 
 
-  for(unsigned int i=0;i<m_QP_N;i++)
+  for(unsigned int i=0; i<m_QP_N; i++)
     {
-      for(unsigned int j=0;j<m_QP_N;j++)
+      for(unsigned int j=0; j<m_QP_N; j++)
         {
           m_LQ(i,j) = localLQ[i*m_QP_N+j];
           m_LQ(i+m_QP_N,j+m_QP_N) = localLQ[i*m_QP_N+j];
@@ -481,9 +504,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
 
       sprintf(Buffer,"LQ.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<2*m_QP_N;i++)
+      for(unsigned int i=0; i<2*m_QP_N; i++)
         {
-          for(unsigned int j=0;j<2*m_QP_N;j++)
+          for(unsigned int j=0; j<2*m_QP_N; j++)
             aof << m_LQ(i,j) << " ";
           aof << endl;
         }
@@ -491,9 +514,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
 
       sprintf(Buffer,"iLQ.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<2*m_QP_N;i++)
+      for(unsigned int i=0; i<2*m_QP_N; i++)
         {
-          for(unsigned int j=0;j<2*m_QP_N;j++)
+          for(unsigned int j=0; j<2*m_QP_N; j++)
             aof << m_iLQ(i,j) << " ";
           aof << endl;
         }
@@ -531,7 +554,7 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   // part of the objective function.
   m_Q=new double[4*m_QP_N*m_QP_N];
   memset(m_Q,0,4*m_QP_N*m_QP_N*sizeof(double));
-  for(unsigned int i=0;i<2*m_QP_N;i++)
+  for(unsigned int i=0; i<2*m_QP_N; i++)
     m_Q[i*2*m_QP_N+i] = 1.0;
 
 
@@ -541,9 +564,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
       char Buffer[1024];
       sprintf(Buffer,"Q.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<2*m_QP_N;i++)
+      for(unsigned int i=0; i<2*m_QP_N; i++)
         {
-          for(unsigned int j=0;j<2*m_QP_N;j++)
+          for(unsigned int j=0; j<2*m_QP_N; j++)
             aof << m_Q[i*m_QP_N*2+j] << " ";
           aof << endl;
         }
@@ -577,9 +600,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
       char Buffer[1024];
       sprintf(Buffer,"OptB.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<m_OptB.rows();i++)
+      for(unsigned int i=0; i<m_OptB.rows(); i++)
         {
-          for(unsigned int j=0;j<m_OptB.cols()-1;j++)
+          for(unsigned int j=0; j<m_OptB.cols()-1; j++)
             aof << m_OptB(i,j) << " ";
           aof << m_OptB(i,m_OptB.cols()-1);
           aof << endl;
@@ -594,9 +617,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
       char Buffer[1024];
       sprintf(Buffer,"OptC.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<m_OptC.rows();i++)
+      for(unsigned int i=0; i<m_OptC.rows(); i++)
         {
-          for(unsigned int j=0;j<m_OptC.cols()-1;j++)
+          for(unsigned int j=0; j<m_OptC.cols()-1; j++)
             aof << m_OptC(i,j) << " ";
           aof << m_OptC(i,m_OptC.cols()-1);
           aof << endl;
@@ -630,13 +653,14 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
 
   // Recursive multiplication of the system is applied.
   // we keep the transpose form, i.e. Pu'.
-  for(unsigned i=0;i<m_QP_N;i++)
+  for(unsigned i=0; i<m_QP_N; i++)
     {
 
-      for(unsigned k=0;k<=i;k++)
+      for(unsigned k=0; k<=i; k++)
         {
           ptPu[k*m_QP_N+i] =
-            ((1+3*(i-k)+3*(i-k)*(i-k))*m_QP_T*m_QP_T*m_QP_T/6.0 - m_QP_T * m_ComHeight/9.81);
+            ((1+3*(i-k)+3*(i-k)*(i-k))*m_QP_T*m_QP_T*m_QP_T/6.0 - m_QP_T *
+             m_ComHeight/9.81);
         }
     }
 
@@ -651,13 +675,13 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
       // (D*Pu*iLQ')' = iLQ*Pu'*D'
       // So here we compute iLQ*Pu'
       // Be careful with the two stages resolution.
-      for(unsigned i=0;i<m_QP_N;i++)
+      for(unsigned i=0; i<m_QP_N; i++)
         {
 
-          for(unsigned j=0;j<m_QP_N;j++)
+          for(unsigned j=0; j<m_QP_N; j++)
             {
               m_Pu[i*m_QP_N+j] = 0;
-              for(unsigned k=0;k<m_QP_N;k++)
+              for(unsigned k=0; k<m_QP_N; k++)
                 {
                   m_Pu[i*m_QP_N+j] += m_iLQ(i,k) * ptPu[k*m_QP_N+j];
                 }
@@ -667,8 +691,8 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
       if (m_FastFormulationMode==PLDP)
         {
           Eigen::MatrixXd  m_mal_Pu(m_QP_N,m_QP_N);
-          for(unsigned j=0;j<m_QP_N;j++)
-            for(unsigned k=0;k<m_QP_N;k++)
+          for(unsigned j=0; j<m_QP_N; j++)
+            for(unsigned k=0; k<m_QP_N; k++)
               m_mal_Pu(j,k) = m_Pu[j*m_QP_N+k];
           m_iPu=m_mal_Pu.inverse();
         }
@@ -680,9 +704,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
       char Buffer[1024];
       sprintf(Buffer,"PuCst.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<m_QP_N;i++)
+      for(unsigned int i=0; i<m_QP_N; i++)
         {
-          for(unsigned int j=0;j<m_QP_N;j++)
+          for(unsigned int j=0; j<m_QP_N; j++)
             aof << m_Pu[j+i*m_QP_N] << " " ;
           aof << endl;
         }
@@ -690,9 +714,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
 
       sprintf(Buffer,"tmpPuCst.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<m_QP_N;i++)
+      for(unsigned int i=0; i<m_QP_N; i++)
         {
-          for(unsigned int j=0;j<m_QP_N;j++)
+          for(unsigned int j=0; j<m_QP_N; j++)
             aof << ptPu[j+i*m_QP_N] << " " ;
           aof << endl;
         }
@@ -700,9 +724,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
 
       sprintf(Buffer,"tmpiLQ.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<m_QP_N;i++)
+      for(unsigned int i=0; i<m_QP_N; i++)
         {
-          for(unsigned int j=0;j<m_QP_N;j++)
+          for(unsigned int j=0; j<m_QP_N; j++)
             aof << m_iLQ(i,j) << " " ;
           aof << endl;
         }
@@ -751,12 +775,13 @@ const double & ZMPConstrainedQPFastFormulation::GetBeta() const
 }
 
 
-int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,double * &DPu,
+int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,
+                                                             double * &DPu,
                                                              unsigned N, double T,
                                                              double StartingTime,
                                                              deque<LinearConstraintInequality_t *> &
                                                              QueueOfLConstraintInequalities,
-                                                             double , //Com_Height,
+                                                             double,  //Com_Height,
                                                              unsigned int &NbOfConstraints,
                                                              Eigen::VectorXd & xk,
                                                              Eigen::VectorXd & ZMPRef,
@@ -803,7 +828,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
       char Buffer[1024];
       sprintf(Buffer,"PXD_%f.dat", StartingTime);
       RESETDEBUG4(Buffer);
-      ODEBUG6("xk:" << xk << " Starting time: " <<StartingTime ,Buffer );
+      ODEBUG6("xk:" << xk << " Starting time: " <<StartingTime,Buffer );
       char Buffer2[1024];
       sprintf(Buffer2,"PXxD_%f.dat", StartingTime);
       RESETDEBUG4(Buffer2);
@@ -815,7 +840,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 
   // Compute first the number of constraint.
   unsigned int IndexConstraint=0;
-  for(unsigned int i=0;i<N;i++)
+  for(unsigned int i=0; i<N; i++)
     {
 
       double ltime = StartingTime+ i* T;
@@ -844,7 +869,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
   IndexConstraint = 0;
   ODEBUG("Starting Matrix to build the constraints. ");
   ODEBUG((*LCI_it)->A );
-  for(unsigned int i=0;i<N;i++)
+  for(unsigned int i=0; i<N; i++)
     {
 
       double ltime = StartingTime+ i* T;
@@ -857,7 +882,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 
 
       // For each constraint.
-      for(unsigned j=0;j<(*LCI_it)->A.rows();j++)
+      for(unsigned j=0; j<(*LCI_it)->A.rows(); j++)
         {
 
           // Verification of constraints.
@@ -877,9 +902,11 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
             + (*LCI_it)->B(j,0);
 
           ODEBUG6(DPx[IndexConstraint] << " " << (*LCI_it)->A(j,0)  << " "
-                  << (*LCI_it)->A[j][1] << " " << (*LCI_it)->B(j,0) ,Buffer);
-          ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer2);
-          ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer3);
+                  << (*LCI_it)->A[j][1] << " " << (*LCI_it)->B(j,0),Buffer);
+          ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 -
+                  Com_Height/9.81,Buffer2);
+          ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 -
+                  Com_Height/9.81,Buffer3);
 
           m_SimilarConstraints[IndexConstraint]=(*LCI_it)->SimilarConstraints[j];
 
@@ -887,7 +914,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
             {
               // In this case, Pu is triangular.
               // so we can speed up the computation.
-              for(unsigned k=0;k<=i;k++)
+              for(unsigned k=0; k<=i; k++)
                 {
                   // X axis
                   DPu[IndexConstraint+k*(NbOfConstraints+1)] =
@@ -901,7 +928,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
                    (m_FastFormulationMode==PLDP))
             {
               // In this case, Pu is *NOT* triangular.
-              for(unsigned k=0;k<N;k++)
+              for(unsigned k=0; k<N; k++)
                 {
                   // X axis
                   DPu[IndexConstraint+k*(NbOfConstraints+1)] =
@@ -932,9 +959,9 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
       char Buffer[1024];
       sprintf(Buffer,"DPu.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<IndexConstraint;i++)
+      for(unsigned int i=0; i<IndexConstraint; i++)
         {
-          for(unsigned int j=0;j<2*N;j++)
+          for(unsigned int j=0; j<2*N; j++)
             aof << DPu[j*(NbOfConstraints+1)+i] << " " ;
           aof << endl;
         }
@@ -942,14 +969,14 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 
       sprintf(Buffer,"DPx.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int j=0;j<IndexConstraint;j++)
+      for(unsigned int j=0; j<IndexConstraint; j++)
         aof << DPx[j] << " " ;
       aof << endl;
       aof.close();
 
       sprintf(Buffer,"CZMPRef.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int j=0;j<2*N;j++)
+      for(unsigned int j=0; j<2*N; j++)
         aof << ZMPRef[j] << " " ;
       aof << endl;
       aof.close();
@@ -957,9 +984,9 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
       sprintf(Buffer,"lD.dat");
       aof.open(Buffer,ofstream::out);
       ODEBUG(lD.rows() << " " << lD.cols() << " " );
-      for(unsigned int lj=0;lj<lD.rows();lj++)
+      for(unsigned int lj=0; lj<lD.rows(); lj++)
         {
-          for(unsigned int k=0;k<lD.cols();k++)
+          for(unsigned int k=0; k<lD.cols(); k++)
             aof << lD(lj,k) << " " ;
           aof << endl;
         }
@@ -967,7 +994,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 
       sprintf(Buffer,"lb.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int j=0;j<IndexConstraint;j++)
+      for(unsigned int j=0; j<IndexConstraint; j++)
         aof << lb(j) << " " ;
       aof << endl;
       aof.close();
@@ -983,9 +1010,9 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
       char Buffer[1024];
       sprintf(Buffer,"PuCst_%f.dat",StartingTime);
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<m_QP_N;i++)
+      for(unsigned int i=0; i<m_QP_N; i++)
         {
-          for(unsigned int j=0;j<m_QP_N;j++)
+          for(unsigned int j=0; j<m_QP_N; j++)
             aof << m_Pu[j+i*m_QP_N] << " " ;
           aof << endl;
         }
@@ -993,9 +1020,9 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 
       sprintf(Buffer,"D_%f.dat",StartingTime);
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<2*m_QP_N;i++)
+      for(unsigned int i=0; i<2*m_QP_N; i++)
         {
-          for(unsigned int j=0;j<NbOfConstraints;j++)
+          for(unsigned int j=0; j<NbOfConstraints; j++)
             aof << lD(i,j) << " " ;
           aof << endl;
         }
@@ -1005,7 +1032,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
         {
           sprintf(Buffer,"DPX_%f.dat", StartingTime);
           aof.open(Buffer,ofstream::out);
-          for(unsigned int i=0;i<IndexConstraint;i++)
+          for(unsigned int i=0; i<IndexConstraint; i++)
             {
               aof << DPx[i] << endl ;
             }
@@ -1033,9 +1060,9 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
 
   // Dumping Q.
   aof << "Q:"<< endl;
-  for(unsigned int i=0;i<2*m_QP_N;i++)
+  for(unsigned int i=0; i<2*m_QP_N; i++)
     {
-      for(unsigned int j=0;j<2*m_QP_N;j++)
+      for(unsigned int j=0; j<2*m_QP_N; j++)
         {
           aof <<Q[j*m_QP_N*2+i]<< " ";
         }
@@ -1044,7 +1071,7 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
 
   // Dumping D.
   aof << "D:"<< endl;
-  for(unsigned int i=0;i<2*m_QP_N;i++)
+  for(unsigned int i=0; i<2*m_QP_N; i++)
     {
       aof <<D[i]<< " ";
     }
@@ -1052,9 +1079,9 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
 
   // Dumping Pu.
   aof << "DPu:"<< endl;
-  for(unsigned int i=0;i<NbOfConstraints;i++)
+  for(unsigned int i=0; i<NbOfConstraints; i++)
     {
-      for(unsigned int j=0;j<2*m_QP_N;j++)
+      for(unsigned int j=0; j<2*m_QP_N; j++)
         {
           aof << DPu[j*(NbOfConstraints+1)+i] << " ";
         }
@@ -1063,7 +1090,7 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
 
   // Dumping Px.
   aof << "Px:"<< endl;
-  for(unsigned int i=0;i<NbOfConstraints;i++)
+  for(unsigned int i=0; i<NbOfConstraints; i++)
     {
       aof << Px[i] << " ";
     }
@@ -1071,7 +1098,7 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
 
   // Dumping XL.
   aof << "XL:"<< endl;
-  for(unsigned int i=0;i<2*m_QP_N;i++)
+  for(unsigned int i=0; i<2*m_QP_N; i++)
     {
       aof << XL[i] << " ";
     }
@@ -1079,7 +1106,7 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
 
   // Dumping XU.
   aof << "XU:"<< endl;
-  for(unsigned int i=0;i<2*m_QP_N;i++)
+  for(unsigned int i=0; i<2*m_QP_N; i++)
     {
       aof << XU[i] << " ";
     }
@@ -1088,7 +1115,8 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
   aof.close();
   return 0;
 }
-int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition>
+int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(
+                                                                          deque<FootAbsolutePosition>
                                                                           &LeftFootAbsolutePositions,
                                                                           deque<FootAbsolutePosition>
                                                                           &RightFootAbsolutePositions,
@@ -1127,7 +1155,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   double *X=new double[2*N];   // Solution of the system.
   double *NewX=new double[2*N];   // Solution of the system.
   double Eps=1e-8 ;
-  double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.;
+  double *U = (double *)malloc( sizeof(double)
+                                *mnn); // Returns the Lagrange multipliers.;
 
 
   int iout=0;
@@ -1235,7 +1264,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
           char Buffer[1024];
           sprintf(Buffer,"ZMPRef_%f.dat",StartingTime);
           aof.open(Buffer,ofstream::out);
-          for(unsigned int i=0;i<2*N;i++)
+          for(unsigned int i=0; i<2*N; i++)
             {
               aof << ZMPRef[i] << endl;
             }
@@ -1249,7 +1278,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
           OptD.resize(2*N);
           OptD=m_OptB+xk;
           OptD -= lterm1v;
-          for(unsigned int i=0;i<2*N;i++)
+          for(unsigned int i=0; i<2*N; i++)
             D[i] = OptD[i];
 
           if (m_FullDebug>0)
@@ -1258,7 +1287,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
               char Buffer[1024];
               sprintf(Buffer,"D_%f.dat",StartingTime);
               aof.open(Buffer,ofstream::out);
-              for(unsigned int i=0;i<2*N;i++)
+              for(unsigned int i=0; i<2*N; i++)
                 {
                   aof << OptD[i] << endl;
                 }
@@ -1269,11 +1298,11 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       else
         {
           // Default : set D to zero.
-          for(unsigned int i=0;i<2*N;i++)
+          for(unsigned int i=0; i<2*N; i++)
             D[i] = 0.0;
         }
 
-      for(unsigned int i=0;i<2*N;i++)
+      for(unsigned int i=0; i<2*N; i++)
         {
           XL[i] = -1e8;
           XU[i] = 1e8;
@@ -1304,7 +1333,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
                      0.000001 * (lend.tv_usec - lbegin.tv_usec););
 
           unsigned int NbOfActivatedConstraints = 0;
-          for(int lk=0;lk<m;lk++)
+          for(int lk=0; lk<m; lk++)
             {
               if (U[lk]>0.0)
                 {
@@ -1360,12 +1389,12 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
           double *pm_iLQ = &m_iLQ(0);
           double *pNewX = NewX;
 
-          for(unsigned int i=0;i<2*N;i++)
+          for(unsigned int i=0; i<2*N; i++)
             {
               double *pX= X+i;
               double *piLQ = pm_iLQ+i*2*N+i;
               *pNewX = 0.0;
-              for(unsigned int j=i;j<2*N;j++)
+              for(unsigned int j=i; j<2*N; j++)
                 {
                   *pNewX+= (*piLQ) * (*pX++);
                   piLQ+=2*N;
@@ -1414,7 +1443,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
           char Buffer[1024];
           sprintf(Buffer,"X_%f.dat",StartingTime);
           aof.open(Buffer,ofstream::out);
-          for(unsigned int i=0;i<2*N;i++)
+          for(unsigned int i=0; i<2*N; i++)
             {
               aof << X[i] << endl;
             }
@@ -1428,7 +1457,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
         0.000001 * (double)(end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
       ODEBUG("Current Time : " << StartingTime << " " <<
-             " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime <<
+             " Virtual time to simulate: " <<
+             QueueOfLConstraintInequalities.back()->EndingTime - StartingTime <<
              "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
     }
@@ -1458,7 +1488,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 }
 
 
-void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
+void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(
+                                                           deque<ZMPPosition> & ZMPPositions,
                                                            deque<COMState> & COMStates,
                                                            deque<RelativeFootPosition> &RelativeFootPositions,
                                                            deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
@@ -1497,7 +1528,7 @@ void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & 
     {
       ofstream aof;
       aof.open("DebugDimitrovZMP.dat",ofstream::out);
-      for(unsigned int i=0;i<ZMPPositions.size();i++)
+      for(unsigned int i=0; i<ZMPPositions.size(); i++)
         {
           aof << ZMPPositions[i].px << " " << ZMPPositions[i].py << endl;
         }
@@ -1507,7 +1538,8 @@ void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & 
 
 }
 
-void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method, std::istringstream &strm)
+void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method,
+                                                 std::istringstream &strm)
 {
   if (Method==":setdimitrovconstraint")
     {
@@ -1536,23 +1568,25 @@ void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method, std::istr
 }
 
 
-std::size_t ZMPConstrainedQPFastFormulation::InitOnLine(deque<ZMPPosition> &,          // FinalZMPPositions,
+std::size_t ZMPConstrainedQPFastFormulation::InitOnLine(
+                                                        deque<ZMPPosition> &,          // FinalZMPPositions,
                                                         deque<COMState> &,             // FinalCOMStates,
                                                         deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
                                                         deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
-                                                        FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
-                                                        FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
+                                                        FootAbsolutePosition &,        // InitLeftFootAbsolutePosition,
+                                                        FootAbsolutePosition &,        // InitRightFootAbsolutePosition,
                                                         deque<RelativeFootPosition> &, // RelativeFootPositions,
-                                                        COMState & ,                   // lStartingCOMState,
+                                                        COMState &,                    // lStartingCOMState,
                                                         Eigen::Vector3d & )      // lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
   return 0;
 }
 
-void ZMPConstrainedQPFastFormulation::OnLineAddFoot(RelativeFootPosition & ,         // NewRelativeFootPosition,
-                                                    deque<ZMPPosition> & ,           // FinalZMPPositions,
-                                                    deque<COMState> & ,              // FinalCOMStates,
+void ZMPConstrainedQPFastFormulation::OnLineAddFoot(RelativeFootPosition &
+                                                    ,         // NewRelativeFootPosition,
+                                                    deque<ZMPPosition> &,            // FinalZMPPositions,
+                                                    deque<COMState> &,               // FinalCOMStates,
                                                     deque<FootAbsolutePosition> &,   // FinalLeftFootAbsolutePositions,
                                                     deque<FootAbsolutePosition> &,   // FinalRightFootAbsolutePositions,
                                                     bool )                           // EndSequence)
@@ -1560,19 +1594,21 @@ void ZMPConstrainedQPFastFormulation::OnLineAddFoot(RelativeFootPosition & ,    
   cout << "To be implemented" << endl;
 }
 
-void ZMPConstrainedQPFastFormulation::OnLine(double ,                                // time,
-                                             deque<ZMPPosition> & ,                  // FinalZMPPositions,
-                                             deque<COMState> & ,                     // FinalCOMStates,
+void ZMPConstrainedQPFastFormulation::OnLine(double
+                                             ,                                // time,
+                                             deque<ZMPPosition> &,                   // FinalZMPPositions,
+                                             deque<COMState> &,                      // FinalCOMStates,
                                              deque<FootAbsolutePosition> &,          // FinalLeftFootAbsolutePositions,
                                              deque<FootAbsolutePosition> & )         // FinalRightFootAbsolutePositions)
 {
   cout << "To be implemented" << endl;
 }
 
-int ZMPConstrainedQPFastFormulation::OnLineFootChange(double ,                       // time,
-                                                      FootAbsolutePosition & ,       // aFootAbsolutePosition,
-                                                      deque<ZMPPosition> & ,         // FinalZMPPositions,
-                                                      deque<COMState> & ,            // CoMPositions,
+int ZMPConstrainedQPFastFormulation::OnLineFootChange(double
+                                                      ,                       // time,
+                                                      FootAbsolutePosition &,        // aFootAbsolutePosition,
+                                                      deque<ZMPPosition> &,          // FinalZMPPositions,
+                                                      deque<COMState> &,             // CoMPositions,
                                                       deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
                                                       deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
                                                       StepStackHandler  *)           // aStepStackHandler)
@@ -1581,7 +1617,8 @@ int ZMPConstrainedQPFastFormulation::OnLineFootChange(double ,                  
   return -1;
 }
 
-void ZMPConstrainedQPFastFormulation::EndPhaseOfTheWalking(deque<ZMPPosition> &,           // ZMPPositions,
+void ZMPConstrainedQPFastFormulation::EndPhaseOfTheWalking(
+                                                           deque<ZMPPosition> &,           // ZMPPositions,
                                                            deque<COMState> &,              // FinalCOMStates,
                                                            deque<FootAbsolutePosition> &,  // LeftFootAbsolutePositions,
                                                            deque<FootAbsolutePosition> & ) // RightFootAbsolutePositions)

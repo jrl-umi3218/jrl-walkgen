@@ -44,7 +44,8 @@ namespace PatternGeneratorJRL
       orthogonal plan as well as the direction.For the height modification a 4th order polynome
       is used. Finally a landing and take off phase using an angular value (\f$\omega\f$).
   */
-  class  FootTrajectoryGenerationStandard : public FootTrajectoryGenerationAbstract
+  class  FootTrajectoryGenerationStandard : public
+  FootTrajectoryGenerationAbstract
   {
   public:
 
@@ -92,14 +93,16 @@ namespace PatternGeneratorJRL
       @param StepType: Type of steps (for book-keeping).
       @param LeftOrRight: Specify if it is left (1) or right (-1).
     */
-    virtual void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
+    virtual void UpdateFootPosition(deque<FootAbsolutePosition>
+                                    &SupportFootAbsolutePositions,
                                     deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
                                     int CurrentAbsoluteIndex,
                                     int IndexInitial,
                                     double ModulatedSingleSupportTime,
                                     int StepType,int LeftOrRight);
 
-    virtual void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
+    virtual void UpdateFootPosition(deque<FootAbsolutePosition>
+                                    &SupportFootAbsolutePositions,
                                     deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
                                     int StartIndex, int k,
                                     double LocalInterpolationStartTime,
@@ -227,7 +230,8 @@ namespace PatternGeneratorJRL
     /*! Compute the absolute foot position from the queue of relative positions.
       There is not direct dependency with time.
     */
-    void ComputingAbsFootPosFromQueueOfRelPos(deque<RelativeFootPosition> &RelativeFootPositions,
+    void ComputingAbsFootPosFromQueueOfRelPos(deque<RelativeFootPosition>
+                                              &RelativeFootPositions,
                                               deque<FootAbsolutePosition> &AbsoluteFootPositions);
 
     /*! Methods to compute a set of positions for the feet according to the discrete time given in parameters

@@ -42,7 +42,8 @@ namespace PatternGeneratorJRL
   public:
 
     /* Default constructor. */
-    ZMPQPWithConstraint(SimplePluginManager *lSPM, string DataFile, PinocchioRobot *aPR=0);
+    ZMPQPWithConstraint(SimplePluginManager *lSPM, string DataFile,
+                        PinocchioRobot *aPR=0);
 
     /* Default destructor. */
     ~ZMPQPWithConstraint();
@@ -50,7 +51,8 @@ namespace PatternGeneratorJRL
     /*! This method builds a set of linear constraint inequalities based
       on the foot trajectories given as an input.
       The result is a set Linear Constraint Inequalities. */
-    int BuildLinearConstraintInequalities(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+    int BuildLinearConstraintInequalities(deque<FootAbsolutePosition>
+                                          &LeftFootAbsolutePositions,
                                           deque<FootAbsolutePosition> &RightFootAbsolutePositions,
                                           deque<LinearConstraintInequality_t *> & QueueOfLConstraintInequalities,
                                           double ConstraintOnX,
@@ -102,7 +104,8 @@ namespace PatternGeneratorJRL
 
     /*! This method is a new way of computing the ZMP trajectory from
       foot trajectory. */
-    int BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+    int BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition>
+                                             &LeftFootAbsolutePositions,
                                              deque<FootAbsolutePosition> &RightFootAbsolutePositions,
                                              deque<ZMPPosition> &ZMPRefPositions,
                                              deque<COMState> &COMStates,

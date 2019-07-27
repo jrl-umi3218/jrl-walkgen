@@ -7,43 +7,44 @@
 #include <jrl/walkgen/pgtypes.hh>
 #include "pinocchio/multibody/model.hpp"
 
-namespace PatternGeneratorJRL {
-
-// repartition of the forces on the contacts
-enum end_effector_e
+namespace PatternGeneratorJRL
 {
-  RightFoot,
-  LeftFoot,
-  RightHand,
-  LeftHand
-};
 
-struct contact_t
-{
-  // position of contact
-  Eigen::Vector3d p;
-  // noraml to the contact surface
-  Eigen::Vector3d n;
-  // force repartition factor
-  double lambda ;
-};
-typedef contact_t contact ;
+  // repartition of the forces on the contacts
+  enum end_effector_e
+    {
+     RightFoot,
+     LeftFoot,
+     RightHand,
+     LeftHand
+    };
+
+  struct contact_t
+  {
+    // position of contact
+    Eigen::Vector3d p;
+    // noraml to the contact surface
+    Eigen::Vector3d n;
+    // force repartition factor
+    double lambda ;
+  };
+  typedef contact_t contact ;
 
 
-class MultiContactHirukawa
-{
-public:
+  class MultiContactHirukawa
+  {
+  public:
     MultiContactHirukawa(se3::Model * model);
 
     ~MultiContactHirukawa();
 
     int oneIteration(COMState & comState,    // INPUT
-        FootAbsolutePosition & rf, // INPUT
-        FootAbsolutePosition & lf, // INPUT
-        HandAbsolutePosition & rh, // INPUT
-        HandAbsolutePosition & lh); // INPUT
+                     FootAbsolutePosition & rf, // INPUT
+                     FootAbsolutePosition & lf, // INPUT
+                     HandAbsolutePosition & rh, // INPUT
+                     HandAbsolutePosition & lh); // INPUT
 
-private :
+  private :
 
     int inverseKinematicsOnLimbs(FootAbsolutePosition &rf,
                                  FootAbsolutePosition &lf,
@@ -56,20 +57,22 @@ private :
 
     se3::Model::Index findIndex(se3::Model * model, std::string name)
     {
-      return model->existBodyName(name)?model->getBodyId(name):(se3::Model::Index)(model->nbody-1) ;
+      return model->existBodyName(name)?model->
+        getBodyId(name):(se3::Model::Index)
+        (model->nbody-1);
     }
 
     Eigen::MatrixXd hat(Eigen::VectorXd vec)
     {
       assert(vec.size()==3);
       Eigen::MatrixXd mat (3,3) ;
-      mat <<    0.0  , -vec(2) ,  vec(1),
-              vec(2) ,    0.0  , -vec(0),
-             -vec(1) ,  vec(0) ,   0.0  ;
+      mat <<    0.0, -vec(2),  vec(1),
+        vec(2),    0.0, -vec(0),
+        -vec(1),  vec(0),   0.0  ;
       return mat ;
     }
 
-protected :
+  protected :
     //robot model an configurations
     se3::Model * robot_model_ ;
     se3::Data  * robot_data_  ;
@@ -77,13 +80,16 @@ protected :
     Eigen::VectorXd q_,dq_ ;
     Eigen::VectorXd dqrh_, dqlh_, dqrf_, dqlf_;
 
-    const se3::Model::Index idx_r_wrist_, idx_l_wrist_, idx_r_ankle_, idx_l_ankle_ ;
-    const se3::Model::Index idx_r_hip_, idx_l_hip_, idx_r_shoulder_, idx_l_shoulder_;
+    const se3::Model::Index idx_r_wrist_, idx_l_wrist_,
+                idx_r_ankle_, idx_l_ankle_ ;
+    const se3::Model::Index idx_r_hip_, idx_l_hip_, idx_r_shoulder_,
+                idx_l_shoulder_;
 
     unsigned int n_it_ ;                // number of iteration max to converge
     double sampling_period_ ;           // sampling period in seconds
 
-    // all the Jacobians of the end effectors : right hand, left hand, right foot, left foot
+    // all the Jacobians of the end effectors :
+    // right hand, left hand, right foot, left foot
     Eigen::MatrixXd tmpJ_, Jrh_, Jlh_, Jrf_, Jlf_;
     Eigen::MatrixXd Jrh_1_, Jlh_1_, Jrf_1_, Jlf_1_ ;
 
@@ -99,7 +105,7 @@ protected :
     Eigen::VectorXd S_;
 
     // linear "P" and angular "L" momentum
-    Eigen::Vector3d P_,L_ , prevP_,prevL_;
+    Eigen::Vector3d P_,L_, prevP_,prevL_;
 
     // first derivative of the angular momentum :
     Eigen::Vector3d dL_ ;
@@ -130,13 +136,16 @@ protected :
     Eigen::MatrixXd A_,A_1_;
     Eigen::VectorXd B_;
 
-    // all the Inertia of the limbs : right hand, left hand, right foot, left foot
+    // all the Inertia of the limbs : right hand, left hand,
+    // right foot, left foot
     Eigen::MatrixXd Mrh_star_, Mlh_star_, Mrf_star_, Mlf_star_ ;
 
-public :
+  public :
     void q(Eigen::VectorXd & q)
-    {q_ = q;}
-};
+    {
+      q_ = q;
+    }
+  };
 
 }
 #endif // HIRUKAWA2007_HH

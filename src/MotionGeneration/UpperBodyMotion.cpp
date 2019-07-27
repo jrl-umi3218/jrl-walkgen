@@ -52,32 +52,35 @@ void UpperBodyMotion::GenerateDataFile(string aFileName, int LenghtDataArray)
   if (aof.is_open())
     {
 
-      for(int i=0;i<LenghtDataArray;i++)
+      for(int i=0; i<LenghtDataArray; i++)
         {
 
 #if 0
-          aof         << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "                                                                      //chest
-                      << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "                                                                             //head
-                      << 14.813*M_PI/180.0  << " " << -10.0*M_PI/180.0 << " "
+          aof         << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " " //chest
+                      << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " "  // head
+                      << 14.813*M_PI/180.0  << " "
+                      << -10.0*M_PI/180.0 << " "
                       << 0.0*M_PI/180.0 << " " << -30.0*M_PI/180.0 << " "
                       << 0.0*M_PI/180.0 << " "  <<  0.0*M_PI/180.0 << " "
                       << 10.0*M_PI/180.0 << " "   //rarm
                       << 14.813*M_PI/180.0 << " " << 10.0*M_PI/180.0 << " "
                       << 0.0*M_PI/180.0 << " " << -30.0*M_PI/180.0 << " "
                       << 0.0*M_PI/180.0<< " "  <<  0.0*M_PI/180.0 << " "
-                      << 10.0*M_PI/180.0<< " "    //larm
+                      << 10.0*M_PI/180.0<< " "  //larm
                       << -10.0*M_PI/180.0 << " " << 10.0*M_PI/180.0 << " "
                       << -10.0*M_PI/180.0 << " " << 10.0*M_PI/180.0 << " "
-                      << -10.0*M_PI/180.0 << " "
-            //rhand
+                      << -10.0*M_PI/180.0 << " " //rhand
                       << -10.0*M_PI/180.0  << " " << 10.0*M_PI/180.0 << " "
                       << -10.0*M_PI/180.0<< " " << 10.0*M_PI/180.0 << " "
-                      << -10.0*M_PI/180.0<< " "
-            //lhand
+                      << -10.0*M_PI/180.0<< " " //lhand
                       << endl;
 #else
-          aof         << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "                                                                      //chest
-                      << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "                                                                             //head
+          aof         << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " " //chest
+                      << 0.0*M_PI/180.0 << " "
+                      << 0.0*M_PI/180.0 << " " //head
                       << 0.0*M_PI/180.0  << " " << 0.0*M_PI/180.0 << " "
                       << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "
                       << 0.0*M_PI/180.0 << " "  <<  0.0*M_PI/180.0 << " "
@@ -88,12 +91,10 @@ void UpperBodyMotion::GenerateDataFile(string aFileName, int LenghtDataArray)
                       << 0.0*M_PI/180.0<< " "     //larm
                       << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "
                       << 0.0*M_PI/180.0 << " " << 0.0*M_PI/180.0 << " "
-                      << 0.0*M_PI/180.0 << " "
-            //rhand
+                      << 0.0*M_PI/180.0 << " " //rhand
                       << 0.0*M_PI/180.0  << " " << 0.0*M_PI/180.0 << " "
                       << 0.0*M_PI/180.0<< " " << 0.0*M_PI/180.0 << " "
-                      << 0.0*M_PI/180.0<< " "
-            //lhand
+                      << 0.0*M_PI/180.0<< " " //lhand
                       << endl;
 #endif
         }
@@ -104,7 +105,8 @@ void UpperBodyMotion::GenerateDataFile(string aFileName, int LenghtDataArray)
 }
 
 
-void UpperBodyMotion::ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles)
+void UpperBodyMotion::ReadDataFile(string aFileName,
+                                   Eigen::MatrixXd &UpperBodyAngles)
 {
 
   std::ifstream aif;
@@ -119,9 +121,9 @@ void UpperBodyMotion::ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyA
   aif.open(aFileName.c_str(),std::ifstream::in);
   if (aif.is_open())
     {
-      for (unsigned int i=0;i<NumberRows;i++)
+      for (unsigned int i=0; i<NumberRows; i++)
         {
-          for (unsigned int j=0;j<NumberColumns;j++)
+          for (unsigned int j=0; j<NumberColumns; j++)
             {
               aif >> r;
               UpperBodyAngles(i,j) = r;
@@ -134,7 +136,8 @@ void UpperBodyMotion::ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyA
 
 }
 
-void UpperBodyMotion::WriteDataFile(string aFileName,Eigen::MatrixXd &UpperBodyAngles )
+void UpperBodyMotion::WriteDataFile(string aFileName,
+                                    Eigen::MatrixXd &UpperBodyAngles )
 {
   ofstream aof;
   unsigned int NumberRows, NumberColumns;
@@ -145,9 +148,9 @@ void UpperBodyMotion::WriteDataFile(string aFileName,Eigen::MatrixXd &UpperBodyA
   if (aof.is_open())
     {
 
-      for (unsigned int i=0;i<NumberRows;i++)
+      for (unsigned int i=0; i<NumberRows; i++)
         {
-          for (unsigned int j=0;j<NumberColumns;j++)
+          for (unsigned int j=0; j<NumberColumns; j++)
             {
               aof << UpperBodyAngles(i,j)  << "\t";
             }

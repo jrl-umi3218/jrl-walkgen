@@ -209,7 +209,8 @@ namespace PatternGeneratorJRL
       @param lCoM: Profile of CoM for each interval.
       @param lZMP: Profile of ZMP for each interval.
     */
-    virtual void BuildingTheZMatrix(std::vector<double> &lCoM, std::vector<double> &lZMP )=0;
+    virtual void BuildingTheZMatrix(std::vector<double> &lCoM,
+                                    std::vector<double> &lZMP )=0;
 
     /*! \brief Building the w vector.
       It is currently assume that all ZMP's speed will be
@@ -240,7 +241,8 @@ namespace PatternGeneratorJRL
       @param InitializeaAZCT: If set to true this variable trigger the initialization
       of the object aAZCT, does nothing otherwise.
     */
-    virtual void TransfertTheCoefficientsToTrajectories(AnalyticalZMPCOGTrajectory &aAZCT,
+    virtual void TransfertTheCoefficientsToTrajectories(AnalyticalZMPCOGTrajectory
+                                                        &aAZCT,
                                                         std::vector<double> &lCoMZ,
                                                         std::vector<double> &lZMPZ,
                                                         double &lZMPInit,
@@ -265,13 +267,14 @@ namespace PatternGeneratorJRL
       this method. */
     void GetPolynomialDegrees(std::vector<unsigned int> &lPolynomialDegrees);
 
-    friend std::ostream& operator <<(std::ostream &os,const AnalyticalMorisawaAbstract &obj);
+    friend std::ostream& operator <<(std::ostream &os,
+                                     const AnalyticalMorisawaAbstract &obj);
 
     /*! \brief Compute the preview control time window. */
     void ComputePreviewControlTimeWindow()
     {
       m_PreviewControlTime = 0.0;
-      for(unsigned int i=0;i<m_DeltaTj.size();i++)
+      for(unsigned int i=0; i<m_DeltaTj.size(); i++)
         m_PreviewControlTime += m_DeltaTj[i];
     }
 
@@ -377,22 +380,30 @@ namespace PatternGeneratorJRL
     /*! \brief Get the absolute reference time of
       the system */
     double  GetAbsoluteTimeReference() const
-    { return m_AbsoluteTimeReference; }
+    {
+      return m_AbsoluteTimeReference;
+    }
 
     /*! \brief Set the absolute reference time of
       the system */
     void SetAbsoluteTimeReference(double anAbsoluteTimeReference)
-    { m_AbsoluteTimeReference = anAbsoluteTimeReference; }
+    {
+      m_AbsoluteTimeReference = anAbsoluteTimeReference;
+    }
 
     /*! \brief Get the reference to the object handling the
       humanoid specificities */
     PinocchioRobot * GetHumanoidSpecificites() const
-    { return m_PR;};
+    {
+      return m_PR;
+    };
 
     /*! \brief Set the reference of the object handling the
       humanoid specificities */
     void SetHumanoidSpecificities(PinocchioRobot *aPR)
-    {  m_PR = aPR;   };
+    {
+      m_PR = aPR;
+    };
   };
 }
 #endif

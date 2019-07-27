@@ -98,7 +98,8 @@ namespace PatternGeneratorJRL
 
     /*! This method is a new way of computing the ZMP trajectory from
       foot trajectory. */
-    int BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+    int BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition>
+                                             &LeftFootAbsolutePositions,
                                              deque<FootAbsolutePosition> &RightFootAbsolutePositions,
                                              deque<ZMPPosition> &ZMPRefPositions,
                                              deque<COMState> &COMStates,

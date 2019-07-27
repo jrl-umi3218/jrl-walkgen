@@ -61,7 +61,7 @@ SetNumberOfIntervals
       (unsigned int)lNumberOfIntervals)
     return;
 
-  for(unsigned int i=0;i<m_SetOfFootTrajectoryGenerationObjects.size();i++)
+  for(unsigned int i=0; i<m_SetOfFootTrajectoryGenerationObjects.size(); i++)
     {
       delete m_SetOfFootTrajectoryGenerationObjects[i];
     }
@@ -95,7 +95,7 @@ SetTimeIntervals
   m_RefTime.resize(lDeltaTj.size());
   double reftime=0.0;
 
-  for(unsigned int li=0;li<m_DeltaTj.size();li++)
+  for(unsigned int li=0; li<m_DeltaTj.size(); li++)
     {
       m_RefTime[li] = reftime;
       ODEBUG(" m_RefTime["<< li <<"]: " << setprecision(12)
@@ -123,7 +123,7 @@ Compute(int axis, double t, double &result)
   ODEBUG(" t: " << t << " reftime :" << reftime << " m_Sensitivity: "
          << m_Sensitivity <<" m_DeltaTj.size(): "<< m_DeltaTj.size() );
 
-  for(unsigned int j=0;j<m_DeltaTj.size();j++)
+  for(unsigned int j=0; j<m_DeltaTj.size(); j++)
     {
       ODEBUG(" t: " << t << " reftime :" << reftime
              << " Tj["<<j << "]= "<< m_DeltaTj[j]);
@@ -201,7 +201,7 @@ Compute
          " m_Sensitivity: "<< m_Sensitivity
          <<" m_DeltaTj.size(): "<< m_DeltaTj.size() );
 
-  for(unsigned int j=0;j<m_DeltaTj.size();j++)
+  for(unsigned int j=0; j<m_DeltaTj.size(); j++)
     {
       ODEBUG("t: " << t << " reftime :"
              << setprecision(12) << reftime <<
@@ -445,7 +445,7 @@ CallMethod
 int FootTrajectoryGenerationMultiple::
 DisplayIntervals() const
 {
-  for(unsigned int i=0;i<m_DeltaTj.size();i++)
+  for(unsigned int i=0; i<m_DeltaTj.size(); i++)
     {
       std::cout << "m_DeltaTj["<<i<<"]="<<m_DeltaTj[i] << std::endl;
     }
@@ -466,7 +466,7 @@ FootTrajectoryGenerationMultiple::operator=
   SetTimeIntervals(lDeltaTj);
 
   /* Copy nature of intervals */
-  for(unsigned int li=0;li<lDeltaTj.size();li++)
+  for(unsigned int li=0; li<lDeltaTj.size(); li++)
     SetNatureInterval(li,aFTGM.GetNatureInterval(li));
 
   /* Set absolute time reference */
@@ -475,10 +475,10 @@ FootTrajectoryGenerationMultiple::operator=
   /* Copy the parameters */
   unsigned int li=0 ;
   int lk=0 ;
-  for(li=0;li<lDeltaTj.size();li++)
+  for(li=0; li<lDeltaTj.size(); li++)
     {
       double TI, FP, IP, IS;
-      for(lk=0;lk<6;lk++)
+      for(lk=0; lk<6; lk++)
         {
           GetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
           /*! Special case when TI is equal to zero */

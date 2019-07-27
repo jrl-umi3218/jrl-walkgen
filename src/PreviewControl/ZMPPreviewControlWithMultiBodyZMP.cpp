@@ -79,8 +79,10 @@ ZMPPreviewControlWithMultiBodyZMP(SimplePluginManager *lSPM)
   RegisterMethods();
 
   // Initialization of the first and second preview controls.
-  m_PC1x.resize(3,1);  m_PC1y.resize(3,1);
-  m_Deltax.resize(3,1);  m_Deltay.resize(3,1);
+  m_PC1x.resize(3,1);
+  m_PC1y.resize(3,1);
+  m_Deltax.resize(3,1);
+  m_Deltay.resize(3,1);
 
   m_PC = new PreviewControl
     (lSPM,
@@ -88,8 +90,8 @@ ZMPPreviewControlWithMultiBodyZMP(SimplePluginManager *lSPM)
      true);
   m_StartingNewSequence = true;
 
-  for(int i=0;i<4;i++)
-    for(int j=0;j<4;j++)
+  for(int i=0; i<4; i++)
+    for(int j=0; j<4; j++)
       m_FinalDesiredCOMPose(i,j) =0.0;
 
 
@@ -207,7 +209,7 @@ int ZMPPreviewControlWithMultiBodyZMP::
 OneGlobalStepOfControl
 (FootAbsolutePosition &LeftFootPosition,
  FootAbsolutePosition &RightFootPosition,
- ZMPPosition & ,
+ ZMPPosition &,
  COMState &refandfinalCOMState,
  Eigen::VectorXd & CurrentConfiguration,
  Eigen::VectorXd & CurrentVelocity,
@@ -367,7 +369,7 @@ SecondStageOfControl(COMState &finalCOMState)
 
       // Correct COM position
       // but be carefull this is the COM for NL steps behind.
-      for(int i=0;i<3;i++)
+      for(int i=0; i<3; i++)
         {
           aCOMState.x[i] += m_Deltax(i,0);
           aCOMState.y[i] += m_Deltay(i,0);
@@ -415,40 +417,40 @@ FirstStageOfControl
                                   m_sxzmp,m_syzmp,
                                   m_FIFOZMPRefPositions,0,
                                   zmpx2, zmpy2, true);
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.x[j] = m_PC1x(j,0);
 
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.y[j] = m_PC1y(j,0);
 
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.z[j] = afCOMState.z[j];
 
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.yaw[j] = afCOMState.yaw[j];
 
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.pitch[j] = afCOMState.pitch[j];
 
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.roll[j] = afCOMState.roll[j];
 
     }
   else if (m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)
     {
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.x[j] = m_PC1x(j,0)= afCOMState.x[j];
 
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.y[j] = m_PC1y(j,0)= afCOMState.y[j];
 
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.z[j] = afCOMState.z[j];
 
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.yaw[j] = afCOMState.yaw[j];
 
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         acomp.pitch[j] = afCOMState.pitch[j];
     }
 
@@ -526,7 +528,7 @@ Setup
                   COMStates,
                   LeftFootPositions,
                   RightFootPositions);
-  for(unsigned int i=0;i<m_NL;i++)
+  for(unsigned int i=0; i<m_NL; i++)
     SetupIterativePhase(ZMPRefPositions,
                         COMStates,
                         LeftFootPositions,
@@ -561,7 +563,7 @@ SetupFirstPhase
   m_FIFOZMPRefPositions.resize(m_NL);
   m_FIFOLeftFootPosition.resize(m_NL);
   m_FIFORightFootPosition.resize(m_NL);
-  for(unsigned int i=0;i<m_NL;i++)
+  for(unsigned int i=0; i<m_NL; i++)
     {
       m_FIFOZMPRefPositions[i] = ZMPRefPositions[i];
       m_FIFOLeftFootPosition[i] = LeftFootPositions[i];
@@ -583,13 +585,16 @@ SetupFirstPhase
   m_PC1y(2,0)= 0;
 
   m_Deltax(0,0)= 0.0; //-StartingCOMState[0];
-  m_Deltax(1,0)= 0;    m_Deltax(2,0)= 0;
+  m_Deltax(1,0)= 0;
+  m_Deltax(2,0)= 0;
   m_Deltay(0,0)= 0.0; //-StartingCOMState[1];
-  m_Deltay(1,0)= 0;    m_Deltay(2,0)= 0;
+  m_Deltay(1,0)= 0;
+  m_Deltay(2,0)= 0;
 
   //  m_sxzmp=-StartingCOMState[0];m_syzmp=-StartingCOMState[1];
   //  zmpx2=StartingCOMState[0];zmpy2=StartingCOMState[1];
-  m_sxzmp = 0.0; m_syzmp =0.0;
+  m_sxzmp = 0.0;
+  m_syzmp =0.0;
   //zmpx2 = 0.0; zmpy2 = 0.0;
 
   m_FIFODeltaZMPPositions.clear();
@@ -634,8 +639,10 @@ SetupIterativePhase
   ODEBUG("COMState["<<localindex<<"]=" << COMStates[localindex].x[0] << " " <<
          COMStates[localindex].y[0] << " " << COMStates[localindex].z[0] <<
          " COMStates.size()=" <<COMStates.size());
-  FirstStageOfControl(LeftFootPositions[localindex],RightFootPositions[localindex],COMStates[localindex]);
-  ODEBUG("m_FIFOCOMStates["<<localindex<<"]=" << m_FIFOCOMStates[localindex].x[0] << " " <<
+  FirstStageOfControl(LeftFootPositions[localindex],
+                      RightFootPositions[localindex],COMStates[localindex]);
+  ODEBUG("m_FIFOCOMStates["<<localindex<<"]=" << m_FIFOCOMStates[localindex].x[0]
+         << " " <<
          m_FIFOCOMStates[localindex].y[0] << " " << m_FIFOCOMStates[localindex].z[0] <<
          " m_FIFOCOMStates.size()=" <<m_FIFOCOMStates.size());
   //COMState acompos = m_FIFOCOMStates[localindex];
@@ -688,7 +695,7 @@ CreateExtraCOMBuffer
   double aZmpx2, aZmpy2;
 
   //initialize ZMP FIFO
-  for (unsigned int i=0;i<m_NL;i++)
+  for (unsigned int i=0; i<m_NL; i++)
     aFIFOZMPRefPositions.push_back(m_ExtraZMPRefBuffer[i]);
 
   //use accumulated zmp error  of preview control so far
@@ -716,7 +723,7 @@ CreateExtraCOMBuffer
     FirstCall = 0;
 #endif
 
-  for (unsigned int i=0;i<m_ExtraCOMBuffer.size();i++)
+  for (unsigned int i=0; i<m_ExtraCOMBuffer.size(); i++)
     {
       aFIFOZMPRefPositions.push_back(m_ExtraZMPRefBuffer[i]);
       m_PC->OneIterationOfPreview(aPC1x,aPC1y,
@@ -724,7 +731,7 @@ CreateExtraCOMBuffer
                                   aFIFOZMPRefPositions,0,
                                   aZmpx2, aZmpy2, true);
 
-      for(unsigned j=0;j<3;j++)
+      for(unsigned j=0; j<3; j++)
         {
           m_ExtraCOMBuffer[i].x[j] = aPC1x(j,0);
           m_ExtraCOMBuffer[i].y[j] = aPC1y(j,0);
@@ -868,11 +875,13 @@ void ZMPPreviewControlWithMultiBodyZMP::
 RegisterMethods()
 {
   std::string aMethodName[3] =
-    {":samplingperiod",
+    {
+     ":samplingperiod",
      ":previewcontroltime",
-     ":comheight"};
+     ":comheight"
+    };
 
-  for(int i=0;i<3;i++)
+  for(int i=0; i<3; i++)
     {
       if (!RegisterMethod(aMethodName[i]))
         {

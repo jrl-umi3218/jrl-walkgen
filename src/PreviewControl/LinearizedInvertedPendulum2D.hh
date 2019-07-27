@@ -143,18 +143,24 @@ namespace PatternGeneratorJRL
 
     /// \brief Accessor
     inline const com_t operator ()() const
-    {return m_CoM;};
+    {
+      return m_CoM;
+    };
 
     /// \brief Accessor
     inline void operator ()( com_t CoM )
-    {m_CoM = CoM;};
+    {
+      m_CoM = CoM;
+    };
 
     /*! Get state. */
     void GetState(Eigen::VectorXd &lxk);
     COMState GetState();
 
     inline com_t getState()
-    {return m_CoM ;}
+    {
+      return m_CoM ;
+    }
 
     /*! Set state. */
     void setState(com_t aCoM);

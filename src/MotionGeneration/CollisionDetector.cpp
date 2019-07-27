@@ -74,14 +74,26 @@ void CollisionDetector::SetObstacleCoordinates(ObstaclePar aObstacleInfo)
 
 
   //this matrix transformes coordinates in the obstacle frame into the world frame
-  m_ObstacleRot(0,0) = c;   m_ObstacleRot(0,1) =-s;            m_ObstacleRot(0,2) = 0;
-  m_ObstacleRot(1,0) = s;   m_ObstacleRot(1,1) = c;            m_ObstacleRot(1,2) = 0;
-  m_ObstacleRot(2,0) = 0;   m_ObstacleRot(2,1) = 0;            m_ObstacleRot(2,2) = 1;
+  m_ObstacleRot(0,0) = c;
+  m_ObstacleRot(0,1) =-s;
+  m_ObstacleRot(0,2) = 0;
+  m_ObstacleRot(1,0) = s;
+  m_ObstacleRot(1,1) = c;
+  m_ObstacleRot(1,2) = 0;
+  m_ObstacleRot(2,0) = 0;
+  m_ObstacleRot(2,1) = 0;
+  m_ObstacleRot(2,2) = 1;
 
   //this matrix transformes coordinates in the world frame into the obstacle frame
-  m_ObstacleRotInv(0,0) = c;       m_ObstacleRotInv(0,1) = s;  m_ObstacleRotInv(0,2) = 0;
-  m_ObstacleRotInv(1,0) = -s;      m_ObstacleRotInv(1,1) = c;  m_ObstacleRotInv(1,2) = 0;
-  m_ObstacleRotInv(2,0) = 0;       m_ObstacleRotInv(2,1) = 0;  m_ObstacleRotInv(2,2) = 1;
+  m_ObstacleRotInv(0,0) = c;
+  m_ObstacleRotInv(0,1) = s;
+  m_ObstacleRotInv(0,2) = 0;
+  m_ObstacleRotInv(1,0) = -s;
+  m_ObstacleRotInv(1,1) = c;
+  m_ObstacleRotInv(1,2) = 0;
+  m_ObstacleRotInv(2,0) = 0;
+  m_ObstacleRotInv(2,1) = 0;
+  m_ObstacleRotInv(2,2) = 1;
 
   //ObstacleDepth = ObstacleInfo.d;
   //ObstacleWidth = ObstacleInfo.w;
@@ -110,7 +122,8 @@ void CollisionDetector::SetObstacleCoordinates(ObstaclePar aObstacleInfo)
   //cout << "I have set the obstacle info in the colission detection class" << endl;
 }
 
-void CollisionDetector::WorldFrameToObstacleFrame(Eigen::Vector3d &WorldFrameCoord,
+void CollisionDetector::WorldFrameToObstacleFrame(Eigen::Vector3d
+                                                  &WorldFrameCoord,
                                                   Eigen::Vector3d &ObstacleFrameCoord)
 {
   // This function transforms the coordinates of a point
@@ -150,9 +163,15 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord,
   c = cos(LegAngles(3));
   s = sin(LegAngles(3));
 
-  Rotation(0,0) = c;       Rotation(0,1) = 0;        Rotation(0,2) = s;
-  Rotation(1,0) = 0;       Rotation(1,1) = 1;        Rotation(1,2) = 0;
-  Rotation(2,0) =-s;       Rotation(2,1) = 0;        Rotation(2,2) = c;
+  Rotation(0,0) = c;
+  Rotation(0,1) = 0;
+  Rotation(0,2) = s;
+  Rotation(1,0) = 0;
+  Rotation(1,1) = 1;
+  Rotation(1,2) = 0;
+  Rotation(2,0) =-s;
+  Rotation(2,1) = 0;
+  Rotation(2,2) = c;
 
   TempCoord =  Rotation*RelCoord;
 
@@ -171,9 +190,15 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord,
   c = cos(LegAngles(2));
   s = sin(LegAngles(2));
 
-  Rotation(0,0) = c;       Rotation(0,1) = 0;        Rotation(0,2) = s;
-  Rotation(1,0) = 0;       Rotation(1,1) = 1;        Rotation(1,2) = 0;
-  Rotation(2,0) =-s;       Rotation(2,1) = 0;        Rotation(2,2) = c;
+  Rotation(0,0) = c;
+  Rotation(0,1) = 0;
+  Rotation(0,2) = s;
+  Rotation(1,0) = 0;
+  Rotation(1,1) = 1;
+  Rotation(1,2) = 0;
+  Rotation(2,0) =-s;
+  Rotation(2,1) = 0;
+  Rotation(2,2) = c;
 
   TempCoord =  Rotation*TempCoord;
 
@@ -182,9 +207,15 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord,
   c = cos(LegAngles(1));
   s = sin(LegAngles(1));
 
-  Rotation(0,0) = 1;       Rotation(0,1) = 0;        Rotation(0,2) = 0;
-  Rotation(1,0) = 0;       Rotation(1,1) = c;        Rotation(1,2) =-s;
-  Rotation(2,0) = 0;       Rotation(2,1) = s;        Rotation(2,2) = c;
+  Rotation(0,0) = 1;
+  Rotation(0,1) = 0;
+  Rotation(0,2) = 0;
+  Rotation(1,0) = 0;
+  Rotation(1,1) = c;
+  Rotation(1,2) =-s;
+  Rotation(2,0) = 0;
+  Rotation(2,1) = s;
+  Rotation(2,2) = c;
 
   TempCoord =  Rotation*TempCoord;
 
@@ -194,9 +225,15 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord,
   c = cos(LegAngles(0));
   s = sin(LegAngles(0));
 
-  Rotation(0,0) = c;       Rotation(0,1) =-s;        Rotation(0,2) = 0;
-  Rotation(1,0) = s;       Rotation(1,1) = c;        Rotation(1,2) = 0;
-  Rotation(2,0) = 0;       Rotation(2,1) = 0;        Rotation(2,2) = 1;
+  Rotation(0,0) = c;
+  Rotation(0,1) =-s;
+  Rotation(0,2) = 0;
+  Rotation(1,0) = s;
+  Rotation(1,1) = c;
+  Rotation(1,2) = 0;
+  Rotation(2,0) = 0;
+  Rotation(2,1) = 0;
+  Rotation(2,2) = 1;
 
   TempCoord =  Rotation*TempCoord;
 
@@ -220,20 +257,20 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord,
 
   TempCoord = WaistRot*TempCoord;
   /*
-       cout << "X TempCoord coordinate:  " <<  TempCoord(0,0) << endl;
-       cout << "Y TempCoord coordinate:  " <<  TempCoord(1,0) << endl;
-       cout << "Z TempCoord coordinate:  " <<  TempCoord(2,0) << endl;
+    cout << "X TempCoord coordinate:  " <<  TempCoord(0,0) << endl;
+    cout << "Y TempCoord coordinate:  " <<  TempCoord(1,0) << endl;
+    cout << "Z TempCoord coordinate:  " <<  TempCoord(2,0) << endl;
 
-       cout << "X WaistPos coordinate:  " <<  WaistPos(0,0) << endl;
-       cout << "Y WaistPos coordinate:  " <<  WaistPos(1,0) << endl;
-       cout << "Z WaistPos coordinate:  " <<  WaistPos(2,0) << endl;
+    cout << "X WaistPos coordinate:  " <<  WaistPos(0,0) << endl;
+    cout << "Y WaistPos coordinate:  " <<  WaistPos(1,0) << endl;
+    cout << "Z WaistPos coordinate:  " <<  WaistPos(2,0) << endl;
 
   */
   AbsCoord = TempCoord + WaistPos;
   /*
-       cout << "X AbsCoord coordinate:  " <<  AbsCoord(0,0) << endl;
-       cout << "Y AbsCoord coordinate:  " <<  AbsCoord(1,0) << endl;
-       cout << "Z AbsCoord coordinate:  " <<  AbsCoord(2,0) << endl;
+    cout << "X AbsCoord coordinate:  " <<  AbsCoord(0,0) << endl;
+    cout << "Y AbsCoord coordinate:  " <<  AbsCoord(1,0) << endl;
+    cout << "Z AbsCoord coordinate:  " <<  AbsCoord(2,0) << endl;
   */
 }
 
@@ -282,7 +319,10 @@ bool CollisionDetector::CollisionLineObstaclePlane(Eigen::Vector3d &LegPoint1,
 
   vector<double> p1, p2, v1, v2;
 
-  p1.resize(2);      p2.resize(2); v1.resize(2); v2.resize(2);
+  p1.resize(2);
+  p2.resize(2);
+  v1.resize(2);
+  v2.resize(2);
 
   CollisionStatusXY = 1;
   CollisionStatusXZ = 1;
@@ -294,20 +334,28 @@ bool CollisionDetector::CollisionLineObstaclePlane(Eigen::Vector3d &LegPoint1,
     {
 
       //collisioncheck two lines in the YZplane
-      p1[0]=LegPoint1(1);   p1[1]=LegPoint1(2);
-      p2[0]=LegPoint2(1);   p2[1]=LegPoint2(2);
+      p1[0]=LegPoint1(1);
+      p1[1]=LegPoint1(2);
+      p2[0]=LegPoint2(1);
+      p2[1]=LegPoint2(2);
 
-      v1[0]=m_ObstaclePoints(1,0); v1[1]=m_ObstaclePoints(2,0);
-      v2[0]=m_ObstaclePoints(1,1); v2[1]=m_ObstaclePoints(2,1);
+      v1[0]=m_ObstaclePoints(1,0);
+      v1[1]=m_ObstaclePoints(2,0);
+      v2[0]=m_ObstaclePoints(1,1);
+      v2[1]=m_ObstaclePoints(2,1);
 
       CollisionStatusYZ = CollisionTwoLines(p1, p2, v1, v2);
 
       //collisioncheck two lines in the XYplane
-      p1[0]=LegPoint1(0);   p1[1]=LegPoint1(1);
-      p2[0]=LegPoint2(0);   p2[1]=LegPoint2(1);
+      p1[0]=LegPoint1(0);
+      p1[1]=LegPoint1(1);
+      p2[0]=LegPoint2(0);
+      p2[1]=LegPoint2(1);
 
-      v1[0]=m_ObstaclePoints(0,0); v1[1]=m_ObstaclePoints(1,0);
-      v2[0]=m_ObstaclePoints(0,3); v2[1]=m_ObstaclePoints(1,3);
+      v1[0]=m_ObstaclePoints(0,0);
+      v1[1]=m_ObstaclePoints(1,0);
+      v2[0]=m_ObstaclePoints(0,3);
+      v2[1]=m_ObstaclePoints(1,3);
 
       CollisionStatusXY = CollisionTwoLines(p1, p2, v1, v2);
     }
@@ -315,20 +363,28 @@ bool CollisionDetector::CollisionLineObstaclePlane(Eigen::Vector3d &LegPoint1,
     {
 
       //collisioncheck two lines in the YZplane
-      p1[0]=LegPoint1(1);   p1[1]=LegPoint1(2);
-      p2[0]=LegPoint2(1);   p2[1]=LegPoint2(2);
+      p1[0]=LegPoint1(1);
+      p1[1]=LegPoint1(2);
+      p2[0]=LegPoint2(1);
+      p2[1]=LegPoint2(2);
 
-      v1[0]=-m_ObstaclePoints(1,0);       v1[1]=m_ObstaclePoints(2,0);
-      v2[0]=-m_ObstaclePoints(1,1);       v2[1]=m_ObstaclePoints(2,1);
+      v1[0]=-m_ObstaclePoints(1,0);
+      v1[1]=m_ObstaclePoints(2,0);
+      v2[0]=-m_ObstaclePoints(1,1);
+      v2[1]=m_ObstaclePoints(2,1);
 
       CollisionStatusYZ = CollisionTwoLines(p1, p2, v1, v2);
 
       //collisioncheck two lines in the XYplane
-      p1[0]=LegPoint1(0);   p1[1]=LegPoint1(1);
-      p2[0]=LegPoint2(0);   p2[1]=LegPoint2(1);
+      p1[0]=LegPoint1(0);
+      p1[1]=LegPoint1(1);
+      p2[0]=LegPoint2(0);
+      p2[1]=LegPoint2(1);
 
-      v1[0]=m_ObstaclePoints(0,0); v1[1]=-m_ObstaclePoints(1,0);
-      v2[0]=m_ObstaclePoints(0,3); v2[1]=-m_ObstaclePoints(1,3);
+      v1[0]=m_ObstaclePoints(0,0);
+      v1[1]=-m_ObstaclePoints(1,0);
+      v2[0]=m_ObstaclePoints(0,3);
+      v2[1]=-m_ObstaclePoints(1,3);
 
       CollisionStatusXY = CollisionTwoLines(p1, p2, v1, v2);
     }
@@ -336,22 +392,30 @@ bool CollisionDetector::CollisionLineObstaclePlane(Eigen::Vector3d &LegPoint1,
     {
 
       //collisioncheck two lines in the XZplane
-      p1[0]=LegPoint1(0);   p1[1]=LegPoint1(2);
-      p2[0]=LegPoint2(0);   p2[1]=LegPoint2(2);
+      p1[0]=LegPoint1(0);
+      p1[1]=LegPoint1(2);
+      p2[0]=LegPoint2(0);
+      p2[1]=LegPoint2(2);
 
-      v1[0]=m_ObstaclePoints(0,0+PlaneNumber);   v1[1]=m_ObstaclePoints(2,0+PlaneNumber);
-      v2[0]=m_ObstaclePoints(0,1+PlaneNumber);   v2[1]=m_ObstaclePoints(2,1+PlaneNumber);
+      v1[0]=m_ObstaclePoints(0,0+PlaneNumber);
+      v1[1]=m_ObstaclePoints(2,0+PlaneNumber);
+      v2[0]=m_ObstaclePoints(0,1+PlaneNumber);
+      v2[1]=m_ObstaclePoints(2,1+PlaneNumber);
 
       CollisionStatusXZ = CollisionTwoLines(p1, p2, v1, v2);
 
 
 
       //collisioncheck two lines in the XYplane
-      p1[0]=LegPoint1(0);   p1[1]=LegPoint1(1);
-      p2[0]=LegPoint2(0);   p2[1]=LegPoint2(1);
+      p1[0]=LegPoint1(0);
+      p1[1]=LegPoint1(1);
+      p2[0]=LegPoint2(0);
+      p2[1]=LegPoint2(1);
 
-      v1[0]=m_ObstaclePoints(0,0+PlaneNumber);   v1[1]=m_ObstaclePoints(1,0+PlaneNumber);
-      v2[0]=m_ObstaclePoints(0,0+PlaneNumber);   v2[1]=-m_ObstaclePoints(1,0+PlaneNumber);
+      v1[0]=m_ObstaclePoints(0,0+PlaneNumber);
+      v1[1]=m_ObstaclePoints(1,0+PlaneNumber);
+      v2[0]=m_ObstaclePoints(0,0+PlaneNumber);
+      v2[1]=-m_ObstaclePoints(1,0+PlaneNumber);
 
       CollisionStatusXY = CollisionTwoLines(p1, p2, v1, v2);
 
@@ -390,7 +454,7 @@ bool CollisionDetector::CollisionLineObstacleComplete(Eigen::Vector3d &Point1,
     }
   else
     {
-      for (int i=0;i<5;i++)
+      for (int i=0; i<5; i++)
         {
           if (CollisionLineObstaclePlane(Point1,Point2,i))
             {

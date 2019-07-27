@@ -15,13 +15,19 @@ class Joint_shortname : public boost::static_visitor<std::string>
 public:
   template<typename D>
   std::string operator()(const pinocchio::JointModelBase<D> & jmodel) const
-  { return jmodel.shortname(); }
+  {
+    return jmodel.shortname();
+  }
 
   static std::string run( const pinocchio::JointModelVariant & jmodel)
-  { return boost::apply_visitor( Joint_shortname(), jmodel ); }
+  {
+    return boost::apply_visitor( Joint_shortname(), jmodel );
+  }
 };
 inline std::string shortname(const pinocchio::JointModelVariant & jmodel)
-{ return Joint_shortname::run(jmodel); }
+{
+  return Joint_shortname::run(jmodel);
+}
 
 PinocchioRobot::PinocchioRobot()
 {
@@ -384,7 +390,7 @@ void PinocchioRobot::initializeLegsInverseKinematics()
 
   m_leftDt.Zero();
   m_rightDt.Zero();
-  pinocchio::SE3 waist_M_leftHip , waist_M_rightHip ;
+  pinocchio::SE3 waist_M_leftHip, waist_M_rightHip ;
 
   waist_M_leftHip = m_robotModel->jointPlacements[leftLeg[0]].
     act(m_robotModel->jointPlacements[leftLeg[1]]).
@@ -443,9 +449,12 @@ RPYToSpatialFreeFlyer
                 Eigen::AngleAxisd(rpy(0), Eigen::Vector3d::UnitX()) ) ;
 
   quat.normalize();
-  double c0,s0; pinocchio::SINCOS (rpy(2), &s0, &c0);
-  double c1,s1; pinocchio::SINCOS (rpy(1), &s1, &c1);
-  double c2,s2; pinocchio::SINCOS (rpy(0), &s2, &c2);
+  double c0,s0;
+  pinocchio::SINCOS (rpy(2), &s0, &c0);
+  double c1,s1;
+  pinocchio::SINCOS (rpy(1), &s1, &c1);
+  double c2,s2;
+  pinocchio::SINCOS (rpy(0), &s2, &c2);
   m_S << -s1, 0., 1., c1 * s2, c2, 0, c1 * c2, -s2, 0;
   omega = m_S * drpy ;
   domega = m_S * ddrpy ;
@@ -626,7 +635,8 @@ ComputeSpecializedInverseKinematics
           getWaistFootKinematics(jointRootPosition, jointEndPosition,
                                  q, m_rightDt);
           return true;
-        }else
+        }
+      else
         {
           return false ;
         }
@@ -675,9 +685,9 @@ getWaistFootKinematics
   /* Build sub-matrices */
   Eigen::Matrix3d Foot_R,Body_R;
   Eigen::Vector3d Foot_P,Body_P;
-  for(unsigned int i=0;i<3;i++)
+  for(unsigned int i=0; i<3; i++)
     {
-      for(unsigned int j=0;j<3;j++)
+      for(unsigned int j=0; j<3; j++)
         {
           Body_R(i,j) = jointRootPosition(i,j);
           Foot_R(i,j) = jointEndPosition(i,j);
@@ -693,7 +703,7 @@ getWaistFootKinematics
   if (q.size()!=6)
     q.resize(6);
 
-  for(unsigned int i=0;i<6;i++)
+  for(unsigned int i=0; i<6; i++)
     q(i)=0.0;
 
   // if Dt(1)<0.0 then Opp=1.0 else Opp=-1.0
@@ -822,7 +832,7 @@ getShoulderWristKinematics
     q.resize(6);
 
   double Alpha,Beta;
-  for(unsigned int i=0;i<6;i++)
+  for(unsigned int i=0; i<6; i++)
     q(i)=0.0;
 
   double X = jointEndPosition(0,3)

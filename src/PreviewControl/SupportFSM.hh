@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Andrei  Herdt
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -53,7 +53,8 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Ref
     /// \param[in] CurrentSupport
-    void update_vel_reference(reference_t & Ref, const support_state_t & CurrentSupport);
+    void update_vel_reference(reference_t & Ref,
+                              const support_state_t & CurrentSupport);
 
     /// \brief Initialize the previewed state
     ///
@@ -62,42 +63,62 @@ namespace PatternGeneratorJRL
     /// \param[out] Support Support state to be actualized
     /// \param[in] Ref Trajectory reference
     void set_support_state( double time,
-        unsigned int pi,
-        support_state_t & Support,
-        const reference_t & Ref) const;
+                            unsigned int pi,
+                            support_state_t & Support,
+                            const reference_t & Ref) const;
 
     /// \name Accessors
     /// \{
     inline double StepPeriod() const
-    { return StepPeriod_; };
+    {
+      return StepPeriod_;
+    };
     inline void StepPeriod( const double StepPeriod )
-    { StepPeriod_ = StepPeriod; };
+    {
+      StepPeriod_ = StepPeriod;
+    };
 
     inline double DSPeriod() const
-    { return DSPeriod_; };
+    {
+      return DSPeriod_;
+    };
     inline void DSPeriod( const double DSPeriod )
-    { DSPeriod_ = DSPeriod; };
+    {
+      DSPeriod_ = DSPeriod;
+    };
 
     inline double DSSSPeriod() const
-    { return DSSSPeriod_; };
+    {
+      return DSSSPeriod_;
+    };
     inline void DSSSPeriod( const double DSSSPeriod )
-    { DSSSPeriod_ = DSSSPeriod; };
+    {
+      DSSSPeriod_ = DSSSPeriod;
+    };
 
     inline unsigned NBStepsSSDS() const
-    { return NbStepsSSDS_; };
+    {
+      return NbStepsSSDS_;
+    };
     inline void NbStepsSSDS( const unsigned NbStepsSSDS )
-    { NbStepsSSDS_ = NbStepsSSDS; };
+    {
+      NbStepsSSDS_ = NbStepsSSDS;
+    };
 
     inline double SamplingPeriod() const
-    { return T_; };
+    {
+      return T_;
+    };
     inline void SamplingPeriod( const double T )
-    { T_ = T; };
+    {
+      T_ = T;
+    };
     /// \}
- 
+
     //
     // Private members:
     //
-  private: 
+  private:
 
     /// \brief Number of steps to be done before DS
     unsigned NbStepsSSDS_;

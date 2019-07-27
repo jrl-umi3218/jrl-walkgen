@@ -69,7 +69,7 @@ double filterprecision(double adb)
 }
 
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
-                                                 string , PinocchioRobot *aPR ) :
+                                                 string, PinocchioRobot *aPR ) :
   ZMPRefTrajectoryGeneration(SPM),
   Robot_(0),SupportFSM_(0),OrientPrw_(0),OrientPrw_DF_(0),
   VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),
@@ -196,14 +196,16 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   // Register method to handle
   const unsigned int NbMethods = 4;
   const char *lMethodNames[NbMethods] =
-    {":previewcontroltime",
+    {
+     ":previewcontroltime",
      ":numberstepsbeforestop",
      ":stoppg",
-     ":setfeetconstraint"};
+     ":setfeetconstraint"
+    };
   RESETDEBUG4("PgDebug2.txt");
   ODEBUG4("Before registering methods for ZMPVelocityReferencedQP",
           "PgDebug2.txt");
-  for(unsigned int i=0;i<NbMethods;i++)
+  for(unsigned int i=0; i<NbMethods; i++)
     {
       //#ifdef DEBUG
       //    std::cout << "lMethodNames["<< i << "]="
@@ -312,7 +314,8 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x, double y)
 //
 //
 //-----------new functions--------------
-void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &strm)
+void ZMPVelocityReferencedQP::CallMethod(std::string & Method,
+                                         std::istringstream &strm)
 {
   //#ifdef DEBUG
   //  std::cout << __PRETTY_FUNCTION__ << " Method:" << Method << std::endl;
@@ -383,7 +386,7 @@ InitOnLine
   FinalRightFootTraj_deq.resize(AddArraySize);
   int CurrentZMPindex=0;
   m_CurrentTime = 0;
-  for( unsigned int i=0;i<FinalZMPTraj_deq.size();i++ )
+  for( unsigned int i=0; i<FinalZMPTraj_deq.size(); i++ )
     {
       // Smooth ramp
       FinalZMPTraj_deq[CurrentZMPindex].px = lStartingZMPPosition(0);
@@ -466,7 +469,7 @@ InitOnLine
   dynamicFilter_->init(m_SamplingPeriod,
                        InterpolationPeriod_,
                        QP_T_,
-                       previewDuration_ + QP_T_ ,
+                       previewDuration_ + QP_T_,
                        previewDuration_,
                        lStartingCOMState);
   return 0;
@@ -490,7 +493,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
   // Test if the end of the online mode has been reached.
   if ((EndingPhase_) &&
       (time>=TimeToStopOnLineMode_))
-    { m_OnLineMode = false; }
+    {
+      m_OnLineMode = false;
+    }
 
 
 
@@ -576,13 +581,14 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       DynamicFilterInterpolation(time);
 
-      unsigned int IndexMax = (int)round((previewDuration_+QP_T_)  / InterpolationPeriod_ );
+      unsigned int IndexMax = (int)round((previewDuration_+QP_T_)  /
+                                         InterpolationPeriod_ );
       ZMPTraj_deq_.resize(IndexMax);
       COMTraj_deq_.resize(IndexMax);
       LeftFootTraj_deq_.resize(IndexMax);
       RightFootTraj_deq_.resize(IndexMax);
       int inc =  (int)round(InterpolationPeriod_ / m_SamplingPeriod) ;
-      for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
+      for (unsigned int i = 0, j = 0 ; j < IndexMax ; i = i + inc, ++j )
         {
           ZMPTraj_deq_[j] = ZMPTraj_deq_ctrl_[i] ;
           COMTraj_deq_[j] = COMTraj_deq_ctrl_[i] ;
@@ -612,7 +618,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       // Correct the CoM.
       for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
         {
-          for(int j=0;j<3;j++)
+          for(int j=0; j<3; j++)
             {
               FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
               FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
@@ -624,16 +630,19 @@ void ZMPVelocityReferencedQP::OnLine(double time,
         {
           if (EndingPhase_ == false)
             {
-              TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_ + m_SamplingPeriod;
+              TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_ +
+                m_SamplingPeriod;
             }
           UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_ + m_SamplingPeriod ;
-        }else{
-        if (EndingPhase_ == false)
-          {
-            TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
-          }
-        UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
-      }
+        }
+      else
+        {
+          if (EndingPhase_ == false)
+            {
+              TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
+            }
+          UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
+        }
 
 
     }
@@ -717,7 +726,7 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 
 void ZMPVelocityReferencedQP::CoMZMPInterpolation(
                                                   std::deque<ZMPPosition> & ZMPPositions,                    // OUTPUT
-                                                  std::deque<COMState> & COMTraj_deq ,                       // OUTPUT
+                                                  std::deque<COMState> & COMTraj_deq,                        // OUTPUT
                                                   const std::deque<FootAbsolutePosition> & LeftFootTraj_deq, // INPUT
                                                   const std::deque<FootAbsolutePosition> & RightFootTraj_deq,// INPUT
                                                   const solution_t * aSolutionReference,                     // INPUT
@@ -726,25 +735,37 @@ void ZMPVelocityReferencedQP::CoMZMPInterpolation(
                                                   const int IterationNumber,                                 // INPUT
                                                   const unsigned int currentIndex)                            // INPUT
 {
-  if(aSolutionReference->SupportStates_deq.size() && aSolutionReference->SupportStates_deq[IterationNumber].NbStepsLeft == 0)
+  if(aSolutionReference->SupportStates_deq.size()
+     && aSolutionReference->SupportStates_deq[IterationNumber].NbStepsLeft == 0)
     {
       unsigned int i = currentIndex + IterationNumber * numberOfSample ;
-      double jx = (LeftFootTraj_deq[i-1].x + RightFootTraj_deq[i-1].x)/2 - COMTraj_deq[i-1].x[0];
-      double jy = (LeftFootTraj_deq[i-1].y + RightFootTraj_deq[i-1].y)/2 - COMTraj_deq[i-1].y[0];
-      if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
+      double jx = (LeftFootTraj_deq[i-1].x + RightFootTraj_deq[i-1].x)/2 -
+        COMTraj_deq[i-1].x[0];
+      double jy = (LeftFootTraj_deq[i-1].y + RightFootTraj_deq[i-1].y)/2 -
+        COMTraj_deq[i-1].y[0];
+      if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3)
+        {
+          Running_ = false;
+        }
       const double tf = 0.75;
-      jx = 6/(tf*tf*tf)*(jx - tf*COMTraj_deq[i-1].x[1] - (tf*tf/2)*COMTraj_deq[i-1].x[2]);
-      jy = 6/(tf*tf*tf)*(jy - tf*COMTraj_deq[i-1].y[1] - (tf*tf/2)*COMTraj_deq[i-1].y[2]);
-      LIPM->Interpolation( COMTraj_deq, ZMPPositions, currentIndex + IterationNumber * numberOfSample,
+      jx = 6/(tf*tf*tf)*(jx - tf*COMTraj_deq[i-1].x[1] - (tf*tf/2)*COMTraj_deq[i
+                                                                               -1].x[2]);
+      jy = 6/(tf*tf*tf)*(jy - tf*COMTraj_deq[i-1].y[1] - (tf*tf/2)*COMTraj_deq[i
+                                                                               -1].y[2]);
+      LIPM->Interpolation( COMTraj_deq, ZMPPositions,
+                           currentIndex + IterationNumber * numberOfSample,
                            jx, jy);
       LIPM->OneIteration( jx, jy );
     }
   else
     {
       Running_ = true;
-      LIPM->Interpolation( COMTraj_deq, ZMPPositions, currentIndex + IterationNumber * numberOfSample,
-                           aSolutionReference->Solution_vec[IterationNumber], aSolutionReference->Solution_vec[IterationNumber+QP_N_] );
-      LIPM->OneIteration( aSolutionReference->Solution_vec[IterationNumber],aSolutionReference->Solution_vec[IterationNumber+QP_N_] );
+      LIPM->Interpolation( COMTraj_deq, ZMPPositions,
+                           currentIndex + IterationNumber * numberOfSample,
+                           aSolutionReference->Solution_vec[IterationNumber],
+                           aSolutionReference->Solution_vec[IterationNumber+QP_N_] );
+      LIPM->OneIteration( aSolutionReference->Solution_vec[IterationNumber],
+                          aSolutionReference->Solution_vec[IterationNumber+QP_N_] );
     }
   return ;
 }
@@ -763,7 +784,7 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
   support_state_t & FirstSupport = solution_.SupportStates_deq[1] ;
   support_state_t & CurrentSupport = solution_.SupportStates_deq.front() ;
   int nbSteps = LastSupport.StepNumber ;
-  FootPrw_vec.resize( nbSteps+2 , vector<double>(2,0.0) );
+  FootPrw_vec.resize( nbSteps+2, vector<double>(2,0.0) );
 
   // complete the previewed feet position
   FootPrw_vec[0][0] = FirstSupport.X ;
@@ -778,22 +799,30 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
   {
     int size_vec_sol = (int) FootPrw_vec.size();
 
-    if ( nbSteps > 0 ){
-      // center of the feet of the last preview double support phase :
-      double middleX = (FootPrw_vec[size_vec_sol-2][0] + FootPrw_vec[size_vec_sol-3][0])*0.5 ;
-      double middleY = (FootPrw_vec[size_vec_sol-2][1] + FootPrw_vec[size_vec_sol-3][1])*0.5 ;
+    if ( nbSteps > 0 )
+      {
+        // center of the feet of the last preview double support phase :
+        double middleX = (FootPrw_vec[size_vec_sol-2][0] + FootPrw_vec[size_vec_sol
+                                                                       -3][0])*0.5 ;
+        double middleY = (FootPrw_vec[size_vec_sol-2][1] + FootPrw_vec[size_vec_sol
+                                                                       -3][1])*0.5 ;
 
-      FootPrw_vec[size_vec_sol-1][0] = FootPrw_vec[size_vec_sol-2][0] + 2*( (middleX + Vx*StepPeriod_) - FootPrw_vec[size_vec_sol-2][0] );
-      FootPrw_vec[size_vec_sol-1][1] = FootPrw_vec[size_vec_sol-2][1] + 2*( (middleY + Vy*StepPeriod_) - FootPrw_vec[size_vec_sol-2][1] );
-    }else
+        FootPrw_vec[size_vec_sol-1][0] = FootPrw_vec[size_vec_sol-2][0] + 2*( (
+                                                                               middleX + Vx*StepPeriod_) - FootPrw_vec[size_vec_sol-2][0] );
+        FootPrw_vec[size_vec_sol-1][1] = FootPrw_vec[size_vec_sol-2][1] + 2*( (
+                                                                               middleY + Vy*StepPeriod_) - FootPrw_vec[size_vec_sol-2][1] );
+      }
+    else
       {
         double Sign;
         if(FirstSupport.Foot == LEFT)
           Sign = 1.0;
         else
           Sign = -1.0;
-        FootPrw_vec[size_vec_sol-1][0] = CurrentSupport.X + Sign*sin(FirstSupport.Yaw)*FeetDistance_;
-        FootPrw_vec[size_vec_sol-1][1] = CurrentSupport.Y - Sign*cos(FirstSupport.Yaw)*FeetDistance_;
+        FootPrw_vec[size_vec_sol-1][0] = CurrentSupport.X + Sign*sin(
+                                                                     FirstSupport.Yaw)*FeetDistance_;
+        FootPrw_vec[size_vec_sol-1][1] = CurrentSupport.Y - Sign*cos(
+                                                                     FirstSupport.Yaw)*FeetDistance_;
       }
   }
   for(unsigned int i = 0 ; i < SupportStates.size() ; ++i)
@@ -814,30 +843,31 @@ void ZMPVelocityReferencedQP::PrepareSolution()
   if(CurrentSupport.Phase!=DS && nbSteps!=0)
     {
       solution_.Solution_vec[2*QP_N_] = FootPrw_vec[CurrentSupport.StepNumber+1][0] ;
-      solution_.Solution_vec[2*QP_N_+nbSteps] = FootPrw_vec[CurrentSupport.StepNumber+1][1];
+      solution_.Solution_vec[2*QP_N_+nbSteps] = FootPrw_vec[CurrentSupport.StepNumber
+                                                            +1][1];
     }
   return ;
 }
 
 // TODO: New parent class needed
-void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ,
-                                                   deque<COMState> & ,
+void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> &,
+                                                   deque<COMState> &,
                                                    deque<RelativeFootPosition> &,
                                                    deque<FootAbsolutePosition> &,
                                                    deque<FootAbsolutePosition> &,
-                                                   double ,
+                                                   double,
                                                    COMState &,
                                                    Eigen::Vector3d &,
-                                                   FootAbsolutePosition & ,
+                                                   FootAbsolutePosition &,
                                                    FootAbsolutePosition & )
 {
   cout << "To be removed" << endl;
 }
 
 
-void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & ,
-                                            deque<ZMPPosition> & ,
-                                            deque<COMState> & ,
+void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition &,
+                                            deque<ZMPPosition> &,
+                                            deque<COMState> &,
                                             deque<FootAbsolutePosition> &,
                                             deque<FootAbsolutePosition> &,
                                             bool)
@@ -845,10 +875,10 @@ void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & ,
   cout << "To be removed" << endl;
 }
 
-int ZMPVelocityReferencedQP::OnLineFootChange(double ,
+int ZMPVelocityReferencedQP::OnLineFootChange(double,
                                               FootAbsolutePosition &,
-                                              deque<ZMPPosition> & ,
-                                              deque<COMState> & ,
+                                              deque<ZMPPosition> &,
+                                              deque<COMState> &,
                                               deque<FootAbsolutePosition> &,
                                               deque<FootAbsolutePosition> &,
                                               StepStackHandler  *)

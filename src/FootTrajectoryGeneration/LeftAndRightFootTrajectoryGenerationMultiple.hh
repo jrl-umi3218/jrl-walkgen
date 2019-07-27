@@ -67,7 +67,8 @@ namespace PatternGeneratorJRL
                                                  PRFoot * inFoot);
 
     /*! \brief Copy constructor. */
-    LeftAndRightFootTrajectoryGenerationMultiple(const LeftAndRightFootTrajectoryGenerationMultiple &);
+    LeftAndRightFootTrajectoryGenerationMultiple(const
+                                                 LeftAndRightFootTrajectoryGenerationMultiple &);
 
     /*! \brief Memory release. */
     ~LeftAndRightFootTrajectoryGenerationMultiple();
@@ -90,7 +91,8 @@ namespace PatternGeneratorJRL
       @param[in] IgnoreFirst: Ignore the first double support phase, should be true at beginning of stepping.
       @param[in] Continuity: Should be true if more steps should be added, false to stop stepping.
     */
-    void InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
+    void InitializeFromRelativeSteps(deque<RelativeFootPosition>
+                                     &RelativeFootPositions,
                                      FootAbsolutePosition &LeftFootInitialPosition,
                                      FootAbsolutePosition &RightFootInitialPosition,
                                      deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions,
@@ -103,7 +105,8 @@ namespace PatternGeneratorJRL
       @param[out] aFootAbsolutePosition: The data structure to be filled with the information
       \f$ (x,y,z,\omega, \omega_2, \theta) \f$.
     */
-    bool ComputeAnAbsoluteFootPosition(int LeftOrRight, double time, FootAbsolutePosition & aFootAbsolutePosition);
+    bool ComputeAnAbsoluteFootPosition(int LeftOrRight, double time,
+                                       FootAbsolutePosition & aFootAbsolutePosition);
 
     /*! \brief Method to compute the absolute position of the foot.
       @param[in] LeftOrRight: -1 indicates the right foot, 1 indicates the left foot.
@@ -114,7 +117,8 @@ namespace PatternGeneratorJRL
       @param[in] IndexInterval: On which interval to compute the foot position.
 
     */
-    bool ComputeAnAbsoluteFootPosition(int LeftOrRight, double time, FootAbsolutePosition & aFootAbsolutePosition,
+    bool ComputeAnAbsoluteFootPosition(int LeftOrRight, double time,
+                                       FootAbsolutePosition & aFootAbsolutePosition,
                                        unsigned int IndexInterval);
 
     /*
@@ -131,7 +135,8 @@ namespace PatternGeneratorJRL
       corresponding to the set of relative foot positions (i.e given step by step
       and not every sampled control time)
     */
-    void ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
+    void ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition>
+                                               &RelativeFootPositions,
                                                FootAbsolutePosition &LeftFootInitialPosition,
                                                FootAbsolutePosition &RightFootInitialPosition,
                                                deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions);
@@ -143,7 +148,8 @@ namespace PatternGeneratorJRL
       corresponding to the set of relative foot positions (i.e given step by step
       and not every sampled control time).
     */
-    void ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
+    void ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition>
+                                               &RelativeFootPositions,
                                                FootAbsolutePosition &SupportFootInitialPosition,
                                                deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions);
 
@@ -156,7 +162,8 @@ namespace PatternGeneratorJRL
       corresponding to the set of relative foot positions (i.e given step by step
       and not every sampled control time).
     */
-    void ChangeRelStepsFromAbsSteps(deque<RelativeFootPosition> &RelativeFootPositions,
+    void ChangeRelStepsFromAbsSteps(deque<RelativeFootPosition>
+                                    &RelativeFootPositions,
                                     FootAbsolutePosition &SupportFootInitialPosition,
                                     deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions,
                                     unsigned int ChangedInterval);

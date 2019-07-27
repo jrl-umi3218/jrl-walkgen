@@ -61,7 +61,8 @@ namespace PatternGeneratorJRL
     /*! \name Constructor and destructor */
 
     /*! Constructor */
-    ComAndFootRealizationByGeometry(PatternGeneratorInterfacePrivate * aPatternGeneratorInterface);
+    ComAndFootRealizationByGeometry(PatternGeneratorInterfacePrivate *
+                                    aPatternGeneratorInterface);
     /*! Destructor */
     ~ComAndFootRealizationByGeometry();
     /** @} */
@@ -190,7 +191,8 @@ namespace PatternGeneratorJRL
     Eigen::MatrixXd GetFinalDesiredCOMPose();
 
     /*! Returns the position of the Waist in the the COM Frame . */
-    void GetCurrentPositionofWaistInCOMFrame(Eigen::VectorXd & CurPosWICF_homogeneous);
+    void GetCurrentPositionofWaistInCOMFrame(Eigen::VectorXd &
+                                             CurPosWICF_homogeneous);
 
 
     /*! Reimplementation of the setter of the HumanoidDynamicRobot. */
@@ -248,75 +250,134 @@ namespace PatternGeneratorJRL
 
     /*! \brief Getter and setter for the previous configurations and velocities */
     inline void SetPreviousConfigurationStage0(Eigen::VectorXd & prev_Configuration)
-    { m_prev_Configuration = prev_Configuration ;}
+    {
+      m_prev_Configuration = prev_Configuration ;
+    }
     inline void SetPreviousVelocityStage0(Eigen::VectorXd & prev_Velocity)
-    { m_prev_Velocity = prev_Velocity ;}
+    {
+      m_prev_Velocity = prev_Velocity ;
+    }
 
     inline void SetPreviousConfigurationStage1(Eigen::VectorXd & prev_Configuration)
-    { m_prev_Configuration1 = prev_Configuration ;}
+    {
+      m_prev_Configuration1 = prev_Configuration ;
+    }
     inline void SetPreviousVelocityStage1(Eigen::VectorXd & prev_Velocity)
-    { m_prev_Velocity1 = prev_Velocity ;}
+    {
+      m_prev_Velocity1 = prev_Velocity ;
+    }
 
     inline void SetPreviousConfigurationStage2(Eigen::VectorXd & prev_Configuration)
-    { m_prev_Configuration2 = prev_Configuration ;}
+    {
+      m_prev_Configuration2 = prev_Configuration ;
+    }
     inline void SetPreviousVelocityStage2(Eigen::VectorXd & prev_Velocity)
-    { m_prev_Velocity2 = prev_Velocity ;}
+    {
+      m_prev_Velocity2 = prev_Velocity ;
+    }
 
     /*! \brief Getter and setter for the previous configurations and velocities */
-    inline void SetPreviousConfigurationStage0(const Eigen::VectorXd & prev_Configuration)
-    { m_prev_Configuration = prev_Configuration ;}
+    inline void SetPreviousConfigurationStage0(const Eigen::VectorXd &
+                                               prev_Configuration)
+    {
+      m_prev_Configuration = prev_Configuration ;
+    }
     inline void SetPreviousVelocityStage0(const Eigen::VectorXd & prev_Velocity)
-    { m_prev_Velocity = prev_Velocity ;}
+    {
+      m_prev_Velocity = prev_Velocity ;
+    }
 
-    inline void SetPreviousConfigurationStage1(const Eigen::VectorXd & prev_Configuration)
-    { m_prev_Configuration1 = prev_Configuration ;}
+    inline void SetPreviousConfigurationStage1(const Eigen::VectorXd &
+                                               prev_Configuration)
+    {
+      m_prev_Configuration1 = prev_Configuration ;
+    }
     inline void SetPreviousVelocityStage1(const Eigen::VectorXd & prev_Velocity)
-    { m_prev_Velocity1 = prev_Velocity ;}
+    {
+      m_prev_Velocity1 = prev_Velocity ;
+    }
 
-    inline void SetPreviousConfigurationStage2(const Eigen::VectorXd & prev_Configuration)
-    { m_prev_Configuration2 = prev_Configuration ;}
+    inline void SetPreviousConfigurationStage2(const Eigen::VectorXd &
+                                               prev_Configuration)
+    {
+      m_prev_Configuration2 = prev_Configuration ;
+    }
     inline void SetPreviousVelocityStage2(const Eigen::VectorXd & prev_Velocity)
-    { m_prev_Velocity2 = prev_Velocity;}
+    {
+      m_prev_Velocity2 = prev_Velocity;
+    }
 
     /*! \brief Getter and setter for the previous configurations and velocities */
     inline Eigen::VectorXd & GetPreviousConfigurationStage0()
-    { return m_prev_Configuration ;};
+    {
+      return m_prev_Configuration ;
+    };
 
     inline Eigen::VectorXd & GetPreviousConfigurationStage1()
-    { return m_prev_Configuration1 ;};
+    {
+      return m_prev_Configuration1 ;
+    };
 
     inline Eigen::VectorXd & GetPreviousVelocityStage0()
-    { return m_prev_Velocity ;};
+    {
+      return m_prev_Velocity ;
+    };
 
     inline Eigen::VectorXd & GetPreviousVelocityStage1()
-    { return m_prev_Velocity1 ;};
+    {
+      return m_prev_Velocity1 ;
+    };
 
     inline void leftLegIndexinConfiguration(std::vector<int> & leftLegMaps) const
-    { leftLegMaps = m_LeftLegIndexinConfiguration ;}
+    {
+      leftLegMaps = m_LeftLegIndexinConfiguration ;
+    }
     inline void rightLegIndexinConfiguration(std::vector<int> & rightLegMaps) const
-    { rightLegMaps = m_RightLegIndexinConfiguration ;}
+    {
+      rightLegMaps = m_RightLegIndexinConfiguration ;
+    }
     inline void leftArmIndexinConfiguration(std::vector<int> & leftArmMaps) const
-    { leftArmMaps = m_LeftArmIndexinConfiguration ;}
+    {
+      leftArmMaps = m_LeftArmIndexinConfiguration ;
+    }
     inline void rightArmIndexinConfiguration(std::vector<int> & rightArmMaps) const
-    { rightArmMaps = m_RightArmIndexinConfiguration ;}
+    {
+      rightArmMaps = m_RightArmIndexinConfiguration ;
+    }
     inline void chestIndexinConfiguration(std::vector<int> & chestMaps) const
-    { chestMaps = m_ChestIndexinConfiguration ;}
+    {
+      chestMaps = m_ChestIndexinConfiguration ;
+    }
 
     inline void leftLegIndexinVelocity(std::vector<int> & leftLegMaps) const
-    { leftLegMaps = m_LeftLegIndexinConfiguration ;}
+    {
+      leftLegMaps = m_LeftLegIndexinConfiguration ;
+    }
     inline void rightLegIndexinVelocity(std::vector<int> & rightLegMaps) const
-    { rightLegMaps = m_RightLegIndexinConfiguration ;}
+    {
+      rightLegMaps = m_RightLegIndexinConfiguration ;
+    }
     inline void leftArmIndexinVelocity(std::vector<int> & leftArmMaps) const
-    { leftArmMaps = m_LeftArmIndexinConfiguration ;}
+    {
+      leftArmMaps = m_LeftArmIndexinConfiguration ;
+    }
     inline void rightArmIndexinVelocity(std::vector<int> & rightArmMaps) const
-    { rightArmMaps = m_RightArmIndexinConfiguration ;}
+    {
+      rightArmMaps = m_RightArmIndexinConfiguration ;
+    }
     inline void chestIndexinVelocity(std::vector<int> & chestMaps) const
-    { chestMaps = m_ChestIndexinConfiguration ;}
+    {
+      chestMaps = m_ChestIndexinConfiguration ;
+    }
 
     inline bool ShiftFoot()
-    {return ShiftFoot_ ;}
+    {
+      return ShiftFoot_ ;
+    }
     inline void ShiftFoot(bool ShiftFoot)
-    {ShiftFoot_=ShiftFoot ;}
+    {
+      ShiftFoot_=ShiftFoot ;
+    }
 
     /*! \brief Get the COG of the ankles at the starting position. */
     virtual Eigen::Vector3d GetCOGInitialAnkles();

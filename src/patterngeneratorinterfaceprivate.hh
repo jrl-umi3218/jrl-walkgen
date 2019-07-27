@@ -76,7 +76,8 @@ namespace PatternGeneratorJRL
 
 
   */
-  class PatternGeneratorInterfacePrivate : public virtual PatternGeneratorInterface,
+  class PatternGeneratorInterfacePrivate : public virtual
+  PatternGeneratorInterface,
                                            SimplePluginManager, SimplePlugin
 
   {
@@ -630,133 +631,134 @@ namespace PatternGeneratorJRL
     /*! \name Internals to deal with several ZMP CoM generation algorithms
       @{ */
     /*! Algorithm to compute ZMP and CoM trajectory */
-      int m_AlgorithmforZMPCOM;
+    int m_AlgorithmforZMPCOM;
 
-      /*! Constants
-        @{ */
-      /*! Using Preview Control with 2 stages proposed by Shuuji Kajita in 2003. */
-      static const int ZMPCOM_KAJITA_2003=1;
+    /*! Constants
+      @{ */
+    /*! Using Preview Control with 2 stages proposed by Shuuji Kajita in 2003. */
+    static const int ZMPCOM_KAJITA_2003=1;
 
-      /*! Using the preview control with 2 stages proposed by Pierre-Brice Wieber in 2006. */
-      static const int ZMPCOM_WIEBER_2006=2;
+    /*! Using the preview control with 2 stages proposed by Pierre-Brice Wieber in 2006. */
+    static const int ZMPCOM_WIEBER_2006=2;
 
-      /*! Using the analytical solution proposed by Morisawa in 2007. */
-      static const int ZMPCOM_MORISAWA_2007=3;
+    /*! Using the analytical solution proposed by Morisawa in 2007. */
+    static const int ZMPCOM_MORISAWA_2007=3;
 
-      /*! Using the QP constrained problem resolution proposed by Dimitrov in 2008. */
-      static const int ZMPCOM_DIMITROV_2008=4;
+    /*! Using the QP constrained problem resolution proposed by Dimitrov in 2008. */
+    static const int ZMPCOM_DIMITROV_2008=4;
 
-      /*! Using the velocity referenced QP proposed by Herdt in 2010. */
-      static const int ZMPCOM_HERDT_2010=5;
+    /*! Using the velocity referenced QP proposed by Herdt in 2010. */
+    static const int ZMPCOM_HERDT_2010=5;
 
-      /*! Using the velocity referenced QP proposed by Herdt in 2010. */
-      static const int ZMPCOM_NAVEAU_2015=6;
-      /*! @} */
-      /*! @} */
+    /*! Using the velocity referenced QP proposed by Herdt in 2010. */
+    static const int ZMPCOM_NAVEAU_2015=6;
+    /*! @} */
+    /*! @} */
 
-      /*! Humanoid Dynamic robot */
-      PinocchioRobot * m_PinocchioRobot ;
-      //CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot, * m_2HumanoidDynamicRobot;
+    /*! Humanoid Dynamic robot */
+    PinocchioRobot * m_PinocchioRobot ;
+    //CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot, * m_2HumanoidDynamicRobot;
 
-      /*! Speed of the leg. */
-      Eigen::VectorXd m_dqr,m_dql;
+    /*! Speed of the leg. */
+    Eigen::VectorXd m_dqr,m_dql;
 
-      /*! Objet to realize the generate the posture for given CoM
-        and feet positions. */
-      std::vector<ComAndFootRealization *> m_ComAndFootRealization;
+    /*! Objet to realize the generate the posture for given CoM
+      and feet positions. */
+    std::vector<ComAndFootRealization *> m_ComAndFootRealization;
 
-      /* \name Object related to stepping over.
-         @{
-      */
+    /* \name Object related to stepping over.
+       @{
+    */
 
-      /*! Planner for stepping over an obstacle. */
-      StepOverPlanner *m_StOvPl;
+    /*! Planner for stepping over an obstacle. */
+    StepOverPlanner *m_StOvPl;
 
-      /*! Position and parameters related to the obstacle. */
-      ObstaclePar m_ObstaclePars;
+    /*! Position and parameters related to the obstacle. */
+    ObstaclePar m_ObstaclePars;
 
-      /*! Boolean on the obstacle's detection */
-      bool m_ObstacleDetected;
+    /*! Boolean on the obstacle's detection */
+    bool m_ObstacleDetected;
 
-      /*! Time Distribution factor */
-      std::vector<double> m_TimeDistrFactor;
+    /*! Time Distribution factor */
+    std::vector<double> m_TimeDistrFactor;
 
-      /*! Variable for delta feasibility limit */
-      double m_DeltaFeasibilityLimit;
+    /*! Variable for delta feasibility limit */
+    double m_DeltaFeasibilityLimit;
 
-      /*! New time for step interval  using Changing On Line Step. */
-      double m_NewNextStepInterval;
+    /*! New time for step interval  using Changing On Line Step. */
+    double m_NewNextStepInterval;
 
-      /* @} */
+    /* @} */
 
-      /*! \brief Foot Trajectory Generator */
-      LeftAndRightFootTrajectoryGenerationMultiple * m_FeetTrajectoryGenerator;
-
-
-      /*! \name Buffers of Positions.
-        @{
-      */
-
-      /*! Buffer of ZMP positions */
-      deque<ZMPPosition> m_ZMPPositions;
-
-      /*! Buffer of Absolute foot position (World frame) */
-      deque<FootAbsolutePosition> m_FootAbsolutePositions;
-
-      /*! Buffer of absolute foot position. */
-      deque<FootAbsolutePosition> m_LeftFootPositions, m_RightFootPositions;
-
-      /*! Buffer for the COM position. */
-      deque<COMState> m_COMBuffer;
-
-      /*! @} */
-
-      /*! \brief Reimplement the SimplePlugin interface. */
-      virtual void CallMethod(string &MethodName,
-                              istringstream &istrm);
-
-      /*! \brief Register the methods handled by the SimplePlugin part of this object. */
-      void RegisterPluginMethods();
-
-      /*! \brief Start FPE trapping. */
-      void AllowFPE();
-
-    protected:
-
-      /*! \name Internal methods which are not to be exposed.
-        They are therefore subject to change.
-        @{
-      */
-
-      /*! \brief Expansion of the buffers handling Center of Masse positions,
-        as well as Upper Body Positions. */
-      void ExpandCOMPositionsQueues(int aNumber);
-
-      /*! \brief Compute the COM, left and right foot position for a given BodyAngle position */
-      void EvaluateStartingCOM(Eigen::VectorXd &Configuration,
-                               Eigen::Vector3d &lStartingCOMPosition);
+    /*! \brief Foot Trajectory Generator */
+    LeftAndRightFootTrajectoryGenerationMultiple * m_FeetTrajectoryGenerator;
 
 
-      /*! \brief Fill the internal buffer with the appropriate information depending on the strategy.
-        The behavior of this method depends on \a m_AlgorithmforZMPCOM.
-      */
-      int CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
-                              COMState &lStartingCOMState,
-                              Eigen::Vector3d & lStartingZMPPosition,
-                              FootAbsolutePosition & InitLeftFootAbsPos,
-                              FootAbsolutePosition & InitRightFootAbsPos);
+    /*! \name Buffers of Positions.
+      @{
+    */
 
-      /*! \brief Create automatically a new step for a ZMP based stability criteria */
-      void AutomaticallyAddFirstStep(deque<RelativeFootPosition> & lRelativeFootPositions,
-                                     FootAbsolutePosition & InitLeftFootAbsPos,
-                                     FootAbsolutePosition & InitRightFootAbsPos,
-                                     COMState &lStartingCOMState);
-      /* @} */
-    };
+    /*! Buffer of ZMP positions */
+    deque<ZMPPosition> m_ZMPPositions;
+
+    /*! Buffer of Absolute foot position (World frame) */
+    deque<FootAbsolutePosition> m_FootAbsolutePositions;
+
+    /*! Buffer of absolute foot position. */
+    deque<FootAbsolutePosition> m_LeftFootPositions, m_RightFootPositions;
+
+    /*! Buffer for the COM position. */
+    deque<COMState> m_COMBuffer;
+
+    /*! @} */
+
+    /*! \brief Reimplement the SimplePlugin interface. */
+    virtual void CallMethod(string &MethodName,
+                            istringstream &istrm);
+
+    /*! \brief Register the methods handled by the SimplePlugin part of this object. */
+    void RegisterPluginMethods();
+
+    /*! \brief Start FPE trapping. */
+    void AllowFPE();
+
+  protected:
+
+    /*! \name Internal methods which are not to be exposed.
+      They are therefore subject to change.
+      @{
+    */
+
+    /*! \brief Expansion of the buffers handling Center of Masse positions,
+      as well as Upper Body Positions. */
+    void ExpandCOMPositionsQueues(int aNumber);
+
+    /*! \brief Compute the COM, left and right foot position for a given BodyAngle position */
+    void EvaluateStartingCOM(Eigen::VectorXd &Configuration,
+                             Eigen::Vector3d &lStartingCOMPosition);
+
+
+    /*! \brief Fill the internal buffer with the appropriate information depending on the strategy.
+      The behavior of this method depends on \a m_AlgorithmforZMPCOM.
+    */
+    int CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
+                            COMState &lStartingCOMState,
+                            Eigen::Vector3d & lStartingZMPPosition,
+                            FootAbsolutePosition & InitLeftFootAbsPos,
+                            FootAbsolutePosition & InitRightFootAbsPos);
+
+    /*! \brief Create automatically a new step for a ZMP based stability criteria */
+    void AutomaticallyAddFirstStep(deque<RelativeFootPosition> &
+                                   lRelativeFootPositions,
+                                   FootAbsolutePosition & InitLeftFootAbsPos,
+                                   FootAbsolutePosition & InitRightFootAbsPos,
+                                   COMState &lStartingCOMState);
+    /* @} */
+  };
 
 
 
-  }
+}
 
 
 #endif

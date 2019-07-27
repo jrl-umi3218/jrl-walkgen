@@ -80,7 +80,7 @@ namespace PatternGeneratorJRL
   struct com_t & com_t::operator=(const com_t &aCS)
   {
 
-    for(unsigned int i=0;i<3;i++)
+    for(unsigned int i=0; i<3; i++)
       {
         x[i] = aCS.x[i];
         y[i] = aCS.y[i];
@@ -115,7 +115,7 @@ namespace PatternGeneratorJRL
   struct trunk_t & trunk_t::operator=(const trunk_t &aTS)
   {
 
-    for(unsigned int i=0;i<3;i++)
+    for(unsigned int i=0; i<3; i++)
       {
         x[i] = aTS.x[i];
         y[i] = aTS.y[i];
@@ -373,7 +373,10 @@ namespace PatternGeneratorJRL
     aos << "Arrays:" << std::endl
         << "Solution: ";
     for( unsigned int i = 0; i < NbVariables; i++ )
-      {aos<<Solution_vec[i]<<" ";}; aos<<std::endl;
+      {
+        aos<<Solution_vec[i]<<" ";
+      };
+    aos<<std::endl;
   }
 
   reference_t::

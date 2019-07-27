@@ -61,26 +61,26 @@ logical sb02ox (double *_alphar, double * _alphai, double *_beta)
 }
 
 /*
-   Inspired from scilab 4.0...
+  Inspired from scilab 4.0...
 
 
-   To select the stable generalized eigenvalues for continuous-time.
+  To select the stable generalized eigenvalues for continuous-time.
 
-   alphar: double precision,
-   the real part of the numerator of the current eigenvalue considered.
+  alphar: double precision,
+  the real part of the numerator of the current eigenvalue considered.
 
-   alphai: double precision,
-   The imaginary part of the numerator of the current
-   eigenvalue considered.
+  alphai: double precision,
+  The imaginary part of the numerator of the current
+  eigenvalue considered.
 
-   beta: double precision
-   The (real) denominator of the current eigenvalue
-   considered. It is assumed that beta <> 0 (regular case).
+  beta: double precision
+  The (real) denominator of the current eigenvalue
+  considered. It is assumed that beta <> 0 (regular case).
 
-   description:
+  description:
 
-   The function value SB02OW is set to true for a stable eigenvalue
-   and to false, otherwise.
+  The function value SB02OW is set to true for a stable eigenvalue
+  and to false, otherwise.
 */
 logical sb02ow (double *_alphar, double * /* _alphai */, double *_beta)
 {
@@ -101,19 +101,19 @@ OptimalControllerSolver::OptimalControllerSolver(Eigen::MatrixXd  &A,
                                                  unsigned int Nl)
 {
   m_A.resize( A.rows(), A.cols());
-  for(unsigned int i=0;i<A.rows();i++)
-    for(unsigned int j=0;j<A.cols();j++)
+  for(unsigned int i=0; i<A.rows(); i++)
+    for(unsigned int j=0; j<A.cols(); j++)
       m_A(i,j) = A(i,j);
 
   m_b.resize( b.rows(), b.cols());
-  for(unsigned int i=0;i<b.rows();i++)
-    for(unsigned int j=0;j<b.cols();j++)
+  for(unsigned int i=0; i<b.rows(); i++)
+    for(unsigned int j=0; j<b.cols(); j++)
       m_b(i,j) = b(i,j);
 
 
   m_c.resize( c.rows(), c.cols());
-  for(unsigned int i=0;i<c.rows();i++)
-    for(unsigned int j=0;j<c.cols();j++)
+  for(unsigned int i=0; i<c.rows(); i++)
+    for(unsigned int j=0; j<c.cols(); j++)
       m_c(i,j) = c(i,j);
 
   m_Q = Q;
@@ -138,25 +138,30 @@ bool OptimalControllerSolver::GeneralizedSchur(MatrixRXd  &A,
   ODEBUG("B:" << A);
   int n = (int)A.rows();
 
-  alphar.resize(n); alphar.setZero();
-  alphai.resize(n); alphai.setZero();
-  beta.resize(n); beta.setZero();
-  L.resize(n, n);L.setZero();
-  R.resize(n,n); R.setZero();
+  alphar.resize(n);
+  alphar.setZero();
+  alphai.resize(n);
+  alphai.setZero();
+  beta.resize(n);
+  beta.setZero();
+  L.resize(n, n);
+  L.setZero();
+  R.resize(n,n);
+  R.setZero();
 
   int sdim = 0;
   int lwork = 1000+ (8*(int)n + 16);
   double *work = new double[lwork]; //std::vector<double> work(lwork);
-  for(int i=0;i<lwork;i++)
+  for(int i=0; i<lwork; i++)
     work[i] = 0.0;
   int info = 0;
   logical *bwork=new logical[2*n];
-  for(int i=0;i<2*n;i++)
+  for(int i=0; i<2*n; i++)
     bwork[i] = 0;
 
   char lV[2]="V";
   char lS[2]="S";
-  for(int i=0;i<2*n;i++)
+  for(int i=0; i<2*n; i++)
     bwork[i] =0;
   A.transposeInPlace();
   B.transposeInPlace();
@@ -186,10 +191,11 @@ bool OptimalControllerSolver::GeneralizedSchur(MatrixRXd  &A,
 
   delete [] work;
   delete [] bwork;
-  if (info != 0) {
-    std::cout << ": info = " << info << " n = " << n << std::endl;
-    return false;
-  }
+  if (info != 0)
+    {
+      std::cout << ": info = " << info << " n = " << n << std::endl;
+      return false;
+    }
   else
     {
       return true;
@@ -222,8 +228,8 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   // Build the upper left sub-block of H
   Eigen::Index n = m_A.rows();
 
-  for(int i=0;i< n;i++)
-    for(int j=0;j<n;j++)
+  for(int i=0; i< n; i++)
+    for(int j=0; j<n; j++)
       H(i,j) = m_A(i,j);
 
   MatrixRXd H21;
@@ -236,8 +242,8 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   H21 = -H21;
 
   ODEBUG("H21:" << H21);
-  for(int i=0;i< n;i++)
-    for(int j=0;j<n;j++)
+  for(int i=0; i< n; i++)
+    for(int j=0; j<n; j++)
       H(i+n,j) = H21(i,j);
 
   ODEBUG("H:" << endl << H);
@@ -249,8 +255,8 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
 
   MatrixRXd At;
   At= m_A.transpose();
-  for(int i=0;i< n;i++)
-    for(int j=0;j<n;j++)
+  for(int i=0; i< n; i++)
+    for(int j=0; j<n; j++)
       {
         E(i,j+n) = G(i,j);
         E(i+n,j+n) = At(i,j);
@@ -261,7 +267,8 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   MatrixRXd ZH(2*n,2*n); // The matrix of schur vectors
   MatrixRXd ZE(2*n,2*n); // The matrix of Schur vectors.
   Eigen::VectorXd WR(2*n);
-  Eigen::VectorXd WI(2*n); // The eigenvalues ( a matrix to handle complex eigenvalues).
+  Eigen::VectorXd WI(
+                     2*n); // The eigenvalues ( a matrix to handle complex eigenvalues).
   Eigen::VectorXd GS(2*n);
 
   if (!GeneralizedSchur(H,E,WR,WI,GS,ZH,ZE))
@@ -282,9 +289,9 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   MatrixRXd Z21(n,n);
 
 
-  for(int i=0;i< n;i++)
+  for(int i=0; i< n; i++)
     {
-      for(int j=0;j<n;j++)
+      for(int j=0; j<n; j++)
         {
           Z11(i,j) = ZE(i,j);
           Z21(i,j) = ZE(i+n,j);
@@ -341,7 +348,7 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
          "PostMatrix:" << endl <<PostMatrix<< endl);
 
   m_F.resize(m_Nl,1);
-  for(int k=0;k<m_Nl;k++)
+  for(int k=0; k<m_Nl; k++)
     {
       Intermediate = PreMatrix*Recursive;
       m_F(k,0) = Intermediate(0,0);

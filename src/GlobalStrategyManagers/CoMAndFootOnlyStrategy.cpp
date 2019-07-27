@@ -65,8 +65,8 @@ OneGlobalStepOfControl
  FootAbsolutePosition &RightFootPosition,
  Eigen::VectorXd & ZMPRefPos,
  COMState & finalCOMPosition,
- Eigen::VectorXd & ,//CurrentConfiguration,
- Eigen::VectorXd & ,//CurrentVelocity,
+ Eigen::VectorXd &, //CurrentConfiguration,
+ Eigen::VectorXd &, //CurrentVelocity,
  Eigen::VectorXd & )//CurrentAcceleration)
 {
   ODEBUG("Begin OneGlobalStepOfControl "
@@ -75,7 +75,8 @@ OneGlobalStepOfControl
          << m_COMBuffer->size() << " "
          << m_ZMPPositions->size());
 
-  /* The strategy of this class is simply to pull off values from the buffers. */
+  /* The strategy of this class is simply to pull 
+     off values from the buffers. */
   if (m_LeftFootPositions->size()>0)
     {
       LeftFootPosition = (*m_LeftFootPositions)[0];
@@ -226,10 +227,13 @@ int CoMAndFootOnlyStrategy::EndOfMotion()
   return 0;
 }
 
-void CoMAndFootOnlyStrategy::Setup(deque<ZMPPosition> &,          // aZMPPositions,
-                                   deque<COMState> &,             // aCOMBuffer,
-                                   deque<FootAbsolutePosition> &, // aLeftFootAbsolutePositions,
-                                   deque<FootAbsolutePosition> &) // aRightFootAbsolutePositions)
+void CoMAndFootOnlyStrategy::
+Setup
+(deque<ZMPPosition>
+ &,          // aZMPPositions,
+ deque<COMState> &,             // aCOMBuffer,
+ deque<FootAbsolutePosition> &, // aLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &) // aRightFootAbsolutePositions)
 {
 }
 
@@ -238,7 +242,8 @@ void CoMAndFootOnlyStrategy::CallMethod(std::string &,//Method,
 {
 }
 
-void CoMAndFootOnlyStrategy::SetTheLimitOfTheBuffer(unsigned int lBufferSizeLimit)
+void CoMAndFootOnlyStrategy::SetTheLimitOfTheBuffer(unsigned int
+                                                    lBufferSizeLimit)
 {
   m_BufferSizeLimit = lBufferSizeLimit;
 }

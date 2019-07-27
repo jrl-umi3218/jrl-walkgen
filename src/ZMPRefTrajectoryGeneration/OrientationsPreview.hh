@@ -43,7 +43,8 @@
 namespace PatternGeneratorJRL
 {
   /// \brief The acceleration phase is fixed
-  class OrientationsPreview {
+  class OrientationsPreview
+  {
 
     //
     // Public methods:
@@ -103,25 +104,45 @@ namespace PatternGeneratorJRL
     /// \name Accessors
     /// \{
     inline COMState const & CurrentTrunkState() const
-    { return TrunkState_; };
+    {
+      return TrunkState_;
+    };
     inline void CurrentTrunkState(const COMState & TrunkState)
-    { TrunkState_ = TrunkState; };
+    {
+      TrunkState_ = TrunkState;
+    };
     inline COMState const & PreviewTrunkState() const
-    { return TrunkStateT_; };
+    {
+      return TrunkStateT_;
+    };
     inline void PreviewTrunkState(const COMState & TrunkState)
-    { TrunkStateT_ = TrunkState; };
+    {
+      TrunkStateT_ = TrunkState;
+    };
     inline double SSLength() const
-    { return SSPeriod_; };
+    {
+      return SSPeriod_;
+    };
     inline void SSLength( double SSPeriod)
-    { SSPeriod_ = SSPeriod; };
+    {
+      SSPeriod_ = SSPeriod;
+    };
     inline double SamplingPeriod() const
-    { return T_; };
+    {
+      return T_;
+    };
     inline void SamplingPeriod( double SamplingPeriod)
-    { T_ = SamplingPeriod; };
+    {
+      T_ = SamplingPeriod;
+    };
     inline double NbSamplingsPreviewed() const
-    { return N_; };
+    {
+      return N_;
+    };
     inline void NbSamplingsPreviewed( double SamplingsPreviewed)
-    { N_ = SamplingsPreviewed; };
+    {
+      N_ = SamplingsPreviewed;
+    };
     /// \}
 
     //
@@ -200,7 +221,8 @@ namespace PatternGeneratorJRL
   private:
 
     /// \brief Angular limitations of the hip joints
-    double lLimitLeftHipYaw_, uLimitLeftHipYaw_, lLimitRightHipYaw_, uLimitRightHipYaw_;
+    double lLimitLeftHipYaw_, uLimitLeftHipYaw_, lLimitRightHipYaw_,
+      uLimitRightHipYaw_;
 
     /// \brief Maximal acceleration of a hip joint
     double uaLimitHipYaw_;

@@ -199,7 +199,8 @@ namespace PatternGeneratorJRL
       @param lCOMZ: Value of the CoM height for this interval.
       @param lZMPZ: Value of the ZMP height for this interval.
     */
-    void TransfertOneIntervalCoefficientsFromCOGTrajectoryToZMPOne(unsigned int IntervalIndex,
+    void TransfertOneIntervalCoefficientsFromCOGTrajectoryToZMPOne(
+                                                                   unsigned int IntervalIndex,
                                                                    double &lCOMZ,
                                                                    double &lZMPZ);
 
@@ -216,15 +217,20 @@ namespace PatternGeneratorJRL
     /*! \brief Returns the maximal fluctuation for the first segment of this trajectory. */
     double FluctuationMaximal();
 
-    friend std::ostream& operator <<(std::ostream &os,const AnalyticalZMPCOGTrajectory &obj);
+    friend std::ostream& operator <<(std::ostream &os,
+                                     const AnalyticalZMPCOGTrajectory &obj);
 
     /*! \brief Absolute Time reference of this trajectory. */
     double  GetAbsoluteTimeReference() const
-    { return m_AbsoluteTimeReference; }
+    {
+      return m_AbsoluteTimeReference;
+    }
 
     /*! \brief Set Absolute time reference of this trajectory */
     void SetAbsoluteTimeReference(double anAbsoluteTimeReference)
-    { m_AbsoluteTimeReference = anAbsoluteTimeReference; }
+    {
+      m_AbsoluteTimeReference = anAbsoluteTimeReference;
+    }
 
     /*! \brief Get the index of the interval according to the time. */
     bool GetIntervalIndexFromTime(double t, unsigned int &j);
@@ -275,6 +281,7 @@ namespace PatternGeneratorJRL
     double m_Sensitivity;
   };
 
-  std::ostream& operator <<(std::ostream &os,const AnalyticalZMPCOGTrajectory &obj);
+  std::ostream& operator <<(std::ostream &os,
+                            const AnalyticalZMPCOGTrajectory &obj);
 }
 #endif /* _ANALYTICAL_COG_H_ */

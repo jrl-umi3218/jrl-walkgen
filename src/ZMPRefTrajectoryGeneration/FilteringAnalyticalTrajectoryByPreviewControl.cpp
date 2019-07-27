@@ -54,11 +54,13 @@ FilteringAnalyticalTrajectoryByPreviewControl::FilteringAnalyticalTrajectoryByPr
   m_LocalBufferIndex=0;
 
   std::string aMethodName[3] =
-    {":samplingperiod",
+    {
+     ":samplingperiod",
      ":previewcontroltime",
-     ":singlesupporttime"};
+     ":singlesupporttime"
+    };
 
-  for(int i=0;i<3;i++)
+  for(int i=0; i<3; i++)
     {
       if (!RegisterMethod(aMethodName[i]))
         {
@@ -73,13 +75,15 @@ FilteringAnalyticalTrajectoryByPreviewControl::FilteringAnalyticalTrajectoryByPr
 
 }
 
-void FilteringAnalyticalTrajectoryByPreviewControl::SetAnalyticalTrajectory(AnalyticalZMPCOGTrajectory *lAZCT)
+void FilteringAnalyticalTrajectoryByPreviewControl::SetAnalyticalTrajectory(
+                                                                            AnalyticalZMPCOGTrajectory *lAZCT)
 {
   m_AnalyticalZMPCOGTrajectory = lAZCT;
 }
 
 
-void FilteringAnalyticalTrajectoryByPreviewControl::SetPreviewControl(PreviewControl *lPreviewControl)
+void FilteringAnalyticalTrajectoryByPreviewControl::SetPreviewControl(
+                                                                      PreviewControl *lPreviewControl)
 {
 
   m_PreviewControl = lPreviewControl;
@@ -100,7 +104,8 @@ void FilteringAnalyticalTrajectoryByPreviewControl::Resize()
       (m_PreviewControlTime!=0.0) &&
       (m_Tsingle!=0.0))
     {
-      unsigned int DataBufferSize = (unsigned int ) ((m_Tsingle +m_PreviewControlTime)/
+      unsigned int DataBufferSize = (unsigned int ) ((m_Tsingle
+                                                      +m_PreviewControlTime)/
                                                      m_SamplingPeriod);
       ODEBUG3("m_Tsingle: " << m_Tsingle << " DataBufferSize:" << DataBufferSize);
       m_DataBuffer.resize(DataBufferSize);
@@ -112,7 +117,8 @@ FilteringAnalyticalTrajectoryByPreviewControl::~FilteringAnalyticalTrajectoryByP
 {
 }
 
-bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double FirstValueofZMPProfil,
+bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(
+                                                                      double FirstValueofZMPProfil,
                                                                       double DeltaTj0 )
 {
   ODEBUG("m_PreviewControl : " << m_PreviewControl <<
@@ -122,7 +128,8 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double Fir
     return false;
 
   if (!m_PreviewControl->IsCoherent())
-    m_PreviewControl->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
+    m_PreviewControl->ComputeOptimalWeights(
+                                            OptimalControllerSolver::MODE_WITH_INITIALPOS);
 
   m_Duration = DeltaTj0;
 
@@ -147,7 +154,8 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double Fir
       aof.open(Buffer,ofstream::out);
     }
   // On the interval of the newly changed first foot.
-  for( unsigned int lDataBufferIndex = 0;lDataBufferIndex<m_DataBuffer.size();t+=DeltaT,lDataBufferIndex++)
+  for( unsigned int lDataBufferIndex = 0; lDataBufferIndex<m_DataBuffer.size();
+       t+=DeltaT,lDataBufferIndex++)
     {
       double r=0.0;
       if (t<DeltaTj0)
@@ -180,13 +188,15 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::UpdateOneStep(double t,
                                                                   double &CoMSpeedValue)
 {
   ODEBUG("time:" << t << " m_StartingTime: " <<
-         m_StartingTime << " " << m_Duration + m_StartingTime << " ( " << m_Duration << " ) "
+         m_StartingTime << " " << m_Duration + m_StartingTime << " ( " << m_Duration <<
+         " ) "
          << " LBI:" << m_LocalBufferIndex);
   if ((t<m_StartingTime) || (t>m_Duration+m_StartingTime) || (m_Duration==0.0))
     return false;
 
   double lsxzmp =0.0;
-  m_PreviewControl->OneIterationOfPreview1D(m_ComState,lsxzmp,m_DataBuffer,m_LocalBufferIndex,
+  m_PreviewControl->OneIterationOfPreview1D(m_ComState,lsxzmp,m_DataBuffer,
+                                            m_LocalBufferIndex,
                                             m_ZMPPCValue,false);
 
   ZMPValue = m_ZMPPCValue;
@@ -200,7 +210,8 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::UpdateOneStep(double t,
 }
 
 /*! \brief Overloading method of SimplePlugin */
-void FilteringAnalyticalTrajectoryByPreviewControl::CallMethod(std::string &Method,
+void FilteringAnalyticalTrajectoryByPreviewControl::CallMethod(
+                                                               std::string &Method,
                                                                std::istringstream &strm)
 {
   if (Method==":samplingperiod")

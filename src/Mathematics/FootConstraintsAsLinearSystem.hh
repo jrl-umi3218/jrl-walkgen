@@ -72,7 +72,8 @@ namespace PatternGeneratorJRL
     /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
       Position.
     */
-    int BuildLinearConstraintInequalities(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
+    int BuildLinearConstraintInequalities(std::deque< FootAbsolutePosition>
+                                          &LeftFootAbsolutePositions,
                                           std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
                                           std::deque<LinearConstraintInequality_t *> &
                                           QueueOfLConstraintInequalities,
@@ -80,7 +81,8 @@ namespace PatternGeneratorJRL
                                           double ConstraintOnY);
 
     /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute Position.  */
-    int BuildLinearConstraintInequalities2(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
+    int BuildLinearConstraintInequalities2(std::deque< FootAbsolutePosition>
+                                           &LeftFootAbsolutePositions,
                                            std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
                                            std::deque<LinearConstraintInequality_t *> &
                                            QueueOfLConstraintInequalities,

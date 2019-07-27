@@ -74,8 +74,10 @@ namespace PatternGeneratorJRL
     /*! \brief Constructor
 
      */
-    inline ComAndFootRealization(PatternGeneratorInterfacePrivate * aPatternGeneratorInterface):
-      SimplePlugin((PatternGeneratorJRL::SimplePluginManager *)aPatternGeneratorInterface)
+    inline ComAndFootRealization(PatternGeneratorInterfacePrivate *
+                                 aPatternGeneratorInterface):
+      SimplePlugin((PatternGeneratorJRL::SimplePluginManager *)
+                   aPatternGeneratorInterface)
       ,m_PinocchioRobot(0)
       ,m_HeightOfCoM(0)
       ,m_SamplingPeriod(0.005)
@@ -133,12 +135,16 @@ namespace PatternGeneratorJRL
     /*! @param aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
     inline  virtual bool setPinocchioRobot(PinocchioRobot *aPinocchioRobot)
-    { m_PinocchioRobot = aPinocchioRobot;
-      return true;}
+    {
+      m_PinocchioRobot = aPinocchioRobot;
+      return true;
+    }
 
     /*! Returns the object able to compute dynamic parametersof the robot. */
     inline PinocchioRobot * getPinocchioRobot() const
-    { return m_PinocchioRobot;}
+    {
+      return m_PinocchioRobot;
+    }
 
     /** @} */
 
@@ -178,10 +184,14 @@ namespace PatternGeneratorJRL
     */
 
     void SetHeightOfTheCoM(double theHeightOfTheCoM)
-    { m_HeightOfCoM = theHeightOfTheCoM; }
+    {
+      m_HeightOfCoM = theHeightOfTheCoM;
+    }
 
     const double & GetHeightOfTheCoM() const
-    {return m_HeightOfCoM;}
+    {
+      return m_HeightOfCoM;
+    }
     /*! @} */
 
     /*! \name Setter and getter for the sampling period.
@@ -189,19 +199,27 @@ namespace PatternGeneratorJRL
     */
     /*! Setter for the sampling period. */
     inline void setSamplingPeriod(double  aSamplingPeriod)
-    { m_SamplingPeriod = aSamplingPeriod; }
+    {
+      m_SamplingPeriod = aSamplingPeriod;
+    }
     /*! Getter for the sampling period. */
     inline const double & getSamplingPeriod() const
-    { return m_SamplingPeriod;}
+    {
+      return m_SamplingPeriod;
+    }
     /* @} */
 
 
     /*! \name Getter and setter for the handler of step stack  @{ */
     void SetStepStackHandler(StepStackHandler * lStepStackHandler)
-    { m_StepStackHandler = lStepStackHandler;}
+    {
+      m_StepStackHandler = lStepStackHandler;
+    }
 
     StepStackHandler *  GetStepStackHandler() const
-    { return m_StepStackHandler; }
+    {
+      return m_StepStackHandler;
+    }
     /*! @} */
 
     /*! Get the current position of the waist in the COM reference frame

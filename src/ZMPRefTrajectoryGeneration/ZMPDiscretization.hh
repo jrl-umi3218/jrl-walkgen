@@ -92,7 +92,8 @@ namespace PatternGeneratorJRL
   public :
 
     /*!  Constructor */
-    ZMPDiscretization(SimplePluginManager *lSPM,string DataFile="",PinocchioRobot *aHDR=0);
+    ZMPDiscretization(SimplePluginManager *lSPM,string DataFile="",
+                      PinocchioRobot *aHDR=0);
 
     /*!  Destructor */
     ~ZMPDiscretization();
@@ -151,7 +152,8 @@ namespace PatternGeneratorJRL
 
     /** Update the value of the foot configuration according to the
         current situation. */
-    void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
+    void UpdateFootPosition(deque<FootAbsolutePosition>
+                            &SupportFootAbsolutePositions,
                             deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
                             int index, int k, int indexinitial, double ModulationSupportTime,int StepType,
                             int LeftOrRight);

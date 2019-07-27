@@ -75,8 +75,12 @@ namespace PatternGeneratorJRL
     virtual ~SimplePluginManager();
 
     /*! Get the map of plugins. */
-    const std::multimap<std::string, SimplePlugin *, ltstr>  & getSimplePlugins() const
-    { return m_SimplePlugins;};
+    const std::multimap<std::string, SimplePlugin *, ltstr>  &
+    getSimplePlugins()
+      const
+    {
+      return m_SimplePlugins;
+    };
 
     /*! \name Register the method for which this object can be called
       by a higher parser. */

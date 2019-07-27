@@ -65,7 +65,8 @@ namespace PatternGeneratorJRL
       \param[in] t: The new time to be add.
       \return false if a problem occured, true otherwise.
     */
-    bool UpdateOneStep(double t, double &ZMPValue, double &CoMValue,double &CoMSpeedValue);
+    bool UpdateOneStep(double t, double &ZMPValue, double &CoMValue,
+                       double &CoMSpeedValue);
 
     /*! \brief Overloading method of SimplePlugin */
     virtual void CallMethod(std::string &Method,

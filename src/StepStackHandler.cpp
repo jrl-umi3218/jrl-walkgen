@@ -52,16 +52,18 @@ StepStackHandler
   m_TransitionFinishOnLine=false;
 
   std::string aMethodName[8] =
-    {":walkmode",
+    {
+     ":walkmode",
      ":singlesupporttime",
      ":doublesupporttime",
      ":supportfoot",
      ":lastsupport",
      ":arc",
      ":addstandardonlinestep",
-     ":arccentered"};
+     ":arccentered"
+    };
 
-  for(int i=0;i<7;i++)
+  for(int i=0; i<7; i++)
     {
       if (!RegisterMethod(aMethodName[i]))
         {
@@ -104,7 +106,7 @@ CopyRelativeFootPosition
 {
   ODEBUG(m_RelativeFootPositions.size());
   lRelativeFootPositions.resize(m_RelativeFootPositions.size());
-  for(unsigned int i=0;i<m_RelativeFootPositions.size();i++)
+  for(unsigned int i=0; i<m_RelativeFootPositions.size(); i++)
     {
       lRelativeFootPositions[i] = m_RelativeFootPositions[i];
     }
@@ -163,7 +165,7 @@ ReadStepStairSequenceAccordingToWalkMode(istringstream &strm)
               aFootPosition.theta << " " <<
               aFootPosition.SStime << " " <<
               aFootPosition.DStime << " " <<
-              aFootPosition.DeviationHipHeight << " " ,
+              aFootPosition.DeviationHipHeight << " ",
               "DebugGMFKW.dat");
 
       m_RelativeFootPositions.push_back(aFootPosition);
@@ -218,7 +220,7 @@ ReadStepSequenceAccordingToWalkMode
                     aFootPosition.theta << " " <<
                     aFootPosition.SStime << " " <<
                     aFootPosition.DStime << " " <<
-                    aFootPosition.DeviationHipHeight << " " ,
+                    aFootPosition.DeviationHipHeight << " ",
                     "DebugGMFKW.dat");
 
             m_RelativeFootPositions.push_back(aFootPosition);
@@ -237,7 +239,8 @@ ReadStepSequenceAccordingToWalkMode
       {
 
 
-        ODEBUG4( "Walk Mode with HipHeight Variation Selected","DebugGMFKW.dat" );
+        ODEBUG4( "Walk Mode with HipHeight Variation Selected",
+                 "DebugGMFKW.dat" );
         RelativeFootPosition aFootPosition;
 
         ODEBUG4("Inside StepStack Handler","DebugGMFKW.dat");
@@ -264,7 +267,7 @@ ReadStepSequenceAccordingToWalkMode
                     aFootPosition.theta << " " <<
                     aFootPosition.SStime << " " <<
                     aFootPosition.DStime << " " <<
-                    aFootPosition.DeviationHipHeight << " " ,
+                    aFootPosition.DeviationHipHeight << " ",
                     "DebugFootPrint.dat");
 
 
@@ -282,8 +285,8 @@ ReadStepSequenceAccordingToWalkMode
     case 2:
       {
         ODEBUG( "Walk Mode with Obstacle StepOver Selected \
-                 (obstacle parameters have to be set first, \
-                 if not standard dimensions are used)" );
+               (obstacle parameters have to be set first, \
+               if not standard dimensions are used)" );
         m_StOvPl->CalculateFootHolds(m_RelativeFootPositions);
 
         break;
@@ -334,7 +337,7 @@ ReadStepSequenceAccordingToWalkMode
                     aFootPosition.theta << " " <<
                     aFootPosition.SStime << " " <<
                     aFootPosition.DStime << " " <<
-                    aFootPosition.DeviationHipHeight << " " ,
+                    aFootPosition.DeviationHipHeight << " ",
                     "DebugGMFKW.dat");
 
             m_RelativeFootPositions.push_back(aFootPosition);
@@ -351,9 +354,9 @@ ReadStepSequenceAccordingToWalkMode
     default:
       {
         ODEBUG( "PLease select proper walk mode. \
-            (0 for normal walking ; \
-             1 for walking with waistheight variation ; \
-             2 for walking with obstacle stepover)" );
+          (0 for normal walking ; \
+           1 for walking with waistheight variation ; \
+           2 for walking with obstacle stepover)" );
         return;
       }
     }
@@ -415,7 +418,7 @@ CreateArcInStepStack
   double Omegakp = 0.0,
     Omegak=0.0;
 
-  for(int i=0;i<NumberOfStep;i++)
+  for(int i=0; i<NumberOfStep; i++)
     {
       ODEBUG("SupportFoot " << SupportFoot);
       aFootPosition.sx = StepMax;
@@ -437,8 +440,10 @@ CreateArcInStepStack
 
         // Transpose of the orientation matrix
         // to get the inverse of the orientation matrix.
-        A(0,0) =  c; A(0,1) = s;
-        A(1,0) = -s; A(1,1) =  c;
+        A(0,0) =  c;
+        A(0,1) = s;
+        A(1,0) = -s;
+        A(1,1) =  c;
 
         double cp,sp;
         cp = cos(Omegakp*M_PI/180.0);
@@ -495,8 +500,10 @@ CreateArcInStepStack
         cp = cos(Omegakp*M_PI/180.0);
         sp = sin(Omegakp*M_PI/180.0);
 
-        A(0,0) = c;  A(0,1) =s;
-        A(1,0) = -s;  A(1,1) = c;
+        A(0,0) = c;
+        A(0,1) =s;
+        A(1,0) = -s;
+        A(1,1) = c;
         Eigen::Matrix<double,2,1> lv;
         Eigen::Matrix<double,2,1> lv2;
         lv(0) = (R+DirectionRay*SupportFoot*0.095)*s -
@@ -600,14 +607,16 @@ CreateArcCenteredInStepStack
   double S=-SupportFoot*0.095;
 
   Eigen::Matrix<double,3,3> Romegastep;;
-  for(int i=0;i<3;i++)
-    for(int j=0;j<3;j++)
+  for(int i=0; i<3; i++)
+    for(int j=0; j<3; j++)
       if (i==j)
         Romegastep(i,j) =1.0;
       else
         Romegastep(i,j) =0.0;
-  Romegastep(0,0) = cosOmegaStep; Romegastep(0,1) = -sinOmegaStep;
-  Romegastep(1,0) = sinOmegaStep; Romegastep(1,1) =  cosOmegaStep;
+  Romegastep(0,0) = cosOmegaStep;
+  Romegastep(0,1) = -sinOmegaStep;
+  Romegastep(1,0) = sinOmegaStep;
+  Romegastep(1,1) =  cosOmegaStep;
 
   Eigen::Matrix<double,3,3> MFNSF;;
   Eigen::Matrix<double,3,3> MFSF;;
@@ -619,8 +628,8 @@ CreateArcCenteredInStepStack
   Eigen::Matrix<double,3,3> Mtmp;;
   Eigen::Matrix<double,3,3> Mtmp2;;
 
-  for(int i=0;i<3;i++)
-    for(int j=0;j<3;j++)
+  for(int i=0; i<3; i++)
+    for(int j=0; j<3; j++)
       if (i==j)
         {
           MFNSF(i,j)  =
@@ -654,7 +663,7 @@ CreateArcCenteredInStepStack
 #endif
   ODEBUG("MSupportFoot  "<< endl << MSupportFoot );
   ODEBUG( "Romegastep " << endl << Romegastep );
-  for(int i=0;i<NumberOfStep;i++)
+  for(int i=0; i<NumberOfStep; i++)
     {
       double cosiOmegaStep,siniOmegaStep;
 
@@ -743,8 +752,8 @@ CreateArcCenteredInStepStack
 
       cosiOmegaStep = cos(LastOmegaStep+NumberOfStep*OmegaStep);
       siniOmegaStep = sin(LastOmegaStep+NumberOfStep*OmegaStep);
-      for(int i=0;i<3;i++)
-        for(int j=0;j<3;j++)
+      for(int i=0; i<3; i++)
+        for(int j=0; j<3; j++)
           if (i==j)
             Romega(i,j) = iRomega(i,j) = 1.0;
           else

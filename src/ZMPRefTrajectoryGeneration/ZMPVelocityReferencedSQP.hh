@@ -148,24 +148,34 @@ namespace PatternGeneratorJRL
     }
 
     inline bool Running()
-    { return Running_; }
+    {
+      return Running_;
+    }
 
     inline void UpperTimeLimitToUpdate(double UpperTimeLimitToUpdate)
-    {UpperTimeLimitToUpdate_=UpperTimeLimitToUpdate ;}
+    {
+      UpperTimeLimitToUpdate_=UpperTimeLimitToUpdate ;
+    }
 
     /// \brief Set the final-stage trigger
     inline void EndingPhase(bool EndingPhase)
-    { EndingPhase_ = EndingPhase;}
+    {
+      EndingPhase_ = EndingPhase;
+    }
 
     void setCoMPerturbationForce(double x,double y);
     void setCoMPerturbationForce(istringstream &strm);
 
     inline const int & SQP_N(void) const
-    { return SQP_N_; }
+    {
+      return SQP_N_;
+    }
 
     /// \brief Setter and getter for the ComAndZMPTrajectoryGeneration.
     inline ComAndFootRealization * getComAndFootRealization()
-    { return dynamicFilter_->getComAndFootRealization();}
+    {
+      return dynamicFilter_->getComAndFootRealization();
+    }
     /// \}
 
     //

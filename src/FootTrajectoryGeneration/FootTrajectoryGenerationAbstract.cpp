@@ -50,14 +50,16 @@ FootTrajectoryGenerationAbstract
 
 
   std::string aMethodName[5] =
-    {":omega",
+    {
+     ":omega",
      ":stepheight",
      ":singlesupporttime",
      ":doublesupporttime",
      ":samplingperiod"
-     ":stepstairon"};
+     ":stepstairon"
+    };
 
-  for (int i=0;i<5;i++)
+  for (int i=0; i<5; i++)
     {
       if (!RegisterMethod(aMethodName[i]))
         {
@@ -100,12 +102,12 @@ void FootTrajectoryGenerationAbstract::CallMethod(std::string &Method,
 
 void FootTrajectoryGenerationAbstract::
 UpdateFootPosition
-(std::deque<FootAbsolutePosition> & , //SupportFootAbsolutePositions,
+(std::deque<FootAbsolutePosition> &,  //SupportFootAbsolutePositions,
  std::deque<FootAbsolutePosition> &, //NoneSupportFootAbsolutePositions,
- int , //CurrentAbsoluteIndex,
- int , //IndexInitial,
- double , //ModulatedSingleSupportTime,
- int , //StepType,
+ int,  //CurrentAbsoluteIndex,
+ int,  //IndexInitial,
+ double,  //ModulatedSingleSupportTime,
+ int,  //StepType,
  int ) //LeftOrRight)
 {
   LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-1: \
@@ -114,13 +116,13 @@ UpdateFootPosition
 
 void FootTrajectoryGenerationAbstract::
 UpdateFootPosition
-(std::deque<FootAbsolutePosition> & ,//SupportFootAbsolutePositions,
- std::deque<FootAbsolutePosition> & ,//NoneSupportFootAbsolutePositions,
- int , // StartIndex,
- int , //k,
- double , //LocalInterpolationStartTime,
- double , //ModulatedSingleSupportTime,
- int , //StepType,
+(std::deque<FootAbsolutePosition> &, //SupportFootAbsolutePositions,
+ std::deque<FootAbsolutePosition> &, //NoneSupportFootAbsolutePositions,
+ int,  // StartIndex,
+ int,  //k,
+ double,  //LocalInterpolationStartTime,
+ double,  //ModulatedSingleSupportTime,
+ int,  //StepType,
  int ) //LeftOrRight)
 {
   LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-2: \

@@ -47,12 +47,14 @@ DoubleStagePreviewControlStrategy
 
   unsigned int NbOfMethods=4;
   std::string aMethodName[4] =
-    {":SetAlgoForZmpTrajectory",
+    {
+     ":SetAlgoForZmpTrajectory",
      ":SetZMPFrame",
      ":samplingperiod",
-     ":previewcontroltime"};
+     ":previewcontroltime"
+    };
 
-  for(unsigned int i=0;i<NbOfMethods;i++)
+  for(unsigned int i=0; i<NbOfMethods; i++)
     {
       if (!RegisterMethod(aMethodName[i]))
         {
@@ -128,7 +130,7 @@ OneGlobalStepOfControl
      CurrentVelocity,
      CurrentAcceleration);
   ODEBUG4("finalCOMState:" <<finalCOMState.x[0] << " "
-          << finalCOMState.y[0] ,"DebugData.txt");
+          << finalCOMState.y[0],"DebugData.txt");
 
   (*m_COMBuffer)[0] = finalCOMState;
 
@@ -177,8 +179,10 @@ OneGlobalStepOfControl
 
     }
   else
-    { std::cerr << "Problem with the ZMP reference frame set to 0."
-                << std::endl;}
+    {
+      std::cerr << "Problem with the ZMP reference frame set to 0."
+                << std::endl;
+    }
 
   ODEBUG4SIMPLE((*m_ZMPPositions)[0].px <<  " " <<
                 (*m_ZMPPositions)[0].py << " " <<
@@ -284,11 +288,14 @@ SetZMPFrame
       m_ZMPFrame = ZMPFRAME_WAIST;
     }
   else if (aZMPFrame=="world")
-    { m_ZMPFrame = ZMPFRAME_WORLD;
+    {
+      m_ZMPFrame = ZMPFRAME_WORLD;
     }
   else
-    { std::cerr << "Mistake wrong keyword" << aZMPFrame
-                << std::endl;}
+    {
+      std::cerr << "Mistake wrong keyword" << aZMPFrame
+                << std::endl;
+    }
 }
 
 void DoubleStagePreviewControlStrategy::

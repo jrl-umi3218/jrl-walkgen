@@ -23,10 +23,12 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
-/*! \doc This class can inherited for creating the trajectory of the robot's joints
+/*! \doc This class can inherited for creating the trajectory 
+  of the robot's joints
   given a path provided by KineoWorks. This path can be based on a partial
   model of the robot. The link between this partial model is given by
-  an auxiliary file, and the redefinition of the virtual functions of this class.
+  an auxiliary file, and the redefinition of the virtual functions of 
+  this class.
 */
 
 #ifndef _GENERATE_MOTION_FROM_KINEOWORKS_H_
@@ -98,9 +100,10 @@ namespace PatternGeneratorJRL
       path and the COM buffer. The main strategy is to find points inside
       the COM buffer which are the closest to the KWs' way points.
       The value between two found points are linearly interpolated. */
-    void ComputeUpperBodyPosition(deque< KWNode > &UpperBodyPositionsBuffer,
-                                  std::vector<int> &ConversionFromLocalToRobotDOFsIndex);
-
+    void ComputeUpperBodyPosition
+    (deque< KWNode > &UpperBodyPositionsBuffer,
+     std::vector<int> &ConversionFromLocalToRobotDOFsIndex);
+    
   protected:
 
     /*! Number of DOFs inside the path provided by KineoWorks. */

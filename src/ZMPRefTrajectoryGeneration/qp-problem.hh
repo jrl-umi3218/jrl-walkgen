@@ -69,7 +69,7 @@ namespace PatternGeneratorJRL
     /// \param[in] Row First row inside the target
     /// \param[in] Col First column inside the target
     void add_term_to( qp_element_e Type, const Eigen::MatrixXd & Mat,
-        unsigned int Row, unsigned int Col );
+                      unsigned int Row, unsigned int Col );
 
     /// \brief Add a vector to the final optimization problem in array form
     ///
@@ -77,7 +77,7 @@ namespace PatternGeneratorJRL
     /// \param[in] Mat Added vector
     /// \param[in] Row First row inside the target
     void add_term_to( qp_element_e Type, const Eigen::VectorXd & Vec,
-        unsigned Row, unsigned Col = 0 );
+                      unsigned Row, unsigned Col = 0 );
 
     /// \brief Dump current problem on disk.
     void dump( const char * Filename );
@@ -106,34 +106,55 @@ namespace PatternGeneratorJRL
     /// \param[in] Solver
     /// \param[out] Result
     /// \param[in] Tests
-    void solve( solver_e Solver, solution_t & Result, const tests_e & Tests = NONE );
+    void solve( solver_e Solver, solution_t & Result,
+                const tests_e & Tests = NONE );
 
     /// \name Accessors and mutators
     /// \{
     inline void NbVariables( unsigned int NbVariables )
-    { NbVariables_ = NbVariables;};
+    {
+      NbVariables_ = NbVariables;
+    };
     inline unsigned int NbVariables( )
-    { return NbVariables_;};
+    {
+      return NbVariables_;
+    };
 
     inline void NbEqConstraints( unsigned int NbEqConstraints )
-    { NbEqConstraints_ = NbEqConstraints;};
+    {
+      NbEqConstraints_ = NbEqConstraints;
+    };
     inline unsigned int NbEqConstraints(  )
-    { return NbEqConstraints_;};
+    {
+      return NbEqConstraints_;
+    };
 
     inline void NbConstraints( unsigned int NbConstraints )
-    { NbConstraints_ = NbConstraints;};
+    {
+      NbConstraints_ = NbConstraints;
+    };
     inline unsigned int NbConstraints()
-    { return NbConstraints_;};
+    {
+      return NbConstraints_;
+    };
 
     inline void nbInvariantRows( unsigned int nbInvariantRows )
-    { nbInvariantRows_ = nbInvariantRows;};
+    {
+      nbInvariantRows_ = nbInvariantRows;
+    };
     inline unsigned int nbInvariantRows()
-    { return nbInvariantRows_;};
+    {
+      return nbInvariantRows_;
+    };
 
     inline void nbInvariantCols( unsigned int nbInvariantCols )
-    { nbInvariantCols_ = nbInvariantCols;};
+    {
+      nbInvariantCols_ = nbInvariantCols;
+    };
     inline unsigned int nbInvariantCols()
-    { return nbInvariantCols_;};
+    {
+      return nbInvariantCols_;
+    };
     /// \}
 
     /// \brief Print_ array
@@ -176,10 +197,14 @@ namespace PatternGeneratorJRL
       unsigned int SizeMem_;
 
       void fill( type Value )
-      { std::fill_n(Array_, NbRows_*NbCols_, Value); }
+      {
+        std::fill_n(Array_, NbRows_*NbCols_, Value);
+      }
 
       void fill( type * Array, int Size, type Value )
-      { std::fill_n(Array, Size, Value); }
+      {
+        std::fill_n(Array, Size, Value);
+      }
 
 
       /// \brief Make a contiguous array
@@ -190,10 +215,11 @@ namespace PatternGeneratorJRL
       /// \return 0
 
       int stick_together( struct array_s<type> & FinalArray,
-          unsigned int NbRows, unsigned int NbCols )
+                          unsigned int NbRows, unsigned int NbCols )
       {
 
-        try {
+        try
+          {
             type * NewArray = 0;
             if ((FinalArray.SizeMem_<NbRows*NbCols) ||
                 (FinalArray.Array_==0))
@@ -210,9 +236,11 @@ namespace PatternGeneratorJRL
 
             FinalArray.NbRows_ = NbRows;
             FinalArray.NbCols_ = NbCols;
-        }
+          }
         catch (std::bad_alloc& ba)
-        {std::cerr << "bad_alloc caught: " << ba.what() << std::endl; }
+          {
+            std::cerr << "bad_alloc caught: " << ba.what() << std::endl;
+          }
 
         return 0;
 
@@ -227,7 +255,8 @@ namespace PatternGeneratorJRL
       int resize( unsigned int NbRows, unsigned int NbCols, bool Preserve )
       {
 
-        try {
+        try
+          {
             bool Reallocate = false;
             type * NewArray = 0;
             if (NbRows*NbCols>SizeMem_)
@@ -240,10 +269,12 @@ namespace PatternGeneratorJRL
 
             fill(NewArray, NbRows*NbCols, (type)0);
             if ((Preserve) &&
-                (Array_!=0) ) {
+                (Array_!=0) )
+              {
                 for(unsigned int j = 0; j < NbCols_; j++)
                   for(unsigned int i = 0; i < NbRows_; i++)
-                    NewArray[i+NbRows*j] = Array_[i+NbRows_*j]; }
+                    NewArray[i+NbRows*j] = Array_[i+NbRows_*j];
+              }
 
             if ((Array_!=0) && Reallocate)
               {
@@ -253,16 +284,19 @@ namespace PatternGeneratorJRL
 
             NbRows_ = NbRows;
             NbCols_ = NbCols;
-        }
+          }
         catch (std::bad_alloc& ba)
-        {std::cerr << "bad_alloc caught: " << ba.what() << std::endl; }
+          {
+            std::cerr << "bad_alloc caught: " << ba.what() << std::endl;
+          }
 
         return 0;
 
       }
 
       array_s():
-        Array_(0),Id_(0),NbRows_(0),NbCols_(0), SizeMem_(0){
+        Array_(0),Id_(0),NbRows_(0),NbCols_(0), SizeMem_(0)
+      {
       };
       ~array_s()
       {

@@ -59,7 +59,7 @@ void OptCholesky::SetToZero()
   if (m_NbMaxOfConstraints!=0)
     {
       if (m_L!=0)
-        for(unsigned int i=0;i<m_NbMaxOfConstraints * m_NbMaxOfConstraints;i++)
+        for(unsigned int i=0; i<m_NbMaxOfConstraints * m_NbMaxOfConstraints; i++)
           m_L[i]=0.0;
 
 
@@ -80,7 +80,7 @@ void OptCholesky::SetA(double *aA,
 int OptCholesky::AddActiveConstraints(vector<unsigned int> & lConstraints)
 {
   int r=0;
-  for(unsigned int li=0;li<lConstraints.size();li++)
+  for(unsigned int li=0; li<lConstraints.size(); li++)
     {
       r=AddActiveConstraint(lConstraints[li]);
       if (r<0)
@@ -135,7 +135,7 @@ int OptCholesky::UpdateCholeskyMatrixNormal()
     m_SetActiveConstraints[IndexNewRowAKAi];
 
   /* Compute Li,j */
-  for(int lj=0;lj<(int)m_SetActiveConstraints.size();lj++)
+  for(int lj=0; lj<(int)m_SetActiveConstraints.size(); lj++)
     {
 
       /* A value M(i,j) is computed once,
@@ -143,7 +143,7 @@ int OptCholesky::UpdateCholeskyMatrixNormal()
       double *Arow_i = PointerArow_i;
       double *Arow_j = m_A + m_CardU * m_SetActiveConstraints[lj];
       Mij=0.0;
-      for(int lk=0;lk<(int)m_CardU;lk++)
+      for(int lk=0; lk<(int)m_CardU; lk++)
         {
           Mij+= (*Arow_i++) * (*Arow_j++);
         }
@@ -153,7 +153,7 @@ int OptCholesky::UpdateCholeskyMatrixNormal()
       double * ptLik =m_L + IndexNewRowAKAi*m_NbMaxOfConstraints;
       double * ptLjk =m_L + lj*m_NbMaxOfConstraints;
 
-      for(int lk=0;lk<lj;lk++)
+      for(int lk=0; lk<lj; lk++)
         {
           r = r - (*ptLik++)  * (*ptLjk++);
         }
@@ -184,7 +184,7 @@ int OptCholesky::UpdateCholeskyMatrixFortran()
     m_SetActiveConstraints[IndexNewRowAKAi];
 
   /* Compute Li,j */
-  for(int lj=0;lj<(int)m_SetActiveConstraints.size();lj++)
+  for(int lj=0; lj<(int)m_SetActiveConstraints.size(); lj++)
     {
 
       /* A value M(i,j) is computed once,
@@ -192,7 +192,7 @@ int OptCholesky::UpdateCholeskyMatrixFortran()
       double *Arow_i = PointerArow_i;
       double *Arow_j = m_A + m_SetActiveConstraints[lj];
       Mij=0.0;
-      for(int lk=0;lk<(int)m_CardU;lk++)
+      for(int lk=0; lk<(int)m_CardU; lk++)
         {
           Mij+= (*Arow_i) * (*Arow_j);
           Arow_i+= m_NbOfConstraints+1;
@@ -206,7 +206,7 @@ int OptCholesky::UpdateCholeskyMatrixFortran()
       double * ptLik =m_L + IndexNewRowAKAi*m_NbMaxOfConstraints;
       double * ptLjk =m_L + lj*m_NbMaxOfConstraints;
 
-      for(int lk=0;lk<lj;lk++)
+      for(int lk=0; lk<lj; lk++)
         {
           r = r - (*ptLik++)  * (*ptLjk++);
         }
@@ -233,9 +233,9 @@ int OptCholesky::ComputeNormalCholeskyOnANormal()
 
 
   double *pA = m_A;
-  for(int li=0;li<(int)m_NbMaxOfConstraints;li++)
+  for(int li=0; li<(int)m_NbMaxOfConstraints; li++)
     {
-      for(int lj=0;lj<=li;lj++)
+      for(int lj=0; lj<=li; lj++)
         {
 
           /* Compute Li,j */
@@ -244,7 +244,7 @@ int OptCholesky::ComputeNormalCholeskyOnANormal()
           double * ptLik =m_L + li*m_NbMaxOfConstraints;
           double * ptLjk =m_L + lj*m_NbMaxOfConstraints;
 
-          for(int lk=0;lk<lj;lk++)
+          for(int lk=0; lk<lj; lk++)
             {
               r = r - (*ptLik++)  * (*ptLjk++);
             }
@@ -274,13 +274,13 @@ int OptCholesky::ComputeInverseCholeskyNormal(int mode)
   else
     LocalSize = m_NbMaxOfConstraints;
 
-  for(long int lj=(long int)LocalSize-1;lj>=0;lj--)
+  for(long int lj=(long int)LocalSize-1; lj>=0; lj--)
     {
       double iLljlj=0.0;
       m_iL[lj*m_NbMaxOfConstraints+lj] =
         iLljlj = 1/m_L[lj*m_NbMaxOfConstraints+lj];
 
-      for(long int li=lj+1;li<(long int)LocalSize;li++)
+      for(long int li=lj+1; li<(long int)LocalSize; li++)
         {
 
           /* Compute Li,j */
@@ -288,7 +288,7 @@ int OptCholesky::ComputeInverseCholeskyNormal(int mode)
           double * ptiLik = m_iL + li*m_NbMaxOfConstraints + lj + 1;
           double * ptLjk  = m_L  + (lj+1)*m_NbMaxOfConstraints + lj ;
 
-          for(long int lk=lj+1;lk<(long int)LocalSize;lk++)
+          for(long int lk=lj+1; lk<(long int)LocalSize; lk++)
             {
               r = r + (*ptiLik++)  * (*ptLjk);
               ptLjk+=m_NbMaxOfConstraints;

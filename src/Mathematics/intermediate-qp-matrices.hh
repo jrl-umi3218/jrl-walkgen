@@ -109,9 +109,13 @@ namespace PatternGeneratorJRL
     /// \name Accessors and mutators
     /// \{
     inline state_variant_t const & State() const
-    { return StateMatrices_; };
+    {
+      return StateMatrices_;
+    };
     inline state_variant_t & State()
-    { return StateMatrices_; };
+    {
+      return StateMatrices_;
+    };
 
     objective_variant_t const & Objective( objective_e type ) const;
     objective_variant_t & Objective( objective_e type );
@@ -120,28 +124,48 @@ namespace PatternGeneratorJRL
     linear_inequality_t & Inequalities( ineq_e type );
 
     inline com_t const & CoM() const
-    { return StateMatrices_.CoM; };
+    {
+      return StateMatrices_.CoM;
+    };
     inline void CoM( const com_t & CoM )
-    { StateMatrices_.CoM = CoM; };
+    {
+      StateMatrices_.CoM = CoM;
+    };
 
     inline trunk_t const & Trunk() const
-    { return StateMatrices_.Trunk; }
+    {
+      return StateMatrices_.Trunk;
+    }
     inline void Trunk( const trunk_t & Trunk )
-    { StateMatrices_.Trunk = Trunk; }
+    {
+      StateMatrices_.Trunk = Trunk;
+    }
 
     inline reference_t const & Reference() const
-    { return StateMatrices_.Ref; };
+    {
+      return StateMatrices_.Ref;
+    };
     inline reference_t & Reference()
-    { return StateMatrices_.Ref; };
+    {
+      return StateMatrices_.Ref;
+    };
     inline void Reference( const reference_t & Ref )
-    { StateMatrices_.Ref = Ref; };
+    {
+      StateMatrices_.Ref = Ref;
+    };
 
     inline support_state_t const & SupportState() const
-    { return StateMatrices_.SupportState; };
+    {
+      return StateMatrices_.SupportState;
+    };
     inline support_state_t & SupportState()
-    { return StateMatrices_.SupportState; };
+    {
+      return StateMatrices_.SupportState;
+    };
     inline void SupportState( const support_state_t & SupportState )
-    { StateMatrices_.SupportState = SupportState; };
+    {
+      StateMatrices_.SupportState = SupportState;
+    };
     /// \}
 
     /// \name Displaying
@@ -160,21 +184,22 @@ namespace PatternGeneratorJRL
 
     objective_variant_t
     MeanVelocity_,
-    InstantVelocity_,
-    COPCentering_,
-    JerkMin_;
+      InstantVelocity_,
+      COPCentering_,
+      JerkMin_;
 
     state_variant_t
     StateMatrices_;
 
     linear_inequality_t
     IneqCoP_,
-    IneqCoM_,
-    IneqFeet_;
+      IneqCoM_,
+      IneqFeet_;
 
   };
 
-  std::ostream& operator<< (std::ostream& o, const IntermedQPMat::objective_variant_s& r);
+  std::ostream& operator<< (std::ostream& o,
+                            const IntermedQPMat::objective_variant_s& r);
 }
 
 

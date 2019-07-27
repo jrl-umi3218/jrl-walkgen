@@ -115,30 +115,44 @@ namespace PatternGeneratorJRL
     }
 
     inline bool Running()
-    { return Running_; }
+    {
+      return Running_;
+    }
 
     /// \brief Set the final-stage trigger
     inline void EndingPhase(bool EndingPhase)
-    { EndingPhase_ = EndingPhase;}
+    {
+      EndingPhase_ = EndingPhase;
+    }
 
     void setCoMPerturbationForce(double x,double y);
     void setCoMPerturbationForce(istringstream &strm);
 
     solution_t & Solution()
-    { return Solution_; }
+    {
+      return Solution_;
+    }
 
     inline const int & QP_N(void) const
-    { return QP_N_; }
+    {
+      return QP_N_;
+    }
 
     /// \brief Setter and getter for the ComAndZMPTrajectoryGeneration.
     inline ComAndFootRealization * getComAndFootRealization()
-    { return dynamicFilter_->getComAndFootRealization();};
+    {
+      return dynamicFilter_->getComAndFootRealization();
+    };
     /// \}
 
     inline double InterpolationPeriod()
-    { return InterpolationPeriod_ ; }
+    {
+      return InterpolationPeriod_ ;
+    }
     inline void InterpolationPeriod( double T )
-    { InterpolationPeriod_ = T ; }
+    {
+      InterpolationPeriod_ = T ;
+    }
 
 
     //
@@ -319,7 +333,7 @@ namespace PatternGeneratorJRL
     /// \brief Interpolation form the com jerk the position of the com and the zmp corresponding to the kart table model
     void CoMZMPInterpolation(
                              std::deque<ZMPPosition> & ZMPPositions,                        // OUTPUT
-                             std::deque<COMState> & COMTraj_deq ,                           // OUTPUT
+                             std::deque<COMState> & COMTraj_deq,                            // OUTPUT
                              const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,    // INPUT
                              const std::deque<FootAbsolutePosition> & RightFootTraj_deq,   // INPUT
                              const solution_t * Solution,                                  // INPUT

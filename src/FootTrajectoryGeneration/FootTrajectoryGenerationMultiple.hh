@@ -133,7 +133,8 @@ namespace PatternGeneratorJRL
       @param[in] IndexInterval: Index of the interval to be used for the computation.
       @param[out] aFootAbsolutePosition: a foot absolute position.
     */
-    bool Compute(double t, FootAbsolutePosition & aFootAbsolutePosition, unsigned int IndexInterval);
+    bool Compute(double t, FootAbsolutePosition & aFootAbsolutePosition,
+                 unsigned int IndexInterval);
 
     /*! This method specifies the parameters for each of the polynome used by this
       object. In this case, as it is used for the 3rd order polynome. The polynome to
@@ -214,12 +215,14 @@ namespace PatternGeneratorJRL
 
     /*! @} */
 
-    FootTrajectoryGenerationMultiple & operator=(const FootTrajectoryGenerationMultiple & aFTGM);
+    FootTrajectoryGenerationMultiple & operator=(const
+                                                 FootTrajectoryGenerationMultiple & aFTGM);
 
   protected:
 
     /*! \brief Handle a set of object allowing the generation of the foot trajectory.*/
-    std::vector<FootTrajectoryGenerationStandard *> m_SetOfFootTrajectoryGenerationObjects;
+    std::vector<FootTrajectoryGenerationStandard *>
+    m_SetOfFootTrajectoryGenerationObjects;
 
     /*! \brief Reference of humanoid specificities. */
     PRFoot * m_Foot;

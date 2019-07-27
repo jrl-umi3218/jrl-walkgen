@@ -47,7 +47,7 @@ SimplePluginManager::SimplePluginManager()
 
 SimplePluginManager::~SimplePluginManager()
 {
-  std::multimap<std::string, SimplePlugin * , ltstr>::iterator it_SP;
+  std::multimap<std::string, SimplePlugin *, ltstr>::iterator it_SP;
 
 
   it_SP =m_SimplePlugins.begin();
@@ -61,7 +61,7 @@ SimplePluginManager::~SimplePluginManager()
 void SimplePluginManager::UnregisterPlugin(SimplePlugin* aSimplePlugin)
 {
   std::multimap
-    <std::string, SimplePlugin * , ltstr>::iterator
+    <std::string, SimplePlugin *, ltstr>::iterator
     it_SP, it_ToBeRemoved;
 
   it_SP =m_SimplePlugins.begin();
@@ -83,7 +83,7 @@ void SimplePluginManager::UnregisterPlugin(SimplePlugin* aSimplePlugin)
 
 void SimplePluginManager::Print( )
 {
-  std::multimap<std::string, SimplePlugin * , ltstr>::iterator it_SP;
+  std::multimap<std::string, SimplePlugin *, ltstr>::iterator it_SP;
 
 
   it_SP =m_SimplePlugins.begin();
@@ -113,17 +113,17 @@ bool SimplePluginManager::RegisterMethod(string &MethodName, SimplePlugin *aSP)
 /*! \name Call the method from the Method name. */
 bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
 {
-  pair <std::multimap<std::string, SimplePlugin * , ltstr>::iterator,
-        std::multimap<std::string, SimplePlugin * , ltstr>::iterator >
+  pair <std::multimap<std::string, SimplePlugin *, ltstr>::iterator,
+        std::multimap<std::string, SimplePlugin *, ltstr>::iterator >
     RangeOfPlugins  = m_SimplePlugins.equal_range(MethodName);
 
 
-  std::multimap<std::string, SimplePlugin * , ltstr>::iterator CurrentPlugin;
+  std::multimap<std::string, SimplePlugin *, ltstr>::iterator CurrentPlugin;
 
 
   unsigned int NbPlugins=0;
   for (CurrentPlugin = RangeOfPlugins.first;
-       CurrentPlugin != RangeOfPlugins.second;++NbPlugins,
+       CurrentPlugin != RangeOfPlugins.second; ++NbPlugins,
          ++CurrentPlugin) ;
 
   ODEBUG5("Size of SimplePlugins: " << m_SimplePlugins.size()
@@ -138,7 +138,7 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
   assert(size < 65635);
 
   memset(aBuffer,0,size+1);
-  for(int i=0;i<size;i++)
+  for(int i=0; i<size; i++)
     aBuffer[i] = (char)pbuf->sbumpc();
   ODEBUG5(aBuffer,"PgDebug.txt");
 

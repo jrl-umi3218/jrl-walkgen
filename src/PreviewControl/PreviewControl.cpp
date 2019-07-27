@@ -61,11 +61,13 @@ PreviewControl::PreviewControl(SimplePluginManager *lSPM,
 
   ODEBUG("Identification: " << this);
   std::string aMethodName[3] =
-    {":samplingperiod",
+    {
+     ":samplingperiod",
      ":previewcontroltime",
-     ":comheight"};
+     ":comheight"
+    };
 
-  for(int i=0;i<3;i++)
+  for(int i=0; i<3; i++)
     {
       if (!RegisterMethod(aMethodName[i]))
         {
@@ -157,7 +159,7 @@ void PreviewControl::ReadPrecomputedFile(string aFileName)
 
 
       float r;
-      for(int i=0;i<3;i++)
+      for(int i=0; i<3; i++)
         {
           aif >> r;
           m_Kx(0,i)=r ;
@@ -171,16 +173,22 @@ void PreviewControl::ReadPrecomputedFile(string aFileName)
                                              m_SamplingPeriod);
       Eigen::MatrixXd m_F(m_SizeOfPreviewWindow,1);
 
-      for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
+      for(unsigned int i=0; i<m_SizeOfPreviewWindow; i++)
         {
           aif >> r;
           m_F(i,0)=r;
         }
       //      cout << (*m_F) << endl;
       double T = m_SamplingPeriod;
-      m_A(0,0) = 1.0; m_A(0,1) =   T; m_A(0,2) = T*T/2.0;
-      m_A(1,0) = 0.0; m_A(1,1) = 1.0; m_A(1,2) = T;
-      m_A(2,0) = 0.0; m_A(2,1) = 0.0; m_A(2,2) = 1.0;
+      m_A(0,0) = 1.0;
+      m_A(0,1) =   T;
+      m_A(0,2) = T*T/2.0;
+      m_A(1,0) = 0.0;
+      m_A(1,1) = 1.0;
+      m_A(1,2) = T;
+      m_A(2,0) = 0.0;
+      m_A(2,1) = 0.0;
+      m_A(2,2) = 1.0;
 
       m_B(0,0) = T*T*T/6.0;
       m_B(1,0) = T*T/2.0;
@@ -206,9 +214,15 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
   OptimalControllerSolver *anOCS;
 
   double T = m_SamplingPeriod;
-  m_A(0,0) = 1.0; m_A(0,1) =   T; m_A(0,2) = T*T/2.0;
-  m_A(1,0) = 0.0; m_A(1,1) = 1.0; m_A(1,2) = T;
-  m_A(2,0) = 0.0; m_A(2,1) = 0.0; m_A(2,2) = 1.0;
+  m_A(0,0) = 1.0;
+  m_A(0,1) =   T;
+  m_A(0,2) = T*T/2.0;
+  m_A(1,0) = 0.0;
+  m_A(1,1) = 1.0;
+  m_A(1,2) = T;
+  m_A(2,0) = 0.0;
+  m_A(2,1) = 0.0;
+  m_A(2,2) = 1.0;
 
   m_B(0,0) = T*T*T/6.0;
   m_B(1,0) = T*T/2.0;
@@ -249,17 +263,17 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       tmpA = m_C*m_A;
 
       Ax(0,0)= 1.0;
-      for(int i=0;i<3;i++)
+      for(int i=0; i<3; i++)
         {
           cx(0,i+1)=0.0;
           Ax(0,i+1) = tmpA(0,i);
-          for(int j=0;j<3;j++)
+          for(int j=0; j<3; j++)
             Ax(i+1,j+1) = m_A(i,j);
         }
 
       tmpb = m_C*m_B;
       bx(0,0) = tmpb(0,0);
-      for(int i=0;i<3;i++)
+      for(int i=0; i<3; i++)
         {
           bx(i+1,0) = m_B(i,0);
         }
@@ -281,7 +295,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       anOCS->GetK(lK);
 
       m_Ks = lK(0,0);
-      for (int i=0;i<3;i++)
+      for (int i=0; i<3; i++)
         m_Kx(0,i) = lK(0,i+1);
 
       delete anOCS;
@@ -293,7 +307,8 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       ODEBUG("COMPUTATION WITH INITIALPOS !");
       anOCS = new PatternGeneratorJRL::OptimalControllerSolver(m_A,m_B,m_C,Q,R,Nl);
 
-      anOCS->ComputeWeights(PatternGeneratorJRL::OptimalControllerSolver::MODE_WITH_INITIALPOS);
+      anOCS->ComputeWeights(
+                            PatternGeneratorJRL::OptimalControllerSolver::MODE_WITH_INITIALPOS);
 
       anOCS->GetF(m_F);
 
@@ -301,7 +316,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
 
       m_Ks = lK(0,0);
 
-      for (int i=0;i<3;i++)
+      for (int i=0; i<3; i++)
         m_Kx(0,i) = lK(0,i);
 
 
@@ -351,23 +366,23 @@ OneIterationOfPreview
       LTHROW("ZMPPositions.size()<m_SizeOfPreviewWindow:" );
     }
 
-  for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
+  for(unsigned int i=0; i<m_SizeOfPreviewWindow; i++)
     ux += m_F(i,0)* ZMPPositions[lindex+i].px;
 
   r = m_Kx * y;
   uy = - r(0,0) + m_Ks * syzmp;
 
-  for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
+  for(unsigned int i=0; i<m_SizeOfPreviewWindow; i++)
     uy += m_F(i,0)* ZMPPositions[lindex+i].py;
 
   x = m_A*x + ux * m_B;
   y = m_A*y + uy * m_B;
 
   zmpx2 = 0.0;
-  for(unsigned int i=0;i<x.rows();i++)
+  for(unsigned int i=0; i<x.rows(); i++)
     zmpx2 += m_C(0,i)*x(i,0);
   zmpy2 = 0.0;
-  for(unsigned int i=0;i<y.rows();i++)
+  for(unsigned int i=0; i<y.rows(); i++)
     zmpy2 += m_C(0,i)*y(i,0);
 
   if (Simulation)
@@ -408,13 +423,13 @@ OneIterationOfPreview1D
       exit(0);
     }
 
-  for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
+  for(unsigned int i=0; i<m_SizeOfPreviewWindow; i++)
     ux += m_F(i,0)* ZMPPositions[lindex+i];
   ODEBUG(" ux preview window phase: " << ux );
   x = m_A*x + ux * m_B;
 
   zmpx2 = 0.0;
-  for(unsigned int i=0;i<x.rows();i++)
+  for(unsigned int i=0; i<x.rows(); i++)
     zmpx2 += m_C(0,i)*x(i,0);
 
 
@@ -462,7 +477,7 @@ OneIterationOfPreview1D
 
   if (TestSize>=0)
     {
-      for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
+      for(unsigned int i=0; i<m_SizeOfPreviewWindow; i++)
         ux += m_F(i,0)* ZMPPositions[lindex+i];
     }
   else
@@ -487,7 +502,7 @@ OneIterationOfPreview1D
   x = m_A*x + ux * m_B;
 
   zmpx2 = 0.0;
-  for(unsigned int i=0;i<x.rows();i++)
+  for(unsigned int i=0; i<x.rows(); i++)
     zmpx2 += m_C(0,i)*x(i,0);
 
   if (Simulation)
@@ -510,14 +525,14 @@ print()
   cout << "Sampling Period: " << m_SamplingPeriod <<endl;
   cout << "Preview control time window: "<<m_PreviewControlTime<<endl;
 
-  for(int i=0;i<3;i++)
+  for(int i=0; i<3; i++)
     cout << m_Kx(0,i) << " ";
   cout << endl;
 
   cout << "Ks "<< m_Ks << endl;
 
   cout << "F:"<<endl;
-  for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
+  for(unsigned int i=0; i<m_SizeOfPreviewWindow; i++)
     cout << m_F(i,0) << endl;
 
 }
@@ -547,7 +562,8 @@ CallMethod
         }
     }
   else if (Method==":comheight")
-    { std::string aws;
+    {
+      std::string aws;
       if (strm.good())
         {
           double lcomheight;

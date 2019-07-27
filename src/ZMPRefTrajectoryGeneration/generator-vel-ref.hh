@@ -57,7 +57,8 @@ namespace PatternGeneratorJRL
 
     /// \name Constructors and destructors.
     /// \{
-    GeneratorVelRef( SimplePluginManager *lSPM, IntermedQPMat * Data, RigidBodySystem * Robot, RelativeFeetInequalities * RFC );
+    GeneratorVelRef( SimplePluginManager *lSPM, IntermedQPMat * Data,
+                     RigidBodySystem * Robot, RelativeFeetInequalities * RFC );
     ~GeneratorVelRef();
     /// \}
 
@@ -70,7 +71,8 @@ namespace PatternGeneratorJRL
     /// \param[in] FinalRightFootTraj_deq
     /// \param[out] SupportStates_deq
     void preview_support_states( double Time, const SupportFSM * FSM,
-                                 const deque<FootAbsolutePosition> & FinalLeftFootTraj_deq, const deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+                                 const deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+                                 const deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
                                  deque<support_state_t> & SupportStates_deq );
 
     /// \brief Set the global reference from the local one and the orientation of the trunk frame
@@ -98,7 +100,8 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Pb
     /// \param[in] SupportStates_deq
-    void update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq );
+    void update_problem( QPProblem & Pb,
+                         const std::deque<support_state_t> & SupportStates_deq );
 
     /// \brief Compute the initial solution vector for warm start
     ///
@@ -114,11 +117,17 @@ namespace PatternGeneratorJRL
     void Ponderation(double weight, objective_e type );
 
     inline void Reference(const reference_t & Ref)
-    {  IntermedData_->Reference(Ref); };
+    {
+      IntermedData_->Reference(Ref);
+    };
     inline void SupportState(const support_state_t & SupportState)
-    { IntermedData_->SupportState(SupportState); };
+    {
+      IntermedData_->SupportState(SupportState);
+    };
     inline void CoM(const com_t & CoM)
-    { IntermedData_->CoM(CoM); };
+    {
+      IntermedData_->CoM(CoM);
+    };
     inline void LastFootSol(const solution_t & Solution)
     {
       if(Solution.Solution_vec.size()>2*N_)
@@ -152,7 +161,8 @@ namespace PatternGeneratorJRL
     /// \brief Compute the selection matrices
     ///
     /// \param[in] SupportStates_deq
-    void generate_selection_matrices( const std::deque<support_state_t> & SupportStates_deq);
+    void generate_selection_matrices( const std::deque<support_state_t> &
+                                      SupportStates_deq);
 
     /// \brief Generate a queue of inequalities with respect to the centers of the feet
     ///
@@ -174,7 +184,8 @@ namespace PatternGeneratorJRL
     /// \param[in] IneqCop
     /// \param[in] NbStepsPreviewed
     /// \param[out] Pb
-    void build_constraints_cop( const linear_inequality_t & IneqCoP, unsigned int NbStepsPreviewed,
+    void build_constraints_cop( const linear_inequality_t & IneqCoP,
+                                unsigned int NbStepsPreviewed,
                                 QPProblem & Pb );
 
     /// \brief Compute feet constraints corresponding to the set of inequalities
@@ -192,21 +203,24 @@ namespace PatternGeneratorJRL
     /// \param[in] IneqCoM
     /// \param[in] CurrentSupport
     /// \param[out] Pb
-    void build_constraints_com( const linear_inequality_t & IneqCoM, const support_state_t & CurrentSupport, QPProblem & Pb );
+    void build_constraints_com( const linear_inequality_t & IneqCoM,
+                                const support_state_t & CurrentSupport, QPProblem & Pb );
 
     /// \brief Compute feet equality constraints from a trajectory
     ///
     /// \param[in] SupportStates_deq
     /// \param[in] NbStepsPreviewed
     /// \param[out] Pb
-    void build_eq_constraints_feet( const std::deque<support_state_t> & SupportStates_deq,
+    void build_eq_constraints_feet( const std::deque<support_state_t> &
+                                    SupportStates_deq,
                                     unsigned int NbStepsPreviewed, QPProblem & Pb );
 
     /// \brief Compute feet equality constraints to restrain the previewed foot position
     /// some iteration before landing
     /// \param[in] Solution
     /// \param[out] Pb
-    void build_eq_constraints_limitPosFeet(const solution_t & Solution,QPProblem & Pb);
+    void build_eq_constraints_limitPosFeet(const solution_t & Solution,
+                                           QPProblem & Pb);
 
     /// \brief Initialize inequality matrices
     ///

@@ -172,12 +172,16 @@ namespace PatternGeneratorJRL
     /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
     inline  bool setHumanoidDynamicRobot(PinocchioRobot *aHumanoidDynamicRobot)
-    { m_PinocchioRobot = aHumanoidDynamicRobot;
-      return true;}
+    {
+      m_PinocchioRobot = aHumanoidDynamicRobot;
+      return true;
+    }
 
     /*! \brief Returns the object able to compute the dynamic parameters of the robot. */
     inline PinocchioRobot * getHumanoidDynamicRobot() const
-    { return m_PinocchioRobot;}
+    {
+      return m_PinocchioRobot;
+    }
 
     /** @} */
 

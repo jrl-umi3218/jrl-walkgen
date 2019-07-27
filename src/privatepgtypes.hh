@@ -47,85 +47,85 @@ namespace PatternGeneratorJRL
   /// \name Enum types
   /// \{
   enum foot_type_e
-  {
-    LEFT, RIGHT
-  };
+    {
+     LEFT, RIGHT
+    };
 
   inline std::ostream & operator<<(std::ostream & out, const foot_type_e & ft)
   {
     switch(ft)
-    {
+      {
       case LEFT:
         out << "LEFT";
         break;
       default:
         out << "RIGHT";
-    }
+      }
     return out;
   }
 
   enum PhaseType
-  {
-    SS, DS
-  };
+    {
+     SS, DS
+    };
 
   inline std::ostream & operator<<(std::ostream & out, const PhaseType & pt)
   {
     switch(pt)
-    {
+      {
       case SS:
         out << "SingleSupport";
         break;
       default:
         out << "DoubleSupport";
-    }
+      }
     return out;
   }
 
   enum ineq_e
-  {
-    INEQ_COP, INEQ_COM, INEQ_FEET
-  };
+    {
+     INEQ_COP, INEQ_COM, INEQ_FEET
+    };
 
   enum objective_e
-  {
-    INSTANT_VELOCITY, COP_CENTERING, JERK_MIN
-  };
+    {
+     INSTANT_VELOCITY, COP_CENTERING, JERK_MIN
+    };
 
   enum dynamics_e
-  {
-    POSITION, VELOCITY, ACCELERATION,
-    JERK, COP_POSITION
-  };
+    {
+     POSITION, VELOCITY, ACCELERATION,
+     JERK, COP_POSITION
+    };
 
   enum qp_element_e
-  {
-    MATRIX_Q,
-    MATRIX_DU,
-    VECTOR_D,
-    VECTOR_DS,
-    VECTOR_XL,
-    VECTOR_XU
-  };
+    {
+     MATRIX_Q,
+     MATRIX_DU,
+     VECTOR_D,
+     VECTOR_DS,
+     VECTOR_XL,
+     VECTOR_XU
+    };
 
   enum solver_e
-  {
-    QLD,
-    LSSOL
-  };
+    {
+     QLD,
+     LSSOL
+    };
 
   enum tests_e
-  {
-    NONE,
-    ALL,
-    ITT,
-    CTR
-  };
+    {
+     NONE,
+     ALL,
+     ITT,
+     CTR
+    };
 
   enum axis_e
-  {
-    X_AXIS, Y_AXIS, Z_AXIS, YAW, PITCH, ROLL
-  };
+    {
+     X_AXIS, Y_AXIS, Z_AXIS, YAW, PITCH, ROLL
+    };
   /// \}
 
   //
@@ -199,8 +199,12 @@ namespace PatternGeneratorJRL
 
   inline std::ostream & operator<<(std::ostream & out, const reference_t & Ref)
   {
-    out << "Global: (" << Ref.Global.X << ", " << Ref.Global.Y << ", " << Ref.Global.Yaw << ")" << std::endl;
-    out << "Local: (" << Ref.Local.X << ", " << Ref.Local.Y << ", " << Ref.Local.Yaw << ")";
+    out << "Global: (" << Ref.Global.X << ", "
+        << Ref.Global.Y << ", " <<
+      Ref.Global.Yaw << ")" << std::endl;
+    out << "Local: (" << Ref.Local.X << ", "
+        << Ref.Local.Y << ", " << Ref.Local.Yaw
+        << ")";
     return out;
   }
 
@@ -229,7 +233,9 @@ namespace PatternGeneratorJRL
     /// \param[in] X_a
     /// \param[in] Y_a
     /// \param[in] Z_a
-    void set_vertices( const double * X_a, const double * Y_a, const double * Z_a );
+    void set_vertices( const double * X_a,
+                       const double * Y_a,
+                       const double * Z_a );
     /// \brief Set the polygon vectors from arrays
     ///
     /// \param[in] X_a
@@ -241,7 +247,8 @@ namespace PatternGeneratorJRL
     /// \param[in] B_a
     /// \param[in] C_a
     /// \param[in] D_a
-    void set_inequalities( const double * A_a, const double * B_a, const double * C_a, const double * D_a );
+    void set_inequalities( const double * A_a, const double * B_a,
+                           const double * C_a, const double * D_a );
 
     /// \brief Set all points to zero
     void clear();
@@ -321,7 +328,8 @@ namespace PatternGeneratorJRL
     support_state_t();
   };
 
-  inline std::ostream & operator<<(std::ostream & out, const support_state_t & st)
+  inline std::ostream & operator<<(std::ostream & out,
+                                   const support_state_t & st)
   {
     out << "SupportState" << std::endl;
     out << "PhaseType " << st.Phase << std::endl;

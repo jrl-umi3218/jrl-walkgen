@@ -151,22 +151,34 @@ namespace PatternGeneratorJRL
                        std::vector<double> &MP);
 
     std::vector<double> MP()
-    {return m_MP;}
+    {
+      return m_MP;
+    }
 
     std::vector<double> ToMP()
-    {return m_ToMP;}
+    {
+      return m_ToMP;
+    }
 
     double FT()
-    {return m_FT;}
+    {
+      return m_FT;
+    }
 
     void FT(double ft)
-    {m_FT=ft;}
+    {
+      m_FT=ft;
+    }
 
     double IP()
-    {return m_IP;}
+    {
+      return m_IP;
+    }
 
     double FP()
-    {return m_FP;}
+    {
+      return m_FP;
+    }
 
     void  SetParametersWithInitFinalPose(double FT,
                                          double IP,
@@ -183,7 +195,8 @@ namespace PatternGeneratorJRL
     double m_FP ; // Final Position
     double m_FS ; // Final Speed
     double m_FA ; // Final Acceleration
-    std::vector<double> m_ToMP ; // times to reach the middle (intermediate) positions
+    std::vector<double> m_ToMP
+    ; // times to reach the middle (intermediate) positions
     std::vector<double> m_MP ; // middle (intermediate) positions
   };
 
