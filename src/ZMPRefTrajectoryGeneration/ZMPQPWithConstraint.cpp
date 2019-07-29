@@ -172,8 +172,8 @@ int ZMPQPWithConstraint::ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
 
     }
 
-  ODEBUG("(x["<< n-1 << "],y["<< n-1 << "]): " << aVecOfPoints[n-1].col << " " <<
-         aVecOfPoints[n-1].row << " "
+  ODEBUG("(x["<< n-1 << "],y["<< n-1 << "]): " << aVecOfPoints[n-1].col << " "
+         << aVecOfPoints[n-1].row << " "
          << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row );
 
   if (fabs(aVecOfPoints[0].col-aVecOfPoints[n-1].col)>1e-7)
@@ -230,13 +230,14 @@ int ZMPQPWithConstraint::ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
   return 0;
 }
 
-int ZMPQPWithConstraint::BuildLinearConstraintInequalities(
-                                                           deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-                                                           deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-                                                           deque<LinearConstraintInequality_t *> &
-                                                           QueueOfLConstraintInequalities,
-                                                           double ConstraintOnX,
-                                                           double ConstraintOnY)
+int ZMPQPWithConstraint::
+BuildLinearConstraintInequalities
+( deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+  deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+  deque<LinearConstraintInequality_t *> &
+  QueueOfLConstraintInequalities,
+  double ConstraintOnX,
+  double ConstraintOnY)
 {
   // Find the convex hull for each of the position,
   // in order to create the corresponding trajectory.
@@ -268,7 +269,8 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(
     return -1;
 
   int State=
-    0; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
+    0; // State for the system 0:start, 1: Right Support Foot,
+  // 2: Left Support Foot,
   // 3: Double Support.
   int ComputeCH=0;
   double lx=0.0, ly=0.0;
@@ -365,13 +367,18 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(
 
 
                   // Computes the maxima.
-                  xmin = aVecOfPoints[j].col < xmin ? aVecOfPoints[j].col : xmin;
-                  xmax = aVecOfPoints[j].col > xmax ? aVecOfPoints[j].col : xmax;
-                  ymin = aVecOfPoints[j].row < ymin ? aVecOfPoints[j].row : ymin;
-                  ymax = aVecOfPoints[j].row > ymax ? aVecOfPoints[j].row : ymax;
+                  xmin = aVecOfPoints[j].col < xmin ?
+                                               aVecOfPoints[j].col : xmin;
+                  xmax = aVecOfPoints[j].col > xmax ?
+                    aVecOfPoints[j].col : xmax;
+                  ymin = aVecOfPoints[j].row < ymin ?
+                                               aVecOfPoints[j].row : ymin;
+                  ymax = aVecOfPoints[j].row > ymax ?
+                    aVecOfPoints[j].row : ymax;
 
                 }
-              ODEBUG("State 3-1 " << xmin << " " << xmax << " " << ymin << " " << ymax);
+              ODEBUG("State 3-1 " << xmin << " " << xmax << " "
+                     << ymin << " " << ymax);
               lx=RightFootAbsolutePositions[i].x;
               ly=RightFootAbsolutePositions[i].y;
 
@@ -383,21 +390,28 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(
                      RightFootAbsolutePositions[i].theta);
               for(unsigned j=0; j<4; j++)
                 {
-                  aVecOfPoints[j+4].col = lx + ( lxcoefs[j] * lRightFootHalfWidth
-                                                 * c_t - lycoefs[j] *
-                                                 lRightFootHalfHeight * s_t );
-                  aVecOfPoints[j+4].row = ly + ( lxcoefs[j] * lRightFootHalfWidth
-                                                 * s_t + lycoefs[j] *
-                                                 lRightFootHalfHeight * c_t );
+                  aVecOfPoints[j+4].col =
+                    lx + ( lxcoefs[j] * lRightFootHalfWidth
+                           * c_t - lycoefs[j] *
+                           lRightFootHalfHeight * s_t );
+                  aVecOfPoints[j+4].row =
+                    ly + ( lxcoefs[j] * lRightFootHalfWidth
+                           * s_t + lycoefs[j] *
+                           lRightFootHalfHeight * c_t );
                   // Computes the maxima.
-                  xmin = aVecOfPoints[j+4].col < xmin ? aVecOfPoints[j+4].col : xmin;
-                  xmax = aVecOfPoints[j+4].col > xmax ? aVecOfPoints[j+4].col : xmax;
-                  ymin = aVecOfPoints[j+4].row < ymin ? aVecOfPoints[j+4].row : ymin;
-                  ymax = aVecOfPoints[j+4].row > ymax ? aVecOfPoints[j+4].row : ymax;
+                  xmin = aVecOfPoints[j+4].col
+                    < xmin ? aVecOfPoints[j+4].col : xmin;
+                  xmax = aVecOfPoints[j+4].col
+                      > xmax ? aVecOfPoints[j+4].col : xmax;
+                  ymin = aVecOfPoints[j+4].row
+                    < ymin ? aVecOfPoints[j+4].row : ymin;
+                  ymax = aVecOfPoints[j+4].row
+                      > ymax ? aVecOfPoints[j+4].row : ymax;
 
                 }
 
-              ODEBUG("State 3-2" << xmin << " " << xmax << " " << ymin << " " << ymax);
+              ODEBUG("State 3-2" << xmin << " " << xmax << " "
+                     << ymin << " " << ymax);
               aCH.DoComputeConvexHull(aVecOfPoints,TheConvexHull);
             }
           // In the second case, it is necessary to compute
@@ -408,7 +422,8 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(
               TheConvexHull.resize(4);
 
               // Who is support foot ?
-              if (LeftFootAbsolutePositions[i].z < RightFootAbsolutePositions[i].z)
+              if (LeftFootAbsolutePositions[i].z
+                  < RightFootAbsolutePositions[i].z)
                 {
                   lx=LeftFootAbsolutePositions[i].x;
                   ly=LeftFootAbsolutePositions[i].y;
@@ -424,10 +439,14 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(
                         ( lxcoefs[j] * lLeftFootHalfWidth * s_t +
                           lycoefs[j] * lLeftFootHalfHeight * c_t );
                       // Computes the maxima.
-                      xmin = TheConvexHull[j].col < xmin ? TheConvexHull[j].col : xmin;
-                      xmax = TheConvexHull[j].col > xmax ? TheConvexHull[j].col : xmax;
-                      ymin = TheConvexHull[j].row < ymin ? TheConvexHull[j].row : ymin;
-                      ymax = TheConvexHull[j].row > ymax ? TheConvexHull[j].row : ymax;
+                      xmin = TheConvexHull[j].col
+                        < xmin ? TheConvexHull[j].col : xmin;
+                      xmax = TheConvexHull[j].col
+                          > xmax ? TheConvexHull[j].col : xmax;
+                      ymin = TheConvexHull[j].row
+                        < ymin ? TheConvexHull[j].row : ymin;
+                      ymax = TheConvexHull[j].row
+                          > ymax ? TheConvexHull[j].row : ymax;
 
                     }
                   ODEBUG("Left support foot");
@@ -440,37 +459,47 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(
                   c_t = cos(RightFootAbsolutePositions[i].theta*M_PI/180.0);
                   for(unsigned j=0; j<4; j++)
                     {
-                      TheConvexHull[j].col = lx + ( lxcoefs[j] *
-                                                    lRightFootHalfWidth * c_t -
-                                                    lycoefs[j] *
-                                                    lRightFootHalfHeight * s_t );
-                      TheConvexHull[j].row = ly + ( lxcoefs[j] *
-                                                    lRightFootHalfWidth * s_t +
-                                                    lycoefs[j] *
-                                                    lRightFootHalfHeight * c_t );
+                      TheConvexHull[j].col =
+                        lx + ( lxcoefs[j] *
+                               lRightFootHalfWidth * c_t -
+                               lycoefs[j] *
+                               lRightFootHalfHeight * s_t );
+                      TheConvexHull[j].row =
+                        ly + ( lxcoefs[j] *
+                               lRightFootHalfWidth * s_t +
+                               lycoefs[j] *
+                               lRightFootHalfHeight * c_t );
                       // Computes the maxima.
-                      xmin = TheConvexHull[j].col < xmin ? TheConvexHull[j].col : xmin;
-                      xmax = TheConvexHull[j].col > xmax ? TheConvexHull[j].col : xmax;
-                      ymin = TheConvexHull[j].row < ymin ? TheConvexHull[j].row : ymin;
-                      ymax = TheConvexHull[j].row > ymax ? TheConvexHull[j].row : ymax;
+                      xmin = TheConvexHull[j].col
+                        < xmin ? TheConvexHull[j].col : xmin;
+                      xmax = TheConvexHull[j].col
+                          > xmax ? TheConvexHull[j].col : xmax;
+                      ymin = TheConvexHull[j].row
+                        < ymin ? TheConvexHull[j].row : ymin;
+                      ymax = TheConvexHull[j].row
+                          > ymax ? TheConvexHull[j].row : ymax;
 
                     }
                   ODEBUG("Right support foot");
                 }
-              ODEBUG("State !=3 " << xmin << " " << xmax << " " << ymin << " " << ymax);
+              ODEBUG("State !=3 " << xmin << " " << xmax << " "
+                     << ymin << " " << ymax);
 
             }
 
           // Linear Constraint Inequality
-          LinearConstraintInequality_t * aLCI = new LinearConstraintInequality_t;
+          LinearConstraintInequality_t * aLCI =
+            new LinearConstraintInequality_t;
           ComputeLinearSystem(TheConvexHull,aLCI->A, aLCI->B);
           aLCI->StartingTime = LeftFootAbsolutePositions[i].time;
           if (QueueOfLConstraintInequalities.size()>0)
             {
               QueueOfLConstraintInequalities.back()->EndingTime =
                 LeftFootAbsolutePositions[i].time;
-              ODEBUG6( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
-                       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
+              ODEBUG6( QueueOfLConstraintInequalities.back()->StartingTime
+                       << " " <<
+                       QueueOfLConstraintInequalities.back()->EndingTime
+                       << " " <<
                        ,"ConstraintMax.dat");
 
             }
@@ -487,8 +516,10 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(
             {
               QueueOfLConstraintInequalities.back()->EndingTime =
                 LeftFootAbsolutePositions[i].time;
-              ODEBUG6( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
-                       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
+              ODEBUG6( QueueOfLConstraintInequalities.back()->StartingTime
+                       << " " <<
+                       QueueOfLConstraintInequalities.back()->EndingTime
+                       << " " <<
                        ,"ConstraintMax.dat");
 
             }
@@ -502,13 +533,15 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(
   return 0;
 }
 
-int ZMPQPWithConstraint::BuildMatricesPxPu(double * & Px,double * &Pu,
-                                           unsigned N, double T,
-                                           double StartingTime,
-                                           deque<LinearConstraintInequality_t *> & QueueOfLConstraintInequalities,
-                                           double Com_Height,
-                                           unsigned int &NbOfConstraints,
-                                           Eigen::VectorXd & xk)
+int ZMPQPWithConstraint::
+BuildMatricesPxPu
+(double * & Px,double * &Pu,
+ unsigned N, double T,
+ double StartingTime,
+ deque<LinearConstraintInequality_t *> & QueueOfLConstraintInequalities,
+ double Com_Height,
+ unsigned int &NbOfConstraints,
+ Eigen::VectorXd & xk)
 {
   // Discretize the problem.
   ODEBUG(" N:" << N << " T: " << T);
@@ -665,15 +698,16 @@ int ZMPQPWithConstraint::BuildMatricesPxPu(double * & Px,double * &Pu,
   return 0;
 }
 
-int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(
-                                                              deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-                                                              deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-                                                              deque<ZMPPosition> &ZMPRefPositions,
-                                                              deque<COMState> &COMStates,
-                                                              double ConstraintOnX,
-                                                              double ConstraintOnY,
-                                                              double T,
-                                                              unsigned int N)
+int ZMPQPWithConstraint::
+BuildZMPTrajectoryFromFootTrajectory
+(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+ deque<ZMPPosition> &ZMPRefPositions,
+ deque<COMState> &COMStates,
+ double ConstraintOnX,
+ double ConstraintOnY,
+ double T,
+ unsigned int N)
 {
   //  double T=0.02;
   //double T=0.02;
@@ -682,7 +716,8 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(
   //  double ComHeight=0.814;
   double ComHeight=0.80;
   double *Px=0,*Pu=0;
-  unsigned int NbOfConstraints=8*N; // Nb of constraints to be taken into account
+  unsigned int NbOfConstraints=8*N;
+  // Nb of constraints to be taken into account
   // for each iteration
   Eigen::VectorXd xk;
   Eigen::VectorXd Buk;
@@ -932,7 +967,8 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(
       LCI_it = QueueOfLConstraintInequalities.begin();
       while(LCI_it!=QueueOfLConstraintInequalities.end())
         {
-          cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime << endl;
+          cout << (*LCI_it)->StartingTime << " "
+               << (*LCI_it)->EndingTime << endl;
           LCI_it++;
         }
     }
@@ -1049,8 +1085,8 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(
   int interval=(int)dinterval;
 
   ODEBUG("Ending time: " << QueueOfLConstraintInequalities.back()->EndingTime);
-  ODEBUG("Loop: 0.0 " << QueueOfLConstraintInequalities.back()->EndingTime- N*T <<
-         " "
+  ODEBUG("Loop: 0.0 " << QueueOfLConstraintInequalities.back()->EndingTime- N*T
+         << " "
          << " T: " << T << " N: " << N << " interval " << interval);
   for(double StartingTime=0.0;
       StartingTime<QueueOfLConstraintInequalities.back()->EndingTime-
@@ -1186,7 +1222,8 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(
 
       if (vnlValConstraint.cols()!=1)
         {
-          cout << "Problem during validation of the constraints matrix: " << endl;
+          cout << "Problem during validation of the constraints matrix: "
+               << endl;
           cout << "   size for the columns different from 1" << endl;
           return -1;
         }
@@ -1284,10 +1321,13 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(
 
           // Put it into the stack.
 
-          ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
-                  aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
+          ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2]
+                  << " " <<
+                  aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2]
+                  << " " <<
                   aCOMPos.yaw << " " <<
-                  aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta << " " <<
+                  aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta
+                  << " " <<
                   X[0] << " " << X[N] << " " <<
                   lkSP << " " << T, "DebugInterpol.dat");
         }
@@ -1373,7 +1413,8 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(
   while(LCI_it!=QueueOfLConstraintInequalities.end())
     {
       //      cout << *LCI_it << endl;
-      //      cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime << endl;
+      //      cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime
+      // << endl;
       delete *(LCI_it);
       LCI_it++;
     }
@@ -1383,17 +1424,18 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(
 }
 
 
-void ZMPQPWithConstraint::GetZMPDiscretization(deque<ZMPPosition> &
-                                               ZMPPositions,
-                                               deque<COMState> & COMStates,
-                                               deque<RelativeFootPosition> &RelativeFootPositions,
-                                               deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-                                               deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-                                               double Xmax,
-                                               COMState & lStartingCOMState,
-                                               Eigen::Vector3d & lStartingZMPPosition,
-                                               FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                                               FootAbsolutePosition & InitRightFootAbsolutePosition)
+void ZMPQPWithConstraint::GetZMPDiscretization
+(deque<ZMPPosition> &
+ ZMPPositions,
+ deque<COMState> & COMStates,
+ deque<RelativeFootPosition> &RelativeFootPositions,
+ deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+ double Xmax,
+ COMState & lStartingCOMState,
+ Eigen::Vector3d & lStartingZMPPosition,
+ FootAbsolutePosition & InitLeftFootAbsolutePosition,
+ FootAbsolutePosition & InitRightFootAbsolutePosition)
 {
   if (m_ZMPD==0)
     return;
@@ -1462,59 +1504,65 @@ void ZMPQPWithConstraint::CallMethod(std::string & Method,
 }
 
 
-std::size_t ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> &
-                                            ,          // FinalZMPPositions,
-                                            deque<COMState> &,             // FinalCOMStates,
-                                            deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
-                                            deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
-                                            FootAbsolutePosition &,        // InitLeftFootAbsolutePosition,
-                                            FootAbsolutePosition &,        // InitRightFootAbsolutePosition,
-                                            deque<RelativeFootPosition> &, // RelativeFootPositions,
-                                            COMState &,                    // lStartingCOMState,
-                                            Eigen::Vector3d & )      // lStartingZMPPosition)
+std::size_t ZMPQPWithConstraint::
+InitOnLine
+(deque<ZMPPosition> &,          // FinalZMPPositions,
+ deque<COMState> &,             // FinalCOMStates,
+ deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
+ FootAbsolutePosition &,        // InitLeftFootAbsolutePosition,
+ FootAbsolutePosition &,        // InitRightFootAbsolutePosition,
+ deque<RelativeFootPosition> &, // RelativeFootPositions,
+ COMState &,                    // lStartingCOMState,
+ Eigen::Vector3d & )      // lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
   return 0;
 }
 
-void ZMPQPWithConstraint::OnLineAddFoot(RelativeFootPosition &
-                                        ,        // NewRelativeFootPosition,
-                                        deque<ZMPPosition> &,          // FinalZMPPositions,
-                                        deque<COMState> &,             // FinalCOMStates,
-                                        deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
-                                        deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
-                                        bool )                         // EndSequence)
+void ZMPQPWithConstraint::
+OnLineAddFoot
+(RelativeFootPosition &,        // NewRelativeFootPosition,
+ deque<ZMPPosition> &,          // FinalZMPPositions,
+ deque<COMState> &,             // FinalCOMStates,
+ deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
+ bool )                         // EndSequence)
 {
   cout << "To be implemented" << endl;
 }
 
-void ZMPQPWithConstraint::OnLine(double,                               // time,
-                                 deque<ZMPPosition> &,                 // FinalZMPPositions,
-                                 deque<COMState> &,                    // FinalCOMStates,
-                                 deque<FootAbsolutePosition> &,        // FinalLeftFootAbsolutePositions,
-                                 deque<FootAbsolutePosition> & )       // FinalRightFootAbsolutePositions)
+void ZMPQPWithConstraint::
+OnLine
+(double,                               // time,
+ deque<ZMPPosition> &,                 // FinalZMPPositions,
+ deque<COMState> &,                    // FinalCOMStates,
+ deque<FootAbsolutePosition> &,        // FinalLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> & )       // FinalRightFootAbsolutePositions)
 {
   cout << "To be implemented" << endl;
 }
 
-int ZMPQPWithConstraint::OnLineFootChange(double
-                                          ,                         // time,
-                                          FootAbsolutePosition &,         // aFootAbsolutePosition,
-                                          deque<ZMPPosition> &,           // FinalZMPPositions,
-                                          deque<COMState> &,              // CoMStates,
-                                          deque<FootAbsolutePosition> &,  // FinalLeftFootAbsolutePositions,
-                                          deque<FootAbsolutePosition> &,  // FinalRightFootAbsolutePositions,
-                                          StepStackHandler  * )           // aStepStackHandler)
+int ZMPQPWithConstraint::
+OnLineFootChange
+(double,                         // time,
+ FootAbsolutePosition &,         // aFootAbsolutePosition,
+ deque<ZMPPosition> &,           // FinalZMPPositions,
+ deque<COMState> &,              // CoMStates,
+ deque<FootAbsolutePosition> &,  // FinalLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &,  // FinalRightFootAbsolutePositions,
+ StepStackHandler  * )           // aStepStackHandler)
 {
   cout << "To be implemented" << endl;
   return -1;
 }
 
-void ZMPQPWithConstraint::EndPhaseOfTheWalking(deque<ZMPPosition> &
-                                               ,           // ZMPPositions,
-                                               deque<COMState> &,              // FinalCOMStates,
-                                               deque<FootAbsolutePosition> &,  // LeftFootAbsolutePositions,
-                                               deque<FootAbsolutePosition> & ) // RightFootAbsolutePositions)
+void ZMPQPWithConstraint::
+EndPhaseOfTheWalking
+(deque<ZMPPosition> &,           // ZMPPositions,
+ deque<COMState> &,              // FinalCOMStates,
+ deque<FootAbsolutePosition> &,  // LeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> & ) // RightFootAbsolutePositions)
 {
 
 }

@@ -102,89 +102,109 @@ namespace PatternGeneratorJRL
     /** Generate ZMP discreatization from a vector of foot position.
         ASSUME A COMPLETE MOTION FROM END TO START, and GENERATE EVERY VALUE.
 
-        @param[out] ZMPPositions: Returns the ZMP reference values for the overall motion.
-        Those are absolute position in the world reference frame. The origin is the initial
-        position of the robot. The relative foot position specified are added.
+        @param[out] ZMPPositions: 
+        Returns the ZMP reference values for the overall motion.
+        Those are absolute position in the world reference frame. 
+        The origin is the initial
+        position of the robot. 
+        The relative foot position specified are added.
 
-        @param[out] CoMStates: Returns the COM reference values for the overall motion.
-        Those are absolute position in the world reference frame. The origin is the initial
+        @param[out] CoMStates: 
+        Returns the COM reference values for the overall motion.
+        Those are absolute position in the world reference frame. 
+        The origin is the initial
         position of the robot. The relative foot position specified are added.
 
         @param[in] RelativeFootPositions: The set of
         relative steps to be performed by the robot.
 
-        @param[out] LeftFootAbsolutePositions: Returns the absolute position of the left foot.
-        According to the macro FULL_POLYNOME the trajectory will follow a third order
-        polynom or a fifth order. By experience it is wise to put a third order.
-        A null acceleration might cause problem for the compensation of the Z-axis momentum.
+        @param[out] LeftFootAbsolutePositions: Returns the 
+        absolute position of the left foot.
+        According to the macro FULL_POLYNOME the trajectory will follow 
+        a third order
+        polynom or a fifth order. By experience it is wise to put 
+        a third order.
+        A null acceleration might cause problem for the compensation 
+        of the Z-axis momentum.
 
-        @param[out] RightFootAbsolutePositions: Returns the absolute position of the right foot.
+        @param[out] RightFootAbsolutePositions: Returns the 
+        absolute position of the right foot.
 
-        @param[in] Xmax: The maximal distance of a hand along the X axis in the waist coordinates.
+        @param[in] Xmax: The maximal distance of a hand along the 
+        X axis in the waist coordinates.
 
         @param[in] lStartingCOMState: The initial position of the CoM.
 
         @param[in] lStartingZMPPosition: The initial position of the ZMP.
 
-        @param[in] InitLeftFootAbsolutePosition: The initial position of the left foot.
+        @param[in] InitLeftFootAbsolutePosition: The initial position 
+        of the left foot.
 
-        @param[in] InitRightFootAbsolutePosition: The initial position of the right foot.
+        @param[in] InitRightFootAbsolutePosition: The initial position 
+        of the right foot.
 
     */
-    void GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
-                              deque<COMState> & CoMStates,
-                              deque<RelativeFootPosition> &RelativeFootPositions,
-                              deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-                              deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-                              double Xmax,
-                              COMState & lStartingCOMState,
-                              Eigen::Vector3d & lStartingZMPPosition,
-                              FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                              FootAbsolutePosition & InitRightFootAbsolutePosition);
+    void GetZMPDiscretization
+    (deque<ZMPPosition> & ZMPPositions,
+     deque<COMState> & CoMStates,
+     deque<RelativeFootPosition> &RelativeFootPositions,
+     deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+     double Xmax,
+     COMState & lStartingCOMState,
+     Eigen::Vector3d & lStartingZMPPosition,
+     FootAbsolutePosition & InitLeftFootAbsolutePosition,
+     FootAbsolutePosition & InitRightFootAbsolutePosition);
 
     /*! Dump data files. */
     void DumpDataFiles(string ZMPFileName, string FootFileName,
                        deque<ZMPPosition> &ZMPPositions,
                        deque<FootAbsolutePosition> &FootAbsolutePositions);
 
-    void DumpFootAbsolutePosition(string aFileName,
-                                  deque<FootAbsolutePosition> &aFootAbsolutePositions);
+    void DumpFootAbsolutePosition
+    (string aFileName,
+     deque<FootAbsolutePosition> &aFootAbsolutePositions);
 
     /** Update the value of the foot configuration according to the
         current situation. */
-    void UpdateFootPosition(deque<FootAbsolutePosition>
-                            &SupportFootAbsolutePositions,
-                            deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
-                            int index, int k, int indexinitial, double ModulationSupportTime,int StepType,
-                            int LeftOrRight);
+    void UpdateFootPosition
+    (deque<FootAbsolutePosition>
+     &SupportFootAbsolutePositions,
+     deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
+     int index, int k, int indexinitial,
+     double ModulationSupportTime,int StepType,
+     int LeftOrRight);
 
     /*! IIR filtering of ZMP Position X put in ZMP Position Y. */
     void FilterZMPRef(deque<ZMPPosition> &ZMPPositionsX,
                       deque<ZMPPosition> &ZMPPositionsY);
 
-    /*! ZMP shift parameters to shift ZMP position during Single support with respect to the normal ankle position */
+    /*! ZMP shift parameters to shift ZMP position during Single support 
+      with respect to the normal ankle position */
     void SetZMPShift(std::vector<double> &ZMPShift);
 
     /*! Methods for on-line generation. (First version)
       The queues will be updated as follows:
       - The first values necessary to start walking will be inserted.
       - The initial positions of the feet will be taken into account
-      according to InitLeftFootAbsolutePosition and InitRightFootAbsolutePosition.
+      according to InitLeftFootAbsolutePosition and
+      InitRightFootAbsolutePosition.
       - The RelativeFootPositions stack will be taken into account,
       - The starting COM Position.
       Returns the number of steps which has been completely put inside
       the queue of ZMP, and foot positions.
     */
-    std::size_t InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-                           deque<COMState> & CoMStates,
-                           deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-                           deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
-                           FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                           FootAbsolutePosition & InitRightFootAbsolutePosition,
-                           deque<RelativeFootPosition> &RelativeFootPositions,
-                           COMState & lStartingCOMState,
-                           Eigen::Vector3d & lStartingZMPPosition );
-
+    std::size_t InitOnLine
+    (deque<ZMPPosition> & FinalZMPPositions,
+     deque<COMState> & CoMStates,
+     deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
+     FootAbsolutePosition & InitLeftFootAbsolutePosition,
+     FootAbsolutePosition & InitRightFootAbsolutePosition,
+     deque<RelativeFootPosition> &RelativeFootPositions,
+     COMState & lStartingCOMState,
+     Eigen::Vector3d & lStartingZMPPosition );
+    
     /*! \brief  Methods to update the stacks on-line. */
     void OnLine(double time,
                 deque<ZMPPosition> & FinalZMPPositions,
@@ -192,38 +212,44 @@ namespace PatternGeneratorJRL
                 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
                 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
-    /*! \brief  Methods to update the stack on-line by inserting a new foot position. */
-    void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-                       deque<ZMPPosition> & FinalZMPPositions,
-                       deque<COMState> & CoMStates,
-                       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-                       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-                       bool EndSequence);
-
+    /*! \brief  Methods to update the stack on-line by inserting a 
+      new foot position. */
+    void OnLineAddFoot
+    (RelativeFootPosition & NewRelativeFootPosition,
+     deque<ZMPPosition> & FinalZMPPositions,
+     deque<COMState> & CoMStates,
+     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+     bool EndSequence);
+    
     /* ! \brief Method to change on line the landing position of a foot.
        @return If the method failed it returns -1, 0 otherwise.
     */
-    int OnLineFootChange(double time,
-                         FootAbsolutePosition &aFootAbsolutePosition,
-                         deque<ZMPPosition> & FinalZMPPositions,
-                         deque<COMState> & CoMStates,
-                         deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-                         deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-                         StepStackHandler * aStepStackHandler=0);
-
-    /*! \brief Return the time at which it is optimal to regenerate a step in online mode.
+    int OnLineFootChange
+    (double time,
+     FootAbsolutePosition &aFootAbsolutePosition,
+     deque<ZMPPosition> & FinalZMPPositions,
+     deque<COMState> & CoMStates,
+     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+     StepStackHandler * aStepStackHandler=0);
+    
+    /*! \brief Return the time at which it is optimal to regenerate 
+      a step in online mode.
      */
     int ReturnOptimalTimeToRegenerateAStep();
 
-    /// Update the current support foot posture using the relative support foot postion RFP.
+    /// Update the current support foot posture using the
+    /// relative support foot postion RFP.
     void UpdateCurrentSupportFootPosition(RelativeFootPosition aRFP);
 
     /// End phase of the walking.
-    void EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
-                                deque<COMState> &FinalCOMStates,
-                                deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-                                deque<FootAbsolutePosition> &RightFootAbsolutePositions);
-
+    void EndPhaseOfTheWalking
+    (  deque<ZMPPosition> &ZMPPositions,
+       deque<COMState> &FinalCOMStates,
+       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+       deque<FootAbsolutePosition> &RightFootAbsolutePositions);
+    
     /*! Filter out the ZMP values and put them at the back FinalZMPPositions. */
     void FilterOutValues(deque<ZMPPosition> &ZMPPositions,
                          deque<ZMPPosition> &FinalZMPPositions,
@@ -255,7 +281,8 @@ namespace PatternGeneratorJRL
     void DumpReferences(deque<ZMPPosition> &FinalZMPPositions,
                         deque<ZMPPosition> &ZMPPositions);
 
-    /* ! ModulationSupportCoefficient coeeficient to wait a little before foot is of the ground */
+    /* ! ModulationSupportCoefficient coeeficient to wait a 
+       little before foot is of the ground */
     double m_ModulationSupportCoefficient;
 
     /* ! Polynome to generate trajectories. */

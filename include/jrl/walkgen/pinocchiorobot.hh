@@ -68,7 +68,8 @@ namespace PatternGeneratorJRL
 
     /// Compute RNEA algorithm from
     /// \param[in] q: \f$q=[r,\theta,\hat{q}]\f$ with \f$r\f$ the position
-    /// of the free floating base (usually the waist), \f$theta\f$ the free floating
+    /// of the free floating base (usually the waist), \f$theta\f$ the
+    /// free floating
     /// orientation in RPY format, $\hat{q}$ the motor angles position.
     void computeInverseDynamics(Eigen::VectorXd & q,
                                 Eigen::VectorXd & v,
@@ -88,7 +89,8 @@ namespace PatternGeneratorJRL
     /// compute POSITION (not velocity) of the joints from end effector pose
     /// This is the implementation of the analitycal inverse kinematic extracted
     /// from the book of Kajita
-    /// Authors Shuuji Kajita ; Hirohisa Hirukawa ; Kensuke Harada ; Kazuhito Yokoi
+    /// Authors Shuuji Kajita ; Hirohisa Hirukawa ; Kensuke Harada ;
+    /// Kazuhito Yokoi
     /// ISBN 9782287877162 ; 9782287877155
     /// It needs a specific distribution of the joint to work.
     /// a test at the initialization of the class is [should be] done to check

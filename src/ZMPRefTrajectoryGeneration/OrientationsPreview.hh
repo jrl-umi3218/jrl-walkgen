@@ -58,11 +58,16 @@ namespace PatternGeneratorJRL
     /// \}
 
     /// \brief Preview feet and trunk orientations inside the preview window
-    /// The orientations of the feet are adapted to the previewed orientation of the hip.
-    /// The resulting velocities accelerations and orientations are verified against the limits.
-    /// If the constraints can not be satisfied the rotational velocity of the trunk is reduced.
-    /// The trunk is rotating with a constant speed after a constant acceleration phase of T_ length.
-    /// During the initial double support phase the trunk is not rotating contrary to the following.
+    /// The orientations of the feet are adapted to the previewed orientation
+    /// of the hip.
+    /// The resulting velocities accelerations and orientations are verified
+    /// against the limits.
+    /// If the constraints can not be satisfied the rotational velocity
+    /// of the trunk is reduced.
+    /// The trunk is rotating with a constant speed after a constant
+    /// acceleration phase of T_ length.
+    /// During the initial double support phase the trunk is not rotating
+    /// contrary to the following.
     ///
     /// \param[in] Time
     /// \param[in] Ref
@@ -70,12 +75,13 @@ namespace PatternGeneratorJRL
     /// \param[in] LeftFootPositions_deq
     /// \param[in] RightFootPositions_deq
     /// \param[out] Solution Trunk and Foot orientations
-    void preview_orientations(double Time,
-                              const reference_t & Ref,
-                              double StepDuration,
-                              const std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
-                              const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
-                              solution_t & Solution);
+    void preview_orientations
+    (double Time,
+     const reference_t & Ref,
+     double StepDuration,
+     const std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
+     const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
+     solution_t & Solution);
 
     /// \brief Interpolate previewed orientation of the trunk
     ///
@@ -84,11 +90,12 @@ namespace PatternGeneratorJRL
     /// \param[in] NewSamplingPeriod
     /// \param[in] PrwSupportStates_deq
     /// \param[out] FinalCOMTraj_deq
-    void interpolate_trunk_orientation(double Time,
-                                       int CurrentIndex,
-                                       double NewSamplingPeriod,
-                                       const std::deque<support_state_t> & PrwSupportStates_deq,
-                                       std::deque<COMState> & FinalCOMTraj_deq);
+    void interpolate_trunk_orientation
+    (double Time,
+     int CurrentIndex,
+     double NewSamplingPeriod,
+     const std::deque<support_state_t> & PrwSupportStates_deq,
+     std::deque<COMState> & FinalCOMTraj_deq);
 
     /// \brief Compute the current state for the preview of the orientation
     ///
@@ -97,9 +104,10 @@ namespace PatternGeneratorJRL
     /// \param[in] NewSamplingPeriod
     /// \param[in] PrwSupportStates_deq
     /// \param[out] FinalCOMTraj_deq
-    void one_iteration(double Time,
-                       const std::deque<support_state_t> & PrwSupportStates_deq);
-
+    void one_iteration
+    (double Time,
+     const std::deque<support_state_t> & PrwSupportStates_deq);
+    
 
     /// \name Accessors
     /// \{
@@ -150,9 +158,13 @@ namespace PatternGeneratorJRL
     //
   private:
 
-    /// \brief Verify and eventually reduce the maximal acceleration of the hip joint necessary to attain the velocity reference in one sampling T_.
-    /// The verification is based on the supposition that the final joint trajectory is composed by
-    /// a fourth-order polynomial acceleration phase inside T_ and a constant velocity phase for the rest of the preview horizon.
+    /// \brief Verify and eventually reduce the maximal acceleration of
+    /// the hip joint necessary to attain the velocity reference in one
+    /// sampling T_.
+    /// The verification is based on the supposition that the final joint
+    /// trajectory is composed by
+    /// a fourth-order polynomial acceleration phase inside T_ and
+    /// a constant velocity phase for the rest of the preview horizon.
     ///
     /// \param[in] Ref
     /// \param[in] CurrentSupport
@@ -161,7 +173,8 @@ namespace PatternGeneratorJRL
 
     /// \brief Verify velocity of hip joint
     /// The velocity is verified only between previewed supports.
-    /// The verification is based on the supposition that the final joint trajectory is a third-order polynomial.
+    /// The verification is based on the supposition that the final joint
+    /// trajectory is a third-order polynomial.
     ///
     /// \param[in] Time
     /// \param[in] PreviewedSupportFoot

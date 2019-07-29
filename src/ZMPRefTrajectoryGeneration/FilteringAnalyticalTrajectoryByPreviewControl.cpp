@@ -21,16 +21,18 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! \file This object filters an analytical ZMP trajectory through preview control. */
+/*! \file This object filters an analytical ZMP trajectory through 
+  preview control. */
 #include <iostream>
 #include <fstream>
 #include "Debug.hh"
-#include <ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.hh>
+#include "FilteringAnalyticalTrajectoryByPreviewControl.hh"
 
 
 using namespace PatternGeneratorJRL;
 
-FilteringAnalyticalTrajectoryByPreviewControl::FilteringAnalyticalTrajectoryByPreviewControl
+FilteringAnalyticalTrajectoryByPreviewControl::
+FilteringAnalyticalTrajectoryByPreviewControl
 (SimplePluginManager *lSPM,
  AnalyticalZMPCOGTrajectory* lAnalyticalZMPCOGTrajectory,
  PreviewControl * lPreviewControl) : SimplePlugin(lSPM)
@@ -75,15 +77,17 @@ FilteringAnalyticalTrajectoryByPreviewControl::FilteringAnalyticalTrajectoryByPr
 
 }
 
-void FilteringAnalyticalTrajectoryByPreviewControl::SetAnalyticalTrajectory(
-                                                                            AnalyticalZMPCOGTrajectory *lAZCT)
+void FilteringAnalyticalTrajectoryByPreviewControl::
+SetAnalyticalTrajectory
+(AnalyticalZMPCOGTrajectory *lAZCT)
 {
   m_AnalyticalZMPCOGTrajectory = lAZCT;
 }
 
 
-void FilteringAnalyticalTrajectoryByPreviewControl::SetPreviewControl(
-                                                                      PreviewControl *lPreviewControl)
+void FilteringAnalyticalTrajectoryByPreviewControl::
+SetPreviewControl
+( PreviewControl *lPreviewControl)
 {
 
   m_PreviewControl = lPreviewControl;
@@ -107,19 +111,22 @@ void FilteringAnalyticalTrajectoryByPreviewControl::Resize()
       unsigned int DataBufferSize = (unsigned int ) ((m_Tsingle
                                                       +m_PreviewControlTime)/
                                                      m_SamplingPeriod);
-      ODEBUG3("m_Tsingle: " << m_Tsingle << " DataBufferSize:" << DataBufferSize);
+      ODEBUG3("m_Tsingle: " << m_Tsingle << " DataBufferSize:"
+              << DataBufferSize);
       m_DataBuffer.resize(DataBufferSize);
     }
 #endif
 }
 
-FilteringAnalyticalTrajectoryByPreviewControl::~FilteringAnalyticalTrajectoryByPreviewControl()
+FilteringAnalyticalTrajectoryByPreviewControl::
+~FilteringAnalyticalTrajectoryByPreviewControl()
 {
 }
 
-bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(
-                                                                      double FirstValueofZMPProfil,
-                                                                      double DeltaTj0 )
+bool FilteringAnalyticalTrajectoryByPreviewControl::
+FillInWholeBuffer
+(double FirstValueofZMPProfil,
+ double DeltaTj0 )
 {
   ODEBUG("m_PreviewControl : " << m_PreviewControl <<
          " m_AnalyticalZMPCOGTrajectory : " << m_AnalyticalZMPCOGTrajectory);
@@ -128,8 +135,8 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(
     return false;
 
   if (!m_PreviewControl->IsCoherent())
-    m_PreviewControl->ComputeOptimalWeights(
-                                            OptimalControllerSolver::MODE_WITH_INITIALPOS);
+    m_PreviewControl->ComputeOptimalWeights
+      ( OptimalControllerSolver::MODE_WITH_INITIALPOS);
 
   m_Duration = DeltaTj0;
 
@@ -137,7 +144,8 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(
   m_StartingTime = m_AnalyticalZMPCOGTrajectory->GetAbsoluteTimeReference();
   double DeltaT = m_PreviewControl->SamplingPeriod();
 
-  unsigned int SizeOfBuffer = (unsigned int)((DeltaTj0+PreviewWindowTime)/DeltaT);
+  unsigned int SizeOfBuffer = (unsigned int)((DeltaTj0+PreviewWindowTime)
+                                             /DeltaT);
   ODEBUG("SizeOfBuffer: " <<SizeOfBuffer<< " Duration : "<<m_Duration);
   if (m_DataBuffer.size()!=SizeOfBuffer)
     m_DataBuffer.resize(SizeOfBuffer);
@@ -182,14 +190,16 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(
   return true;
 }
 
-bool FilteringAnalyticalTrajectoryByPreviewControl::UpdateOneStep(double t,
-                                                                  double &ZMPValue,
-                                                                  double &CoMValue,
-                                                                  double &CoMSpeedValue)
+bool FilteringAnalyticalTrajectoryByPreviewControl::
+UpdateOneStep
+(double t,
+ double &ZMPValue,
+ double &CoMValue,
+ double &CoMSpeedValue)
 {
   ODEBUG("time:" << t << " m_StartingTime: " <<
-         m_StartingTime << " " << m_Duration + m_StartingTime << " ( " << m_Duration <<
-         " ) "
+         m_StartingTime << " " << m_Duration + m_StartingTime << " ( "
+         << m_Duration << " ) "
          << " LBI:" << m_LocalBufferIndex);
   if ((t<m_StartingTime) || (t>m_Duration+m_StartingTime) || (m_Duration==0.0))
     return false;
@@ -210,9 +220,10 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::UpdateOneStep(double t,
 }
 
 /*! \brief Overloading method of SimplePlugin */
-void FilteringAnalyticalTrajectoryByPreviewControl::CallMethod(
-                                                               std::string &Method,
-                                                               std::istringstream &strm)
+void FilteringAnalyticalTrajectoryByPreviewControl::
+CallMethod
+(std::string &Method,
+ std::istringstream &strm)
 {
   if (Method==":samplingperiod")
     {

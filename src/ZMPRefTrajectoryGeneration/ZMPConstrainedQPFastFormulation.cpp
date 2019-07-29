@@ -44,10 +44,11 @@
 using namespace std;
 using namespace PatternGeneratorJRL;
 
-ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(
-                                                                 SimplePluginManager *lSPM,
-                                                                 string DataFile,
-                                                                 PinocchioRobot *aPR) :
+ZMPConstrainedQPFastFormulation::
+ZMPConstrainedQPFastFormulation
+(SimplePluginManager *lSPM,
+ string DataFile,
+ PinocchioRobot *aPR) :
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_Q = 0;
@@ -206,7 +207,8 @@ int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
               m_VPu(i+m_QP_N,j)=0.0;
 
 
-              m_PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
+              m_PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) *
+                m_QP_T*m_QP_T*m_QP_T/6.0;
               m_PPu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) *
                 m_QP_T*m_QP_T*m_QP_T/6.0;
               m_PPu(i,j+m_QP_N)=0.0;
@@ -263,15 +265,16 @@ int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
   return 0;
 }
 
-int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,
-                                                           double * &DPu,
-                                                           int NbOfConstraints,
-                                                           deque<LinearConstraintInequality_t *> &
-                                                           QueueOfLConstraintInequalities,
-                                                           unsigned int li,
-                                                           double *X,
-                                                           double StartingTime
-                                                           )
+int ZMPConstrainedQPFastFormulation::
+ValidationConstraints
+(double * & DPx,
+ double * &DPu,
+ int NbOfConstraints,
+ deque<LinearConstraintInequality_t *> &
+ QueueOfLConstraintInequalities,
+ unsigned int li,
+ double *X,
+ double StartingTime)
 {
   double lSizeMat = QueueOfLConstraintInequalities.back()->EndingTime/m_QP_T;
   Eigen::MatrixXd vnlPx;
@@ -397,8 +400,9 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,
     }
   return 0;
 }
-int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLD(
-                                                                                   Eigen::MatrixXd &OptA)
+int ZMPConstrainedQPFastFormulation::
+BuildingConstantPartOfTheObjectiveFunctionQLD
+(Eigen::MatrixXd &OptA)
 {
   for(unsigned int i=0; i<2*m_QP_N; i++)
     for(unsigned int j=0; j<2*m_QP_N; j++)
@@ -406,8 +410,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
 
   return 0;
 }
-int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(
-                                                                                        Eigen::MatrixXd &OptA)
+int ZMPConstrainedQPFastFormulation::
+BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ
+(Eigen::MatrixXd &OptA)
 {
 
   /*! Build cholesky matrix of the optimum
@@ -529,7 +534,8 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
   return 0;
 }
 
-int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction()
+int ZMPConstrainedQPFastFormulation::
+BuildingConstantPartOfTheObjectiveFunction()
 {
 
   Eigen::MatrixXd OptA;
@@ -775,17 +781,19 @@ const double & ZMPConstrainedQPFastFormulation::GetBeta() const
 }
 
 
-int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,
-                                                             double * &DPu,
-                                                             unsigned N, double T,
-                                                             double StartingTime,
-                                                             deque<LinearConstraintInequality_t *> &
-                                                             QueueOfLConstraintInequalities,
-                                                             double,  //Com_Height,
-                                                             unsigned int &NbOfConstraints,
-                                                             Eigen::VectorXd & xk,
-                                                             Eigen::VectorXd & ZMPRef,
-                                                             unsigned int &NextNumberOfRemovedConstraints)
+int ZMPConstrainedQPFastFormulation::
+BuildConstraintMatrices
+(double * & DPx,
+ double * &DPu,
+ unsigned N, double T,
+ double StartingTime,
+ deque<LinearConstraintInequality_t *> &
+ QueueOfLConstraintInequalities,
+ double,  //Com_Height,
+ unsigned int &NbOfConstraints,
+ Eigen::VectorXd & xk,
+ Eigen::VectorXd & ZMPRef,
+ unsigned int &NextNumberOfRemovedConstraints)
 {
   // Discretize the problem.
   ODEBUG(" N:" << N << " T: " << T);
@@ -908,7 +916,8 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,
           ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 -
                   Com_Height/9.81,Buffer3);
 
-          m_SimilarConstraints[IndexConstraint]=(*LCI_it)->SimilarConstraints[j];
+          m_SimilarConstraints[IndexConstraint]=
+            (*LCI_it)->SimilarConstraints[j];
 
           if (m_FastFormulationMode==QLD)
             {
@@ -1043,14 +1052,16 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,
   return 0;
 }
 
-int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
-                                                 double * D,
-                                                 double * DPu,
-                                                 unsigned int NbOfConstraints,
-                                                 double * Px,
-                                                 double * XL,
-                                                 double * XU,
-                                                 double Time)
+int ZMPConstrainedQPFastFormulation::
+DumpProblem
+(double * Q,
+ double * D,
+ double * DPu,
+ unsigned int NbOfConstraints,
+ double * Px,
+ double * XL,
+ double * XU,
+ double Time)
 {
   ofstream aof;
 
@@ -1115,21 +1126,23 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
   aof.close();
   return 0;
 }
-int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(
-                                                                          deque<FootAbsolutePosition>
-                                                                          &LeftFootAbsolutePositions,
-                                                                          deque<FootAbsolutePosition>
-                                                                          &RightFootAbsolutePositions,
-                                                                          deque<ZMPPosition> &ZMPRefPositions,
-                                                                          deque<COMState> &COMStates,
-                                                                          double ConstraintOnX,
-                                                                          double ConstraintOnY,
-                                                                          double T,
-                                                                          unsigned int N)
+int ZMPConstrainedQPFastFormulation::
+BuildZMPTrajectoryFromFootTrajectory
+(deque<FootAbsolutePosition>
+ &LeftFootAbsolutePositions,
+ deque<FootAbsolutePosition>
+ &RightFootAbsolutePositions,
+ deque<ZMPPosition> &ZMPRefPositions,
+ deque<COMState> &COMStates,
+ double ConstraintOnX,
+ double ConstraintOnY,
+ double T,
+ unsigned int N)
 {
 
   double *DPx=0,*DPu=0;
-  unsigned int NbOfConstraints=8*N; // Nb of constraints to be taken into account
+  unsigned int NbOfConstraints=8*N;
+  // Nb of constraints to be taken into account
   // for each iteration
 
   Eigen::VectorXd ZMPRef;
@@ -1191,7 +1204,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(
   while(LCI_it!=QueueOfLConstraintInequalities.end())
     {
       //      cout << *LCI_it << endl;
-      //      cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime << endl;
+      //      cout << (*LCI_it)->StartingTime << " "
+      // << (*LCI_it)->EndingTime << endl;
       LCI_it++;
     }
 
@@ -1459,7 +1473,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(
       ODEBUG("Current Time : " << StartingTime << " " <<
              " Virtual time to simulate: " <<
              QueueOfLConstraintInequalities.back()->EndingTime - StartingTime <<
-             "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
+             "Computation Time " << CurrentCPUTime << " "
+             << TotalAmountOfCPUTime);
 
     }
 
@@ -1478,7 +1493,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(
   while(LCI_it!=QueueOfLConstraintInequalities.end())
     {
       //      cout << *LCI_it << endl;
-      //      cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime << endl;
+      //      cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime
+      //      << endl;
       delete *(LCI_it);
       LCI_it++;
     }
@@ -1488,17 +1504,18 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(
 }
 
 
-void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(
-                                                           deque<ZMPPosition> & ZMPPositions,
-                                                           deque<COMState> & COMStates,
-                                                           deque<RelativeFootPosition> &RelativeFootPositions,
-                                                           deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-                                                           deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-                                                           double Xmax,
-                                                           COMState & lStartingCOMState,
-                                                           Eigen::Vector3d & lStartingZMPPosition,
-                                                           FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                                                           FootAbsolutePosition & InitRightFootAbsolutePosition)
+void ZMPConstrainedQPFastFormulation::
+GetZMPDiscretization
+(deque<ZMPPosition> & ZMPPositions,
+ deque<COMState> & COMStates,
+ deque<RelativeFootPosition> &RelativeFootPositions,
+ deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+ double Xmax,
+ COMState & lStartingCOMState,
+ Eigen::Vector3d & lStartingZMPPosition,
+ FootAbsolutePosition & InitLeftFootAbsolutePosition,
+ FootAbsolutePosition & InitRightFootAbsolutePosition)
 {
   if (m_ZMPD==0)
     return;
@@ -1568,60 +1585,65 @@ void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method,
 }
 
 
-std::size_t ZMPConstrainedQPFastFormulation::InitOnLine(
-                                                        deque<ZMPPosition> &,          // FinalZMPPositions,
-                                                        deque<COMState> &,             // FinalCOMStates,
-                                                        deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
-                                                        deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
-                                                        FootAbsolutePosition &,        // InitLeftFootAbsolutePosition,
-                                                        FootAbsolutePosition &,        // InitRightFootAbsolutePosition,
-                                                        deque<RelativeFootPosition> &, // RelativeFootPositions,
-                                                        COMState &,                    // lStartingCOMState,
-                                                        Eigen::Vector3d & )      // lStartingZMPPosition)
+std::size_t ZMPConstrainedQPFastFormulation::
+InitOnLine
+(deque<ZMPPosition> &,          // FinalZMPPositions,
+ deque<COMState> &,             // FinalCOMStates,
+ deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
+ FootAbsolutePosition &,        // InitLeftFootAbsolutePosition,
+ FootAbsolutePosition &,        // InitRightFootAbsolutePosition,
+ deque<RelativeFootPosition> &, // RelativeFootPositions,
+ COMState &,                    // lStartingCOMState,
+ Eigen::Vector3d & )      // lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
   return 0;
 }
 
-void ZMPConstrainedQPFastFormulation::OnLineAddFoot(RelativeFootPosition &
-                                                    ,         // NewRelativeFootPosition,
-                                                    deque<ZMPPosition> &,            // FinalZMPPositions,
-                                                    deque<COMState> &,               // FinalCOMStates,
-                                                    deque<FootAbsolutePosition> &,   // FinalLeftFootAbsolutePositions,
-                                                    deque<FootAbsolutePosition> &,   // FinalRightFootAbsolutePositions,
-                                                    bool )                           // EndSequence)
+void ZMPConstrainedQPFastFormulation::
+OnLineAddFoot
+(RelativeFootPosition &,         // NewRelativeFootPosition,
+ deque<ZMPPosition> &,            // FinalZMPPositions,
+ deque<COMState> &,               // FinalCOMStates,
+ deque<FootAbsolutePosition> &,   // FinalLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &,   // FinalRightFootAbsolutePositions,
+ bool )                           // EndSequence)
 {
   cout << "To be implemented" << endl;
 }
 
-void ZMPConstrainedQPFastFormulation::OnLine(double
-                                             ,                                // time,
-                                             deque<ZMPPosition> &,                   // FinalZMPPositions,
-                                             deque<COMState> &,                      // FinalCOMStates,
-                                             deque<FootAbsolutePosition> &,          // FinalLeftFootAbsolutePositions,
-                                             deque<FootAbsolutePosition> & )         // FinalRightFootAbsolutePositions)
+void ZMPConstrainedQPFastFormulation::
+OnLine
+(double,                                // time,
+ deque<ZMPPosition> &,                   // FinalZMPPositions,
+ deque<COMState> &,                      // FinalCOMStates,
+ deque<FootAbsolutePosition> &,          // FinalLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> & )         // FinalRightFootAbsolutePositions)
 {
   cout << "To be implemented" << endl;
 }
 
-int ZMPConstrainedQPFastFormulation::OnLineFootChange(double
-                                                      ,                       // time,
-                                                      FootAbsolutePosition &,        // aFootAbsolutePosition,
-                                                      deque<ZMPPosition> &,          // FinalZMPPositions,
-                                                      deque<COMState> &,             // CoMPositions,
-                                                      deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
-                                                      deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
-                                                      StepStackHandler  *)           // aStepStackHandler)
+int ZMPConstrainedQPFastFormulation::
+OnLineFootChange
+(double,                       // time,
+ FootAbsolutePosition &,        // aFootAbsolutePosition,
+ deque<ZMPPosition> &,          // FinalZMPPositions,
+ deque<COMState> &,             // CoMPositions,
+ deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
+ StepStackHandler  *)           // aStepStackHandler)
 {
   cout << "To be implemented" << endl;
   return -1;
 }
 
-void ZMPConstrainedQPFastFormulation::EndPhaseOfTheWalking(
-                                                           deque<ZMPPosition> &,           // ZMPPositions,
-                                                           deque<COMState> &,              // FinalCOMStates,
-                                                           deque<FootAbsolutePosition> &,  // LeftFootAbsolutePositions,
-                                                           deque<FootAbsolutePosition> & ) // RightFootAbsolutePositions)
+void ZMPConstrainedQPFastFormulation::
+EndPhaseOfTheWalking
+(deque<ZMPPosition> &,           // ZMPPositions,
+ deque<COMState> &,              // FinalCOMStates,
+ deque<FootAbsolutePosition> &,  // LeftFootAbsolutePositions,
+ deque<FootAbsolutePosition> & ) // RightFootAbsolutePositions)
 {
 
 }

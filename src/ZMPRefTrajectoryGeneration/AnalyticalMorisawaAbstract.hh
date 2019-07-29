@@ -22,7 +22,8 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file AnalyticalMorisawaAbstract.h
-   \brief This abstract class specifies how to generate the reference value for the
+   \brief This abstract class specifies how to generate the reference 
+   value for the
    ZMP based on a polynomial representation following the paper
    "Experimentation of Humanoid Walking Allowing Immediate
    Modification of Foot Place Based on Analytical Solution"
@@ -44,7 +45,8 @@
 
 namespace PatternGeneratorJRL
 {
-  /*! \brief Class to define the abstract interface to compute analytically the trajectories of both the ZMP and the CoM.
+  /*! \brief Class to define the abstract interface to compute analytically 
+    the trajectories of both the ZMP and the CoM.
     @ingroup analyticalformulation
 
     Using this method we assume again the linear inverted pendulum of Kajita,
@@ -65,112 +67,131 @@ namespace PatternGeneratorJRL
     /*! Destructor */
     virtual ~AnalyticalMorisawaAbstract();
 
-    /*! \name Methods inherited from ZMPRefTrajectoryGeneration and reimplemented
+    /*! \name Methods inherited from ZMPRefTrajectoryGeneration and
+      reimplemented
       @{ */
 
     /*! Returns the CoM and ZMP trajectory for some relative foot positions.
       Generate ZMP discreatization from a vector of foot position.
       ASSUME A COMPLETE MOTION FROM END TO START, and GENERATE EVERY VALUE.
 
-      @param[out] ZMPPositions: Returns the ZMP reference values for the overall motion.
-      Those are absolute position in the world reference frame. The origin is the initial
+      @param[out] ZMPPositions: Returns the ZMP reference values for 
+      the overall motion.
+      Those are absolute position in the world reference frame. The origin 
+      is the initial
       position of the robot. The relative foot position specified are added.
 
-      @param[out] CoMStates: Returns the CoM reference values for the overall motion.
-      Those are absolute position in the world reference frame. The origin is the initial
+      @param[out] CoMStates: Returns the CoM reference values for the 
+      overall motion.
+      Those are absolute position in the world reference frame. 
+      The origin is the initial
       position of the robot. The relative foot position specified are added.
 
       @param[in] RelativeFootPositions: The set of
       relative steps to be performed by the robot.
 
-      @param[out] LeftFootAbsolutePositions: Returns the absolute position of the left foot.
-      According to the macro FULL_POLYNOME the trajectory will follow a third order
+      @param[out] LeftFootAbsolutePositions: Returns the absolute 
+      position of the left foot.
+      According to the macro FULL_POLYNOME the trajectory will follow 
+      a third order
       polynom or a fifth order. By experience it is wise to put a third order.
-      A null acceleration might cause problem for the compensation of the Z-axis momentum.
+      A null acceleration might cause problem for the compensation of the
+      Z-axis momentum.
 
-      @param[out] RightFootAbsolutePositions: Returns the absolute position of the right foot.
+      @param[out] RightFootAbsolutePositions: Returns the absolute position 
+      of the right foot.
 
-      @param[in] Xmax: The maximal distance of a hand along the X axis in the waist coordinates.
+      @param[in] Xmax: The maximal distance of a hand along the X axis in 
+      the waist coordinates.
 
       @param[in] lStartingCOMState: The starting position of the CoM.
 
       @param[in] lStartingZMPPosition: The starting position of the ZMP.
 
-      @param[in] InitLeftFootAbsolutePosition: The absolute position of the left foot.
+      @param[in] InitLeftFootAbsolutePosition: The absolute position of 
+      the left foot.
 
-      @param[in] InitRightFootAbsolutePosition: The absolute position of the right foot.
+      @param[in] InitRightFootAbsolutePosition: The absolute position of 
+      the right foot.
 
     */
-    virtual void GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
-                                      deque<COMState> & CoMStates,
-                                      deque<RelativeFootPosition> &RelativeFootPositions,
-                                      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-                                      deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-                                      double Xmax,
-                                      COMState & lStartingCOMState,
-                                      Eigen::Vector3d &lStartingZMPPosition,
-                                      FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                                      FootAbsolutePosition & InitRightFootAbsolutePosition) =0;
+    virtual void GetZMPDiscretization
+    (deque<ZMPPosition> & ZMPPositions,
+     deque<COMState> & CoMStates,
+     deque<RelativeFootPosition> &RelativeFootPositions,
+     deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+     double Xmax,
+     COMState & lStartingCOMState,
+     Eigen::Vector3d &lStartingZMPPosition,
+     FootAbsolutePosition & InitLeftFootAbsolutePosition,
+     FootAbsolutePosition & InitRightFootAbsolutePosition) =0;
 
     /*! Methods for on-line generation. (First version)
       The queues will be updated as follows:
       \li \c The first values necessary to start walking will be inserted.
       \li \c The initial positions of the feet will be taken into account
-      according to InitLeftFootAbsolutePosition and InitRightFootAbsolutePosition.
+      according to InitLeftFootAbsolutePosition and
+      InitRightFootAbsolutePosition.
       \li \c The RelativeFootPositions stack will be taken into account,
       \li \c The starting COM Position.
       Returns the number of steps which has been completely put inside
       the queue of ZMP, and foot positions.
     */
-    virtual std::size_t InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-                                   deque<COMState> & CoMStates,
-                                   deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-                                   deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
-                                   FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                                   FootAbsolutePosition & InitRightFootAbsolutePosition,
-                                   deque<RelativeFootPosition> &RelativeFootPositions,
-                                   COMState & lStartingCOMState,
-                                   Eigen::Vector3d & aStartingZMPPosition) =0 ;
+    virtual std::size_t InitOnLine
+    (deque<ZMPPosition> & FinalZMPPositions,
+     deque<COMState> & CoMStates,
+     deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
+     FootAbsolutePosition & InitLeftFootAbsolutePosition,
+     FootAbsolutePosition & InitRightFootAbsolutePosition,
+     deque<RelativeFootPosition> &RelativeFootPositions,
+     COMState & lStartingCOMState,
+     Eigen::Vector3d & aStartingZMPPosition) =0 ;
 
     /* ! \brief Method to update the stacks on-line */
-    virtual void OnLine(double time,
-                        deque<ZMPPosition> & FinalZMPPositions,
-                        deque<COMState> & CoMStates,
-                        deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-                        deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)=0;
-
-    /* ! Methods to update the stack on-line by inserting a new foot position. */
-    virtual void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-                               deque<ZMPPosition> & FinalZMPPositions,
-                               deque<COMState> & CoMStates,
-                               deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-                               deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-                               bool EndSequence)=0;
-
+    virtual void OnLine
+    (double time,
+     deque<ZMPPosition> & FinalZMPPositions,
+     deque<COMState> & CoMStates,
+     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)=0;
+    
+    /* ! Methods to update the stack on-line by 
+       inserting a new foot position. */
+    virtual void OnLineAddFoot
+    (RelativeFootPosition & NewRelativeFootPosition,
+     deque<ZMPPosition> & FinalZMPPositions,
+     deque<COMState> & CoMStates,
+     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+     bool EndSequence)=0;
+    
     /* ! \brief Method to change on line the landing position of a foot.
        @return If the method failed it returns -1, 0 otherwise.
     */
-    virtual int OnLineFootChange(double time,
-                                 FootAbsolutePosition &aFootAbsolutePosition,
-                                 deque<ZMPPosition> & FinalZMPPositions,
-                                 deque<COMState> & CoMStates,
-                                 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-                                 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-                                 StepStackHandler *aStepStackHandler)=0;
+    virtual int OnLineFootChange
+    (double time,
+     FootAbsolutePosition &aFootAbsolutePosition,
+     deque<ZMPPosition> & FinalZMPPositions,
+     deque<COMState> & CoMStates,
+     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+     StepStackHandler *aStepStackHandler)=0;
 
     /*! \brief Method to stop walking.
       @param[out] ZMPPositions: The queue of ZMP reference positions.
       @param[out] FinalCOMStates: The queue of COM reference positions.
-      @param[out] LeftFootAbsolutePositions: The queue of left foot absolute positions.
-      @param[out] RightFootAbsolutePositions: The queue of right foot absolute positions.
+      @param[out] LeftFootAbsolutePositions: 
+      The queue of left foot absolute positions.
+      @param[out] RightFootAbsolutePositions: 
+      The queue of right foot absolute positions.
     */
-    virtual void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-                                      deque<COMState> &FinalCOMStates,
-                                      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-                                      deque<FootAbsolutePosition> &RightFootAbsolutePositions)=0;
-
-
-
+    virtual void EndPhaseOfTheWalking
+    (deque<ZMPPosition> &ZMPPositions,
+     deque<COMState> &FinalCOMStates,
+     deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> &RightFootAbsolutePositions)=0;
     /*! @} */
 
     /*! \name Methods specifics to our current implementation.
@@ -233,25 +254,30 @@ namespace PatternGeneratorJRL
 
     /*! \brief Transfert the computed weights to an Analytical ZMP COG
       Trajectory able to generate the appropriate intermediates values.
-      @param aAZCT: The object to be filled with the appropriate intermediate values.
+      @param aAZCT: The object to be filled with the appropriate 
+      intermediate values.
       @param lCoMZ: The height trajectory of the CoM.
       @param lZMPZ: The height trajectory of the ZMP.
-      @param lZMPInit: The initial value of the ZMP for this trajectory along the axis.
-      @param lZMPEnd: The final value of the ZMP for this trajectory along the axis.
-      @param InitializeaAZCT: If set to true this variable trigger the initialization
+      @param lZMPInit: The initial value of the ZMP for 
+      this trajectory along the axis.
+      @param lZMPEnd: The final value of the ZMP for 
+      this trajectory along the axis.
+      @param InitializeaAZCT: If set to true this variable trigger 
+      the initialization
       of the object aAZCT, does nothing otherwise.
     */
-    virtual void TransfertTheCoefficientsToTrajectories(AnalyticalZMPCOGTrajectory
-                                                        &aAZCT,
-                                                        std::vector<double> &lCoMZ,
-                                                        std::vector<double> &lZMPZ,
-                                                        double &lZMPInit,
-                                                        double &lZMPEnd,
-                                                        bool InitializeaAZCT) =0 ;
-
+    virtual void TransfertTheCoefficientsToTrajectories
+    (AnalyticalZMPCOGTrajectory &aAZCT,
+     std::vector<double> &lCoMZ,
+     std::vector<double> &lZMPZ,
+     double &lZMPInit,
+     double &lZMPEnd,
+     bool InitializeaAZCT) =0 ;
+    
     /*! @} */
 
-    /*! \brief Initialize automatically Polynomial degrees, and temporal intervals.
+    /*! \brief Initialize automatically Polynomial degrees, 
+      and temporal intervals.
       @return True if succeedeed, false otherwise.
     */
     virtual bool InitializeBasicVariables()=0;
@@ -300,7 +326,8 @@ namespace PatternGeneratorJRL
     /*! \name Control variables.
       @{. */
 
-    /*! \brief Number of steps ($NbSteps$) on which the polynomials coefficients are computed.
+    /*! \brief Number of steps ($NbSteps$) on which the polynomials
+      coefficients are computed.
      */
     int m_NumberOfStepsInAdvance;
 

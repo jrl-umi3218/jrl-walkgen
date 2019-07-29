@@ -66,14 +66,16 @@ namespace PatternGeneratorJRL
     /// \brief Handle plugins (SimplePlugin interface)
     void CallMethod(std::string &Method, std::istringstream &strm);
 
-    /*! \name Call method to handle on-line generation of ZMP reference trajectory.
+    /*! \name Call method to handle on-line generation of ZMP 
+      reference trajectory.
       @{*/
 
     /*! Methods for on-line generation. (First version!)
       The queues will be updated as follows:
       - The first values necessary to start walking will be inserted.
       - The initial positions of the feet will be taken into account
-      according to InitLeftFootAbsolutePosition and InitRightFootAbsolutePosition.
+      according to InitLeftFootAbsolutePosition and 
+      InitRightFootAbsolutePosition.
       - The RelativeFootPositions stack will NOT be taken into account,
       - The starting COM Position will NOT be taken into account.
       Returns the number of steps which has been completely put inside
@@ -100,7 +102,8 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors and mutators
     /// \{
-    /// \brief Set the reference (velocity only as for now) through the Interface (slow)
+    /// \brief Set the reference (velocity only as for now) through
+    /// the Interface (slow)
     void Reference(istringstream &strm)
     {
       strm >> NewVelRef_.Local.X;
@@ -209,10 +212,12 @@ namespace PatternGeneratorJRL
     /// \brief Simplified robot model
     RigidBodySystem * Robot_ ;
 
-    /// \brief Finite State Machine to simulate the evolution of the support states.
+    /// \brief Finite State Machine to simulate the evolution of
+    /// the support states.
     SupportFSM * SupportFSM_;
 
-    /// \brief Decoupled optimization problem to compute the evolution of feet angles.
+    /// \brief Decoupled optimization problem to compute the evolution
+    /// of feet angles.
     OrientationsPreview * OrientPrw_;
     OrientationsPreview * OrientPrw_DF_;
 
@@ -278,10 +283,12 @@ namespace PatternGeneratorJRL
     /// \brief Height of the CoM
     double CoMHeight_ ;
 
-    /// \brief Number of interpolated point needed for control computed during QP_T_
+    /// \brief Number of interpolated point needed for control computed
+    /// during QP_T_
     unsigned NbSampleControl_ ;
 
-    /// \brief Number of interpolated point needed for the dynamic filter computed during QP_T_
+    /// \brief Number of interpolated point needed for the dynamic filter
+    /// computed during QP_T_
     unsigned NbSampleInterpolation_ ;
 
     COMState InitStateLIPM_ ;
@@ -297,63 +304,70 @@ namespace PatternGeneratorJRL
 
   public:
 
-    void GetZMPDiscretization(std::deque<ZMPPosition> & ZMPPositions,
-                              std::deque<COMState> & COMStates,
-                              std::deque<RelativeFootPosition> &RelativeFootPositions,
-                              std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-                              std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-                              double Xmax,
-                              COMState & lStartingCOMState,
-                              Eigen::Vector3d & lStartingZMPPosition,
-                              FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                              FootAbsolutePosition & InitRightFootAbsolutePosition);
+    void GetZMPDiscretization
+    (std::deque<ZMPPosition> & ZMPPositions,
+     std::deque<COMState> & COMStates,
+     std::deque<RelativeFootPosition> &RelativeFootPositions,
+     std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+     double Xmax,
+     COMState & lStartingCOMState,
+     Eigen::Vector3d & lStartingZMPPosition,
+     FootAbsolutePosition & InitLeftFootAbsolutePosition,
+     FootAbsolutePosition & InitRightFootAbsolutePosition);
 
-    void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-                       std::deque<ZMPPosition> & FinalZMPPositions,
-                       std::deque<COMState> & COMStates,
-                       std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-                       std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-                       bool EndSequence);
+    void OnLineAddFoot
+    (RelativeFootPosition & NewRelativeFootPosition,
+     std::deque<ZMPPosition> & FinalZMPPositions,
+     std::deque<COMState> & COMStates,
+     std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+     std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+     bool EndSequence);
 
-    int OnLineFootChange(double time,
-                         FootAbsolutePosition & aFootAbsolutePosition,
-                         deque<ZMPPosition> & FinalZMPPositions,
-                         deque<COMState> & CoMPositions,
-                         deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-                         deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-                         StepStackHandler * aStepStackHandler);
-
-    void EndPhaseOfTheWalking(deque<ZMPPosition> & ZMPPositions,
-                              deque<COMState> & FinalCOMTraj_deq,
-                              deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
-                              deque<FootAbsolutePosition> & RightFootAbsolutePositions);
-
+    int OnLineFootChange
+    (double time,
+     FootAbsolutePosition & aFootAbsolutePosition,
+     deque<ZMPPosition> & FinalZMPPositions,
+     deque<COMState> & CoMPositions,
+     deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+     deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+     StepStackHandler * aStepStackHandler);
+    
+    void EndPhaseOfTheWalking
+    (deque<ZMPPosition> & ZMPPositions,
+     deque<COMState> & FinalCOMTraj_deq,
+     deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
+     deque<FootAbsolutePosition> & RightFootAbsolutePositions);
+    
     int ReturnOptimalTimeToRegenerateAStep();
 
-    /// \brief Interpolation form the com jerk the position of the com and the zmp corresponding to the kart table model
-    void CoMZMPInterpolation(
-                             std::deque<ZMPPosition> & ZMPPositions,                        // OUTPUT
-                             std::deque<COMState> & COMTraj_deq,                            // OUTPUT
-                             const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,    // INPUT
-                             const std::deque<FootAbsolutePosition> & RightFootTraj_deq,   // INPUT
-                             const solution_t * Solution,                                  // INPUT
-                             LinearizedInvertedPendulum2D * LIPM,                           // INPUT/OUTPUT
-                             const unsigned numberOfSample,                                // INPUT
-                             const int IterationNumber,                                      // INPUT
-                             const unsigned int currentIndex);                                // INPUT
-
-    /// \brief Interpolate just enough data to pilot the robot (period of interpolation = QP_T_)
-    void ControlInterpolation(
-                              std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
-                              std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
-                              std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,     // OUTPUT
-                              std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,    // OUTPUT
-                              double time);                                                               // INPUT
-
+    /// \brief Interpolation form the com jerk the position of the com and the
+    /// zmp corresponding to the kart table model
+    void CoMZMPInterpolation
+    (std::deque<ZMPPosition> & ZMPPositions,                     // OUTPUT
+     std::deque<COMState> & COMTraj_deq,                         // OUTPUT
+     const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,  // INPUT
+     const std::deque<FootAbsolutePosition> & RightFootTraj_deq, // INPUT
+     const solution_t * Solution,                                // INPUT
+     LinearizedInvertedPendulum2D * LIPM,                        // INPUT/OUTPUT
+     const unsigned numberOfSample,                              // INPUT
+     const int IterationNumber,                                  // INPUT
+     const unsigned int currentIndex);                           // INPUT
+    
+    /// \brief Interpolate just enough data to pilot the robot (period of
+    ///    interpolation = QP_T_)
+    void ControlInterpolation
+    (std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
+     std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
+     std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,     // OUTPUT
+     std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,    // OUTPUT
+     double time);                                                 // INPUT
+  
     /// \brief Interpolation everything on the whole preview
     void DynamicFilterInterpolation(double time);
 
-    /// \brief Define the position of an additionnal foot step outside the preview to interpolate the position of the swinging feet in 3D
+    /// \brief Define the position of an additionnal foot step outside
+    /// the preview to interpolate the position of the swinging feet in 3D
     void InterpretSolutionVector();
 
     /// \brief Prepare the vecteur containing the solution for the interpolation

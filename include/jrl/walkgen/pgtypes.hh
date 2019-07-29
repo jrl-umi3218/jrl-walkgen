@@ -67,7 +67,8 @@ namespace PatternGeneratorJRL
   {
     for(size_t i = 0; i < 3; ++i)
     {
-      os << "x[" << i << "] " << aCp.x[i] << " y[" << i << "] " << aCp.y[i] << " z[" << i << "] " << aCp.z[i] << std::endl;
+      os << "x[" << i << "] " << aCp.x[i] << " y[" << i << "] "
+         << aCp.y[i] << " z[" << i << "] " << aCp.z[i] << std::endl;
     }
     os << "yaw " << aCp.yaw << " pitch " << aCp.pitch << " roll " << aCp.roll;
     return os;
@@ -90,7 +91,8 @@ namespace PatternGeneratorJRL
 
     COMState_s();
 
-    friend std::ostream & operator<<(std::ostream &os, const struct COMState_s & acs);
+    friend std::ostream & operator<<(std::ostream &os,
+                                     const struct COMState_s & acs);
   };
 
 
@@ -105,7 +107,8 @@ namespace PatternGeneratorJRL
     double SStime;
     double DStime;
     int stepType;     //1:normal walking 2:one step before obstacle
-                      //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle 6 :stepping stair
+                      //3:first leg over obstacle 4:second leg over obstacle
+    // 5:one step after obstacle 6 :stepping stair
     double DeviationHipHeight;
     RelativeFootPosition_s();
   };
@@ -166,14 +169,16 @@ namespace PatternGeneratorJRL
     /*! Time at which this position should be reached. */
     double time;
     /*! 1:normal walking 2:one step before obstacle
-      3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
+      3:first leg over obstacle 4:second leg over obstacle 
+      5:one step after  obstacle
       +10 if double support phase
       (-1) if support foot  */
     int stepType;
   };
   typedef struct FootAbsolutePosition_t FootAbsolutePosition;
 
-  inline std::ostream & operator<<(std::ostream & os, const FootAbsolutePosition & fap)
+  inline std::ostream & operator<<(std::ostream & os,
+                                   const FootAbsolutePosition & fap)
   {
     os << "x " << fap.x
        << " y " << fap.y
@@ -218,7 +223,8 @@ namespace PatternGeneratorJRL
   };
   typedef struct HandAbsolutePosition_t HandAbsolutePosition;
 
-  inline std::ostream & operator<<(std::ostream & os, const HandAbsolutePosition& hap)
+  inline std::ostream & operator<<(std::ostream & os,
+                                   const HandAbsolutePosition& hap)
   {
     os << "x " << hap.x
        << " y " << hap.y

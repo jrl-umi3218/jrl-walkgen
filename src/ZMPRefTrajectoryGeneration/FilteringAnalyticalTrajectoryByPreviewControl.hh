@@ -21,7 +21,8 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! \file This object filters an analytical ZMP trajectory through preview control. */
+/*! \file This object filters an analytical ZMP trajectory through preview
+  control. */
 
 #ifndef _FILTERING_ANALYTICAL_TRAJECTORY_BY_PREVIEW_CONTROL_H_
 #define _FILTERING_ANALYTICAL_TRAJECTORY_BY_PREVIEW_CONTROL_H_
@@ -40,10 +41,11 @@ namespace PatternGeneratorJRL
   public:
 
     /*! \brief Default constructor */
-    FilteringAnalyticalTrajectoryByPreviewControl(SimplePluginManager * lSPM,
-                                                  AnalyticalZMPCOGTrajectory * lAnalyticalZMPCOGTrajectory=0,
-                                                  PreviewControl * lPreviewControl=0);
-
+    FilteringAnalyticalTrajectoryByPreviewControl
+    (SimplePluginManager * lSPM,
+     AnalyticalZMPCOGTrajectory * lAnalyticalZMPCOGTrajectory=0,
+     PreviewControl * lPreviewControl=0);
+    
     /*! \brief Set Analytical trajectory */
     void SetAnalyticalTrajectory(AnalyticalZMPCOGTrajectory *lAZCT);
 
@@ -54,7 +56,8 @@ namespace PatternGeneratorJRL
       This has to be done if the analytical trajectory has been changed,
       and that the first interval has been changed.
       \param FistValueOfZMPProfil: The first value of the desired ZMP interval.
-      \param DeltaTj0: Value of the time interval during which the filter is applied.
+      \param DeltaTj0: Value of the time interval during which the filter 
+      is applied.
       \return false if a problem occured, true otherwise.
     */
     bool FillInWholeBuffer(double FirstValueofZMPProfil,

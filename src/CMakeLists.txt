@@ -22,6 +22,8 @@ ENDIF()
 CONFIGURE_FILE(configJRLWPG.hh.in ${CMAKE_BINARY_DIR}/include/jrl/walkgen/configJRLWPG.hh)
 # Make sure to find Debug.h
 INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src)
+INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src/ZMPRefTrajectoryGeneration)
+INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src/FootTrajectoryGeneration)
 
 # Add Boost path to include directories.
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
