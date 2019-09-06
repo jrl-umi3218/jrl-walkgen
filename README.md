@@ -57,4 +57,3 @@ This package has been tested using Microsoft Visual Studio 8.
  - Install MinGW
  - Make sure all environment variables are set up properly.
  - Generate the Makefile using the NMake Makefile generator.
-
