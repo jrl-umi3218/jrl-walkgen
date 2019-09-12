@@ -29,6 +29,8 @@
 // System include for floating point errors
 #include <fenv.h>
 
+#include <pinocchio/fwd.hpp>
+
 // Boost includes to parse XML files
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
