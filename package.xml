@@ -1,0 +1,21 @@
+<package format="2">
+  <name>jrl-walkgen</name>
+  <version>4.2.0</version>
+  <description>
+    jrl-walkgen library
+  </description>
+  <maintainer email="ostasse@laas.fr">Olivier Stasse</maintainer>
+  <license>BSDv2</license>
+
+  <url>http://github.com/stack-of-tasks/sot-talos</url>
+  <author>Olivier Stasse</author>
+
+  <build_depend>roscpp</build_depend>
+  
+  <exec_depend>roscpp</exec_depend>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <doc_depend>doxygen</doc_depend>
+
+</package>
