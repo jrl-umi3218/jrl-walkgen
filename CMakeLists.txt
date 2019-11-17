@@ -1,76 +1,56 @@
 # Copyright 2010, Olivier Stasse, JRL, CNRS/AIST
-#
-# This file is part of jrl-walkgen.
-# jrl-walkgen is free software: you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public License
-# as published by the Free Software Foundation, either version 3 of
-# the License, or (at your option) any later version.
-#
-# jrl-walkgen is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Lesser Public License for more details.  You should have
-# received a copy of the GNU Lesser General Public License along with
-# jrl-walkgen. If not, see <http://www.gnu.org/licenses/>.
+# See LICENSE file
 
 # Requires at least CMake 2.6 to configure the package.
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-# Includes from jrl-cmaketools
-INCLUDE(cmake/base.cmake)
-INCLUDE(cmake/lapack.cmake)
-INCLUDE(cmake/cpack.cmake)
-INCLUDE(cmake/boost.cmake)
-INCLUDE(CMakeDependentOption)
-
-# Define properties of the project
+SET(PROJECT_ORG stack-of-tasks)
 SET(PROJECT_NAME jrl-walkgen)
 SET(PROJECT_DESCRIPTION "Walking pattern generator for Humanoids")
 SET(PROJECT_URL "")
 
+# Export CMake Target
+SET(PROJECT_USE_CMAKE_EXPORT TRUE)
+
 SET(CXX_DISABLE_WERROR True)
 SET(DOXYGEN_USE_MATHJAX YES)
 
-# Initialize generic properties of the project
-SETUP_PROJECT()
+# Includes from jrl-cmaketools
+INCLUDE(cmake/base.cmake)
+
+# Specify the project.
+cmake_policy(SET CMP0048 NEW)
+PROJECT(${PROJECT_NAME}
+  LANGUAGES
+  CXX C
+  VERSION
+  ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
+  )
+
+find_package (Boost REQUIRED
+  filesystem system unit_test_framework program_options regex)
+find_package (Eigen3 REQUIRED NO_MODULE)
+
+#ADD_PROJECT_DEPENDENCY(lapack REQUIRED)
+#Include(LAPACK)
+find_package(LAPACK)
+#INCLUDE(cmake/cpack.cmake)
+#INCLUDE(cmake/boost.cmake)
+INCLUDE(CMakeDependentOption)
+
+# Define properties of the project
 
 # Handle OS specificities
 INCLUDE(CheckIncludeFiles)
 CHECK_INCLUDE_FILES("sys/time.h" SYS_TIME_H)
-IF(SYS_TIME_H)
+#IF(SYS_TIME_H)
 ADD_DEFINITIONS("-DHAVE_SYS_TIME_H")
-ENDIF(SYS_TIME_H)
+#ENDIF(SYS_TIME_H)
 
 # Required dependencies
 ADD_REQUIRED_DEPENDENCY("pinocchio >=  2.1.0")
 
-# Search for Boost.
-# Boost.Test is used by the test suite.
-# Boost program_options is used by the embedfile utility, which is used
-# by metapod_robotbuilder
-# Boost filesystem and regex are used by metapod_robotbuilder.
-# Boost filesystem depends on Boost system.
-SET(BOOST_COMPONENTS
-  filesystem system unit_test_framework program_options regex)
-SEARCH_FOR_BOOST()
-# If Boost is recent enough, we look for Boost timer which can be used by
-# by metapod_timer, which is in turn used by the benchmark.
-# Boost timer depends on Boost chrono and system.
-IF((BUILD_MULTI_MODEL_BENCHMARK OR BUILD_SINGLE_MODEL_BENCHMARKS)
-   AND NOT Boost_VERSION LESS 104800)
-  SET(BOOST_COMPONENTS ${BOOST_COMPONENTS} timer chrono system)
-  SEARCH_FOR_BOOST()
-ENDIF()
-
-SEARCH_FOR_LAPACK()
-
-# Search for Eigen.
-ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.5")
-# Eigen (at least version 3.0.5) makes gcc report conversion warnings
-# when one assigns to a block. This floods the compilation results.
-# So we include Eigen headers as if they were system headers: the compiler
-# won't report warning coming from them.
-INCLUDE_DIRECTORIES(SYSTEM ${EIGEN3_INCLUDE_DIRS})
+#SEARCH_FOR_LAPACK()
 
 # TODO kinda dirty patch to find lssol for now
 #  using ADD_OPTIONAL_DEPENDENCY prevents the creation
@@ -121,6 +101,13 @@ ADD_SUBDIRECTORY(tests)
 # Generate dependency to jrl-walkgen in pc file
 PKG_CONFIG_APPEND_LIBS("jrl-walkgen")
 
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+  list(APPEND LOGGING_WATCHED_VARIABLES ${_variableName})
+endforeach()
+
 # Ask to generate the final steps.
-SETUP_PROJECT_FINALIZE()
-SETUP_PROJECT_CPACK()
+SETUP_PROJECT_PACKAGE_FINALIZE()
+
+
