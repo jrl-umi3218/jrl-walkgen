@@ -217,6 +217,8 @@ namespace PatternGeneratorJRL
     {return m_vrpy;}
     inline Eigen::VectorXd & currentRPYAcceleration()
     {return m_arpy;}
+    inline Eigen::VectorXd & currentTau()
+    {return m_tau;}
 
     inline unsigned numberDof()
     {return m_robotModel->nq;}

@@ -70,6 +70,7 @@ namespace PatternGeneratorJRL
       FootAbsolutePosition m_RightFootPosition;
       Eigen::VectorXd m_ZMPTarget;
       unsigned long int m_NbOfIt;
+      Eigen::VectorXd m_Tau;
       
       /// Vector of data to dump
       std::vector<double> m_DebugVector;
@@ -78,8 +79,10 @@ namespace PatternGeneratorJRL
       /// TestName
       std::string m_TestName;
       
-      /// Pinocchio Robot
-      PinocchioRobot * m_PR ;
+      /// Pinocchio Robot for the Pattern generator
+      PinocchioRobot * m_PR;
+      /// Pointer towards the debugging robot.
+      PinocchioRobot * m_DebugPR;
       
       OneStep();
       

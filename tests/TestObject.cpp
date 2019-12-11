@@ -63,7 +63,7 @@ TestObject::TestObject(int argc, char *argv[], string &aTestName,
 
   /*! default debug output */
   m_DebugFGPI = true;
-  m_DebugFGPIFull = false;
+  m_DebugFGPIFull = true;
   m_DebugZMP2 = false;
   m_TestProfile = 0;
 
@@ -132,6 +132,8 @@ bool TestObject::init() {
 
   // Create Pattern Generator Interface
   m_OneStep.m_PR = m_PR;
+  m_OneStep.m_DebugPR = m_DebugPR;
+
   m_PGI = patternGeneratorInterfaceFactory(m_PR);
   m_PGI->SetCurrentJointValues(m_HalfSitting);
 
@@ -464,6 +466,10 @@ void TestObject::fillInDebugFilesFull() {
     Eigen::Vector3d zmpmb;
     m_DebugPR->zeroMomentumPoint(zmpmb);
 
+    Eigen::VectorXd tau;
+
+    tau = m_DebugPR->currentTau();
+
     ofstream aof;
     string aFileName;
     aFileName = m_TestName;
@@ -483,6 +489,9 @@ void TestObject::fillInDebugFilesFull() {
     }
     for (unsigned int k = 0; k < m_acc.size(); k++) { // 119-125 -> 125-155
       aof << filterprecision(m_acc(k)) << " ";
+    }
+    for (unsigned int k = 0; k < tau.size(); k++) { // 119-125 -> 125-155
+      aof << filterprecision(tau(k)) << " ";
     }
     aof << endl;
     aof.close();

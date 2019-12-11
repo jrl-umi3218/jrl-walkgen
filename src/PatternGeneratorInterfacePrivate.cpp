@@ -525,6 +525,7 @@ void PatternGeneratorInterfacePrivate::initOnlineHerdt() {
                         InitRightFootAbsPos, RelativeFootPositions,
                         lStartingCOMState, lStartingZMPPosition);
 
+
   m_GlobalStrategyManager->Setup(m_ZMPPositions, m_COMBuffer,
                                  m_LeftFootPositions, m_RightFootPositions);
 
@@ -1755,6 +1756,9 @@ int PatternGeneratorInterfacePrivate::CreateZMPReferences(
         m_ZMPPositions, m_COMBuffer, lRelativeFootPositions,
         m_LeftFootPositions, m_RightFootPositions, m_Xmax, lStartingCOMState,
         lStartingZMPPosition, InitLeftFootAbsPos, InitRightFootAbsPos);
+    std::cout << "m_ZMPPositions.size() :" << m_ZMPPositions.size() << std::endl;
+    std::cout << "m_COMBuffer.size() :" << m_COMBuffer.size() << std::endl;
+
     //      m_COMBuffer.clear();
     //      m_COMBuffer.resize(m_RightFootPositions.size());
   } else if (m_AlgorithmforZMPCOM == ZMPCOM_MORISAWA_2007) {

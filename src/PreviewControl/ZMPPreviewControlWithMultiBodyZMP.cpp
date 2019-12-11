@@ -68,7 +68,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(
   RESETDEBUG4("DebugConfSO.dat");
   RESETDEBUG4("DebugConfSV.dat");
   RESETDEBUG4("DebugConfSA.dat");
-  RESETDEBUG4("DebugDataCheckZMP1.txt");
+  RESETDEBUG5("DebugDataCheckZMP1.txt");
   RESETDEBUG4("2ndStage.dat");
   RESETDEBUG4("ZMPPCWMZOGSOC.dat");
   // Sampling period.DMB
@@ -286,13 +286,14 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(
   LeftFootPosition = m_FIFOLeftFootPosition[0];
   RightFootPosition = m_FIFORightFootPosition[0];
 
+#if 0
   // Preview control on delta ZMP.
   if ((m_StageStrategy == ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY) ||
       (m_StageStrategy == ZMPCOM_TRAJECTORY_FULL)) {
     ODEBUG2(m_FIFODeltaZMPPositions[0].px << " "
-                                          << m_FIFODeltaZMPPositions[0].py);
+            << m_FIFODeltaZMPPositions[0].py);
 
-    ODEBUG2("Second Stage Size of FIFODeltaZMPPositions: "
+    ODEBUG("Second Stage Size of FIFODeltaZMPPositions: "
             << m_FIFODeltaZMPPositions.size() << " " << m_Deltax << " "
             << m_Deltay << " " << m_sxDeltazmp << " " << m_syDeltazmp << " "
             << Deltazmpx2 << " " << Deltazmpy2);
@@ -308,6 +309,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(
       aCOMState.y[i] += m_Deltay(i, 0);
     }
   }
+  #endif
 
   ODEBUG2("Delta :" << m_Deltax(0, 0) << " " << m_Deltay(0, 0) << " "
                     << aCOMState.x[0] << " " << aCOMState.y[0]);
@@ -398,7 +400,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(
   // compute the ZMP related to the motion found by CoMAndZMPRealization.
   Eigen::Vector3d ZMPmultibody;
   m_PinocchioRobot->zeroMomentumPoint(ZMPmultibody);
-  ODEBUG4(ZMPmultibody[0] << " " << ZMPmultibody[1] << " "
+  ODEBUG5(ZMPmultibody[0] << " " << ZMPmultibody[1] << " "
                           << m_FIFOZMPRefPositions[0].px << " "
                           << m_FIFOZMPRefPositions[0].py,
           "DebugDataCheckZMP1.txt");
@@ -451,7 +453,7 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(
 
 int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(
     deque<ZMPPosition> &ZMPRefPositions,
-    deque<COMState> &, // COMStates,
+    deque<COMState> & COMStates,
     deque<FootAbsolutePosition> &LeftFootPositions,
     deque<FootAbsolutePosition> &RightFootPositions) {
   ODEBUG6("Beginning of Setup 0 ", "DebugData.txt");

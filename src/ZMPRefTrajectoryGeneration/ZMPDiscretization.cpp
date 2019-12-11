@@ -431,14 +431,6 @@ std::size_t ZMPDiscretization::InitOnLine(
   // The first foot when walking dynamically
   // does not leave the soil, but needs to be treated for the first phase.
   m_RelativeFootPositions.push_back(RelativeFootPositions[0]);
-
-  if (1) {
-    ofstream dbg_aof("DebugZMPRefPos.dat", ofstream::out);
-    for (unsigned int i = 0; i < ZMPPositions.size(); i++) {
-      dbg_aof << ZMPPositions[i].px << " " << ZMPPositions[i].py << endl;
-    }
-    dbg_aof.close();
-  }
   FilterOutValues(ZMPPositions, FinalZMPPositions, true);
 
   ODEBUG5("InitOnLine", "DebugDataRFPos.txt");
