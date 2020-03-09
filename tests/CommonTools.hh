@@ -36,77 +36,64 @@
 #include <fstream>
 #include <string>
 
-
-
 #include <jrl/walkgen/patterngeneratorinterface.hh>
-#include <jrl/walkgen/config_private.hh>
 #include "ClockCPUTime.hh"
 
 #ifndef _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_
 #define _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_
 
-namespace PatternGeneratorJRL
-{
-  namespace TestSuite
-  {
-    double filterprecision(double adb);
-    
-    void getOptions(int argc,
-                    char *argv[],
-                    std::string &urdfFullPath,
-                    std::string &srdfFullPath,
-                    unsigned int &); // TestProfil)
+namespace PatternGeneratorJRL {
+namespace TestSuite {
+double filterprecision(double adb);
 
-    void CommonInitialization
-    (PatternGeneratorJRL::PatternGeneratorInterface &aPGI);
+void getOptions(int argc, char *argv[], std::string &urdfFullPath, std::string &srdfFullPath,
+                unsigned int &);  // TestProfil)
 
-    /*! \brief Structure to handle information related 
-      to one step of each algorithm m_*/
-    class OneStep
-    {
-    public:
-      COMState m_finalCOMPosition;
-      FootAbsolutePosition m_LeftFootPosition;
-      FootAbsolutePosition m_RightFootPosition;
-      Eigen::VectorXd m_ZMPTarget;
-      unsigned long int m_NbOfIt;
-      Eigen::VectorXd m_Tau;
-      
-      /// Vector of data to dump
-      std::vector<double> m_DebugVector;
-      /// Vector of documentation string
-      std::vector<std::string> m_DebugStrings;
-      /// TestName
-      std::string m_TestName;
-      
-      /// Pinocchio Robot for the Pattern generator
-      PinocchioRobot * m_PR;
-      /// Pointer towards the debugging robot.
-      PinocchioRobot * m_DebugPR;
-      
-      OneStep();
-      
-      /// Filling m_DebugVector
-      void fillInDebugVectorFoot
-      (FootAbsolutePosition &aFootAbsolutePosition,
-       size_t &index);
+void CommonInitialization(PatternGeneratorJRL::PatternGeneratorInterface &aPGI);
 
-      /// Filling documentation vector
-      void fillInDebugVectorDoc();
+/*! \brief Structure to handle information related
+  to one step of each algorithm m_*/
+class OneStep {
+ public:
+  COMState m_finalCOMPosition;
+  FootAbsolutePosition m_LeftFootPosition;
+  FootAbsolutePosition m_RightFootPosition;
+  Eigen::VectorXd m_ZMPTarget;
+  unsigned long int m_NbOfIt;
+  Eigen::VectorXd m_Tau;
 
-      /// Filling files based on m_DebugVector.
-      void fillInDebugFileContent(std::ofstream &aof);
+  /// Vector of data to dump
+  std::vector<double> m_DebugVector;
+  /// Vector of documentation string
+  std::vector<std::string> m_DebugStrings;
+  /// TestName
+  std::string m_TestName;
 
-      /// Creates a file based on filename.
-      void fillInDebugFile();
+  /// Pinocchio Robot for the Pattern generator
+  PinocchioRobot *m_PR;
+  /// Pointer towards the debugging robot.
+  PinocchioRobot *m_DebugPR;
 
-      /// Fill in the debug vector.
-      void fillInDebugVector();
+  OneStep();
 
-      /// Writes down the description vector.
-      void writeDescriptionFile();
-      
-    };
-  } /* end of TestSuite namespace */
-} /* end of PatternGeneratorJRL namespace */
+  /// Filling m_DebugVector
+  void fillInDebugVectorFoot(FootAbsolutePosition &aFootAbsolutePosition, size_t &index);
+
+  /// Filling documentation vector
+  void fillInDebugVectorDoc();
+
+  /// Filling files based on m_DebugVector.
+  void fillInDebugFileContent(std::ofstream &aof);
+
+  /// Creates a file based on filename.
+  void fillInDebugFile();
+
+  /// Fill in the debug vector.
+  void fillInDebugVector();
+
+  /// Writes down the description vector.
+  void writeDescriptionFile();
+};
+}  // namespace TestSuite
+}  // namespace PatternGeneratorJRL
 #endif /* _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_*/

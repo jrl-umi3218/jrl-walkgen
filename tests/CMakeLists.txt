@@ -13,7 +13,9 @@
 # received a copy of the GNU Lesser General Public License along with
 # jrl-walkgen. If not, see <http://www.gnu.org/licenses/>.
 
-INCLUDE(CTest)
+SET(urdfpath ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/urdf/simple_humanoid.urdf)
+SET(srdfpath ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/srdf/simple_humanoid.srdf)
+
 
 ADD_LIBRARY(${PROJECT_NAME}-test SHARED
   TestObject.cpp
@@ -22,64 +24,56 @@ ADD_LIBRARY(${PROJECT_NAME}-test SHARED
   DumpReferencesObjects.cpp
   ../src/portability/gettimeofday.cc )
 
-PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME}-test pinocchio)
-TARGET_LINK_LIBRARIES(${PROJECT_NAME}-test ${PROJECT_NAME})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME}-test ${PROJECT_NAME} pinocchio::pinocchio)
+TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME}-test PUBLIC
+  URDF_FULL_PATH="${urdfpath}" SRDF_FULL_PATH="${srdfpath}")
 
 # Make sure private headers can be used.
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
-
-# Make the config_private.hh file available
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake
-               ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
-
-ADD_REQUIRED_DEPENDENCY("simple_humanoid_description >= 1.0.1")
-#ADD_OPTIONAL_DEPENDENCY("hrp2_14_description >= 1.0.2")
 
 #################
 ## Generic test #
 #################
 #SET(GENERIC_TEST)
 IF(GENERIC_TEST)
-  ADD_EXECUTABLE(TestFootPrintPGInterface
+  ADD_UNIT_TEST(TestFootPrintPGInterface
     TestFootPrintPGInterfaceData.cpp
     TestFootPrintPGInterface.cpp
     )
 
   TARGET_LINK_LIBRARIES(TestFootPrintPGInterface ${PROJECT_NAME})
-  ADD_DEPENDENCIES(TestFootPrintPGInterface ${PROJECT_NAME})
 ENDIF(GENERIC_TEST)
 
 ##########################
 ## Test Optimal Cholesky #
 ##########################
-ADD_EXECUTABLE(TestOptCholesky
+ADD_UNIT_TEST(TestOptCholesky
   TestOptCholesky.cpp
   ../src/Mathematics/OptCholesky.cpp
-)
-# Add test on the ricatti equation
-ADD_TEST(TestOptCholesky TestOptCholesky)
+  )
+TARGET_LINK_LIBRARIES(TestOptCholesky ${PROJECT_NAME})
 
 ##########################
 ## Test Bspline #
 ##########################
 #TODO create a proper test for polynomes and bsplines
-ADD_EXECUTABLE(TestBsplines
-  TestBsplines.cpp
-  ../src/Mathematics/Bsplines.cpp
-  )
+#ADD_UNIT_TEST(TestBsplines
+#TestBsplines.cpp
+#../src/Mathematics/Bsplines.cpp
+#)
+#TARGET_LINK_LIBRARIES(TestBsplines ${PROJECT_NAME})
 
 ##########################
 ## Test Ricatti Equation #
 ##########################
 CONFIG_FILES_CMAKE(TestRiccatiEquationWeightsWithoutInitialPose.datref)
 CONFIG_FILES_CMAKE(TestRiccatiEquationWeightsWithInitialPose.datref)
-ADD_EXECUTABLE(TestRiccatiEquation
+ADD_UNIT_TEST(TestRiccatiEquation
   TestRiccatiEquation.cpp
   ../src/PreviewControl/OptimalControllerSolver.cpp
   )
 
 # Add test on the ricatti equation
-ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
 TARGET_LINK_LIBRARIES(TestRiccatiEquation ${LAPACK_LIBRARIES} ${PROJECT_NAME})
 
 ################################################
@@ -89,28 +83,17 @@ MATH(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
 MACRO(ADD_JRL_WALKGEN_TEST test_arg test_file_name)
   SET(test_name "${test_arg}${BITS}")
   CONFIG_FILES_CMAKE(${test_name}TestFGPI.datref)
-  MESSAGE(STATUS "Prepare test : " ${test_name})
-  SET(urdfpath
-    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/urdf/simple_humanoid.urdf
-  )
-  SET(srdfpath
-    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/srdf/simple_humanoid.srdf
-  )
-  LIST(APPEND LOGGING_WATCHED_VARIABLES urdfpath srdfpath)
-  ADD_TEST(${test_name} ${test_name} ${urdfpath} ${srdfpath})
+  ADD_UNIT_TEST(${test_name} ${test_name})
 ENDMACRO(ADD_JRL_WALKGEN_TEST)
 #################################################
 MACRO(ADD_JRL_WALKGEN_EXE test_arg test_file_name)
 
   SET(test_name "${test_arg}${BITS}")
 
-  ADD_EXECUTABLE(${test_name}
-    ${test_file_name}
-  )
+  ADD_UNIT_TEST(${test_name} ${test_file_name})
 
-  TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
-  TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME}-test)
-  PKG_CONFIG_USE_DEPENDENCY(${test_name} pinocchio)
+  TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME} ${PROJECT_NAME}-test
+    pinocchio::pinocchio)
 
 ENDMACRO(ADD_JRL_WALKGEN_EXE)
 
@@ -179,11 +162,11 @@ ENDMACRO(ADD_JRL_WALKGEN_EXE)
 #CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq1${BITS}TestFGPI.datref)
 #CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq2${BITS}TestFGPI.datref)
 #CONFIG_FILES_CMAKE(TestKajita2003WalkingOnSpot${BITS}TestFGPI.datref)
-ADD_JRL_WALKGEN_EXE(TestKajita2003StraightWalking TestKajita2003.cpp)
-ADD_JRL_WALKGEN_EXE(TestKajita2003Circle          TestKajita2003.cpp)
-ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
-ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
-ADD_JRL_WALKGEN_EXE(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
+#ADD_JRL_WALKGEN_EXE(TestKajita2003StraightWalking TestKajita2003.cpp)
+#ADD_JRL_WALKGEN_EXE(TestKajita2003Circle          TestKajita2003.cpp)
+#ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
+#ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
+#ADD_JRL_WALKGEN_EXE(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
 
 #IF(BUILD_TESTING)
 #  ADD_JRL_WALKGEN_TEST(TestKajita2003StraightWalking TestKajita2003.cpp)
@@ -205,8 +188,8 @@ ADD_JRL_WALKGEN_EXE(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
 ################
 
 # Disabled as the test fail : random results oscillating around mean behaviour
-ADD_JRL_WALKGEN_EXE(TestNaveau2015Online TestNaveau2015.cpp)
-ADD_JRL_WALKGEN_EXE(TestNaveau2015OnlineSimple TestNaveau2015.cpp)
+#ADD_JRL_WALKGEN_EXE(TestNaveau2015Online TestNaveau2015.cpp)
+#ADD_JRL_WALKGEN_EXE(TestNaveau2015OnlineSimple TestNaveau2015.cpp)
 
 #####################
 # Add user examples #
@@ -221,6 +204,4 @@ SET(EXAMPLES_SOURCES
   examples.CMakeList
   )
 
-INSTALL(FILES ${EXAMPLES_SOURCES}
-  DESTINATION share/jrl/dynamics/examples/
-  PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE )
+INSTALL(FILES ${EXAMPLES_SOURCES} DESTINATION share/jrl/dynamics/examples)

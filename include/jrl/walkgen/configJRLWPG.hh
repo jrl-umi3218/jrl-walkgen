@@ -21,6 +21,7 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
+
 /*! Uses the default implementation for the small 4x4 matrices */
 #define _DEFAULT_MATRIX4x4_ 1
 
