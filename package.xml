@@ -1,6 +1,6 @@
 <package format="2">
   <name>jrl-walkgen</name>
-  <version>4.2.0</version>
+  <version>4.2.1</version>
   <description>
     jrl-walkgen library
   </description>
@@ -11,9 +11,9 @@
   <author>Olivier Stasse</author>
 
   <build_depend>roscpp</build_depend>
-  
+
   <exec_depend>roscpp</exec_depend>
-  
+
   <buildtool_depend>catkin</buildtool_depend>
 
   <doc_depend>doxygen</doc_depend>
