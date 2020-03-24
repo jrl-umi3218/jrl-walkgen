@@ -29,8 +29,7 @@ using namespace PatternGeneratorJRL;
 #include <iostream>
 using namespace std;
 
-FootHalfSize::FootHalfSize()
-{
+FootHalfSize::FootHalfSize() {
   m_HalfWidth = -1.0;
   m_HalfHeight = -1.0;
   m_Width = -1.0;
@@ -44,14 +43,10 @@ FootHalfSize::FootHalfSize()
   m_ConstraintsOnY = 0.02;
 }
 
-FootHalfSize::~FootHalfSize()
-{
-}
+FootHalfSize::~FootHalfSize() {}
 
-void FootHalfSize::setSize(double lWidth,
-                           double lHeight,
-                           double DSFeetDistance)
-{
+void FootHalfSize::setSize(double lWidth, double lHeight,
+                           double DSFeetDistance) {
   m_Height = lHeight;
   m_Width = lWidth;
 
@@ -59,8 +54,7 @@ void FootHalfSize::setSize(double lWidth,
   updateHalfHeightDS(DSFeetDistance);
 }
 
-void FootHalfSize::updateHalfSize()
-{
+void FootHalfSize::updateHalfSize() {
   m_HalfWidth = 0.5 * m_Width;
   m_HalfHeight = 0.5 * m_Height;
 
@@ -68,33 +62,21 @@ void FootHalfSize::updateHalfSize()
   m_HalfHeight -= m_ConstraintsOnY;
 }
 
-void FootHalfSize::updateHalfHeightDS(double DSFeetDistance)
-{
-  m_HalfHeightDS = m_HalfHeight+DSFeetDistance/2.0;
+void FootHalfSize::updateHalfHeightDS(double DSFeetDistance) {
+  m_HalfHeightDS = m_HalfHeight + DSFeetDistance / 2.0;
 }
 
-void FootHalfSize::setConstraints(double OnX, double OnY, double DSFeetDistance)
-{
+void FootHalfSize::setConstraints(double OnX, double OnY,
+                                  double DSFeetDistance) {
   m_ConstraintsOnX = OnX;
   m_ConstraintsOnY = OnY;
 
   updateHalfSize();
   updateHalfHeightDS(DSFeetDistance);
-
 }
 
-double FootHalfSize::getHalfHeight() const
-{
-  return m_HalfHeight;
-}
+double FootHalfSize::getHalfHeight() const { return m_HalfHeight; }
 
-double FootHalfSize::getHalfWidth() const
-{
-  return m_HalfWidth;
-}
+double FootHalfSize::getHalfWidth() const { return m_HalfWidth; }
 
-double FootHalfSize::getHalfHeightDS() const
-{
-  return m_HalfHeightDS;
-}
-
+double FootHalfSize::getHalfHeightDS() const { return m_HalfHeightDS; }

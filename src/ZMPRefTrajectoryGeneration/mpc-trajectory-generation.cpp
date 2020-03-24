@@ -23,99 +23,59 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file mpc-trajectory-generation.cpp
-   \brief Abstract object for trajectory generation 
+   \brief Abstract object for trajectory generation
    via model predictive control.*/
 
 #include <Debug.hh>
 #include <ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh>
 
-
 using namespace PatternGeneratorJRL;
 
 MPCTrajectoryGeneration::MPCTrajectoryGeneration(SimplePluginManager *lSPM)
-  : SimplePlugin(lSPM)
-  , Tsingle_(0.)
-  , Tdble_(0.)
-  , Tctr_(0.)
-  , Tprw_(0.)
-  , PreviewControlTime_(0.)
-  , N_(0)
-  , NbVariables_(0)
-  , StepHeight_(0.)
-  , CurrentTime_(0.)
-  , OnLineMode_(false)
-  , CoMHeight_(0.)
-  , SecurityMargin_(0.)
-  , ModulationSupportCoefficient_(0.)
-  , Omega_(0.)
-{
+    : SimplePlugin(lSPM), Tsingle_(0.), Tdble_(0.), Tctr_(0.), Tprw_(0.),
+      PreviewControlTime_(0.), N_(0), NbVariables_(0), StepHeight_(0.),
+      CurrentTime_(0.), OnLineMode_(false), CoMHeight_(0.), SecurityMargin_(0.),
+      ModulationSupportCoefficient_(0.), Omega_(0.) {
 
-  std::string aMethodName[6] =
-    {
-     ":omega",
-     ":stepheight",
-     ":singlesupporttime",
-     ":doublesupporttime",
-     ":comheight",
-     ":samplingperiod"
-    };
+  std::string aMethodName[6] = {":omega",
+                                ":stepheight",
+                                ":singlesupporttime",
+                                ":doublesupporttime",
+                                ":comheight",
+                                ":samplingperiod"};
 
-  for(int i=0; i<6; i++)
-    {
-      if (!RegisterMethod(aMethodName[i]))
-        {
-          std::cerr << "Unable to register " << aMethodName << std::endl;
-        }
-      else
-        {
-          ODEBUG("Succeed in registering " << aMethodName[i]);
-        }
-
+  for (int i = 0; i < 6; i++) {
+    if (!RegisterMethod(aMethodName[i])) {
+      std::cerr << "Unable to register " << aMethodName << std::endl;
+    } else {
+      ODEBUG("Succeed in registering " << aMethodName[i]);
     }
+  }
 }
 
-
-void MPCTrajectoryGeneration::CallMethod(std::string & Method,
-                                         std::istringstream &strm)
-{
+void MPCTrajectoryGeneration::CallMethod(std::string &Method,
+                                         std::istringstream &strm) {
   ODEBUG("Calling me (" << this << ") with Method: " << Method);
-  if (Method==":omega")
-    {
-      strm >> Omega_;
-    }
-  else if (Method==":omega2")
-    {
-      strm >> Omega2_;
-    }
-  else if (Method==":stepheight")
-    {
-      strm >> StepHeight_;
-      ODEBUG("Value of stepheight " << StepHeight_ << " this:" << this);
-    }
-  else if (Method==":singlesupporttime")
-    {
-      strm >> Tsingle_;
-      ODEBUG(":singlesupporttime " << Tsingle_ << " ID: " << this);
-    }
-  else if (Method==":doublesupporttime")
-    {
-      strm >> Tdble_;
-      ODEBUG(":doublesupporttime " << Tdble_ << " ID: " << this);
-    }
-  else if (Method==":comheight")
-    {
-      strm >> CoMHeight_;
-      ODEBUG(":comheight" << CoMHeight_ << " ID: " << this);
-    }
-  else if (Method==":samplingperiod")
-    {
-      strm >> Tprw_;
-      ODEBUG(":samplingperiod" << Tprw_ << " ID: " << this);
-    }
-
+  if (Method == ":omega") {
+    strm >> Omega_;
+  } else if (Method == ":omega2") {
+    strm >> Omega2_;
+  } else if (Method == ":stepheight") {
+    strm >> StepHeight_;
+    ODEBUG("Value of stepheight " << StepHeight_ << " this:" << this);
+  } else if (Method == ":singlesupporttime") {
+    strm >> Tsingle_;
+    ODEBUG(":singlesupporttime " << Tsingle_ << " ID: " << this);
+  } else if (Method == ":doublesupporttime") {
+    strm >> Tdble_;
+    ODEBUG(":doublesupporttime " << Tdble_ << " ID: " << this);
+  } else if (Method == ":comheight") {
+    strm >> CoMHeight_;
+    ODEBUG(":comheight" << CoMHeight_ << " ID: " << this);
+  } else if (Method == ":samplingperiod") {
+    strm >> Tprw_;
+    ODEBUG(":samplingperiod" << Tprw_ << " ID: " << this);
+  }
 }
 
-bool MPCTrajectoryGeneration::GetOnLineMode()
-{
-  return OnLineMode_;
-}
+bool MPCTrajectoryGeneration::GetOnLineMode() { return OnLineMode_; }

@@ -167,19 +167,19 @@ namespace PatternGeneratorJRL
     /// \brief Time variables
     /// -----------------------------------
     ///
-    /// \brief control period of the PG host
+    /// \brief Control period of the PG host
     double controlPeriod_;
 
     /// \brief Interpolation Period for the PG host preview window
     double interpolationPeriod_ ;
 
-    /// \brief size of the kajita PC preview window in second
+    /// \brief Size of the kajita PC preview window in second
     double kajitaPCwindowSize_ ;
 
-    /// \brief size of the window containing the controls in second
+    /// \brief Size of the window containing the controls in second
     double controlWindowSize_ ;
 
-    /// \brief size of the preview window of the PG host in second
+    /// \brief Size of the preview window of the PG host in second
     double previewWindowSize_ ;
 
     /// \brief Inverse Kinematics variables

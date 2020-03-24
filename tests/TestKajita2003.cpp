@@ -29,36 +29,33 @@
 
 #include <Debug.hh>
 
-using namespace::PatternGeneratorJRL;
-using namespace::PatternGeneratorJRL::TestSuite;
+using namespace ::PatternGeneratorJRL;
+using namespace ::PatternGeneratorJRL::TestSuite;
 using namespace std;
 
 enum Profiles_t {
-  PROFIL_STRAIGHT_WALKING,       // 2
-  PROFIL_CIRCLE,                 // 1
-  PROFIL_PB_FLORENT_SEQ1,        // 3
-  PROFIL_PB_FLORENT_SEQ2,        // 4
-  PROFIL_WALKING_ON_SPOT         // 5
+  PROFIL_STRAIGHT_WALKING, // 2
+  PROFIL_CIRCLE,           // 1
+  PROFIL_PB_FLORENT_SEQ1,  // 3
+  PROFIL_PB_FLORENT_SEQ2,  // 4
+  PROFIL_WALKING_ON_SPOT   // 5
 };
 
-class TestKajita2003: public TestObject
-{
+class TestKajita2003 : public TestObject {
 
 private:
 public:
-  TestKajita2003(int argc, char *argv[], string &aString, int TestProfile):
-    TestObject(argc,argv,aString)
-  {
+  TestKajita2003(int argc, char *argv[], string &aString, int TestProfile)
+      : TestObject(argc, argv, aString) {
     m_TestProfile = TestProfile;
   }
 
-
 protected:
-
-  void fillInDebugFiles( )
-  {
+  void fillInDebugFiles() {
     if (m_DebugFGPI)
       m_OneStep.fillInDebugFile();
+
+    TestObject::fillInDebugFilesFull();
 
     /// \brief Debug Purpose
     /// --------------------
@@ -67,60 +64,57 @@ protected:
     ostringstream oss(std::ostringstream::ate);
     static int iteration = 0;
 
-    if ( iteration == 0 ){
+    if (iteration == 0) {
       oss.str("/tmp/walk_Kajita.pos");
       aFileName = oss.str();
-      aof.open(aFileName.c_str(),ofstream::out);
+      aof.open(aFileName.c_str(), ofstream::out);
       aof.close();
-      m_DumpReferencesObjects.
-	setAnklePositions
-	(m_PR->rightFoot()->anklePosition,
-	 m_PR->leftFoot()->anklePosition);
+      m_DumpReferencesObjects.setAnklePositions(
+          m_PR->rightFoot()->anklePosition, m_PR->leftFoot()->anklePosition);
     }
-    m_DumpReferencesObjects.
-      fillInTests(m_TestName,m_OneStep,m_CurrentConfiguration);
+    m_DumpReferencesObjects.fillInTests(m_TestName, m_OneStep,
+                                        m_CurrentConfiguration);
 
     ///----
     oss.str("/tmp/walk_Kajita.pos");
     aFileName = oss.str();
-    aof.open(aFileName.c_str(),ofstream::app);
+    aof.open(aFileName.c_str(), ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( iteration * 0.1 ) << " "  ; // 1
-    for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
-      aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 1
+    aof << filterprecision(iteration * 0.1) << " "; // 1
+    for (unsigned int i = 6; i < m_CurrentConfiguration.size(); i++) {
+      aof << filterprecision(m_CurrentConfiguration(i)) << " "; // 1
     }
-    for(unsigned int i = 0 ; i < 10 ; i++){
-      aof << 0.0 << " "  ;
+    for (unsigned int i = 0; i < 10; i++) {
+      aof << 0.0 << " ";
     }
-    aof  << endl ;
+    aof << endl;
     aof.close();
 
-    if ( iteration == 0 ){
+    if (iteration == 0) {
       oss.str("/tmp/walk_Kajita.hip");
       aFileName = oss.str();
-      aof.open(aFileName.c_str(),ofstream::out);
+      aof.open(aFileName.c_str(), ofstream::out);
       aof.close();
     }
     oss.str("/tmp/walk_Kajita.hip");
     aFileName = oss.str();
-    aof.open(aFileName.c_str(),ofstream::app);
+    aof.open(aFileName.c_str(), ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    for(unsigned int j = 0 ; j < 20 ; j++){
-      aof << filterprecision( iteration * 0.5 ) << " "  ; // 1
-      aof << filterprecision( 0.0 ) << " "  ; // 1
-      aof << filterprecision( 0.0 ) << " "  ; // 1
-      aof << filterprecision( m_OneStep.m_finalCOMPosition.yaw[0] ) << " "  ; // 1
-      aof << endl ;
+    for (unsigned int j = 0; j < 20; j++) {
+      aof << filterprecision(iteration * 0.5) << " ";                     // 1
+      aof << filterprecision(0.0) << " ";                                 // 1
+      aof << filterprecision(0.0) << " ";                                 // 1
+      aof << filterprecision(m_OneStep.m_finalCOMPosition.yaw[0]) << " "; // 1
+      aof << endl;
     }
     aof.close();
 
     iteration++;
   }
 
-  void TurningOnTheCircle(PatternGeneratorInterface &aPGI)
-  {
+  void TurningOnTheCircle(PatternGeneratorInterface &aPGI) {
     CommonInitialization(aPGI);
 
     {
@@ -142,35 +136,43 @@ protected:
       istringstream strm2(":finish");
       aPGI.ParseCmd(strm2);
     }
-
-
   }
 
-  void StraightWalking(PatternGeneratorInterface &aPGI)
-  {
+  void StraightWalking(PatternGeneratorInterface &aPGI) {
     CommonInitialization(aPGI);
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
       aPGI.ParseCmd(strm2);
     }
 
+    // {
+    //   istringstream strm2(":stepseq 0.0 -0.09 0.0 0.0 \
+    //                  0.15 0.18 0.0 0.0 \
+    //                  0.15 -0.18 0.0 0.0 \
+    //                  0.15 0.18 0.0 0.0 \
+    //                  0.15 -0.18 0.0 0.0 \
+    //                  0.15 0.18 0.0 0.0 \
+    //                  0.15 -0.18 0.0 0.0 \
+    //                  0.15 0.18 0.0 0.0 \
+    //                  0.15 -0.18 0.0 0.0 \
+    //                  0.15 0.18 0.0 0.0 \
+    //                  0.15 -0.18 0.0 0.0 \
+    //                  0.15 0.18 0.0 0.0 \
+    //                  0.15 -0.18 0.0 0.0 \
+    //                  0.15 0.18 0.0 0.0 \
+    //                  0.15 -0.18 0.0 0.0 \
+    //                  0.0 0.18 0.0 0.0");
+    //   aPGI.ParseCmd(strm2);
+    // }
+    { istringstream strm2(":singlesupporttime 0.9");
+      aPGI.ParseCmd(strm2);
+      strm2.str(string(":doublesupporttime 0.115"));
+      aPGI.ParseCmd(strm2); }
+
     {
       istringstream strm2(":stepseq 0.0 -0.09 0.0 0.0 \
-                     0.15 0.18 0.0 0.0 \
-                     0.15 -0.18 0.0 0.0 \
-                     0.15 0.18 0.0 0.0 \
-                     0.15 -0.18 0.0 0.0 \
-                     0.15 0.18 0.0 0.0 \
-                     0.15 -0.18 0.0 0.0 \
-                     0.15 0.18 0.0 0.0 \
-                     0.15 -0.18 0.0 0.0 \
-                     0.15 0.18 0.0 0.0 \
-                     0.15 -0.18 0.0 0.0 \
-                     0.15 0.18 0.0 0.0 \
-                     0.15 -0.18 0.0 0.0 \
-                     0.15 0.18 0.0 0.0 \
-                     0.15 -0.18 0.0 0.0 \
-                     0.0 0.18 0.0 0.0");
+                     0.1 0.18 0.0 0.0 \
+                     0.0 -0.18 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
 
@@ -178,11 +180,9 @@ protected:
       istringstream strm2(":useDynamicFilter true");
       aPGI.ParseCmd(strm2);
     }
-
   }
 
-  void WalkingOnSpot(PatternGeneratorInterface &aPGI)
-  {
+  void WalkingOnSpot(PatternGeneratorInterface &aPGI) {
     CommonInitialization(aPGI);
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
@@ -222,12 +222,9 @@ protected:
       istringstream strm2(":useDynamicFilter true");
       aPGI.ParseCmd(strm2);
     }
-
-
   }
 
-  void PbFlorentSeq1(PatternGeneratorInterface &aPGI)
-  {
+  void PbFlorentSeq1(PatternGeneratorInterface &aPGI) {
     CommonInitialization(aPGI);
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
@@ -256,8 +253,7 @@ protected:
     }
   }
 
-  void PbFlorentSeq2(PatternGeneratorInterface &aPGI)
-  {
+  void PbFlorentSeq2(PatternGeneratorInterface &aPGI) {
     CommonInitialization(aPGI);
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
@@ -323,114 +319,94 @@ protected:
 				0 -0.2 0 ");
       aPGI.ParseCmd(strm2);
     }
-
   }
 
+  void chooseTestProfile() {
 
-  void chooseTestProfile()
-  {
+    switch (m_TestProfile) {
 
-    switch(m_TestProfile)
-      {
-
-      case PROFIL_STRAIGHT_WALKING:
-	StraightWalking(*m_PGI);
-	break;
-      case PROFIL_CIRCLE:
-	TurningOnTheCircle(*m_PGI);
-	break;
-      case PROFIL_PB_FLORENT_SEQ1:
-	PbFlorentSeq1(*m_PGI);
-	break;
-      case PROFIL_PB_FLORENT_SEQ2:
-	PbFlorentSeq2(*m_PGI);
-	break;
-      case PROFIL_WALKING_ON_SPOT:
-	WalkingOnSpot(*m_PGI);
-	break;
-      default:
-	throw("No correct test profile");
-	break;
-      }
+    case PROFIL_STRAIGHT_WALKING:
+      StraightWalking(*m_PGI);
+      break;
+    case PROFIL_CIRCLE:
+      TurningOnTheCircle(*m_PGI);
+      break;
+    case PROFIL_PB_FLORENT_SEQ1:
+      PbFlorentSeq1(*m_PGI);
+      break;
+    case PROFIL_PB_FLORENT_SEQ2:
+      PbFlorentSeq2(*m_PGI);
+      break;
+    case PROFIL_WALKING_ON_SPOT:
+      WalkingOnSpot(*m_PGI);
+      break;
+    default:
+      throw("No correct test profile");
+      break;
+    }
   }
 
-  void generateEvent()
-  {
-  }
+  void generateEvent() {}
 };
 
-int PerformTests(int argc, char *argv[])
-{
+int PerformTests(int argc, char *argv[]) {
 
   std::string CompleteName = string(argv[0]);
   std::size_t found = CompleteName.find_last_of("/\\");
-  std::string TestName =  CompleteName.substr(found+1);
+  std::string TestName = CompleteName.substr(found + 1);
 
-  std::string TestNames[5] = { "TestKajita2003StraightWalking",
-			       "TestKajita2003Circle",
-                               "TestKajita2003PbFlorentSeq1",
-                               "TestKajita2003PbFlorentSeq2",
-			       "TestKajita2003WalkingOnSpot"};
+  std::string TestNames[5] = {
+      "TestKajita2003StraightWalking", "TestKajita2003Circle",
+      "TestKajita2003PbFlorentSeq1", "TestKajita2003PbFlorentSeq2",
+      "TestKajita2003WalkingOnSpot"};
 
-  int TestProfiles[5] = { PROFIL_STRAIGHT_WALKING,
-                          PROFIL_CIRCLE,
-                          PROFIL_PB_FLORENT_SEQ1,
-                          PROFIL_PB_FLORENT_SEQ2,
-                          PROFIL_WALKING_ON_SPOT};
+  int TestProfiles[5] = {PROFIL_STRAIGHT_WALKING, PROFIL_CIRCLE,
+                         PROFIL_PB_FLORENT_SEQ1, PROFIL_PB_FLORENT_SEQ2,
+                         PROFIL_WALKING_ON_SPOT};
 
-  int indexProfile=-1;
+  int indexProfile = -1;
 
-  if (TestName.compare(14,15,"StraightWalking")==0)
-    indexProfile=PROFIL_STRAIGHT_WALKING;
-  if (TestName.compare(14,6,"Circle")==0)
-    indexProfile=PROFIL_CIRCLE;
-  if (TestName.compare(14,13,"PbFlorentSeq1")==0)
-    indexProfile=PROFIL_PB_FLORENT_SEQ1;
-  if (TestName.compare(14,13,"PbFlorentSeq2")==0)
-    indexProfile=PROFIL_PB_FLORENT_SEQ2;
-  if (TestName.compare(14,13,"WalkingOnSpot")==0)
-    indexProfile=PROFIL_WALKING_ON_SPOT;
+  if (TestName.compare(14, 15, "StraightWalking") == 0)
+    indexProfile = PROFIL_STRAIGHT_WALKING;
+  if (TestName.compare(14, 6, "Circle") == 0)
+    indexProfile = PROFIL_CIRCLE;
+  if (TestName.compare(14, 13, "PbFlorentSeq1") == 0)
+    indexProfile = PROFIL_PB_FLORENT_SEQ1;
+  if (TestName.compare(14, 13, "PbFlorentSeq2") == 0)
+    indexProfile = PROFIL_PB_FLORENT_SEQ2;
+  if (TestName.compare(14, 13, "WalkingOnSpot") == 0)
+    indexProfile = PROFIL_WALKING_ON_SPOT;
 
-  if (indexProfile==-1)
-    {
-      std::cerr << "CompleteName: " << CompleteName << std::endl;
-      std::cerr<< " TestName: " << TestName <<std::endl;
-      std::cerr<< "Failure to find the proper indexFile:"
-	       << TestName.substr(14,6) << endl;
-      exit(-1);
-    }
-  else
-    { ODEBUG("Index detected: " << indexProfile);}
-  TestKajita2003 aTK2003(argc,argv,
-			 TestName,
-			 TestProfiles[indexProfile]);
+  if (indexProfile == -1) {
+    std::cerr << "CompleteName: " << CompleteName << std::endl;
+    std::cerr << " TestName: " << TestName << std::endl;
+    std::cerr << "Failure to find the proper indexFile:"
+              << TestName.substr(14, 6) << endl;
+    exit(-1);
+  } else {
+    ODEBUG("Index detected: " << indexProfile);
+  }
+  TestKajita2003 aTK2003(argc, argv, TestName, TestProfiles[indexProfile]);
   aTK2003.init();
-  try
-    {
-      if (!aTK2003.doTest(std::cout))
-	{
-	  cout << "Failed test " << indexProfile << endl;
-	  return -1;
-	}
-      else
-	cout << "Passed test " << indexProfile << endl;
-    }
-  catch (const char * astr)
-    { cerr << "Failed on following error " << astr << std::endl;
-      return -1; }
+  try {
+    if (!aTK2003.doTest(std::cout)) {
+      cout << "Failed test " << indexProfile << endl;
+      return -1;
+    } else
+      cout << "Passed test " << indexProfile << endl;
+  } catch (const char *astr) {
+    cerr << "Failed on following error " << astr << std::endl;
+    return -1;
+  }
 
   return 0;
 }
 
-int main(int argc, char *argv[])
-{
-  try
-    {
-      return PerformTests(argc,argv);
-    }
-  catch (const std::string& msg)
-    {
-      std::cerr << msg << std::endl;
-    }
+int main(int argc, char *argv[]) {
+  try {
+    return PerformTests(argc, argv);
+  } catch (const std::string &msg) {
+    std::cerr << msg << std::endl;
+  }
   return 1;
 }

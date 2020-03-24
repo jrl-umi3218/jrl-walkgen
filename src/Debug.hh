@@ -48,6 +48,8 @@
     DebugFile.close();}
 #define ODEBUG5(x,y) { std::ofstream DebugFile;         \
     DebugFile.open(y,ofstream::app);                    \
+    DebugFile.precision(8);                             \
+    DebugFile.setf(ios::scientific,ios::floatfield);    \
     DebugFile << __FILE__ << ":"                        \
               << __FUNCTION__ << "(#"                   \
               << __LINE__ << "):" << x << std::endl;    \

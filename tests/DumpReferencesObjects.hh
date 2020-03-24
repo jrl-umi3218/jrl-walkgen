@@ -12,6 +12,23 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
+    class FillingFileArgs_t
+    {
+    public:
+      std::ofstream &aof;
+      double dt;
+      double nb_subsampling;
+      struct OneStep &anOneStep;
+
+      FillingFileArgs_t (std::ofstream &laof,
+			 double ldt,
+			 double lnb_subsampling,
+			 struct OneStep &lOneStep):
+	aof(laof),
+	dt(ldt), nb_subsampling(lnb_subsampling),
+	anOneStep(lOneStep)
+      {};
+    };
 
     class DumpReferencesObjects
     {
@@ -47,20 +64,18 @@ namespace PatternGeneratorJRL
        Eigen::VectorXd &aCurrentConfiguration);
 
       virtual void fillFileWithSubsamplingAndClose
-      (std::ofstream &aof,
-       std::vector<double> &prev,
+      (FillingFileArgs_t &aSetOfFillingFileArgs,
        std::vector<double> &next,
-       double dt,
-       double nb_subsampling,
-       struct OneStep &anOneStep
-       );
+       std::vector<double> &prev);
 
-      std::vector<double> m_prevCoMp;
+      std::vector<double> m_prevCoMp,m_prevCoMpF2;
       std::vector<double> m_prevdCoMp;
       std::vector<double> m_prevddCoMp;
-      std::vector<double> m_prevWaistOrien;
+      std::vector<double> m_prevWaistOrien,
+	m_prevWaistOrienF2;
 
       std::vector<double> m_prevLeftAnklePos,
+	m_prevLeftAnklePosF2,
 	m_prevLeftAnkledPos,
 	m_prevLeftAnkleddPos,
 	m_prevLeftAnkleOrientation,
@@ -68,13 +83,17 @@ namespace PatternGeneratorJRL
 	m_prevLeftAnkleddOrientation;
 
       std::vector<double> m_prevRightAnklePos,
+	m_prevRightAnklePosF2,
 	m_prevRightAnkledPos,
 	m_prevRightAnkleddPos,
 	m_prevRightAnkleOrientation,
 	m_prevRightAnkledOrientation,
 	m_prevRightAnkleddOrientation;
 
-      std::vector<double> m_prevZMPlocal, m_prevZMPRef;
+      std::vector<double> m_prevZMPlocal,
+	m_prevZMPlocalF2,
+	m_prevZMPRef,
+	m_prevTorquesF2;
 
       Eigen::Vector3d m_AnklePositionRight,
 	m_AnklePositionLeft;

@@ -24,81 +24,65 @@
  */
 /* Polynomes object for trajectories. */
 
-#include <iostream>
 #include <Mathematics/Polynome.hh>
+#include <iostream>
 
-using namespace::PatternGeneratorJRL;
+using namespace ::PatternGeneratorJRL;
 
-Polynome::Polynome(int Degree)
-{
+Polynome::Polynome(int Degree) {
   m_Coefficients.clear();
-  m_Coefficients.resize(Degree+1);
+  m_Coefficients.resize(Degree + 1);
   m_Degree = Degree;
 }
 
-Polynome::~Polynome()
-{
-}
+Polynome::~Polynome() {}
 
-
-double Polynome::Compute(double t)
-{
-  double r=0.0,pt=1.0;
-  for(unsigned int i=0; i<m_Coefficients.size(); i++)
-    {
-      r += m_Coefficients[i]*pt;
-      pt *=t;
-    }
+double Polynome::Compute(double t) {
+  double r = 0.0, pt = 1.0;
+  for (unsigned int i = 0; i < m_Coefficients.size(); i++) {
+    r += m_Coefficients[i] * pt;
+    pt *= t;
+  }
   return r;
 }
 
-double Polynome::ComputeDerivative(double t)
-{
-  double r=0,pt=1;
-  for(unsigned int i=1; i<m_Coefficients.size(); i++)
-    {
-      r += i*m_Coefficients[i]*pt;
-      pt *=t;
-    }
+double Polynome::ComputeDerivative(double t) {
+  double r = 0, pt = 1;
+  for (unsigned int i = 1; i < m_Coefficients.size(); i++) {
+    r += i * m_Coefficients[i] * pt;
+    pt *= t;
+  }
   return r;
 }
 
-double Polynome::ComputeSecDerivative(double t)
-{
-  double r=0,pt=1;
-  for(unsigned int i=2; i<m_Coefficients.size(); i++)
-    {
-      r += i*(i-1)*m_Coefficients[i]*pt;
-      pt *=t;
-    }
+double Polynome::ComputeSecDerivative(double t) {
+  double r = 0, pt = 1;
+  for (unsigned int i = 2; i < m_Coefficients.size(); i++) {
+    r += i * (i - 1) * m_Coefficients[i] * pt;
+    pt *= t;
+  }
   return r;
 }
 
-double Polynome::ComputeJerk(double t)
-{
-  double r=0,pt=1;
-  for(unsigned int i=3; i<m_Coefficients.size(); i++)
-    {
-      r += i*(i-1)*(i-2)*m_Coefficients[i]*pt;
-      pt *=t;
-    }
+double Polynome::ComputeJerk(double t) {
+  double r = 0, pt = 1;
+  for (unsigned int i = 3; i < m_Coefficients.size(); i++) {
+    r += i * (i - 1) * (i - 2) * m_Coefficients[i] * pt;
+    pt *= t;
+  }
   return r;
 }
 
-void Polynome::GetCoefficients(vector<double> &lCoefficients) const
-{
+void Polynome::GetCoefficients(vector<double> &lCoefficients) const {
   lCoefficients = m_Coefficients;
 }
 
-
-void Polynome::SetCoefficients(const vector<double> &lCoefficients)
-{
+void Polynome::SetCoefficients(const vector<double> &lCoefficients) {
   m_Coefficients = lCoefficients;
 }
 
-void Polynome::print() const
-{
-  for(unsigned int i=0; i<m_Coefficients.size(); i++)
-    cout << m_Coefficients[i] << " " ;
+void Polynome::print() const {
+  for (unsigned int i = 0; i < m_Coefficients.size(); i++)
+    cout << m_Coefficients[i] << " ";
   cout << endl;
 }
