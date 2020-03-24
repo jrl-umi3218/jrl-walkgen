@@ -27,45 +27,35 @@
 using namespace PatternGeneratorJRL;
 using namespace std;
 
-RigidBody::RigidBody():
-  T_(0),Tr_(0),Ta_(0),N_(16),Mass_(0)
-{
+RigidBody::RigidBody() : T_(0), Tr_(0), Ta_(0), N_(16), Mass_(0) {
 
   PositionDynamics_.Type = POSITION;
   VelocityDynamics_.Type = VELOCITY;
   AccelerationDynamics_.Type = ACCELERATION;
   JerkDynamics_.Type = JERK;
-
 }
 
+RigidBody::~RigidBody() {}
 
-RigidBody::~RigidBody()
-{
+int RigidBody::initialize() {
 
-}
-
-
-int RigidBody::initialize()
-{
-
-  PositionDynamics_.S.resize( N_,3);
+  PositionDynamics_.S.resize(N_, 3);
   PositionDynamics_.S.setZero();
-  VelocityDynamics_.S.resize( N_,3 );
+  VelocityDynamics_.S.resize(N_, 3);
   VelocityDynamics_.S.setZero();
-  AccelerationDynamics_.S.resize( N_,3);
+  AccelerationDynamics_.S.resize(N_, 3);
   AccelerationDynamics_.S.setZero();
-  CoPDynamics_.S.resize( N_,3);
+  CoPDynamics_.S.resize(N_, 3);
   CoPDynamics_.S.setZero();
 
-  Trajectory_.resize( N_ );
+  Trajectory_.resize(N_);
 
   return 0;
-
 }
 
 // TODO: RigidBody::interpolate RigidBody::increment_state
-//int
-//RigidBody::interpolate(deque<COMState> &COMStates,
+// int
+// RigidBody::interpolate(deque<COMState> &COMStates,
 //                                        deque<ZMPPosition> &ZMPRefPositions,
 //                                        int CurrentPosition,
 //                                        double CX, double CY)
@@ -76,100 +66,77 @@ int RigidBody::initialize()
 //}
 //
 //
-//RigidBody::rigid_body_state_t
-//RigidBody::increment_state(double Control)
+// RigidBody::rigid_body_state_t
+// RigidBody::increment_state(double Control)
 //{
 //
 //  return State_;
 //
 //}
 
-
 // ACCESSORS:
 // ----------
-linear_dynamics_t const &
-RigidBody::Dynamics( dynamics_e type ) const
-{
+linear_dynamics_t const &RigidBody::Dynamics(dynamics_e type) const {
 
-  switch(type)
-    {
-    case POSITION:
-      return PositionDynamics_;
-    case VELOCITY:
-      return VelocityDynamics_;
-    case ACCELERATION:
-      return AccelerationDynamics_;
-    case JERK:
-      return JerkDynamics_;
-    case COP_POSITION:
-      return CoPDynamics_;
-    }
+  switch (type) {
+  case POSITION:
+    return PositionDynamics_;
+  case VELOCITY:
+    return VelocityDynamics_;
+  case ACCELERATION:
+    return AccelerationDynamics_;
+  case JERK:
+    return JerkDynamics_;
+  case COP_POSITION:
+    return CoPDynamics_;
+  }
 
   return VelocityDynamics_;
-
 }
 
-linear_dynamics_t &
-RigidBody::Dynamics( dynamics_e type )
-{
+linear_dynamics_t &RigidBody::Dynamics(dynamics_e type) {
 
-  switch(type)
-    {
-    case POSITION:
-      return PositionDynamics_;
-    case VELOCITY:
-      return VelocityDynamics_;
-    case ACCELERATION:
-      return AccelerationDynamics_;
-    case JERK:
-      return JerkDynamics_;
-    case COP_POSITION:
-      return CoPDynamics_;
-    }
+  switch (type) {
+  case POSITION:
+    return PositionDynamics_;
+  case VELOCITY:
+    return VelocityDynamics_;
+  case ACCELERATION:
+    return AccelerationDynamics_;
+  case JERK:
+    return JerkDynamics_;
+  case COP_POSITION:
+    return CoPDynamics_;
+  }
 
   return VelocityDynamics_;
-
 }
-
 
 //
 // Private methods
 //
 
-
 //
 // Internal type methods:
 //
-rigid_body_state_s::rigid_body_state_s()
-{
+rigid_body_state_s::rigid_body_state_s() { reset(); }
 
-  reset();
+struct rigid_body_state_s &rigid_body_state_t::
+operator=(const rigid_body_state_s &RB) {
 
-}
+  for (unsigned int i = 0; i < 3; i++) {
+    X[i] = RB.X[i];
+    Y[i] = RB.Y[i];
+    Z[i] = RB.Z[i];
 
-
-struct rigid_body_state_s &
-rigid_body_state_t::operator=(const rigid_body_state_s & RB)
-{
-
-  for(unsigned int i=0; i<3; i++)
-    {
-      X[i] = RB.X[i];
-      Y[i] = RB.Y[i];
-      Z[i] = RB.Z[i];
-
-      Yaw[i] = RB.Yaw[i];
-      Pitch[i] = RB.Pitch[i];
-      Roll[i] = RB.Roll[i];
-    };
+    Yaw[i] = RB.Yaw[i];
+    Pitch[i] = RB.Pitch[i];
+    Roll[i] = RB.Roll[i];
+  };
   return *this;
-
 }
 
-
-void
-rigid_body_state_t::reset()
-{
+void rigid_body_state_t::reset() {
 
   X.resize(3);
   Y.resize(3);
@@ -184,5 +151,4 @@ rigid_body_state_t::reset()
   Yaw.setZero();
   Pitch.setZero();
   Roll.setZero();
-
 }

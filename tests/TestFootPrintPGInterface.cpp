@@ -1,7 +1,7 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
- * Mehdi    Benallegue 
+ * Mehdi    Benallegue
  * Andrei   Herdt
  * Francois Keith
  * Mathieu  Poirier
@@ -22,19 +22,19 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
 #include "portability/gettimeofday.hh"
 
 #ifdef WIN32
-# include <Windows.h>
+#include <Windows.h>
 #endif /* WIN32 */
 
-#include <time.h>
-#include <sstream>
 #include <fstream>
+#include <sstream>
+#include <time.h>
 
 #include <jrl/mal/matrixabstractlayer.hh>
 
@@ -48,148 +48,139 @@
 
 #include "TestFootPrintPGInterfaceData.h"
 
-using namespace::PatternGeneratorJRL;
+using namespace ::PatternGeneratorJRL;
 using namespace std;
 
 double InitialPoses[7][40] = {
 
-  // 1- With previous half-sitting value
-  { 
-    0.0, 0.0, -20.0, 40.0, -20.0, 0.0, 0.0, 0.0, -20.0, 40.0, -20.0, 0.0,  // legs
+    // 1- With previous half-sitting value
+    {
+        0.0,   0.0,   -20.0, 40.0,  -20.0, 0.0,   0.0,
+        0.0,   -20.0, 40.0,  -20.0, 0.0, // legs
 
-    0.0, 0.0, -23.7, 6.6, // chest and head
+        0.0,   0.0,   -23.7, 6.6, // chest and head
 
-    27.0, -5.0, -4.0, -87.0, -4.0, -16.0, 20.0, // right arm
-    15.0,  10.0, 0.0, -20.0, 0.0, 0.0, 10.0, // left arm 
+        27.0,  -5.0,  -4.0,  -87.0, -4.0,  -16.0, 20.0, // right arm
+        15.0,  10.0,  0.0,   -20.0, 0.0,   0.0,   10.0, // left arm
 
-    -20.0, 20.0, -20.0, 20.0, -20.0, // right hand
-    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
-  },
-  // 2- Nicolas position + New half sitting for the legs
-  { 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
+        -20.0, 20.0,  -20.0, 20.0,  -20.0, // right hand
+        -10.0, 10.0,  -10.0, 10.0,  -10.0  // left hand
+    },
+    // 2- Nicolas position + New half sitting for the legs
+    {
+        0.0,   0.0,   -26.0, 50.0,  -24.0, 0.0,   0.0,
+        0.0,   -26.0, 50.0,  -24.0, 0.0, // legs
 
-    0.0, 0.0, -23.7, 6.6, // chest and head
+        0.0,   0.0,   -23.7, 6.6, // chest and head
 
-    27.0, -5.0, -4.0, -87.0, -4.0, -16.0, 20.0, // right arm
-    15.0,  10.0, 0.0, -20.0, 0.0, 0.0, 10.0, // left arm 
+        27.0,  -5.0,  -4.0,  -87.0, -4.0,  -16.0, 20.0, // right arm
+        15.0,  10.0,  0.0,   -20.0, 0.0,   0.0,   10.0, // left arm
 
-    -20.0, 20.0, -20.0, 20.0, -20.0, // right hand
-    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
-  },
-  // 3- Test for comparison with PG v1.x
-  { 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
+        -20.0, 20.0,  -20.0, 20.0,  -20.0, // right hand
+        -10.0, 10.0,  -10.0, 10.0,  -10.0  // left hand
+    },
+    // 3- Test for comparison with PG v1.x
+    {
+        0.0, 0.0,   -26.0, 50.0,  -24.0, 0.0, 0.0,
+        0.0, -26.0, 50.0,  -24.0, 0.0, // legs
 
-    0.0, 0.0, 0.0, 0.0, // chest and head
+        0.0, 0.0,   0.0,   0.0, // chest and head
 
-    0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // right arm
-    0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // left arm 
+        0.0, 0.0,   0.0,   0.0,   0.0,   0.0, 0.0, // right arm
+        0.0, 0.0,   0.0,   0.0,   0.0,   0.0, 0.0, // left arm
 
-    0.0, 0.0, 0.0, 0.0, 0.0, // right hand
-    0.0, 0.0, 0.0, 0.0, 0.0  // left hand
-  },
-  // 4- New Half sitting
-  { 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
+        0.0, 0.0,   0.0,   0.0,   0.0, // right hand
+        0.0, 0.0,   0.0,   0.0,   0.0  // left hand
+    },
+    // 4- New Half sitting
+    {
+        0.0,   0.0,   -26.0, 50.0,  -24.0, 0.0, 0.0,
+        0.0,   -26.0, 50.0,  -24.0, 0.0, // legs
 
-    0.0, 0.0, 0.0, 0.0, // chest and head
+        0.0,   0.0,   0.0,   0.0, // chest and head
 
-    15.0, -10.0, 0.0, -30.0, 0.0, 0.0, 10.0, // right arm
-    15.0,  10.0, 0.0, -30.0, 0.0, 0.0, 10.0, // left arm 
+        15.0,  -10.0, 0.0,   -30.0, 0.0,   0.0, 10.0, // right arm
+        15.0,  10.0,  0.0,   -30.0, 0.0,   0.0, 10.0, // left arm
 
-    -10.0, 10.0, -10.0, 10.0, -10.0,  // right hand
-    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
-  },
-  // 5- Position for interaction
-  {
-    0.0 ,  0.0 , -26.0 ,  50.0 , -24 ,   0.0,  
-    0.0 ,  0.0 , -26.0 ,  50.0 , -24 ,   0.0 , // legs
-    0.0 ,  0.0 ,  // chest
-    0.0 ,  0.0 , // head 
+        -10.0, 10.0,  -10.0, 10.0,  -10.0, // right hand
+        -10.0, 10.0,  -10.0, 10.0,  -10.0  // left hand
+    },
+    // 5- Position for interaction
+    {
+        0.0,        0.0,        -26.0,      50.0,      -24,
+        0.0,        0.0,        0.0,        -26.0,     50.0,
+        -24,        0.0, // legs
+        0.0,        0.0, // chest
+        0.0,        0.0, // head
 
-    10.0, -18.0, 0.0, -100.0, -18.0, 0.0, 10.0, // right arm  
-    10.0,  18.0, 0.0, -100.0,  18.0, 0.0, 10.0, 
-    -10.000004 ,  10.000004 , -10.000004 ,  10.000004 , -10.000004 , // right hand 
-    -10.000004 ,  10.000004 , -10.000004 ,  10.000004 , -10.000004 // left hand
-  },
-  // 6- Initial position for model building 1,
-  {
-    14.323945,  -6.0363396,  -13.459409,    44.02602,  -30.566611,    6.0363396,
-    0.0000001,   7.4859801,  -27.663319,    44.65489,  -16.991579,   -7.4859801,
-    0.,    0.,    0.,    0.,    
-    12.397718,  -10.000004,    0.,  -29.618538,    0.,    0.,    10.0,
-    16.536364,   10.000004,    0.,  -29.828011,    0.,    0.,    10.0,
-    
-    -10.0,  10.0, -10.0,  10,   -10.0, 
-    -10.0,  10.0, -10.0,  10.0, -10.0 
-  },
-  // 7- Initial position for model buiding 2
-  {
-    -7.16197, -7.69299, -16.1787, 44.5201, -28.3415,  7.69299, 
-    7.16197,   5.74946, -31.3668, 44.1057, -12.7389, -5.74946,
-    
-    0., 0., 0., 0., 
-    
-    12.622 , -10, 0, -29.678 , 0, 0, 10, 
-    16.7091,  10, 0, -29.7841, 0, 0, 10, 
-    
-    -10.0,  10.0, -10.0,  10,   -10.0, 
-    -10.0,  10.0, -10.0,  10.0, -10.0 
-  }
+        10.0,       -18.0,      0.0,        -100.0,    -18.0,
+        0.0,        10.0, // right arm
+        10.0,       18.0,       0.0,        -100.0,    18.0,
+        0.0,        10.0,       -10.000004, 10.000004, -10.000004,
+        10.000004,  -10.000004,                                   // right hand
+        -10.000004, 10.000004,  -10.000004, 10.000004, -10.000004 // left hand
+    },
+    // 6- Initial position for model building 1,
+    {14.323945, -6.0363396, -13.459409, 44.02602, -30.566611, 6.0363396,
+     0.0000001, 7.4859801,  -27.663319, 44.65489, -16.991579, -7.4859801,
+     0.,        0.,         0.,         0.,       12.397718,  -10.000004,
+     0.,        -29.618538, 0.,         0.,       10.0,       16.536364,
+     10.000004, 0.,         -29.828011, 0.,       0.,         10.0,
+
+     -10.0,     10.0,       -10.0,      10,       -10.0,      -10.0,
+     10.0,      -10.0,      10.0,       -10.0},
+    // 7- Initial position for model buiding 2
+    {-7.16197, -7.69299, -16.1787, 44.5201,  -28.3415, 7.69299, 7.16197,
+     5.74946,  -31.3668, 44.1057,  -12.7389, -5.74946,
+
+     0.,       0.,       0.,       0.,
+
+     12.622,   -10,      0,        -29.678,  0,        0,       10,
+     16.7091,  10,       0,        -29.7841, 0,        0,       10,
+
+     -10.0,    10.0,     -10.0,    10,       -10.0,    -10.0,   10.0,
+     -10.0,    10.0,     -10.0}
 
 };
 
-
-
 //      ":comheight 0.807727",
-void CommonInitialization(PatternGeneratorInterface &aPGI)
-{
-  const char lBuffer[12][256] =
-    {":comheight 0.8078",
-     ":samplingperiod 0.005",
-     ":previewcontroltime 1.6",
-     ":omega 0.0",
-     ":stepheight 0.07",
-     ":singlesupporttime 0.7",
-     ":doublesupporttime 0.1",
-     ":armparameters 0.5",
-     ":LimitsFeasibility 0.0",
-     ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
-     ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
-     ":UpperBodyMotionParameters -0.1 -1.0 0.0"
-    };
-  
-  for(int i=0;i<9;i++)
-    {
-      std::istringstream strm(lBuffer[i]);
-      aPGI.ParseCmd(strm);
-    }
+void CommonInitialization(PatternGeneratorInterface &aPGI) {
+  const char lBuffer[12][256] = {":comheight 0.8078",
+                                 ":samplingperiod 0.005",
+                                 ":previewcontroltime 1.6",
+                                 ":omega 0.0",
+                                 ":stepheight 0.07",
+                                 ":singlesupporttime 0.7",
+                                 ":doublesupporttime 0.1",
+                                 ":armparameters 0.5",
+                                 ":LimitsFeasibility 0.0",
+                                 ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
+                                 ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
+                                 ":UpperBodyMotionParameters -0.1 -1.0 0.0"};
+
+  for (int i = 0; i < 9; i++) {
+    std::istringstream strm(lBuffer[i]);
+    aPGI.ParseCmd(strm);
+  }
   // Evaluate current state of the robot in the PG.
-  COMState   lStartingCOMPosition;
-  MAL_S3_VECTOR_TYPE(double)  lStartingZMPPosition;
-  MAL_VECTOR_TYPE(double)  lStartingWaistPose;
-  FootAbsolutePosition  InitLeftFootAbsPos;
-  FootAbsolutePosition  InitRightFootAbsPos;
+  COMState lStartingCOMPosition;
+  MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
+  MAL_VECTOR_TYPE(double) lStartingWaistPose;
+  FootAbsolutePosition InitLeftFootAbsPos;
+  FootAbsolutePosition InitRightFootAbsPos;
 
-  aPGI.EvaluateStartingState(lStartingCOMPosition,
-			     lStartingZMPPosition,
-			     lStartingWaistPose,
-			     InitLeftFootAbsPos,
-			     InitRightFootAbsPos);
-      
-
+  aPGI.EvaluateStartingState(lStartingCOMPosition, lStartingZMPPosition,
+                             lStartingWaistPose, InitLeftFootAbsPos,
+                             InitRightFootAbsPos);
 }
 
-void StraightWalking(PatternGeneratorInterface &aPGI)
-{
+void StraightWalking(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
-   {
+  {
     istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
     aPGI.ParseCmd(strm2);
   }
- 
+
   {
     istringstream strm2(":stepseq 0.0 -0.105 0.0 \
                      0.2 0.21 0.0  \
@@ -209,13 +200,11 @@ void StraightWalking(PatternGeneratorInterface &aPGI)
                      0.0 0.21 0.0");
     aPGI.ParseCmd(strm2);
   }
-
 }
 
-void PbFlorentSeq1(PatternGeneratorInterface &aPGI)
-{
+void PbFlorentSeq1(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
-   {
+  {
     istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
     aPGI.ParseCmd(strm2);
   }
@@ -248,7 +237,7 @@ void PbFlorentSeq1(PatternGeneratorInterface &aPGI)
 0.0136717 0.2 -0.00157708 \
 0 -0.2 0");
     */
-istringstream strm2(":stepseq 0 0.1 0 \
+    istringstream strm2(":stepseq 0 0.1 0 \
 	-0.0398822	-0.232351	4.6646 \
 	-0.0261703	0.199677	4.6646 \
 	-0.0471999	-0.256672	4.6646 \
@@ -269,10 +258,9 @@ istringstream strm2(":stepseq 0 0.1 0 \
   }
 }
 
-void PbFlorentSeq2(PatternGeneratorInterface &aPGI)
-{
+void PbFlorentSeq2(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
-   {
+  {
     istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
     aPGI.ParseCmd(strm2);
   }
@@ -336,14 +324,11 @@ void PbFlorentSeq2(PatternGeneratorInterface &aPGI)
 				0 -0.2 0 ");
     aPGI.ParseCmd(strm2);
   }
-      
 }
 
-
-void PbFlorentSeq3(PatternGeneratorInterface &aPGI)
-{
+void PbFlorentSeq3(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
-   {
+  {
     istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
     aPGI.ParseCmd(strm2);
   }
@@ -387,20 +372,17 @@ void PbFlorentSeq3(PatternGeneratorInterface &aPGI)
 				0.00117482 -0.20335 -1.27115 \
 				0 0.2 0 ");
     aPGI.ParseCmd(strm2);
-    
   }
 }
 
-void StraightWalkingPBW(PatternGeneratorInterface &aPGI)
-{
+void StraightWalkingPBW(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     istringstream strm2(":SetAlgoForZmpTrajectory PBW");
     aPGI.ParseCmd(strm2);
   }
 
-  if (0)
-  {
+  if (0) {
     istringstream strm2(":setpbwconstraint XY 0.07 0.05");
     aPGI.ParseCmd(strm2);
   }
@@ -415,12 +397,10 @@ void StraightWalkingPBW(PatternGeneratorInterface &aPGI)
                      0.0 -0.21 0.0");
     aPGI.ParseCmd(strm2);
   }
-
 }
 
-void Herdt(PatternGeneratorInterface &aPGI)
-{
-  CommonInitialization(aPGI);  
+void Herdt(PatternGeneratorInterface &aPGI) {
+  CommonInitialization(aPGI);
 
   {
     istringstream strm2(":setVelReference  0.2 0.0 0.0");
@@ -435,12 +415,10 @@ void Herdt(PatternGeneratorInterface &aPGI)
     aPGI.ParseCmd(strm2);
   }
 
-  if (0)
-  {
+  if (0) {
     istringstream strm2(":setdimitrovconstraint XY 0.07 0.05");
     aPGI.ParseCmd(strm2);
   }
-
 
   {
     istringstream strm2(":stepseq 0.0 -0.105 0.0 \
@@ -452,27 +430,23 @@ void Herdt(PatternGeneratorInterface &aPGI)
                      0.0 -0.21 0.0");
     aPGI.ParseCmd(strm2);
   }
-
 }
 
-void Herdt_Stop(PatternGeneratorInterface &aPGI)
-{
+void Herdt_Stop(PatternGeneratorInterface &aPGI) {
   {
     istringstream strm2(":setVelReference  0.0 0.0 0.0");
     aPGI.ParseCmd(strm2);
   }
 }
 
-void StraightWalkingDimitrov(PatternGeneratorInterface &aPGI)
-{
+void StraightWalkingDimitrov(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     istringstream strm2(":SetAlgoForZmpTrajectory Dimitrov");
     aPGI.ParseCmd(strm2);
   }
 
-  if (0)
-  {
+  if (0) {
     istringstream strm2(":setdimitrovconstraint XY 0.07 0.05");
     aPGI.ParseCmd(strm2);
   }
@@ -487,25 +461,20 @@ void StraightWalkingDimitrov(PatternGeneratorInterface &aPGI)
                      0.0 -0.21 0.0");
     aPGI.ParseCmd(strm2);
   }
-
 }
 
-
-
-void CurvedWalkingDimitrov(PatternGeneratorInterface &aPGI)
-{
+void CurvedWalkingDimitrov(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     istringstream strm2(":SetAlgoForZmpTrajectory Dimitrov");
     aPGI.ParseCmd(strm2);
   }
 
-  if (0)
-    {
-      istringstream strm2(":setpbwconstraint XY 0.07 0.05");
-      aPGI.ParseCmd(strm2);
-    }
-  
+  if (0) {
+    istringstream strm2(":setpbwconstraint XY 0.07 0.05");
+    aPGI.ParseCmd(strm2);
+  }
+
   {
     istringstream strm2(":stepseq 0.0 -0.105 0.0 \
                      0.2 0.21 10.0  \
@@ -521,23 +490,20 @@ void CurvedWalkingDimitrov(PatternGeneratorInterface &aPGI)
                      0.0 0.21 0.0");
     aPGI.ParseCmd(strm2);
   }
-
 }
 
-void CurvedWalkingPBW(PatternGeneratorInterface &aPGI)
-{
+void CurvedWalkingPBW(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     istringstream strm2(":SetAlgoForZmpTrajectory PBW");
     aPGI.ParseCmd(strm2);
   }
 
-  if (0)
-    {
-      istringstream strm2(":setpbwconstraint XY 0.07 0.05");
-      aPGI.ParseCmd(strm2);
-    }
-  
+  if (0) {
+    istringstream strm2(":setpbwconstraint XY 0.07 0.05");
+    aPGI.ParseCmd(strm2);
+  }
+
   {
     istringstream strm2(":stepseq 0.0 -0.105 0.0 \
                      0.2 0.21 10.0  \
@@ -548,24 +514,20 @@ void CurvedWalkingPBW(PatternGeneratorInterface &aPGI)
                      0.0 -0.21 0.0");
     aPGI.ParseCmd(strm2);
   }
-
 }
 
-
-void CurvedWalkingPBW2(PatternGeneratorInterface &aPGI)
-{
+void CurvedWalkingPBW2(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     istringstream strm2(":SetAlgoForZmpTrajectory PBW");
     aPGI.ParseCmd(strm2);
   }
 
-  if (0)
-    {
-      istringstream strm2(":setpbwconstraint XY 0.07 0.05");
-      aPGI.ParseCmd(strm2);
-    }
-  
+  if (0) {
+    istringstream strm2(":setpbwconstraint XY 0.07 0.05");
+    aPGI.ParseCmd(strm2);
+  }
+
   {
     istringstream strm2(":stepseq 0.0 -0.105 0.0 \
                      0.2 0.21 10.0  \
@@ -581,11 +543,9 @@ void CurvedWalkingPBW2(PatternGeneratorInterface &aPGI)
                      0.0 0.21 0.0");
     aPGI.ParseCmd(strm2);
   }
-
 }
 
-void ShortStraightWalking(PatternGeneratorInterface &aPGI)
-{
+void ShortStraightWalking(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     istringstream strm2(":stepseq 0.0 -0.105 0.0 \
@@ -595,13 +555,12 @@ void ShortStraightWalking(PatternGeneratorInterface &aPGI)
                      0.2 -0.21 0.0 \
                      0.2  0.21 0.0 \
                      0.0 -0.21 0.0");
-    
+
     aPGI.ParseCmd(strm2);
   }
 }
 
-void ShortStraightWalkingOneStage(PatternGeneratorInterface &aPGI)
-{
+void ShortStraightWalkingOneStage(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     istringstream strm2(":SetAlgoForZmpTrajectory KajitaOneStage");
@@ -616,13 +575,12 @@ void ShortStraightWalkingOneStage(PatternGeneratorInterface &aPGI)
                      0.2 -0.21 0.0 \
                      0.2  0.21 0.0 \
                      0.0 -0.21 0.0");
-    
+
     aPGI.ParseCmd(strm2);
   }
 }
 
-void AnalyticalShortStraightWalking(PatternGeneratorInterface &aPGI)
-{
+void AnalyticalShortStraightWalking(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
@@ -639,11 +597,9 @@ void AnalyticalShortStraightWalking(PatternGeneratorInterface &aPGI)
                      0.0 -0.21 0.0");
     aPGI.ParseCmd(strm2);
   }
-
 }
 
-void Turn90DegreesWalking(PatternGeneratorInterface &aPGI)
-{
+void Turn90DegreesWalking(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     istringstream strm2(":stepseq 0.0 -0.105 0.0 \
@@ -662,53 +618,46 @@ void Turn90DegreesWalking(PatternGeneratorInterface &aPGI)
   }
 }
 
-void TurningOnTheCircleTowardsTheCenter(PatternGeneratorInterface &aPGI)
-{
+void TurningOnTheCircleTowardsTheCenter(PatternGeneratorInterface &aPGI) {
 
   CommonInitialization(aPGI);
 
-
   {
-     istringstream strm2(":arccentered 0.75 360.0 -1");
-     aPGI.ParseCmd(strm2);
-  }
-   
-  {
-     istringstream strm2(":finish");
-     aPGI.ParseCmd(strm2);
+    istringstream strm2(":arccentered 0.75 360.0 -1");
+    aPGI.ParseCmd(strm2);
   }
 
+  {
+    istringstream strm2(":finish");
+    aPGI.ParseCmd(strm2);
+  }
 }
 
-void TurningOnTheCircle(PatternGeneratorInterface &aPGI)
-{
+void TurningOnTheCircle(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
 
-   {
-     istringstream strm2(":supportfoot 1");
-     aPGI.ParseCmd(strm2);
+  {
+    istringstream strm2(":supportfoot 1");
+    aPGI.ParseCmd(strm2);
   }
 
   {
-     istringstream strm2(":arc 0.0 0.75 30.0 -1");
-     aPGI.ParseCmd(strm2);
-  }
-  
-  {
-     istringstream strm2(":lastsupport");
-     aPGI.ParseCmd(strm2);
+    istringstream strm2(":arc 0.0 0.75 30.0 -1");
+    aPGI.ParseCmd(strm2);
   }
 
   {
-     istringstream strm2(":finish");
-     aPGI.ParseCmd(strm2);
+    istringstream strm2(":lastsupport");
+    aPGI.ParseCmd(strm2);
   }
 
-
+  {
+    istringstream strm2(":finish");
+    aPGI.ParseCmd(strm2);
+  }
 }
 
-void StartOnLineWalking(PatternGeneratorInterface &aPGI)
-{
+void StartOnLineWalking(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     /*    istringstream strm2(":StartOnLineStepSequencing 0.0 -0.105 0.0 \
@@ -723,8 +672,7 @@ void StartOnLineWalking(PatternGeneratorInterface &aPGI)
   }
 }
 
-void StartSimuOnLineWalking(PatternGeneratorInterface &aPGI)
-{
+void StartSimuOnLineWalking(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
   {
     /*    istringstream strm2(":StartOnLineStepSequencing 0.0 -0.105 0.0 \
@@ -744,14 +692,12 @@ void StartSimuOnLineWalking(PatternGeneratorInterface &aPGI)
   }
 }
 
-void HerdtOnline(PatternGeneratorInterface &aPGI)
-{
+void HerdtOnline(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
 
   {
     istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
     aPGI.ParseCmd(strm2);
-
   }
   {
     istringstream strm2(":singlesupporttime 0.7");
@@ -763,9 +709,7 @@ void HerdtOnline(PatternGeneratorInterface &aPGI)
   }
 }
 
-
-void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
-{
+void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
 
   {
@@ -792,8 +736,7 @@ void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
   }
 }
 
-void StrangeStartingPosition(PatternGeneratorInterface &aPGI)
-{
+void StrangeStartingPosition(PatternGeneratorInterface &aPGI) {
   CommonInitialization(aPGI);
 
   {
@@ -807,15 +750,12 @@ void StrangeStartingPosition(PatternGeneratorInterface &aPGI)
   }
 }
 
-
-void StopOnLineWalking(PatternGeneratorInterface &aPGI)
-{
+void StopOnLineWalking(PatternGeneratorInterface &aPGI) {
   istringstream strm2(":StopOnLineStepSequencing");
   aPGI.ParseCmd(strm2);
 }
 
-void KineoWorks(PatternGeneratorInterface &aPGI)
-{
+void KineoWorks(PatternGeneratorInterface &aPGI) {
 
   CommonInitialization(aPGI);
   {
@@ -828,7 +768,7 @@ void KineoWorks(PatternGeneratorInterface &aPGI)
     aPGI.ParseCmd(strm2);
   }
   {
-    
+
     istringstream strm2(":stepseq 0.0 -0.105 0.0 0.0 0.2 \
                           0.21 0.0 0.0 0.2 -0.21 0.0 0.0 0.2 \
                           0.21 0.0 0.0 0.2 -0.21 0.0 0.0 0.2 \
@@ -840,34 +780,27 @@ void KineoWorks(PatternGeneratorInterface &aPGI)
                           0.21 0.0 0.0");
     aPGI.ParseCmd(strm2);
   }
-
 }
 
-void SteppingOver(PatternGeneratorInterface &aPGI)
-{
-  const char lBuffer[3][256] =
-    { ":walkmode 2",
-      ":UpperBodyMotionParameters -0.1 -1.0 0.0",
+void SteppingOver(PatternGeneratorInterface &aPGI) {
+  const char lBuffer[3][256] = {
+      ":walkmode 2", ":UpperBodyMotionParameters -0.1 -1.0 0.0",
       ":stepseq 0.0 -0.105 0.0 0.2 0.21 0.0 0.2 -0.21 0.0 0.2 \
                 0.21 0.0 0.2 -0.21 0.0 0.2 0.21 0.0 0.2 \
                -0.21 0.0  0.2 0.21 0.0 0.2 -0.21 0.0 0.2 \
-                0.21 0.0 0.2 -0.21 0.0 0.0 0.21 0.0"
-    };
-  
-  for(int i=0;i<3;i++)
-    {
-      std::istringstream strm(lBuffer[i]);
-      aPGI.ParseCmd(strm);
-    }
+                0.21 0.0 0.2 -0.21 0.0 0.0 0.21 0.0"};
+
+  for (int i = 0; i < 3; i++) {
+    std::istringstream strm(lBuffer[i]);
+    aPGI.ParseCmd(strm);
+  }
 }
 
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   // unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
   // unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
-   unsigned int TestProfil=PROFIL_HERDT_ONLINE;
-  //unsigned int TestProfil = PROFIL_STRAIGHT_WALKING_DIMITROV;
+  unsigned int TestProfil = PROFIL_HERDT_ONLINE;
+  // unsigned int TestProfil = PROFIL_STRAIGHT_WALKING_DIMITROV;
 
   string PCParametersFile;
   string VRMLPath;
@@ -875,97 +808,89 @@ int main(int argc, char *argv[])
   string SpecificitiesFileName;
   string LinkJointRank;
 
-  
-  if (argc!=5)
-    {
-      const char *openhrphome="OPENHRPHOME";
-      char *value = 0;
-      value = getenv(openhrphome);
-      if (value==0)
-	{
-	  cerr << " This program takes 4 arguments: " << endl;
-	  cerr << "./TestFootPrintPGInterface \
+  if (argc != 5) {
+    const char *openhrphome = "OPENHRPHOME";
+    char *value = 0;
+    value = getenv(openhrphome);
+    if (value == 0) {
+      cerr << " This program takes 4 arguments: " << endl;
+      cerr << "./TestFootPrintPGInterface \
                          PATH_TO_VRML_FILE	   \
                          VRML_FILE_NAME		   \
                          PATH_TO_SPECIFICITIES_XML \
-                         LINK_JOINT_RANK" << endl;
-	  exit(-1);
-	}
-      else
-	{
-	  VRMLPath=value;
-	  //VRMLPath+="/Controller/IOserver/robot/HRP2JRL/model/";
-	  VRMLFileName="HRP2JRLmain.wrl";
-	  SpecificitiesFileName = value;
-	  //SpecificitiesFileName +="/Controller/IOserver/robot/HRP2JRL/etc/";
-	  SpecificitiesFileName += "/HRP2Specificities.xml";
-	  LinkJointRank = value;
-	  //LinkJointRank += "/Controller/IOserver/robot/HRP2JRL/etc/";
-	  LinkJointRank += "HRP2LinkJointRank.xml";
-	  
-	  if (argc==2)
-	    {
-	      TestProfil=atoi(argv[1]);
-	      cout << "Profil: " << ProfilesNames[TestProfil] << endl;
-	    }
-	      
-	}
-    }	
-  else 
-    {
-      VRMLPath=argv[1];
-      VRMLFileName=argv[2];
-      SpecificitiesFileName = argv[3];
-      LinkJointRank = argv[4];
-    }
+                         LINK_JOINT_RANK"
+           << endl;
+      exit(-1);
+    } else {
+      VRMLPath = value;
+      // VRMLPath+="/Controller/IOserver/robot/HRP2JRL/model/";
+      VRMLFileName = "HRP2JRLmain.wrl";
+      SpecificitiesFileName = value;
+      // SpecificitiesFileName +="/Controller/IOserver/robot/HRP2JRL/etc/";
+      SpecificitiesFileName += "/HRP2Specificities.xml";
+      LinkJointRank = value;
+      // LinkJointRank += "/Controller/IOserver/robot/HRP2JRL/etc/";
+      LinkJointRank += "HRP2LinkJointRank.xml";
 
+      if (argc == 2) {
+        TestProfil = atoi(argv[1]);
+        cout << "Profil: " << ProfilesNames[TestProfil] << endl;
+      }
+    }
+  } else {
+    VRMLPath = argv[1];
+    VRMLFileName = argv[2];
+    SpecificitiesFileName = argv[3];
+    LinkJointRank = argv[4];
+  }
 
   // Creating the humanoid robot.
-  CjrlHumanoidDynamicRobot * aHDR = 0, * aDebugHDR = 0;
-  //dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
+  CjrlHumanoidDynamicRobot *aHDR = 0, *aDebugHDR = 0;
+  // dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
 
 #ifndef WITH_HRP2DYNAMICS
 //  aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
 //  aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
 #else
-# ifdef WIN32
-#pragma message ( " -- !!! -- Warning : Compiled with HRP2DYNAMICS !" )
-# else
+#ifdef WIN32
+#pragma message(" -- !!! -- Warning : Compiled with HRP2DYNAMICS !")
+#else
 #warning "Compiled with HRP2DYNAMICS !"
-# endif
-  Chrp2OptHumanoidDynamicRobot *aHRP2HDR= new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+#endif
+  Chrp2OptHumanoidDynamicRobot *aHRP2HDR =
+      new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
   aHDR = aHRP2HDR;
-  aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+  aDebugHDR =
+      new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
 #endif
 
   // Parsing the file.
   string RobotFileName = VRMLPath + VRMLFileName;
-//  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,
-//					 LinkJointRank,
-//					 SpecificitiesFileName);
+  //  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,
+  //					 LinkJointRank,
+  //					 SpecificitiesFileName);
 
-//  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aDebugHDR,RobotFileName,
-//					 LinkJointRank,
-//					 SpecificitiesFileName);
+  //  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aDebugHDR,RobotFileName,
+  //					 LinkJointRank,
+  //					 SpecificitiesFileName);
 
-  
   // Create Pattern Generator Interface
-  PatternGeneratorInterface * aPGI;
+  PatternGeneratorInterface *aPGI;
   aPGI = patternGeneratorInterfaceFactory(aHDR);
 
-  bool conversiontoradneeded=true;
-  
+  bool conversiontoradneeded = true;
+
   //  double * dInitPos = InitialPoses[INTERACTION_2008];
-  double * dInitPos = InitialPoses[HALF_SITTING_2008];
-  
+  double *dInitPos = InitialPoses[HALF_SITTING_2008];
+
   // This is a vector corresponding to the DOFs actuated of the robot.
-  MAL_VECTOR_DIM(InitialPosition,double,40);
-  //MAL_VECTOR_DIM(CurrentPosition,double,40);
+  MAL_VECTOR_DIM(InitialPosition, double, 40);
+  // MAL_VECTOR_DIM(CurrentPosition,double,40);
   if (conversiontoradneeded)
-    for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
-      InitialPosition(i) = dInitPos[i]*M_PI/180.0;
+    for (unsigned int i = 0; i < MAL_VECTOR_SIZE(InitialPosition); i++)
+      InitialPosition(i) = dInitPos[i] * M_PI / 180.0;
   else
-    for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
+    for (unsigned int i = 0; i < MAL_VECTOR_SIZE(InitialPosition); i++)
       InitialPosition(i) = dInitPos[i];
   aPGI->SetCurrentJointValues(InitialPosition);
 
@@ -975,42 +900,35 @@ int main(int argc, char *argv[])
 
   // This is a vector corresponding to ALL the DOFS of the robot:
   // free flyer + actuated DOFS.
-  MAL_VECTOR_DIM(CurrentConfiguration,double,46);
-  MAL_VECTOR_DIM(CurrentVelocity,double,46);
-  MAL_VECTOR_DIM(CurrentAcceleration,double,46);
-  MAL_VECTOR_DIM(PreviousConfiguration,double,46) ;
-  MAL_VECTOR_DIM(PreviousVelocity,double,46);
-  MAL_VECTOR_DIM(PreviousAcceleration,double,46);
-  for(int i=0;i<6;i++)
-    {
-      PreviousConfiguration[i] = 
-	PreviousVelocity[i] = 
-	PreviousAcceleration[i] = 0.0;
-    }
+  MAL_VECTOR_DIM(CurrentConfiguration, double, 46);
+  MAL_VECTOR_DIM(CurrentVelocity, double, 46);
+  MAL_VECTOR_DIM(CurrentAcceleration, double, 46);
+  MAL_VECTOR_DIM(PreviousConfiguration, double, 46);
+  MAL_VECTOR_DIM(PreviousVelocity, double, 46);
+  MAL_VECTOR_DIM(PreviousAcceleration, double, 46);
+  for (int i = 0; i < 6; i++) {
+    PreviousConfiguration[i] = PreviousVelocity[i] = PreviousAcceleration[i] =
+        0.0;
+  }
 
-  for(int i=6;i<46;i++)
-    {
-      PreviousConfiguration[i] = InitialPosition[i-6];
-      PreviousVelocity[i] = 
-	PreviousAcceleration[i] = 0.0;
-    }
+  for (int i = 6; i < 46; i++) {
+    PreviousConfiguration[i] = InitialPosition[i - 6];
+    PreviousVelocity[i] = PreviousAcceleration[i] = 0.0;
+  }
 
-  MAL_VECTOR_DIM(ZMPTarget,double,3);
-  
-  string inProperty[5]={"TimeStep","ComputeAcceleration",
-			"ComputeBackwardDynamics", "ComputeZMP",
-			"ResetIteration"};
-  string inValue[5]={"0.005","false","false","true","true"};
-  
-  for(unsigned int i=0;i<5;i++)
-    aDebugHDR->setProperty(inProperty[i],
-			   inValue[i]);
-  
-    
-  //COMPosition CurrentWaistPosition;
-  struct timeval begin,end,startingtime;
-  unsigned long int NbOfIt=0, NbOfItToCompute=0;
+  MAL_VECTOR_DIM(ZMPTarget, double, 3);
 
+  string inProperty[5] = {"TimeStep", "ComputeAcceleration",
+                          "ComputeBackwardDynamics", "ComputeZMP",
+                          "ResetIteration"};
+  string inValue[5] = {"0.005", "false", "false", "true", "true"};
+
+  for (unsigned int i = 0; i < 5; i++)
+    aDebugHDR->setProperty(inProperty[i], inValue[i]);
+
+  // COMPosition CurrentWaistPosition;
+  struct timeval begin, end, startingtime;
+  unsigned long int NbOfIt = 0, NbOfItToCompute = 0;
 
   bool TestChangeFoot = true;
 
@@ -1020,362 +938,328 @@ int main(int argc, char *argv[])
   FootAbsolutePosition LeftFootPosition;
   FootAbsolutePosition RightFootPosition;
 
-
   bool DebugFGPI = true;
   bool DebugZMP2 = true;
   bool DebugConfiguration = false;
   unsigned int PGIInterface = 0;
-  
-  double TimeProfile[200*620];
-  bool bTimeProfile=true;
-  double TimeProfileTS[200*620];
+
+  double TimeProfile[200 * 620];
+  bool bTimeProfile = true;
+  double TimeProfileTS[200 * 620];
   unsigned int TimeProfileIndex = 0;
-  unsigned int TimeProfileUpperLimit=200*620;
+  unsigned int TimeProfileUpperLimit = 200 * 620;
 
   ofstream aofzmpmb2;
   if (DebugZMP2)
-    aofzmpmb2.open("ZMPMBSTAGE2.dat",ofstream::out);
+    aofzmpmb2.open("ZMPMBSTAGE2.dat", ofstream::out);
 
   ofstream aofq;
-  if (DebugConfiguration)
-    {
-      aofq.open("TestConfiguration.dat",ofstream::out);
-      if (aofq.is_open())
-	{
-	  for(unsigned int k=0;k<30;k++)
-	    {
-	      aofq << dInitPos[k] << " ";
-	    }
-	  aofq << endl;
-	}
-
+  if (DebugConfiguration) {
+    aofq.open("TestConfiguration.dat", ofstream::out);
+    if (aofq.is_open()) {
+      for (unsigned int k = 0; k < 30; k++) {
+        aofq << dInitPos[k] << " ";
+      }
+      aofq << endl;
     }
+  }
 
   ofstream aof;
-  if (DebugFGPI)
-    {
-      aof.open("TestFGPI_description.dat",ofstream::out);
-      string Titles[25] =
-	{ "Time",
-	  "Com X",
-	  "Com Y" ,
-	  "Com Z" ,
-	  "Com dX" ,
-	  "Com dY" ,
-	  "Com dZ" ,
-	  "ZMP X (waist ref.)" ,
-	  "ZMP Y (waist ref.)" ,
-	  "Left Foot X" ,
-	  "Left Foot Y" ,
-	  "Left Foot Z" ,
-	  "Left Foot Theta" ,
-	  "Left Foot Omega" ,
-	  "Left Foot Omega2" ,
-	  "Right Foot X" ,
-	  "Right Foot Y" ,
-	  "Right Foot Z" ,
-	  "Right Foot Theta" ,
-	  "Right Foot Omega" ,
-	  "Right Foot Omega2" ,
-	  "ZMP X (world ref.)" ,
-	  "ZMP Y (world ref.)" ,
-	  "Waist X (world ref.)" ,
-	  "Waist Y (world ref.)" };
-      for(unsigned int i=0;i<25;i++)
-	aof << i+1 << ". " <<Titles[i] <<std::endl;
-	
-      aof.close();
-      aof.open("TestFGPI.dat",ofstream::out);
-    }
+  if (DebugFGPI) {
+    aof.open("TestFGPI_description.dat", ofstream::out);
+    string Titles[25] = {"Time",
+                         "Com X",
+                         "Com Y",
+                         "Com Z",
+                         "Com dX",
+                         "Com dY",
+                         "Com dZ",
+                         "ZMP X (waist ref.)",
+                         "ZMP Y (waist ref.)",
+                         "Left Foot X",
+                         "Left Foot Y",
+                         "Left Foot Z",
+                         "Left Foot Theta",
+                         "Left Foot Omega",
+                         "Left Foot Omega2",
+                         "Right Foot X",
+                         "Right Foot Y",
+                         "Right Foot Z",
+                         "Right Foot Theta",
+                         "Right Foot Omega",
+                         "Right Foot Omega2",
+                         "ZMP X (world ref.)",
+                         "ZMP Y (world ref.)",
+                         "Waist X (world ref.)",
+                         "Waist Y (world ref.)"};
+    for (unsigned int i = 0; i < 25; i++)
+      aof << i + 1 << ". " << Titles[i] << std::endl;
 
-  double totaltime=0,maxtime=0;
-  double totaltimemodif=0, timemodif = 0;
-  double totaltimeinplanning=0;
-  double newtime=0,deltatime=0;
-  unsigned long int nbofmodifs=0;
-  
-  gettimeofday(&startingtime,0);
+    aof.close();
+    aof.open("TestFGPI.dat", ofstream::out);
+  }
+
+  double totaltime = 0, maxtime = 0;
+  double totaltimemodif = 0, timemodif = 0;
+  double totaltimeinplanning = 0;
+  double newtime = 0, deltatime = 0;
+  unsigned long int nbofmodifs = 0;
+
+  gettimeofday(&startingtime, 0);
   // Number of sequences added.
   unsigned int lNbItMax = 1;
-  
-  if (TestProfil==PROFIL_PB_FLORENT)
+
+  if (TestProfil == PROFIL_PB_FLORENT)
     lNbItMax = 3;
 
-  for (unsigned int lNbIt=0;lNbIt<lNbItMax;lNbIt++)
-    {
-      //StrangeStartingPosition(*aPGI);
-      cout << "<===============================================================>"<<endl;
-      cout << "Iteration nb: " << lNbIt << endl;
-      gettimeofday(&begin,0);
-      switch (TestProfil) 
-	{
+  for (unsigned int lNbIt = 0; lNbIt < lNbItMax; lNbIt++) {
+    // StrangeStartingPosition(*aPGI);
+    cout << "<===============================================================>"
+         << endl;
+    cout << "Iteration nb: " << lNbIt << endl;
+    gettimeofday(&begin, 0);
+    switch (TestProfil) {
 
-	case PROFIL_PB_FLORENT:
-	  if (lNbIt==0)
-	    PbFlorentSeq1(*aPGI);
-	  else if (lNbIt==1)
-	    PbFlorentSeq2(*aPGI);
-	  else if (lNbIt==2)
-	    PbFlorentSeq3(*aPGI);  
-	    break;
+    case PROFIL_PB_FLORENT:
+      if (lNbIt == 0)
+        PbFlorentSeq1(*aPGI);
+      else if (lNbIt == 1)
+        PbFlorentSeq2(*aPGI);
+      else if (lNbIt == 2)
+        PbFlorentSeq3(*aPGI);
+      break;
 
-	case PROFIL_STEPPING_OVER:
-	  SteppingOver(*aPGI);
-	  break;
+    case PROFIL_STEPPING_OVER:
+      SteppingOver(*aPGI);
+      break;
 
-	case PROFIL_SHORT_STRAIGHT_WALKING:
-	  ShortStraightWalking(*aPGI);
-	  break;
+    case PROFIL_SHORT_STRAIGHT_WALKING:
+      ShortStraightWalking(*aPGI);
+      break;
 
-	case PROFIL_SHORT_STRAIGHT_WALKING_ONE_STAGE:
-	  ShortStraightWalking(*aPGI);
-	  break;	  
+    case PROFIL_SHORT_STRAIGHT_WALKING_ONE_STAGE:
+      ShortStraightWalking(*aPGI);
+      break;
 
-	case PROFIL_CURVED_WALKING_PBW2:
-	  CurvedWalkingPBW2(*aPGI);
-	  break;
+    case PROFIL_CURVED_WALKING_PBW2:
+      CurvedWalkingPBW2(*aPGI);
+      break;
 
-	case PROFIL_KINEOWORKS:
-	  KineoWorks(*aPGI);
-	  break;
+    case PROFIL_KINEOWORKS:
+      KineoWorks(*aPGI);
+      break;
 
-	case PROFIL_STRAIGHT_WALKING:
-	  StraightWalking(*aPGI);
-	  break;
+    case PROFIL_STRAIGHT_WALKING:
+      StraightWalking(*aPGI);
+      break;
 
-	case PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING:
-	  AnalyticalShortStraightWalking(*aPGI);
-	  break;
+    case PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING:
+      AnalyticalShortStraightWalking(*aPGI);
+      break;
 
-	case PROFIL_CURVED_WALKING_PBW:
-	  CurvedWalkingPBW(*aPGI);
-	  break;
+    case PROFIL_CURVED_WALKING_PBW:
+      CurvedWalkingPBW(*aPGI);
+      break;
 
-	case PROFIL_STRAIGHT_WALKING_DIMITROV:
-	  StraightWalkingDimitrov(*aPGI);
-	  break;
+    case PROFIL_STRAIGHT_WALKING_DIMITROV:
+      StraightWalkingDimitrov(*aPGI);
+      break;
 
-	case PROFIL_HERDT:
-	  Herdt(*aPGI);
-	  break;
-	  
-	case PROFIL_HERDT_ONLINE:
-	  HerdtOnline(*aPGI);
-	  break;
+    case PROFIL_HERDT:
+      Herdt(*aPGI);
+      break;
 
-	case PROFIL_CURVED_WALKING_DIMITROV:
-	  CurvedWalkingDimitrov(*aPGI);
-	  break;
+    case PROFIL_HERDT_ONLINE:
+      HerdtOnline(*aPGI);
+      break;
 
-	case PROFIL_TURN_90D:
-	  Turn90DegreesWalking(*aPGI);
-	  break;
+    case PROFIL_CURVED_WALKING_DIMITROV:
+      CurvedWalkingDimitrov(*aPGI);
+      break;
 
-	case PROFIL_TURNING_ON_THE_CIRCLE:
-	  TurningOnTheCircle(*aPGI);
-	  break;
+    case PROFIL_TURN_90D:
+      Turn90DegreesWalking(*aPGI);
+      break;
 
-	case PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER:
-	  TurningOnTheCircleTowardsTheCenter(*aPGI);
-	  break;
+    case PROFIL_TURNING_ON_THE_CIRCLE:
+      TurningOnTheCircle(*aPGI);
+      break;
 
-	case PROFIL_ANALYTICAL_ONLINE_WALKING:
-	  StartAnalyticalOnLineWalking(*aPGI);
-	  break;
+    case PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER:
+      TurningOnTheCircleTowardsTheCenter(*aPGI);
+      break;
 
-	case PROFIL_ONLINE_WALKING:
-	  StartOnLineWalking(*aPGI);
-	  break;
-	  
-	case PROFIL_SIMU_ONLINE_WALKING:
-	  StartSimuOnLineWalking(*aPGI);
+    case PROFIL_ANALYTICAL_ONLINE_WALKING:
+      StartAnalyticalOnLineWalking(*aPGI);
+      break;
 
-	default:
-	  break;
-	};
+    case PROFIL_ONLINE_WALKING:
+      StartOnLineWalking(*aPGI);
+      break;
 
-	
-      // Should generate the same than the one previous (but shorter to specify).
+    case PROFIL_SIMU_ONLINE_WALKING:
+      StartSimuOnLineWalking(*aPGI);
 
-      gettimeofday(&end,0);
-      double ltime = end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
-      totaltimeinplanning+=ltime;
+    default:
+      break;
+    };
 
-      aDebugHDR->currentConfiguration(PreviousConfiguration);	      
-      aDebugHDR->currentVelocity(PreviousVelocity);
-      aDebugHDR->currentAcceleration(PreviousAcceleration);
-      aDebugHDR->computeForwardKinematics();
+    // Should generate the same than the one previous (but shorter to specify).
 
-      bool ok = true;
-      while(ok)
-	{
-	  gettimeofday(&begin,0);
-	  
-	  if (PGIInterface==0)
-	    {
-	      ok = aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
-						    CurrentVelocity,
-						    CurrentAcceleration,
-						    ZMPTarget,
-						    finalCOMPosition,
-						    LeftFootPosition,
-						    RightFootPosition);
-	    }
-	  else if (PGIInterface==1)
-	    {
-	      ok = aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
-						    CurrentVelocity,
-						    CurrentAcceleration,
-						    ZMPTarget);
-	    }
+    gettimeofday(&end, 0);
+    double ltime =
+        end.tv_sec - begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
+    totaltimeinplanning += ltime;
 
-	  gettimeofday(&end,0);
-	  double ltime = end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
-	  if (maxtime<ltime)
-	    maxtime = ltime;
-	  NbOfIt++;
-	  
-	  if (ltime>0.000300)
-	    {
-	      totaltime += ltime;
-	      NbOfItToCompute++;
-	    }
-	  
-	  if (NbOfIt>3)
-	    {
-	      if (TestProfil==PROFIL_SHORT_STRAIGHT_WALKING)
-		{
-		  aDebugHDR->currentConfiguration(PreviousConfiguration);	      
-		  aDebugHDR->currentVelocity(PreviousVelocity);
-		  aDebugHDR->currentAcceleration(PreviousAcceleration);
-		  aDebugHDR->computeForwardKinematics();
-		  
-		  MAL_S3_VECTOR_TYPE(double) ZMPmultibody;
-		  ZMPmultibody = aDebugHDR->zeroMomentumPoint();
-		  if (DebugZMP2)
-		    {
-		      if (aofzmpmb2.is_open())
-			{
-			  aofzmpmb2 << ZMPmultibody[0] << " " << ZMPmultibody[1] << endl;
-			}
-		    }
-		}
-	    }
-	  PreviousConfiguration = CurrentConfiguration;	  
-	  PreviousVelocity = CurrentVelocity;
-	  PreviousAcceleration = CurrentAcceleration;
-	  
-	  timemodif =0;
-			      
-	  if (TestProfil==PROFIL_ANALYTICAL_ONLINE_WALKING)
-	    {
-	      if (NbOfIt>50*200) /* Stop after 30 seconds the on-line stepping */
-		{
-		  StopOnLineWalking(*aPGI);
-		}
-	      else{
-		
-		double triggertime = 9.64*200 + deltatime*200;
-		if ((NbOfIt>triggertime) && 
-		    TestChangeFoot)
-		  {
-		    struct timeval beginmodif,endmodif;
-		    PatternGeneratorJRL::FootAbsolutePosition aFAP;
-		    //aFAP.x=0.2;
-		    //aFAP.y=-0.09;
-		    if (nbofmodifs<NBOFPREDEFONLINEFOOTSTEPS)
-		      {
-			aFAP.x = OnLineFootSteps[nbofmodifs][0];
-			aFAP.y = OnLineFootSteps[nbofmodifs][1];
-			aFAP.theta = OnLineFootSteps[nbofmodifs][2];
-		      }
-		    else
-		      {
-			aFAP.x=0.1;
-			aFAP.y=0.0;
-			aFAP.theta=5.0;
-		      }
-		    gettimeofday(&beginmodif,0);
-		    aPGI->ChangeOnLineStep(0.805,aFAP,newtime);
-		    deltatime += newtime+0.025;
-		    gettimeofday(&endmodif,0);
-		    timemodif = endmodif.tv_sec-beginmodif.tv_sec + 
-		      0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
-		    totaltimemodif += timemodif;
-		    nbofmodifs++;
-		    TestChangeFoot=true;
-		    NbStepsModified++;
-		    if (NbStepsModified==360)
-		      TestChangeFoot=false;
-		  }
-	      }
-	    }
+    aDebugHDR->currentConfiguration(PreviousConfiguration);
+    aDebugHDR->currentVelocity(PreviousVelocity);
+    aDebugHDR->currentAcceleration(PreviousAcceleration);
+    aDebugHDR->computeForwardKinematics();
 
-		      
-	  if (TestProfil==PROFIL_HERDT_ONLINE)
-	    {
-	      if (NbOfIt>3*200) /* Stop after 3 seconds the on-line stepping */
-		{
-		  Herdt_Stop(*aPGI);
-		  if(NbOfIt > 5*200)
-		    ok=false;
-		}
-	    }
+    bool ok = true;
+    while (ok) {
+      gettimeofday(&begin, 0);
 
-	  TimeProfile[TimeProfileIndex] = ltime + timemodif;
-	  TimeProfileTS[TimeProfileIndex] = begin.tv_sec + 0.000001 * begin.tv_usec;
-	  TimeProfileIndex++;
-	  if (TimeProfileIndex>TimeProfileUpperLimit)
-	    TimeProfileIndex = 0;
+      if (PGIInterface == 0) {
+        ok = aPGI->RunOneStepOfTheControlLoop(
+            CurrentConfiguration, CurrentVelocity, CurrentAcceleration,
+            ZMPTarget, finalCOMPosition, LeftFootPosition, RightFootPosition);
+      } else if (PGIInterface == 1) {
+        ok = aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
+                                              CurrentVelocity,
+                                              CurrentAcceleration, ZMPTarget);
+      }
 
-	  if (DebugFGPI)
-	    {
-	      aof << NbOfIt*0.005 << " " 
-		  << finalCOMPosition.x[0] << " "
-		  << finalCOMPosition.y[0] << " " 
-		  << finalCOMPosition.z[0] << " "
-		  << finalCOMPosition.x[1] << " "
-		  << finalCOMPosition.y[1] << " " 
-		  << finalCOMPosition.z[1] << " "
-		  << ZMPTarget(0) << " " << ZMPTarget(1) << " " 
-		  << LeftFootPosition.x  << " " << LeftFootPosition.y  << " " 
-		  << LeftFootPosition.z  << " " << LeftFootPosition.theta  << " "  
-		  << LeftFootPosition.omega  << " " << LeftFootPosition.omega2  << " "
-		  << RightFootPosition.x << " " << RightFootPosition.y << " " 
-		  << RightFootPosition.z << " " << RightFootPosition.theta << " " 
-		  << RightFootPosition.omega  << " " << RightFootPosition.omega2  << " "
-		  << ZMPTarget(0)*cos(CurrentConfiguration(5)) - ZMPTarget(1)*sin(CurrentConfiguration(5))+CurrentConfiguration(0) << " " 
-		  << ZMPTarget(0)*sin(CurrentConfiguration(5)) + ZMPTarget(1)*cos(CurrentConfiguration(5))+CurrentConfiguration(1) << " "
-		  << CurrentConfiguration(0) << " " 
-		  << CurrentConfiguration(1) << " " 
-		  << begin.tv_sec + 0.000001 * begin.tv_usec 
-		  << endl;
-	    }
-	  
-	  if (DebugConfiguration)
-	    {
-	      for(unsigned int k=0;k<30;k++)
-		{
-		  aofq << CurrentConfiguration[k+6]*180/M_PI << " ";
-		}
-	      aofq << endl;
-	    }
-	}
+      gettimeofday(&end, 0);
+      double ltime =
+          end.tv_sec - begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
+      if (maxtime < ltime)
+        maxtime = ltime;
+      NbOfIt++;
 
-      cout << "End of iteration " << lNbIt << endl;
-      cout << "<===============================================================>"<<endl;
+      if (ltime > 0.000300) {
+        totaltime += ltime;
+        NbOfItToCompute++;
+      }
+
+      if (NbOfIt > 3) {
+        if (TestProfil == PROFIL_SHORT_STRAIGHT_WALKING) {
+          aDebugHDR->currentConfiguration(PreviousConfiguration);
+          aDebugHDR->currentVelocity(PreviousVelocity);
+          aDebugHDR->currentAcceleration(PreviousAcceleration);
+          aDebugHDR->computeForwardKinematics();
+
+          MAL_S3_VECTOR_TYPE(double) ZMPmultibody;
+          ZMPmultibody = aDebugHDR->zeroMomentumPoint();
+          if (DebugZMP2) {
+            if (aofzmpmb2.is_open()) {
+              aofzmpmb2 << ZMPmultibody[0] << " " << ZMPmultibody[1] << endl;
+            }
+          }
+        }
+      }
+      PreviousConfiguration = CurrentConfiguration;
+      PreviousVelocity = CurrentVelocity;
+      PreviousAcceleration = CurrentAcceleration;
+
+      timemodif = 0;
+
+      if (TestProfil == PROFIL_ANALYTICAL_ONLINE_WALKING) {
+        if (NbOfIt > 50 * 200) /* Stop after 30 seconds the on-line stepping */
+        {
+          StopOnLineWalking(*aPGI);
+        } else {
+
+          double triggertime = 9.64 * 200 + deltatime * 200;
+          if ((NbOfIt > triggertime) && TestChangeFoot) {
+            struct timeval beginmodif, endmodif;
+            PatternGeneratorJRL::FootAbsolutePosition aFAP;
+            // aFAP.x=0.2;
+            // aFAP.y=-0.09;
+            if (nbofmodifs < NBOFPREDEFONLINEFOOTSTEPS) {
+              aFAP.x = OnLineFootSteps[nbofmodifs][0];
+              aFAP.y = OnLineFootSteps[nbofmodifs][1];
+              aFAP.theta = OnLineFootSteps[nbofmodifs][2];
+            } else {
+              aFAP.x = 0.1;
+              aFAP.y = 0.0;
+              aFAP.theta = 5.0;
+            }
+            gettimeofday(&beginmodif, 0);
+            aPGI->ChangeOnLineStep(0.805, aFAP, newtime);
+            deltatime += newtime + 0.025;
+            gettimeofday(&endmodif, 0);
+            timemodif = endmodif.tv_sec - beginmodif.tv_sec +
+                        0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
+            totaltimemodif += timemodif;
+            nbofmodifs++;
+            TestChangeFoot = true;
+            NbStepsModified++;
+            if (NbStepsModified == 360)
+              TestChangeFoot = false;
+          }
+        }
+      }
+
+      if (TestProfil == PROFIL_HERDT_ONLINE) {
+        if (NbOfIt > 3 * 200) /* Stop after 3 seconds the on-line stepping */
+        {
+          Herdt_Stop(*aPGI);
+          if (NbOfIt > 5 * 200)
+            ok = false;
+        }
+      }
+
+      TimeProfile[TimeProfileIndex] = ltime + timemodif;
+      TimeProfileTS[TimeProfileIndex] = begin.tv_sec + 0.000001 * begin.tv_usec;
+      TimeProfileIndex++;
+      if (TimeProfileIndex > TimeProfileUpperLimit)
+        TimeProfileIndex = 0;
+
+      if (DebugFGPI) {
+        aof << NbOfIt * 0.005 << " " << finalCOMPosition.x[0] << " "
+            << finalCOMPosition.y[0] << " " << finalCOMPosition.z[0] << " "
+            << finalCOMPosition.x[1] << " " << finalCOMPosition.y[1] << " "
+            << finalCOMPosition.z[1] << " " << ZMPTarget(0) << " "
+            << ZMPTarget(1) << " " << LeftFootPosition.x << " "
+            << LeftFootPosition.y << " " << LeftFootPosition.z << " "
+            << LeftFootPosition.theta << " " << LeftFootPosition.omega << " "
+            << LeftFootPosition.omega2 << " " << RightFootPosition.x << " "
+            << RightFootPosition.y << " " << RightFootPosition.z << " "
+            << RightFootPosition.theta << " " << RightFootPosition.omega << " "
+            << RightFootPosition.omega2 << " "
+            << ZMPTarget(0) * cos(CurrentConfiguration(5)) -
+                   ZMPTarget(1) * sin(CurrentConfiguration(5)) +
+                   CurrentConfiguration(0)
+            << " "
+            << ZMPTarget(0) * sin(CurrentConfiguration(5)) +
+                   ZMPTarget(1) * cos(CurrentConfiguration(5)) +
+                   CurrentConfiguration(1)
+            << " " << CurrentConfiguration(0) << " " << CurrentConfiguration(1)
+            << " " << begin.tv_sec + 0.000001 * begin.tv_usec << endl;
+      }
+
+      if (DebugConfiguration) {
+        for (unsigned int k = 0; k < 30; k++) {
+          aofq << CurrentConfiguration[k + 6] * 180 / M_PI << " ";
+        }
+        aofq << endl;
+      }
     }
 
+    cout << "End of iteration " << lNbIt << endl;
+    cout << "<===============================================================>"
+         << endl;
+  }
 
   aofzmpmb2.close();
 
-  if (bTimeProfile)
-  {
-    ofstream lProfileOutput("TimeProfile.dat",ofstream::out);
+  if (bTimeProfile) {
+    ofstream lProfileOutput("TimeProfile.dat", ofstream::out);
     double dST = startingtime.tv_sec + 0.000001 * startingtime.tv_usec;
-    for(unsigned int i=0;i<TimeProfileIndex;i++)
-      lProfileOutput << " " <<	TimeProfileTS[i] - dST
-		     << " " << TimeProfile[i] << std::endl;
+    for (unsigned int i = 0; i < TimeProfileIndex; i++)
+      lProfileOutput << " " << TimeProfileTS[i] - dST << " " << TimeProfile[i]
+                     << std::endl;
 
     lProfileOutput.close();
   }
@@ -1386,16 +1270,13 @@ int main(int argc, char *argv[])
   if (DebugFGPI)
     aof.close();
 
-  
   delete aPGI;
 
   cout << "Number of iterations " << NbOfIt << " " << NbOfItToCompute << endl;
-  cout << "Time consumption: " << (double)totaltime/(double)NbOfItToCompute 
-       << " max time: " << maxtime <<endl;
-  cout << "Time for modif: " << (double)totaltimemodif/(double)nbofmodifs 
-       <<  " nb of modifs: " << nbofmodifs << endl ;
-  cout << "Time on ZMP ref planning (Kajita policy): " 
-       << totaltimeinplanning<< " " 
-       << totaltimeinplanning*4/(double)NbOfIt<< endl;
-
+  cout << "Time consumption: " << (double)totaltime / (double)NbOfItToCompute
+       << " max time: " << maxtime << endl;
+  cout << "Time for modif: " << (double)totaltimemodif / (double)nbofmodifs
+       << " nb of modifs: " << nbofmodifs << endl;
+  cout << "Time on ZMP ref planning (Kajita policy): " << totaltimeinplanning
+       << " " << totaltimeinplanning * 4 / (double)NbOfIt << endl;
 }
