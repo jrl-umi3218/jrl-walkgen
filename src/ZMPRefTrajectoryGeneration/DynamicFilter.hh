@@ -88,8 +88,7 @@ public: // Public methods
   void CallMethod(std::string &Method, std::istringstream &strm);
 
 private: // Private methods
-  // void computeWaist(const FootAbsolutePosition & inputLeftFoot) ;
-
+         // void computeWaist(const FootAbsolutePosition & inputLeftFoot) ;
   // -------------------------------------------------------------------
 
 public: // The accessors
