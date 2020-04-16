@@ -42,6 +42,7 @@
 
 #include <SimplePlugin.hh>
 #include <jrl/walkgen/pgtypes.hh>
+#include <privatepgtypes.hh>
 
 namespace PatternGeneratorJRL {
 
