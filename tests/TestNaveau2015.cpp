@@ -642,29 +642,29 @@ protected:
   void chooseTestProfile() {
     ODEBUG("ROBOT:" << m_PR->getName() << " Profile: " << m_TestProfile);
     switch (m_TestProfile) {
-    case PROFIL_NAVEAU:
-      createFullEventsForHRP2();
-      if (m_PR->getName() == "hrp2_14_reduced")
-        startHRP2OnLineWalking(*m_PGI);
-      else if (m_PR->getName() == "talos")
-        startTalosOnLineWalking(*m_PGI);
-      else
-        throw("No valid robot");
-      break;
+      case PROFIL_NAVEAU:
+        createFullEventsForHRP2();
+        if (m_PR->getName() == "hrp2_14_reduced")
+          startHRP2OnLineWalking(*m_PGI);
+        else if (m_PR->getName() == "talos")
+          startTalosOnLineWalking(*m_PGI);
+        else
+          throw("No valid robot "+m_PR->getName());
+        break;
 
-    case PROFIL_SIMPLE_NAVEAU:
-      createSimpleEventsForHRP2();
-      if (m_PR->getName() == "hrp2_14_reduced")
-        startHRP2OnLineWalking(*m_PGI);
-      else if (m_PR->getName() == "talos")
-        startTalosOnLineWalking(*m_PGI);
-      else
-        throw("No valid robot");
-      break;
+      case PROFIL_SIMPLE_NAVEAU:
+        createSimpleEventsForHRP2();
+        if (m_PR->getName() == "hrp2_14_reduced")
+          startHRP2OnLineWalking(*m_PGI);
+        else if (m_PR->getName() == "talos")
+          startTalosOnLineWalking(*m_PGI);
+        else
+          throw("No valid robot "+m_PR->getName());
+        break;
 
-    default:
-      throw("No correct test profile");
-      break;
+      default:
+        throw("No correct test profile");
+        break;
     }
   }
 
