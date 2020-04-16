@@ -30,43 +30,32 @@
 #ifndef _UPPER_BODY_MOTION_
 #define _UPPER_BODY_MOTION_
 
-
-
-#include <vector>
 #include <string>
+#include <vector>
 //#define FULL_POLYNOME
 
-using namespace::std;
+using namespace ::std;
 
 #include <Eigen/Dense>
 #include <Mathematics/PolynomeFoot.hh>
 
+namespace PatternGeneratorJRL {
 
+class UpperBodyMotion {
+public:
+  /// Constructor
+  UpperBodyMotion();
 
-namespace PatternGeneratorJRL
-{
+  /// Destructor
+  ~UpperBodyMotion();
 
-  class  UpperBodyMotion
-  {
-  public :
+  void GenerateDataFile(string aFileName, int LenghtDataArray);
 
-    /// Constructor
-    UpperBodyMotion();
+  void ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles);
 
-    /// Destructor
-    ~UpperBodyMotion();
+  void WriteDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles);
 
-    void GenerateDataFile(string aFileName, int LenghtDataArray);
-
-    void ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles);
-
-    void WriteDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles);
-
-
-  protected:
-
-
-
-  };
-}
+protected:
+};
+} // namespace PatternGeneratorJRL
 #endif /* _UPPER_BODY_MOTION_*/

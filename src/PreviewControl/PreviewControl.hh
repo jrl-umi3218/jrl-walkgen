@@ -28,165 +28,147 @@
 #ifndef _PREVIEW_CONTROL_H_
 #define _PREVIEW_CONTROL_H_
 
-
+#include <deque>
 #include <iostream>
 #include <string>
-#include <deque>
 #include <vector>
 
-using namespace::std;
+using namespace ::std;
 
-
-#include <jrl/walkgen/pgtypes.hh>
-#include <SimplePlugin.hh>
 #include <PreviewControl/OptimalControllerSolver.hh>
+#include <SimplePlugin.hh>
+#include <jrl/walkgen/pgtypes.hh>
 
-namespace PatternGeneratorJRL
-{
+namespace PatternGeneratorJRL {
 
+/** @ingroup previewcontrol
 
-  /** @ingroup previewcontrol
+    \brief Class to implement the preview control
+*/
+class PreviewControl : public SimplePlugin {
+public:
+  /*! Constructor */
+  PreviewControl(
+      SimplePluginManager *lSPM,
+      unsigned int defaultMode = OptimalControllerSolver::MODE_WITH_INITIALPOS,
+      bool computeWeightsAutomatically = false);
 
-      \brief Class to implement the preview control
+  /*! Destructor */
+  ~PreviewControl();
+
+  /** \brief Read the file of parameters aFileName
+      and set the sampling period, the preview control time,
+      Ks, Kx, and F. */
+  void ReadPrecomputedFile(string aFileName);
+
+  /*! \brief One iteration of the preview control. */
+  int OneIterationOfPreview(
+      Eigen::MatrixXd &x, Eigen::MatrixXd &y, double &sxzmp, double &syzmp,
+      deque<PatternGeneratorJRL::ZMPPosition> &ZMPPositions,
+      unsigned long int lindex, double &zmpx2, double &zmpy2, bool Simulation);
+
+  /*! \brief One iteration of the preview control
+    along one axis (using queues)*/
+  int OneIterationOfPreview1D(Eigen::MatrixXd &x, double &sxzmp,
+                              deque<double> &ZMPPositions,
+                              unsigned long int lindex, double &zmpx2,
+                              bool Simulation);
+
+  /*! \brief One iteration of the preview control along one axis
+    (using vectors)
+    \param [in][out] x: Current state of the CoM along the axis.
+    \param [in][out] sxzmp: Summed error.
+    \param [in] ZMPPositions: Vector of ZMP reference positions.
+    \param [in] lindex: Starting index in the array of ZMP reference
+    positions.
+    \param [out] zmpx2: Resulting ZMP value.
+    \param [in] Simulation: This should be set to false.
   */
-  class  PreviewControl : public SimplePlugin
-  {
-  public:
+  int OneIterationOfPreview1D(Eigen::MatrixXd &x, double &sxzmp,
+                              vector<double> &ZMPPositions,
+                              unsigned long int lindex, double &zmpx2,
+                              bool Simulation);
 
-    /*! Constructor */
-    PreviewControl
-    (SimplePluginManager *lSPM,
-     unsigned int defaultMode = OptimalControllerSolver::MODE_WITH_INITIALPOS,
-     bool computeWeightsAutomatically = false);
+  /*! \name Methods to access the basic variables of the preview control.
+    @{
+  */
+  /*! \brief Getter for the sampling period. */
+  double SamplingPeriod() const;
 
-    /*! Destructor */
-    ~PreviewControl();
+  /*! Getter for the preview control time. */
+  double PreviewControlTime() const;
 
-    /** \brief Read the file of parameters aFileName
-        and set the sampling period, the preview control time,
-        Ks, Kx, and F. */
-    void ReadPrecomputedFile(string aFileName);
+  /*! Getter for the height position of the CoM. */
+  double GetHeightOfCoM() const;
 
+  /*! \brief Setter for the sampling period. */
+  void SetSamplingPeriod(double lSamplingPeriod);
 
-    /*! \brief One iteration of the preview control. */
-    int OneIterationOfPreview
-    (Eigen::MatrixXd &x,
-     Eigen::MatrixXd &y,
-     double & sxzmp, double & syzmp,
-     deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
-     unsigned long int lindex,
-     double & zmpx2, double & zmpy2,
-     bool Simulation);
+  /*! \biref Setter for the preview control time. */
+  void SetPreviewControlTime(double lPreviewControlTime);
 
+  /*! Getter for the height position of the CoM. */
+  void SetHeightOfCoM(double lZc);
+  /*! \brief Indicates if the weights are coherent with the parameters. */
+  bool IsCoherent();
 
-    /*! \brief One iteration of the preview control 
-      along one axis (using queues)*/
-    int OneIterationOfPreview1D(Eigen::MatrixXd &x,
-                                double & sxzmp,
-                                deque<double> & ZMPPositions,
-                                unsigned long int lindex,
-                                double & zmpx2,
-                                bool Simulation);
+  /*! @} */
 
-    /*! \brief One iteration of the preview control along one axis 
-      (using vectors)
-      \param [in][out] x: Current state of the CoM along the axis.
-      \param [in][out] sxzmp: Summed error.
-      \param [in] ZMPPositions: Vector of ZMP reference positions.
-      \param [in] lindex: Starting index in the array of ZMP reference 
-      positions.
-      \param [out] zmpx2: Resulting ZMP value.
-      \param [in] Simulation: This should be set to false.
-    */
-    int OneIterationOfPreview1D(Eigen::MatrixXd &x,
-                                double & sxzmp,
-                                vector<double> & ZMPPositions,
-                                unsigned long int lindex,
-                                double & zmpx2,
-                                bool Simulation);
+  /*! \brief Compute optimal weights.
+    \param [in] mode: with initial pos
+    (OptimalControllerSolver::MODE_WITH_INITIALPOS),
+    without initial position (OptimalControllerSolver::
+    MODE_WITHOUT_INITIALPOS).
+  */
+  void ComputeOptimalWeights(unsigned int mode);
 
-    /*! \name Methods to access the basic variables of the preview control.
-      @{
-    */
-    /*! \brief Getter for the sampling period. */
-    double SamplingPeriod() const;
+  /*! \brief Overloading of << operator. */
+  void print();
 
-    /*! Getter for the preview control time. */
-    double  PreviewControlTime() const;
+  /*! \brief Overloading method of SimplePlugin */
+  virtual void CallMethod(std::string &Method, std::istringstream &astrm);
 
-    /*! Getter for the height position of the CoM. */
-    double GetHeightOfCoM() const;
+private:
+  /*! \brief Matrices for preview control. */
+  Eigen::MatrixXd m_A;
+  Eigen::MatrixXd m_B;
+  Eigen::MatrixXd m_C;
 
-    /*! \brief Setter for the sampling period. */
-    void SetSamplingPeriod(double lSamplingPeriod);
+  /** \name Control parameters.
+      @{ */
 
-    /*! \biref Setter for the preview control time. */
-    void SetPreviewControlTime(double lPreviewControlTime);
+  /*! Gain on the current state of the CoM. */
+  Eigen::MatrixXd m_Kx;
+  /*! Gain on the current ZMP. */
+  double m_Ks;
+  /*! Window  */
+  Eigen::MatrixXd m_F;
+  //@}
 
-    /*! Getter for the height position of the CoM. */
-    void SetHeightOfCoM(double lZc);
-    /*! \brief Indicates if the weights are coherent with the parameters. */
-    bool IsCoherent();
+  /* \name Preview parameters. */
+  /**@{ */
+  /*! Time for the preview control */
+  double m_PreviewControlTime;
 
-    /*! @} */
+  /*! Sampling period for the preview  */
+  double m_SamplingPeriod;
 
-    /*! \brief Compute optimal weights.
-      \param [in] mode: with initial pos
-      (OptimalControllerSolver::MODE_WITH_INITIALPOS),
-      without initial position (OptimalControllerSolver::
-      MODE_WITHOUT_INITIALPOS).
-    */
-    void ComputeOptimalWeights(unsigned int mode);
+  /*! Size of the preview window. */
+  long unsigned int m_SizeOfPreviewWindow;
 
-    /*! \brief Overloading of << operator. */
-    void print();
+  /*! Height of the CoM. */
+  double m_Zc;
+  //@}
 
-    /*! \brief Overloading method of SimplePlugin */
-    virtual void CallMethod(std::string &Method,
-                            std::istringstream &astrm);
-  private:
+  /*! \brief Keep track of the modification of the preview parameters. */
+  bool m_Coherent;
 
-    /*! \brief Matrices for preview control. */
-    Eigen::MatrixXd m_A;
-    Eigen::MatrixXd m_B;
-    Eigen::MatrixXd m_C;
+  /*! \brief Computes weight automatically */
+  bool m_AutoComputeWeights;
 
-
-    /** \name Control parameters.
-        @{ */
-
-    /*! Gain on the current state of the CoM. */
-    Eigen::MatrixXd m_Kx;
-    /*! Gain on the current ZMP. */
-    double m_Ks;
-    /*! Window  */
-    Eigen::MatrixXd m_F;
-    //@}
-
-    /* \name Preview parameters. */
-    /**@{ */
-    /*! Time for the preview control */
-    double m_PreviewControlTime;
-
-    /*! Sampling period for the preview  */
-    double m_SamplingPeriod;
-
-    /*! Size of the preview window. */
-    long unsigned int m_SizeOfPreviewWindow;
-
-    /*! Height of the CoM. */
-    double m_Zc;
-    //@}
-
-    /*! \brief Keep track of the modification of the preview parameters. */
-    bool m_Coherent;
-
-    /*! \brief Computes weight automatically */
-    bool m_AutoComputeWeights;
-
-    /*! \brief Default Mode. */
-    unsigned int m_DefaultWeightComputationMode;
-  };
-}
+  /*! \brief Default Mode. */
+  unsigned int m_DefaultWeightComputationMode;
+};
+} // namespace PatternGeneratorJRL
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
 #endif /* _PREVIEW_CONTROL_H_ */

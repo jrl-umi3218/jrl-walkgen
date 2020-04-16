@@ -22,206 +22,155 @@
 
 /// \doc Simulate a rigid body
 
-
 #ifndef _RIGID_BODY_
 #define _RIGID_BODY_
-
 
 #include <deque>
 #include <jrl/walkgen/pgtypes.hh>
 #include <privatepgtypes.hh>
 
-namespace PatternGeneratorJRL
-{
+namespace PatternGeneratorJRL {
 
-  /// \brief State vectors
-  struct rigid_body_state_s
-  {
-    /// \name Translational degrees of freedom
-    /// \{
-    Eigen::VectorXd X;
-    Eigen::VectorXd Y;
-    Eigen::VectorXd Z;
-    /// \}
-    /// \name Rotational degrees of freedom
-    /// \{
-    Eigen::VectorXd Pitch;
-    Eigen::VectorXd Roll;
-    Eigen::VectorXd Yaw;
-    /// \}
-
-    struct rigid_body_state_s & operator=(const rigid_body_state_s &RB);
-
-    void reset();
-
-    rigid_body_state_s();
-  };
-  typedef struct rigid_body_state_s rigid_body_state_t;
-
-  /// \name Dynamics matrices
+/// \brief State vectors
+struct rigid_body_state_s {
+  /// \name Translational degrees of freedom
   /// \{
-  struct linear_dynamics_s
-  {
-    /// \brief Control matrix
-    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> U;
-
-    /// \brief Inverse of control matrix
-    Eigen::MatrixXd Um1;
-
-    /// \brief Transpose of control matrix
-    Eigen::MatrixXd UT;
-
-    /// \brief State matrix
-    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> S;
-
-    dynamics_e Type;
-
-    void clear()
-    {
-      U.setZero();
-      UT.setZero();
-      S.setZero();
-    }
-  };
-  typedef linear_dynamics_s linear_dynamics_t;
+  Eigen::VectorXd X;
+  Eigen::VectorXd Y;
+  Eigen::VectorXd Z;
+  /// \}
+  /// \name Rotational degrees of freedom
+  /// \{
+  Eigen::VectorXd Pitch;
+  Eigen::VectorXd Roll;
+  Eigen::VectorXd Yaw;
   /// \}
 
+  struct rigid_body_state_s &operator=(const rigid_body_state_s &RB);
 
-  class RigidBody
-  {
+  void reset();
 
-    //
-    // Public methods
-    //
-  public:
+  rigid_body_state_s();
+};
+typedef struct rigid_body_state_s rigid_body_state_t;
 
-    RigidBody();
+/// \name Dynamics matrices
+/// \{
+struct linear_dynamics_s {
+  /// \brief Control matrix
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> U;
 
-    ~RigidBody();
+  /// \brief Inverse of control matrix
+  Eigen::MatrixXd Um1;
 
-    /// \brief Interpolate
-    int interpolate(std::deque<COMState> &COMStates,
-                    std::deque<ZMPPosition> &ZMPRefPositions,
-                    int CurrentPosition,
-                    double CX, double CY);
+  /// \brief Transpose of control matrix
+  Eigen::MatrixXd UT;
 
-    /// \brief Initialize
-    ///
-    /// \return 0
-    int initialize();
+  /// \brief State matrix
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> S;
 
-    /// \brief Increment the state
-    ///
-    /// \param[in] Control Control vector
-    rigid_body_state_t increment_state( double Control );
+  dynamics_e Type;
 
-    /// \brief Decouple degree of freedom by injected trajectory
-    ///
-    /// \param[in] Axis The axis to be decoupled
-    /// \param[in] Trajectory The injected trajectory
-    ///
-    /// \return 0
-    int inject_trajectory( unsigned int Axis, Eigen::VectorXd Trajectory );
+  void clear() {
+    U.setZero();
+    UT.setZero();
+    S.setZero();
+  }
+};
+typedef linear_dynamics_s linear_dynamics_t;
+/// \}
 
-    /// \name Accessors
-    /// \{
-    linear_dynamics_t const & Dynamics( dynamics_e ) const;
-    linear_dynamics_t & Dynamics( dynamics_e );
+class RigidBody {
 
-    inline double const & SamplingPeriodSim( ) const
-    {
-      return T_;
-    }
-    inline void SamplingPeriodSim( double T )
-    {
-      T_ = T;
-    }
+  //
+  // Public methods
+  //
+public:
+  RigidBody();
 
-    inline double const & SamplingPeriodAct( ) const
-    {
-      return Ta_;
-    }
-    inline void SamplingPeriodAct( double Ta )
-    {
-      Ta_ = Ta;
-    }
+  ~RigidBody();
 
-    inline unsigned const & NbSamplingsPreviewed( ) const
-    {
-      return N_;
-    }
-    inline void NbSamplingsPreviewed( unsigned N )
-    {
-      N_ = N;
-    }
+  /// \brief Interpolate
+  int interpolate(std::deque<COMState> &COMStates,
+                  std::deque<ZMPPosition> &ZMPRefPositions, int CurrentPosition,
+                  double CX, double CY);
 
-    inline double const & Mass( ) const
-    {
-      return Mass_;
-    }
-    inline void Mass( double Mass )
-    {
-      Mass_ = Mass;
-    }
+  /// \brief Initialize
+  ///
+  /// \return 0
+  int initialize();
 
-    inline std::deque<rigid_body_state_t> & Trajectory()
-    {
-      return Trajectory_;
-    }
+  /// \brief Increment the state
+  ///
+  /// \param[in] Control Control vector
+  rigid_body_state_t increment_state(double Control);
 
-    inline rigid_body_state_t & State()
-    {
-      return State_;
-    }
-    inline rigid_body_state_t const & State() const
-    {
-      return State_;
-    }
-    /// \}
+  /// \brief Decouple degree of freedom by injected trajectory
+  ///
+  /// \param[in] Axis The axis to be decoupled
+  /// \param[in] Trajectory The injected trajectory
+  ///
+  /// \return 0
+  int inject_trajectory(unsigned int Axis, Eigen::VectorXd Trajectory);
 
+  /// \name Accessors
+  /// \{
+  linear_dynamics_t const &Dynamics(dynamics_e) const;
+  linear_dynamics_t &Dynamics(dynamics_e);
 
-    //
-    // Private member functions
-    //
-  private:
+  inline double const &SamplingPeriodSim() const { return T_; }
+  inline void SamplingPeriodSim(double T) { T_ = T; }
 
-    //
-    // Private members
-    //
-  private:
+  inline double const &SamplingPeriodAct() const { return Ta_; }
+  inline void SamplingPeriodAct(double Ta) { Ta_ = Ta; }
 
-    /// \brief State
-    rigid_body_state_t State_;
+  inline unsigned const &NbSamplingsPreviewed() const { return N_; }
+  inline void NbSamplingsPreviewed(unsigned N) { N_ = N; }
 
-    /// \brief Trajectory vector of decoupled DoF's
-    std::deque<rigid_body_state_t> Trajectory_;
+  inline double const &Mass() const { return Mass_; }
+  inline void Mass(double Mass) { Mass_ = Mass; }
 
-    /// \name Dynamics
-    /// \{
-    linear_dynamics_t
-    PositionDynamics_,
-      VelocityDynamics_,
-      AccelerationDynamics_,
-      JerkDynamics_,
-      CoPDynamics_;
-    /// \}
+  inline std::deque<rigid_body_state_t> &Trajectory() { return Trajectory_; }
 
-    /// \brief Sampling period simulation
-    double T_;
+  inline rigid_body_state_t &State() { return State_; }
+  inline rigid_body_state_t const &State() const { return State_; }
+  /// \}
 
-    /// \brief Recalculation period
-    /// The state is incremented with respect to this parameter
-    double Tr_;
+  //
+  // Private member functions
+  //
+private:
+  //
+  // Private members
+  //
+private:
+  /// \brief State
+  rigid_body_state_t State_;
 
-    /// \brief Sampling period actuators
-    double Ta_;
+  /// \brief Trajectory vector of decoupled DoF's
+  std::deque<rigid_body_state_t> Trajectory_;
 
-    /// \brief Nb previewed samples
-    unsigned int N_;
+  /// \name Dynamics
+  /// \{
+  linear_dynamics_t PositionDynamics_, VelocityDynamics_, AccelerationDynamics_,
+      JerkDynamics_, CoPDynamics_;
+  /// \}
 
-    /// \brief Mass
-    double Mass_;
+  /// \brief Sampling period simulation
+  double T_;
 
-  };
-}
+  /// \brief Recalculation period
+  /// The state is incremented with respect to this parameter
+  double Tr_;
+
+  /// \brief Sampling period actuators
+  double Ta_;
+
+  /// \brief Nb previewed samples
+  unsigned int N_;
+
+  /// \brief Mass
+  double Mass_;
+};
+} // namespace PatternGeneratorJRL
 #endif /* _RIGID_BODY_ */

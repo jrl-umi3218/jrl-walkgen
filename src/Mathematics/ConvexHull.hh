@@ -28,37 +28,32 @@
 
 #include <vector>
 
+namespace PatternGeneratorJRL {
 
-namespace PatternGeneratorJRL
-{
+/*! @struct CH_Point
+  @ingroup geometry
+  Structure to store points for the convex hull computation.
+*/
+typedef struct {
+  double col, row; /* col: x, row : y */
+} CH_Point;
 
-  /*! @struct CH_Point
-    @ingroup geometry
-    Structure to store points for the convex hull computation.
-  */
-  typedef struct
-  {
-    double col,row;  /* col: x, row : y */
-  } CH_Point;
+typedef std::vector<CH_Point> ConvexHullList;
 
-  typedef std::vector<CH_Point> ConvexHullList;
+/*! This class compute the convex hull in 2D. */
+class ComputeConvexHull {
+public:
+  ComputeConvexHull();
+  ~ComputeConvexHull();
 
-  /*! This class compute the convex hull in 2D. */
-  class  ComputeConvexHull
-  {
-  public:
-    ComputeConvexHull();
-    ~ComputeConvexHull();
-
-    /*! Compute the convex hull
-      by applying Graham's algorithm.
-      @param aVecOfPoints: 
-      The set of 2D points on which the convex hull is computed.
-      @param TheConvexHull: 
-      The set of 2D points which give the convex hull. */
-    void DoComputeConvexHull(std::vector<CH_Point> aVecOfPoints,
-                             std::vector<CH_Point> &TheConvexHull);
-
-  };
-}
+  /*! Compute the convex hull
+    by applying Graham's algorithm.
+    @param aVecOfPoints:
+    The set of 2D points on which the convex hull is computed.
+    @param TheConvexHull:
+    The set of 2D points which give the convex hull. */
+  void DoComputeConvexHull(std::vector<CH_Point> aVecOfPoints,
+                           std::vector<CH_Point> &TheConvexHull);
+};
+} // namespace PatternGeneratorJRL
 #endif

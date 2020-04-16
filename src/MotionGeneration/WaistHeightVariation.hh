@@ -44,90 +44,74 @@
 #ifndef _WAISTHEIGHT_VARIATION_H_
 #define _WAISTHEIGHT_VARIATION_H_
 
-#include <vector>
-#include <string>
 #include <deque>
+#include <string>
+#include <vector>
 
 #include <Mathematics/Polynome.hh>
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
 #include <PreviewControl/PreviewControl.hh>
-
-
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
 
 //#include <PolynomeFoot.h>
 
-namespace PatternGeneratorJRL
-{
+namespace PatternGeneratorJRL {
 
-  class  WaistPolynome : public Polynome
-  {
-  public:
-    /// Constructor:
-    /// boundCond: the different boundary conditions begin,
-    /// intermediate and end of polynomial
-    /// timeDistr: vector with time instants for intermediate
-    /// boundary conditions and end time
+class WaistPolynome : public Polynome {
+public:
+  /// Constructor:
+  /// boundCond: the different boundary conditions begin,
+  /// intermediate and end of polynomial
+  /// timeDistr: vector with time instants for intermediate
+  /// boundary conditions and end time
 
-    WaistPolynome();
+  WaistPolynome();
 
-    /// Set the parameters
-    void SetParameters( Eigen::VectorXd boundCond,
-                        std::vector<double> timeDistr);
+  /// Set the parameters
+  void SetParameters(Eigen::VectorXd boundCond, std::vector<double> timeDistr);
 
-    /// Destructor.
-    ~WaistPolynome();
-  };
+  /// Destructor.
+  ~WaistPolynome();
+};
 
+/// Object to compute new foot trajectories for the height of the waist
+/// with waist differnces as input for each step
+class WaistHeightVariation {
+public:
+  /// Constructor
+  WaistHeightVariation();
 
+  /// Destructor
+  ~WaistHeightVariation();
 
+  /// call for polynomial planning of both steps during the obstacle stepover
+  void PolyPlanner(deque<COMPosition> &aCOMBuffer,
+                   deque<RelativeFootPosition> &aFootHolds,
+                   deque<ZMPPosition> aZMPPosition);
 
+protected:
+  deque<RelativeFootPosition> m_FootHolds;
 
-  /// Object to compute new foot trajectories for the height of the waist
-  /// with waist differnces as input for each step
-  class WaistHeightVariation
-  {
-  public :
+  Eigen::MatrixXd mBoundCond;
+  std::vector<double> mTimeDistr;
 
-    /// Constructor
-    WaistHeightVariation();
+  WaistPolynome *m_PolynomeHip;
 
-    /// Destructor
-    ~WaistHeightVariation();
+  /// extra COMPosition buffer calculated in ZMPMultibody class
+  std::vector<COMPosition> m_ExtraCOMBuffer;
 
-    ///call for polynomial planning of both steps during the obstacle stepover
-    void PolyPlanner(deque<COMPosition> &aCOMBuffer,
-                     deque<RelativeFootPosition> &aFootHolds,
-                     deque<ZMPPosition> aZMPPosition);
+  /// buffers for first preview
+  deque<COMPosition> m_COMBuffer;
+  unsigned int m_ExtraBufferLength;
+  double m_ModulationSupportCoefficient;
+  float m_Tsingle, m_TsingleStepOver;
+  float m_Tdble;
+  double m_DiffBetweenComAndWaist;
+  /// Sampling Period.
+  double m_SamplingPeriod;
+  /// Starting a new step sequences.
+  bool m_StartingNewSequence;
+};
 
-  protected:
-
-    deque<RelativeFootPosition> m_FootHolds;
-
-    Eigen::MatrixXd mBoundCond;
-    std::vector<double> mTimeDistr;
-
-
-
-    WaistPolynome *m_PolynomeHip;
-
-    ///extra COMPosition buffer calculated in ZMPMultibody class
-    std::vector<COMPosition> m_ExtraCOMBuffer;
-
-
-
-    /// buffers for first preview
-    deque<COMPosition> m_COMBuffer;
-    unsigned int m_ExtraBufferLength;
-    double m_ModulationSupportCoefficient;
-    float m_Tsingle,m_TsingleStepOver;
-    float m_Tdble;
-    double m_DiffBetweenComAndWaist;
-    /// Sampling Period.
-    double m_SamplingPeriod;
-    /// Starting a new step sequences.
-    bool m_StartingNewSequence;
-  };
-
-}
+} // namespace PatternGeneratorJRL
 
 #endif /*_WAISTHEIGHT_VARIATION_H_ */

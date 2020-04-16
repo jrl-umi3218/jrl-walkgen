@@ -309,7 +309,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(
       aCOMState.y[i] += m_Deltay(i, 0);
     }
   }
-  #endif
+#endif
 
   ODEBUG2("Delta :" << m_Deltax(0, 0) << " " << m_Deltay(0, 0) << " "
                     << aCOMState.x[0] << " " << aCOMState.y[0]);
@@ -452,8 +452,7 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(
 }
 
 int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(
-    deque<ZMPPosition> &ZMPRefPositions,
-    deque<COMState> & COMStates,
+    deque<ZMPPosition> &ZMPRefPositions, deque<COMState> &COMStates,
     deque<FootAbsolutePosition> &LeftFootPositions,
     deque<FootAbsolutePosition> &RightFootPositions) {
   ODEBUG6("Beginning of Setup 0 ", "DebugData.txt");

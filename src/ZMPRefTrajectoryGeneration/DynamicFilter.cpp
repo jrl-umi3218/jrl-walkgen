@@ -280,7 +280,7 @@ int DynamicFilter::OnLinefilter(
         zmpmb_i_[i * inc] = ZMPMB_vec_[i];
       }
 
-      vector<vector<double> > dZMPMB_vec(N, vector<double>(2, 0.0));
+      vector<vector<double>> dZMPMB_vec(N, vector<double>(2, 0.0));
       dZMPMB_vec[0][0] = (ZMPMB_vec_[1][0] - ZMPMB_vec_[0][0]) / inc;
       dZMPMB_vec[0][1] = (ZMPMB_vec_[1][1] - ZMPMB_vec_[0][1]) / inc;
       dZMPMB_vec[N - 1][0] =

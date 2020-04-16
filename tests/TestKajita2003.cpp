@@ -164,10 +164,12 @@ protected:
     //                  0.0 0.18 0.0 0.0");
     //   aPGI.ParseCmd(strm2);
     // }
-    { istringstream strm2(":singlesupporttime 0.9");
+    {
+      istringstream strm2(":singlesupporttime 0.9");
       aPGI.ParseCmd(strm2);
       strm2.str(string(":doublesupporttime 0.115"));
-      aPGI.ParseCmd(strm2); }
+      aPGI.ParseCmd(strm2);
+    }
 
     {
       istringstream strm2(":stepseq 0.0 -0.09 0.0 0.0 \

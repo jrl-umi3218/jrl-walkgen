@@ -641,7 +641,7 @@ void AnalyticalMorisawaCompact::GetZMPDiscretization(
         COMStates, ZMPPositions, LeftFootAbsolutePositions,
         RightFootAbsolutePositions, outputDeltaCOMTraj_deq);
 #endif
-    vector<vector<double> > filteredZMPMB(n, vector<double>(2, 0.0));
+    vector<vector<double>> filteredZMPMB(n, vector<double>(2, 0.0));
     for (unsigned int i = 0; i < n; ++i) {
       for (int j = 0; j < 3; j++) {
         COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j];

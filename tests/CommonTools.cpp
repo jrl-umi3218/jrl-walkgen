@@ -49,7 +49,8 @@ namespace PatternGeneratorJRL {
 namespace TestSuite {
 
 double filterprecision(double adb) {
-  if (fabs(adb) < 1e-7) return 0.0;
+  if (fabs(adb) < 1e-7)
+    return 0.0;
 
   double ladb2 = adb * 1e7;
   double lintadb2 = trunc(ladb2);
@@ -58,19 +59,20 @@ double filterprecision(double adb) {
 
 void CommonInitialization(PatternGeneratorInterface &aPGI) {
   const unsigned int nbMethod = 13;
-  const char lBuffer[nbMethod][256] = {":comheight 0.876681",
-                                       ":samplingperiod 0.005",
-                                       ":previewcontroltime 1.6",
-                                       ":omega 0.0",
-                                       ":stepheight 0.07",
-                                       ":singlesupporttime 0.78",
-                                       ":doublesupporttime 0.02",
-                                       ":armparameters 0.5",
-                                       ":LimitsFeasibility 0.0",
-                                       ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
-                                       ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
-                                       ":UpperBodyMotionParameters -0.1 -1.0 0.0",
-                                       ":useDynamicFilter false"};
+  const char lBuffer[nbMethod][256] = {
+      ":comheight 0.876681",
+      ":samplingperiod 0.005",
+      ":previewcontroltime 1.6",
+      ":omega 0.0",
+      ":stepheight 0.07",
+      ":singlesupporttime 0.78",
+      ":doublesupporttime 0.02",
+      ":armparameters 0.5",
+      ":LimitsFeasibility 0.0",
+      ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
+      ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
+      ":UpperBodyMotionParameters -0.1 -1.0 0.0",
+      ":useDynamicFilter false"};
 
   for (unsigned int i = 0; i < nbMethod; i++) {
     std::istringstream strm(lBuffer[i]);
@@ -83,29 +85,36 @@ void CommonInitialization(PatternGeneratorInterface &aPGI) {
   FootAbsolutePosition InitLeftFootAbsPos;
   FootAbsolutePosition InitRightFootAbsPos;
 
-  aPGI.EvaluateStartingState(lStartingCOMPosition, lStartingZMPPosition, lStartingWaistPose, InitLeftFootAbsPos,
+  aPGI.EvaluateStartingState(lStartingCOMPosition, lStartingZMPPosition,
+                             lStartingWaistPose, InitLeftFootAbsPos,
                              InitRightFootAbsPos);
 
-  ODEBUG("Starting COM Position: " << lStartingCOMPosition.x[0] << " " << lStartingCOMPosition.y[0] << " "
+  ODEBUG("Starting COM Position: " << lStartingCOMPosition.x[0] << " "
+                                   << lStartingCOMPosition.y[0] << " "
                                    << lStartingCOMPosition.z[0]);
 
-  ODEBUG("Starting Waist Position: " << lStartingWaistPose[0] << " " << lStartingWaistPose[1] << " "
+  ODEBUG("Starting Waist Position: " << lStartingWaistPose[0] << " "
+                                     << lStartingWaistPose[1] << " "
                                      << lStartingWaistPose[2]);
 
-  ODEBUG("Starting ZMP Position: " << lStartingZMPPosition[0] << " " << lStartingZMPPosition[1] << " "
+  ODEBUG("Starting ZMP Position: " << lStartingZMPPosition[0] << " "
+                                   << lStartingZMPPosition[1] << " "
                                    << lStartingZMPPosition[2]);
 
-  ODEBUG("Starting Left Foot Pos: " << InitLeftFootAbsPos.x << " " << InitLeftFootAbsPos.y << " "
-                                    << InitLeftFootAbsPos.z << " " << InitLeftFootAbsPos.theta << " "
-                                    << InitLeftFootAbsPos.omega << " " << InitLeftFootAbsPos.omega2);
+  ODEBUG("Starting Left Foot Pos: "
+         << InitLeftFootAbsPos.x << " " << InitLeftFootAbsPos.y << " "
+         << InitLeftFootAbsPos.z << " " << InitLeftFootAbsPos.theta << " "
+         << InitLeftFootAbsPos.omega << " " << InitLeftFootAbsPos.omega2);
 
-  ODEBUG("Starting Right Foot Pos: " << InitRightFootAbsPos.x << " " << InitRightFootAbsPos.y << " "
-                                     << InitRightFootAbsPos.z << " " << InitRightFootAbsPos.theta << " "
-                                     << InitRightFootAbsPos.omega << " " << InitRightFootAbsPos.omega2);
+  ODEBUG("Starting Right Foot Pos: "
+         << InitRightFootAbsPos.x << " " << InitRightFootAbsPos.y << " "
+         << InitRightFootAbsPos.z << " " << InitRightFootAbsPos.theta << " "
+         << InitRightFootAbsPos.omega << " " << InitRightFootAbsPos.omega2);
 }
 
-void getOptions(int argc, char *argv[], string &urdfFullPath, string &srdfFullPath,
-                unsigned int &)  // TestProfil)
+void getOptions(int argc, char *argv[], string &urdfFullPath,
+                string &srdfFullPath,
+                unsigned int &) // TestProfil)
 {
   urdfFullPath = URDF_FULL_PATH;
   srdfFullPath = SRDF_FULL_PATH;
@@ -142,12 +151,14 @@ void OneStep::fillInDebugVectorDoc() {
                              "ZMP X in Waist Ref",
                              "ZMP Y in Waist Ref"};
 
-  for (std::size_t i = 0; i < 15; i++) m_DebugStrings.push_back(docInit[i]);
+  for (std::size_t i = 0; i < 15; i++)
+    m_DebugStrings.push_back(docInit[i]);
 
   const char *footNames[2] = {"Left Foot", "Right Foot"};
-  const char *docFootInit[14] = {" - Pos X",  " - Pos Y",   " - Pos Z",   " - Vel dX",  " - Vel dY",
-                                 " - Vel dZ", " - Acc ddX", " - Acc ddY", " - Acc ddZ", " - Yaw",
-                                 " - dYaw",   " - ddYaw",   " - Roll",    " - Pitch"};
+  const char *docFootInit[14] = {
+      " - Pos X",  " - Pos Y",   " - Pos Z",   " - Vel dX",  " - Vel dY",
+      " - Vel dZ", " - Acc ddX", " - Acc ddY", " - Acc ddZ", " - Yaw",
+      " - dYaw",   " - ddYaw",   " - Roll",    " - Pitch"};
   for (std::size_t footId = 0; footId < 2; footId++) {
     for (std::size_t docFootId = 0; docFootId < 14; docFootId++) {
       std::string aDoc = footNames[footId];
@@ -157,9 +168,11 @@ void OneStep::fillInDebugVectorDoc() {
     }
   }
 
-  const char *docInit2[2] = {"ZMP Target X - world ref", " ZMP Target Y - world ref"};
+  const char *docInit2[2] = {"ZMP Target X - world ref",
+                             " ZMP Target Y - world ref"};
 
-  for (std::size_t i = 0; i < 2; i++) m_DebugStrings.push_back(docInit2[i]);
+  for (std::size_t i = 0; i < 2; i++)
+    m_DebugStrings.push_back(docInit2[i]);
 
   if (m_PR != 0) {
     Eigen::VectorXd &currentConfiguration = m_PR->currentRPYConfiguration();
@@ -172,7 +185,8 @@ void OneStep::fillInDebugVectorDoc() {
   }
 }
 
-void OneStep::fillInDebugVectorFoot(FootAbsolutePosition &aFootAbsolutePosition, std::size_t &lindex) {
+void OneStep::fillInDebugVectorFoot(FootAbsolutePosition &aFootAbsolutePosition,
+                                    std::size_t &lindex) {
   m_DebugVector[lindex++] = aFootAbsolutePosition.x;
   m_DebugVector[lindex++] = aFootAbsolutePosition.y;
   m_DebugVector[lindex++] = aFootAbsolutePosition.z;
@@ -194,7 +208,8 @@ void OneStep::fillInDebugVector() {
   Eigen::VectorXd &currentConfiguration = m_PR->currentRPYConfiguration();
 
   Eigen::Index nq = currentConfiguration.size();
-  if (m_DebugVector.size() == 0) m_DebugVector.resize(17 + 14 * 2 + nq);
+  if (m_DebugVector.size() == 0)
+    m_DebugVector.resize(17 + 14 * 2 + nq);
 
   /// Time
   m_DebugVector[lindex++] = ((double)m_NbOfIt) * 0.005;
@@ -224,16 +239,20 @@ void OneStep::fillInDebugVector() {
 
   /// ZMP Target in absolute reference
   m_DebugVector[lindex++] = m_ZMPTarget(0) * cos(currentConfiguration(5)) -
-                            m_ZMPTarget(1) * sin(currentConfiguration(5)) + currentConfiguration(0);
+                            m_ZMPTarget(1) * sin(currentConfiguration(5)) +
+                            currentConfiguration(0);
   m_DebugVector[lindex++] = m_ZMPTarget(0) * sin(currentConfiguration(5)) +
-                            m_ZMPTarget(1) * cos(currentConfiguration(5)) + currentConfiguration(1);
+                            m_ZMPTarget(1) * cos(currentConfiguration(5)) +
+                            currentConfiguration(1);
 
   /// Saving configuration
-  for (unsigned int i = 0; i < currentConfiguration.size(); i++) m_DebugVector[lindex++] = currentConfiguration(i);
+  for (unsigned int i = 0; i < currentConfiguration.size(); i++)
+    m_DebugVector[lindex++] = currentConfiguration(i);
 }
 
 void OneStep::fillInDebugFileContent(std::ofstream &aof) {
-  for (std::size_t i = 0; i < m_DebugVector.size(); i++) aof << filterprecision(m_DebugVector[i]) << " ";
+  for (std::size_t i = 0; i < m_DebugVector.size(); i++)
+    aof << filterprecision(m_DebugVector[i]) << " ";
 }
 
 void OneStep::fillInDebugFile() {
@@ -268,8 +287,9 @@ void OneStep::writeDescriptionFile() {
   aFileName += "TestFGPI_description.dat";
   aof.open(aFileName.c_str(), ofstream::out);
 
-  for (std::size_t i = 0; i < m_DebugStrings.size(); i++) aof << i << " - " << m_DebugStrings[i] << std::endl;
+  for (std::size_t i = 0; i < m_DebugStrings.size(); i++)
+    aof << i << " - " << m_DebugStrings[i] << std::endl;
   aof.close();
 }
-}  // namespace TestSuite
-}  // namespace PatternGeneratorJRL
+} // namespace TestSuite
+} // namespace PatternGeneratorJRL

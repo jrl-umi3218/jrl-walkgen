@@ -31,84 +31,73 @@
 #ifndef _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_
 #define _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_
 
-#include <vector>
 #include <deque>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include <jrl/walkgen/pinocchiorobot.hh>
 
-#include <jrl/walkgen/pgtypes.hh>
 #include <Mathematics/ConvexHull.hh>
 #include <SimplePlugin.hh>
+#include <jrl/walkgen/pgtypes.hh>
 
-namespace PatternGeneratorJRL
-{
-  /*! This class generates matrix representation of linear
-    constraint based on foot position.
-    It handles a stack of constraint on a sliding mode
-    for QP solving.
+namespace PatternGeneratorJRL {
+/*! This class generates matrix representation of linear
+  constraint based on foot position.
+  It handles a stack of constraint on a sliding mode
+  for QP solving.
+*/
+class FootConstraintsAsLinearSystem : public SimplePlugin {
+public:
+  /*! Constructor */
+  FootConstraintsAsLinearSystem(SimplePluginManager *aSPM, PinocchioRobot *aPR);
+
+  /*! Destructor */
+  ~FootConstraintsAsLinearSystem();
+
+  /*! Compute the linear system \f${\bf A}{\bf x} \geq {\bf b}\f$
+    associated with the
+    set of points specified by aVecOfPoints. aVecOfPoints is
+    supposed to represent
+    the convex hull of the robot contact points with the ground.
   */
-  class  FootConstraintsAsLinearSystem: public SimplePlugin
-  {
-  public:
+  int ComputeLinearSystem(std::vector<CH_Point> aVecOfPoints,
+                          Eigen::MatrixXd &A, Eigen::MatrixXd &B,
+                          Eigen::VectorXd &C);
 
-    /*! Constructor */
-    FootConstraintsAsLinearSystem(SimplePluginManager *aSPM,
-                                  PinocchioRobot *aPR);
+  /*!  Build a queue of constraint Inequalities based on a list of
+    Foot Absolute Position.
+  */
+  int BuildLinearConstraintInequalities(
+      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+      std::deque<LinearConstraintInequality_t *>
+          &QueueOfLConstraintInequalities,
+      double ConstraintOnX, double ConstraintOnY);
 
-    /*! Destructor */
-    ~FootConstraintsAsLinearSystem();
+  /*!  Build a queue of constraint Inequalities based on a list
+    of Foot Absolute Position.  */
+  int BuildLinearConstraintInequalities2(
+      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+      std::deque<LinearConstraintInequality_t *>
+          &QueueOfLConstraintInequalities,
+      double ConstraintOnX, double ConstraintOnY);
 
-    /*! Compute the linear system \f${\bf A}{\bf x} \geq {\bf b}\f$ 
-      associated with the
-      set of points specified by aVecOfPoints. aVecOfPoints is 
-      supposed to represent
-      the convex hull of the robot contact points with the ground.
-    */
-    int ComputeLinearSystem(std::vector<CH_Point> aVecOfPoints,
-                            Eigen::MatrixXd &A,
-                            Eigen::MatrixXd &B,
-                            Eigen::VectorXd &C);
+  /*! Find Similar Constraints */
+  int FindSimilarConstraints(Eigen::MatrixXd &A,
+                             std::vector<int> &SimilarConstraints);
 
-    /*!  Build a queue of constraint Inequalities based on a list of 
-      Foot Absolute Position.
-    */
-    int BuildLinearConstraintInequalities
-    (std::deque< FootAbsolutePosition>
-     &LeftFootAbsolutePositions,
-     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-     std::deque<LinearConstraintInequality_t *> &
-     QueueOfLConstraintInequalities,
-     double ConstraintOnX,
-     double ConstraintOnY);
-    
-    /*!  Build a queue of constraint Inequalities based on a list 
-      of Foot Absolute Position.  */
-    int BuildLinearConstraintInequalities2
-    (std::deque< FootAbsolutePosition>
-     &LeftFootAbsolutePositions,
-     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-     std::deque<LinearConstraintInequality_t *> &
-     QueueOfLConstraintInequalities,
-     double ConstraintOnX,
-     double ConstraintOnY);
+  /*! Reimplement the interface of SimplePluginManager
+    \param[in] Method: The method to be called.
+    \param[in] Args: Arguments of the methods.
+  */
+  virtual void CallMethod(std::string &Method, std::istringstream &Args);
 
-    /*! Find Similar Constraints */
-    int FindSimilarConstraints(Eigen::MatrixXd &A,
-                               std::vector<int> &SimilarConstraints);
-
-    /*! Reimplement the interface of SimplePluginManager
-      \param[in] Method: The method to be called.
-      \param[in] Args: Arguments of the methods.
-    */
-    virtual void CallMethod(std::string & Method, std::istringstream &Args);
-
-  private:
-
-    /* ! Reference on the Humanoid Specificities. */
-    PinocchioRobot * m_PR;
-
-  };
-}
+private:
+  /* ! Reference on the Humanoid Specificities. */
+  PinocchioRobot *m_PR;
+};
+} // namespace PatternGeneratorJRL
 #endif /* _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_ */

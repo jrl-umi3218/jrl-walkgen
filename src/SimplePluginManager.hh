@@ -32,71 +32,56 @@
 
 #include <string.h>
 
-#include <map>
 #include <iostream>
-#include <string>
+#include <map>
 #include <sstream>
+#include <string>
 
+namespace PatternGeneratorJRL {
+class SimplePlugin;
 
+/*! This class takes care of dispatching the call
+  appropriatly.
 
-namespace PatternGeneratorJRL
-{
-  class SimplePlugin;
+*/
+class SimplePluginManager {
 
-
-  /*! This class takes care of dispatching the call
-    appropriatly.
-
-  */
-  class SimplePluginManager
-  {
-
-
-  public:
-
-    struct ltstr
-    {
-      bool operator()(const std::string s1, const std::string s2) const
-      {
-        return strcmp(s1.c_str(), s2.c_str()) < 0;
-      }
-    };
-
-
-  protected:
-
-    /*! Set of plugins sorted by names */
-    std::multimap<std::string, SimplePlugin *, ltstr>  m_SimplePlugins;
-
-  public:
-
-    /*! \brief Pointer towards the PGI which is handling this object. */
-    SimplePluginManager();
-    virtual ~SimplePluginManager();
-
-    /*! Get the map of plugins. */
-    const std::multimap<std::string, SimplePlugin *, ltstr>  &
-    getSimplePlugins()
-      const
-    {
-      return m_SimplePlugins;
-    };
-
-    /*! \name Register the method for which this object can be called
-      by a higher parser. */
-    bool RegisterMethod(std::string &MethodName, SimplePlugin *aSP);
-
-    /*! \name Unregister a plugin */
-    void UnregisterPlugin(SimplePlugin *aSP);
-
-    /*! \name Call the method from the Method name. */
-    bool CallMethod(std::string &MethodName, std::istringstream &istrm);
-
-    /*! \name Operator to display in cout. */
-    void Print();
-
+public:
+  struct ltstr {
+    bool operator()(const std::string s1, const std::string s2) const {
+      return strcmp(s1.c_str(), s2.c_str()) < 0;
+    }
   };
-}
+
+protected:
+  /*! Set of plugins sorted by names */
+  std::multimap<std::string, SimplePlugin *, ltstr> m_SimplePlugins;
+
+public:
+  /*! \brief Pointer towards the PGI which is handling this object. */
+  SimplePluginManager();
+  virtual ~SimplePluginManager();
+
+  /*! Get the map of plugins. */
+  const std::multimap<std::string, SimplePlugin *, ltstr> &
+  getSimplePlugins() const {
+    return m_SimplePlugins;
+  };
+
+  /*! \name Register the method for which this object can be called
+    by a higher parser. */
+  bool RegisterMethod(std::string &MethodName, SimplePlugin *aSP);
+
+  /*! \name Unregister a plugin */
+  void UnregisterPlugin(SimplePlugin *aSP);
+
+  /*! \name Call the method from the Method name. */
+  bool CallMethod(std::string &MethodName, std::istringstream &istrm);
+
+  /*! \name Operator to display in cout. */
+  void Print();
+};
+} // namespace PatternGeneratorJRL
 
 #include <SimplePlugin.hh>
 

@@ -33,111 +33,91 @@
 #ifndef _COLLISION_DETECTOR_H_
 #define _COLLISION_DETECTOR_H_
 
-
-
-#include <vector>
 #include <string>
+#include <vector>
 
 #include <Eigen/Dense>
 
-namespace PatternGeneratorJRL
-{
+namespace PatternGeneratorJRL {
 
-  static const double  RadToGrad = 57.295779578;
-  static const double  GradToRad = 0.0174532925;
+static const double RadToGrad = 57.295779578;
+static const double GradToRad = 0.0174532925;
 
-  struct ObstaclePar_t ;
-  typedef struct ObstaclePar_t ObstaclePar;
-  /** @ingroup steppingover
-      @brief Object to detect collisions between robot leg and obstacle
+struct ObstaclePar_t;
+typedef struct ObstaclePar_t ObstaclePar;
+/** @ingroup steppingover
+    @brief Object to detect collisions between robot leg and obstacle
+*/
+class CollisionDetector {
+public:
+  /// Constructor
+  CollisionDetector();
+
+  /// Destructor
+  ~CollisionDetector();
+
+  /* !Calculates the absolute coordinates (ref frame) of a point on the
+     lower legs given in relative coordinates in the locale frame
+     (whichLeg positive for left leg and negative for right leg).
+     This function might be replaced by functions from DynamicMultibody
   */
-  class  CollisionDetector
-  {
-  public :
+  void CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord,
+                                   Eigen::Vector3d &AbsCoord,
+                                   Eigen::VectorXd LegAngles,
+                                   Eigen::Matrix3d WaistRot,
+                                   Eigen::Vector3d WaistPos, int WhichLeg);
 
-    /// Constructor
-    CollisionDetector();
+  /*! Set opstacle position in worldframe and
+    the obstacle points in local obstacle frame */
+  void SetObstacleCoordinates(ObstaclePar aObstacleInfo);
 
-    /// Destructor
-    ~CollisionDetector();
+  /*! This function transforms the coordinates of a point
+    expressed in the world frame to the local coordinates
+    in the obstacle frame */
+  void WorldFrameToObstacleFrame(Eigen::Vector3d &WorldFrameCoord,
+                                 Eigen::Vector3d &ObstacleFrameCoord);
 
-    /* !Calculates the absolute coordinates (ref frame) of a point on the
-       lower legs given in relative coordinates in the locale frame
-       (whichLeg positive for left leg and negative for right leg).
-       This function might be replaced by functions from DynamicMultibody
-    */
-    void CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord,
-                                     Eigen::Vector3d &AbsCoord,
-                                     Eigen::VectorXd LegAngles,
-                                     Eigen::Matrix3d WaistRot,
-                                     Eigen::Vector3d WaistPos,
-                                     int WhichLeg);
+  /*! This function checks for intersection of two line segments
+    p1p2 and v1v2. It returns true if a collision occurs, else false
+  */
+  bool CollisionTwoLines(std::vector<double> p1, std::vector<double> p2,
+                         std::vector<double> v1, std::vector<double> v2);
 
+  /*! This function checks for intersection of a linesegment p1p2
+    of the robot, expressed in the obstacle frame, with one of the
+    three planes of the obstacle: plane 0: front; plane 1: top;
+    plane 2:rear plane.
+    It returns true if a collision occurs, else false.
+  */
+  bool CollisionLineObstaclePlane(Eigen::Vector3d &LegPoint1,
+                                  Eigen::Vector3d &LegPoint2, int PlaneNumber);
 
+  /*! This function does the complete check if a linesegment
+    intersects with the obstacle or is completely inside the obstacle
+  */
+  bool CollisionLineObstacleComplete(Eigen::Vector3d &Point1,
+                                     Eigen::Vector3d &Point2);
 
+protected:
+  /*! x, y, z position of obstacle in worldframe
+    (point taken on the front plan of the obstacle
+    on the floor and in the middel of the width) */
+  Eigen::Vector3d m_ObstaclePosition;
 
-    /*! Set opstacle position in worldframe and
-      the obstacle points in local obstacle frame */
-    void SetObstacleCoordinates(ObstaclePar aObstacleInfo);
+  /*! This is the rotationmatrix from obstacle frame to world frame */
+  Eigen::Matrix3d m_ObstacleRot;
 
-    /*! This function transforms the coordinates of a point
-      expressed in the world frame to the local coordinates
-      in the obstacle frame */
-    void WorldFrameToObstacleFrame(Eigen::Vector3d &WorldFrameCoord,
-                                   Eigen::Vector3d &ObstacleFrameCoord);
+  /*! This is the rotationmatrix from world frame to obstacle frame */
+  Eigen::Matrix3d m_ObstacleRotInv;
 
-    /*! This function checks for intersection of two line segments
-      p1p2 and v1v2. It returns true if a collision occurs, else false
-    */
-    bool CollisionTwoLines(std::vector<double> p1,
-                           std::vector<double> p2,
-                           std::vector<double> v1,
-                           std::vector<double> v2);
+  /*! This contains four points of one side of the obstacle in the
+    local obstacle frame......this frame is positionend in the origin
+    of the obstacle to where Obstacle Position is pointing,
+    the orientation is x following depth, y following width
+  */
+  Eigen::MatrixXd m_ObstaclePoints;
+};
 
-    /*! This function checks for intersection of a linesegment p1p2
-      of the robot, expressed in the obstacle frame, with one of the
-      three planes of the obstacle: plane 0: front; plane 1: top;
-      plane 2:rear plane.
-      It returns true if a collision occurs, else false.
-    */
-    bool CollisionLineObstaclePlane(Eigen::Vector3d &LegPoint1,
-                                    Eigen::Vector3d &LegPoint2,
-                                    int PlaneNumber);
-
-    /*! This function does the complete check if a linesegment
-      intersects with the obstacle or is completely inside the obstacle
-    */
-    bool CollisionLineObstacleComplete(Eigen::Vector3d &Point1,
-                                       Eigen::Vector3d &Point2);
-
-  protected:
-
-    /*! x, y, z position of obstacle in worldframe
-      (point taken on the front plan of the obstacle
-      on the floor and in the middel of the width) */
-    Eigen::Vector3d m_ObstaclePosition;
-
-    /*! This is the rotationmatrix from obstacle frame to world frame */
-    Eigen::Matrix3d m_ObstacleRot;
-
-    /*! This is the rotationmatrix from world frame to obstacle frame */
-    Eigen::Matrix3d m_ObstacleRotInv;
-
-    /*! This contains four points of one side of the obstacle in the
-      local obstacle frame......this frame is positionend in the origin
-      of the obstacle to where Obstacle Position is pointing,
-      the orientation is x following depth, y following width
-    */
-    Eigen::MatrixXd m_ObstaclePoints;
-
-
-
-  };
-
-
-
-
-
-}
+} // namespace PatternGeneratorJRL
 #include <MotionGeneration/StepOverPlanner.hh>
 #endif /* _COLLISION_DETECTOR_H_ */

@@ -1012,8 +1012,8 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAbsoluteTimeReference(
 }
 
 LeftAndRightFootTrajectoryGenerationMultiple &
-LeftAndRightFootTrajectoryGenerationMultiple::
-operator=(const LeftAndRightFootTrajectoryGenerationMultiple &aLRFTGM) {
+LeftAndRightFootTrajectoryGenerationMultiple::operator=(
+    const LeftAndRightFootTrajectoryGenerationMultiple &aLRFTGM) {
   ODEBUG("Went through this.");
   if (this == &aLRFTGM)
     return *this;

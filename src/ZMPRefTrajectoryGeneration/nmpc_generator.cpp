@@ -1533,7 +1533,8 @@ void NMPCgenerator::updateFootPoseConstraint(Eigen::VectorXd &U) {
     if (support_state[n - 1].Foot != SupportStates_deq_[i + 1].Foot) {
       support_state[n] = SupportStates_deq_[i + 1];
       if (support_state[n].StepNumber != 0) {
-        support_state[n].Yaw = U(2 * N_ + 2 * nf_ + n - 1); // F_kp1_theta_(n-1);
+        support_state[n].Yaw =
+            U(2 * N_ + 2 * nf_ + n - 1); // F_kp1_theta_(n-1);
       }
       ++n;
       done = true;
@@ -1610,7 +1611,8 @@ void NMPCgenerator::evalFootPoseConstraint(Eigen::VectorXd &U) {
     if (support_state[n - 1].Foot != SupportStates_deq_[i + 1].Foot) {
       support_state[n] = SupportStates_deq_[i + 1];
       if (support_state[n].StepNumber != 0) {
-        support_state[n].Yaw = U(2 * N_ + 2 * nf_ + n - 1); // F_kp1_theta_(n-1);
+        support_state[n].Yaw =
+            U(2 * N_ + 2 * nf_ + n - 1); // F_kp1_theta_(n-1);
       }
       ++n;
       done = true;

@@ -27,78 +27,69 @@
 #ifndef _PROBLEM_VEL_REF_H_
 #define _PROBLEM_VEL_REF_H_
 
+namespace PatternGeneratorJRL {
 
+/*! \brief Final optimization problem to handle velocity reference.
+  This object store a standardized optimization quadratic problem.
+*/
+struct ProblemVelRef_s {
+  int m, me, mmax, n, nmax, mnn;
+  double *Q, *D, *DU, *DS, *XL, *XU, *X, *NewX, *U, *war; // For COM
+  int *iwar;
+  int iout, ifail, iprint, lwar, liwar;
+  double Eps;
 
+  /// \brief Initialize by default an empty problem.
+  ProblemVelRef_s();
 
-namespace PatternGeneratorJRL
-{
+  /// \brief Release the memory at the end only.
+  ~ProblemVelRef_s();
 
-  /*! \brief Final optimization problem to handle velocity reference.
-    This object store a standardized optimization quadratic problem.
-  */
-  struct ProblemVelRef_s
-  {
-    int m, me, mmax, n, nmax, mnn;
-    double *Q, *D, *DU, *DS, *XL, *XU, *X, *NewX, *U, *war;//For COM
-    int *iwar;
-    int iout, ifail, iprint, lwar, liwar;
-    double Eps;
+  /// \brief Set the dimensions of the problem.
+  /// This method has an internal logic to
+  /// allocate the memory. It is done only
+  /// when the problem gets bigger. When it shrinks
+  /// down the memory is kept to avoid overhead.
+  void setDimensions(int NbOfConstraints, int NbOfEqConstraints, int StepNumber,
+                     int QP_N);
 
-    /// \brief Initialize by default an empty problem.
-    ProblemVelRef_s();
+  /// \brief Dump on disk a problem.
+  void dumpProblem(const char *filename);
+  void dumpProblem(std::ostream &);
 
-    /// \brief Release the memory at the end only.
-    ~ProblemVelRef_s();
+  /// \brief Dump on disk a matrix defined by type.
+  void dumpMatrix(const char *filename, int type);
+  void dumpMatrix(std::ostream &, int type);
+  /// \brief Dump on disk a vector defined by type.
+  void dumpVector(const char *filename, int type);
+  void dumpVector(std::ostream &, int type);
 
-    /// \brief Set the dimensions of the problem.
-    /// This method has an internal logic to
-    /// allocate the memory. It is done only
-    /// when the problem gets bigger. When it shrinks
-    /// down the memory is kept to avoid overhead.
-    void setDimensions(int NbOfConstraints,
-                       int NbOfEqConstraints,
-                       int StepNumber,
-                       int QP_N);
+  /// \brief Initialize the problem
+  void initializeProblem();
 
-    /// \brief Dump on disk a problem.
-    void dumpProblem(const char *filename);
-    void dumpProblem(std::ostream &);
+  const static int MATRIX_Q = 0;
+  const static int MATRIX_DU = 1;
+  const static int VECTOR_D = 2;
+  const static int VECTOR_DL = 3;
+  const static int VECTOR_XL = 4;
+  const static int VECTOR_XU = 5;
+  const static int VECTOR_DS = 6;
 
-    /// \brief Dump on disk a matrix defined by type.
-    void dumpMatrix(const char *filename,int type);
-    void dumpMatrix(std::ostream &, int type);
-    /// \brief Dump on disk a vector defined by type.
-    void dumpVector(const char *filename,int type);
-    void dumpVector(std::ostream &,int type);
+protected:
+  /// The method doing the real job of releasing the memory.
+  void ReleaseMemory();
 
-    /// \brief Initialize the problem
-    void initializeProblem();
+  /// The method allocating the memory.
+  /// Called when setting the dimensions of the problem.
+  void AllocateMemory();
 
-    const static int MATRIX_Q=0;
-    const static int MATRIX_DU=1;
-    const static int VECTOR_D=2;
-    const static int VECTOR_DL=3;
-    const static int VECTOR_XL=4;
-    const static int VECTOR_XU=5;
-    const static int VECTOR_DS=6;
+private:
+  /// Previous set of step number considered.
+  int m_stepNumber;
 
-  protected:
-
-    /// The method doing the real job of releasing the memory.
-    void ReleaseMemory();
-
-    /// The method allocating the memory.
-    /// Called when setting the dimensions of the problem.
-    void AllocateMemory();
-
-  private:
-    /// Previous set of step number considered.
-    int m_stepNumber;
-
-    /// Previous size of the preview.
-    int m_QP_N;
-
-  };
-  typedef struct ProblemVelRef_s Problem;
-}
+  /// Previous size of the preview.
+  int m_QP_N;
+};
+typedef struct ProblemVelRef_s Problem;
+} // namespace PatternGeneratorJRL
 #endif /* _PROBLEM_VEL_REF_H_ */

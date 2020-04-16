@@ -31,60 +31,52 @@
 #ifndef _POLYNOME_H_
 #define _POLYNOME_H_
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
-using namespace::std;
+using namespace ::std;
 
-namespace PatternGeneratorJRL
-{
+namespace PatternGeneratorJRL {
 
-  /** Class for computing trajectories */
-  class  Polynome
-  {
+/** Class for computing trajectories */
+class Polynome {
 
-  public:
+public:
+  /*! Constructor */
+  Polynome(int Degree);
 
-    /*! Constructor */
-    Polynome(int Degree);
+  /*! Destructor */
+  ~Polynome();
 
-    /*! Destructor */
-    ~Polynome();
+  /*! Compute the value. */
+  double Compute(double t);
 
-    /*! Compute the value. */
-    double Compute(double t);
+  /*! Compute the value of the derivative. */
+  double ComputeDerivative(double t);
 
-    /*! Compute the value of the derivative. */
-    double ComputeDerivative(double t);
+  /*! Compute the value of the second derivative. */
+  double ComputeSecDerivative(double t);
 
-    /*! Compute the value of the second derivative. */
-    double ComputeSecDerivative(double t);
+  /*! Compute the value of the third derivative (jerk). */
+  double ComputeJerk(double t);
 
-    /*! Compute the value of the third derivative (jerk). */
-    double ComputeJerk(double t);
+  /*! Get the coefficients. */
+  void GetCoefficients(std::vector<double> &lCoefficients) const;
 
-    /*! Get the coefficients. */
-    void GetCoefficients(std::vector<double> &lCoefficients) const;
+  /*! Set the coefficients. */
+  void SetCoefficients(const std::vector<double> &lCoefficients);
 
-    /*! Set the coefficients. */
-    void SetCoefficients(const std::vector<double> &lCoefficients);
+  inline int Degree() { return m_Degree; };
 
-    inline int Degree()
-    {
-      return m_Degree;
-    };
+  /*! Print the coefficient. */
+  void print() const;
 
+protected:
+  /// Degree of the polynome
+  int m_Degree;
 
-    /*! Print the coefficient. */
-    void print() const;
-
-  protected:
-
-    /// Degree of the polynome
-    int m_Degree;
-
-    /// Vector of coefficients.
-    std::vector<double> m_Coefficients;
-  };
-}
+  /// Vector of coefficients.
+  std::vector<double> m_Coefficients;
+};
+} // namespace PatternGeneratorJRL
 #endif /* _POLYNOME_H_*/

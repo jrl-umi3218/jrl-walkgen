@@ -27,90 +27,85 @@
   \brief Defines an object for measuring the time spend in some code part.
 */
 #ifndef _HWPG_CLOCK_H_
-# define _HWPG_CLOCK_H_
-# include <time.h>
-# include <vector>
-# include <string>
+#define _HWPG_CLOCK_H_
+#include <string>
+#include <time.h>
+#include <vector>
 
-# include "portability/gettimeofday.hh"
+#include "portability/gettimeofday.hh"
 
-# ifdef WIN32
-#  include <Windows.h>
-# endif
+#ifdef WIN32
+#include <Windows.h>
+#endif
 
+namespace PatternGeneratorJRL {
+/*! \brief Measure time spend in some code.
+  The object measure the time between StartTiming() and StopTiming() slots.
+  The number of iteration is incremented by IncIteration().
+  MaxTime() and AverageTime() returns the maximum time spend in one iteration,
+  and the average time spends in one iteration respectively.
+  TotalTime() returns the time spend in total in the code measured.
+  The precision is expected to be in micro-second but is OS dependent.
+*/
+class Clock {
+public:
+  /*! \brief Default constructor */
+  Clock();
 
-namespace PatternGeneratorJRL
-{
-  /*! \brief Measure time spend in some code.
-    The object measure the time between StartTiming() and StopTiming() slots.
-    The number of iteration is incremented by IncIteration().
-    MaxTime() and AverageTime() returns the maximum time spend in one iteration,
-    and the average time spends in one iteration respectively.
-    TotalTime() returns the time spend in total in the code measured.
-    The precision is expected to be in micro-second but is OS dependent.
-  */
-  class  Clock
-  {
-  public:
+  /*! \brief Default destructor */
+  ~Clock();
 
-    /*! \brief Default constructor */
-    Clock();
+  /*! \brief Start Timing. */
+  void StartTiming();
 
-    /*! \brief Default destructor */
-    ~Clock();
+  /*! \brief End Timing. */
+  void StopTiming();
 
-    /*! \brief Start Timing. */
-    void StartTiming();
+  /*! \brief Increment Iteration by specifying the number of iterations*/
+  void IncIteration(int lNbOfIts = 1);
 
-    /*! \brief End Timing. */
-    void StopTiming();
+  /*! \brief Returns number of iteration. */
+  unsigned long int NbOfIterations();
 
-    /*! \brief Increment Iteration by specifying the number of iterations*/
-    void IncIteration(int lNbOfIts=1);
+  /*! \brief Returns maximum time interval measured
+    between two increment of iteration. */
+  double MaxTime();
 
-    /*! \brief Returns number of iteration. */
-    unsigned long int NbOfIterations();
+  /*! \brief Returns average time interval measured
+    between two increment of iteration. */
+  double AverageTime();
 
-    /*! \brief Returns maximum time interval measured
-      between two increment of iteration. */
-    double MaxTime();
+  /*! \brief Returns the total time measured. */
+  double TotalTime();
 
-    /*! \brief Returns average time interval measured
-      between two increment of iteration. */
-    double AverageTime();
+  /*! \brief Reset the clock to restart a campaign
+    of measures */
+  void Reset();
 
-    /*! \brief Returns the total time measured. */
-    double TotalTime();
+  /*! \brief Display a brief description of the current status. */
+  void Display();
 
-    /*! \brief Reset the clock to restart a campaign
-      of measures */
-    void Reset();
+  /*! \brief Record buffer of time consumption. */
+  void RecordDataBuffer(std::string filename);
 
-    /*! \brief Display a brief description of the current status. */
-    void Display();
+private:
+  /*! Storing begin and end timestamps. */
+  struct timeval m_BeginTimeStamp, m_EndTimeStamp;
 
-    /*! \brief Record buffer of time consumption. */
-    void RecordDataBuffer(std::string filename);
+  /*! Starting time of the clock. */
+  double m_StartingTime;
 
-  private:
+  /*! Number of iterations. */
+  unsigned long int m_NbOfIterations;
 
-    /*! Storing begin and end timestamps. */
-    struct timeval m_BeginTimeStamp, m_EndTimeStamp;
+  /*! Maximum time. */
+  double m_MaximumTime;
 
-    /*! Starting time of the clock. */
-    double m_StartingTime;
+  /*! Total time. */
+  double m_TotalTime;
 
-    /*! Number of iterations. */
-    unsigned long int m_NbOfIterations;
-
-    /*! Maximum time. */
-    double m_MaximumTime;
-
-    /*! Total time. */
-    double m_TotalTime;
-
-    /*! Buffer */
-    std::vector<double> m_DataBuffer;
-  };
-}
+  /*! Buffer */
+  std::vector<double> m_DataBuffer;
+};
+} // namespace PatternGeneratorJRL
 #endif /* _HWPG_CLOCK_H_ */

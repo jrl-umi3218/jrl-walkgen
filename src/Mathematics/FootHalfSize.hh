@@ -26,46 +26,38 @@
 #ifndef _FOOT_HALF_SIZE_H_
 #define _FOOT_HALF_SIZE_H_
 
-namespace PatternGeneratorJRL
-{
+namespace PatternGeneratorJRL {
 
-  /*! This class handles the size and the constraints related to the feet
-   */
-  class FootHalfSize
-  {
-  public:
-    FootHalfSize();
-    ~FootHalfSize();
+/*! This class handles the size and the constraints related to the feet
+ */
+class FootHalfSize {
+public:
+  FootHalfSize();
+  ~FootHalfSize();
 
-    void setSize(double lWidth,
-                 double lHeight,
-                 double DSFeetDistance);
+  void setSize(double lWidth, double lHeight, double DSFeetDistance);
 
-    void setConstraints(double OnX,
-                        double OnY,
-                        double DSFeetDistance);
+  void setConstraints(double OnX, double OnY, double DSFeetDistance);
 
-  protected:
-    void updateHalfHeightDS(double DSFeetDistance);
-    void updateHalfSize();
+protected:
+  void updateHalfHeightDS(double DSFeetDistance);
+  void updateHalfSize();
 
-  private:
+private:
+  double m_HalfHeight;
+  double m_HalfWidth;
+  double m_HalfHeightDS;
+  double m_Height;
+  double m_Width;
 
-    double m_HalfHeight;
-    double m_HalfWidth;
-    double m_HalfHeightDS;
-    double m_Height;
-    double m_Width;
+  double m_ConstraintsOnX;
+  double m_ConstraintsOnY;
 
-    double m_ConstraintsOnX;
-    double m_ConstraintsOnY;
-
-  public:
-
-    double getHalfHeight() const;
-    double getHalfWidth() const;
-    double getHalfHeightDS() const;
-  };
-}
+public:
+  double getHalfHeight() const;
+  double getHalfWidth() const;
+  double getHalfHeightDS() const;
+};
+} // namespace PatternGeneratorJRL
 
 #endif /*  _FOOT_HALF_SIZE_H_*/

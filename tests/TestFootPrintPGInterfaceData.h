@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Francois Keith
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 #ifndef _TEST_FOOT_PRINT_PG_INTERFACE_H_
@@ -27,26 +27,26 @@
 
 #include <string>
 
-enum Profiles_t  {
-  PROFIL_PB_FLORENT,                                 //  0
-  PROFIL_STEPPING_OVER,                              //  1 
-  PROFIL_SHORT_STRAIGHT_WALKING,                     //  2
-  PROFIL_SHORT_STRAIGHT_WALKING_ONE_STAGE,           //  3
-  PROFIL_CURVED_WALKING_PBW2,                        //  4
-  PROFIL_KINEOWORKS,                                 //  5
-  PROFIL_STRAIGHT_WALKING,                           //  6
-  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,          //  7
-  PROFIL_CURVED_WALKING_PBW,                         //  8
-  PROFIL_STRAIGHT_WALKING_DIMITROV,                  //  9
-  PROFIL_CURVED_WALKING_DIMITROV,                    // 10
-  PROFIL_TURN_90D,                                   // 11
-  PROFIL_TURNING_ON_THE_CIRCLE,                      // 12
-  PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER,   // 13
-  PROFIL_ANALYTICAL_ONLINE_WALKING,                  // 14
-  PROFIL_ONLINE_WALKING,                             // 15
-  PROFIL_SIMU_ONLINE_WALKING,                        // 16
-  PROFIL_HERDT,										 // 17
-  PROFIL_HERDT_ONLINE									 // 18
+enum Profiles_t {
+  PROFIL_PB_FLORENT,                               //  0
+  PROFIL_STEPPING_OVER,                            //  1
+  PROFIL_SHORT_STRAIGHT_WALKING,                   //  2
+  PROFIL_SHORT_STRAIGHT_WALKING_ONE_STAGE,         //  3
+  PROFIL_CURVED_WALKING_PBW2,                      //  4
+  PROFIL_KINEOWORKS,                               //  5
+  PROFIL_STRAIGHT_WALKING,                         //  6
+  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,        //  7
+  PROFIL_CURVED_WALKING_PBW,                       //  8
+  PROFIL_STRAIGHT_WALKING_DIMITROV,                //  9
+  PROFIL_CURVED_WALKING_DIMITROV,                  // 10
+  PROFIL_TURN_90D,                                 // 11
+  PROFIL_TURNING_ON_THE_CIRCLE,                    // 12
+  PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER, // 13
+  PROFIL_ANALYTICAL_ONLINE_WALKING,                // 14
+  PROFIL_ONLINE_WALKING,                           // 15
+  PROFIL_SIMU_ONLINE_WALKING,                      // 16
+  PROFIL_HERDT,                                    // 17
+  PROFIL_HERDT_ONLINE                              // 18
 };
 
 enum InitialPoses_t {
@@ -63,9 +63,8 @@ enum InitialPoses_t {
 
 extern std::string ProfilesNames[19];
 
-extern double InitialPoses[7][40]; 
+extern double InitialPoses[7][40];
 
 extern double OnLineFootSteps[NBOFPREDEFONLINEFOOTSTEPS][3];
-
 
 #endif /* _TEST_FOOT_PRINT_PG_INTERFACE_H_ */

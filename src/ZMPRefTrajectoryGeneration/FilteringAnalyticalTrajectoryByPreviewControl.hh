@@ -31,94 +31,88 @@
 #include <Mathematics/AnalyticalZMPCOGTrajectory.hh>
 #include <PreviewControl/PreviewControl.hh>
 
-namespace PatternGeneratorJRL
-{
-  /*! \object This class intends to filter an analytical
-    trajectory using a preview control model. */
+namespace PatternGeneratorJRL {
+/*! \object This class intends to filter an analytical
+  trajectory using a preview control model. */
 
-  class  FilteringAnalyticalTrajectoryByPreviewControl : public SimplePlugin
-  {
-  public:
+class FilteringAnalyticalTrajectoryByPreviewControl : public SimplePlugin {
+public:
+  /*! \brief Default constructor */
+  FilteringAnalyticalTrajectoryByPreviewControl(
+      SimplePluginManager *lSPM,
+      AnalyticalZMPCOGTrajectory *lAnalyticalZMPCOGTrajectory = 0,
+      PreviewControl *lPreviewControl = 0);
 
-    /*! \brief Default constructor */
-    FilteringAnalyticalTrajectoryByPreviewControl
-    (SimplePluginManager * lSPM,
-     AnalyticalZMPCOGTrajectory * lAnalyticalZMPCOGTrajectory=0,
-     PreviewControl * lPreviewControl=0);
-    
-    /*! \brief Set Analytical trajectory */
-    void SetAnalyticalTrajectory(AnalyticalZMPCOGTrajectory *lAZCT);
+  /*! \brief Set Analytical trajectory */
+  void SetAnalyticalTrajectory(AnalyticalZMPCOGTrajectory *lAZCT);
 
-    /*! \brief Set PreviewControl */
-    void SetPreviewControl(PreviewControl *lPC);
+  /*! \brief Set PreviewControl */
+  void SetPreviewControl(PreviewControl *lPC);
 
-    /*! \brief Fill in the whole buffer with the analytical trajectory.
-      This has to be done if the analytical trajectory has been changed,
-      and that the first interval has been changed.
-      \param FistValueOfZMPProfil: The first value of the desired ZMP interval.
-      \param DeltaTj0: Value of the time interval during which the filter 
-      is applied.
-      \return false if a problem occured, true otherwise.
-    */
-    bool FillInWholeBuffer(double FirstValueofZMPProfil,
-                           double DeltaTj0 );
+  /*! \brief Fill in the whole buffer with the analytical trajectory.
+    This has to be done if the analytical trajectory has been changed,
+    and that the first interval has been changed.
+    \param FistValueOfZMPProfil: The first value of the desired ZMP interval.
+    \param DeltaTj0: Value of the time interval during which the filter
+    is applied.
+    \return false if a problem occured, true otherwise.
+  */
+  bool FillInWholeBuffer(double FirstValueofZMPProfil, double DeltaTj0);
 
-    /*! \brief Update the buffer by removing the first value in the queue,
-      and adding a new one corresponding to the next control step.
-      \param[in] t: The new time to be add.
-      \return false if a problem occured, true otherwise.
-    */
-    bool UpdateOneStep(double t, double &ZMPValue, double &CoMValue,
-                       double &CoMSpeedValue);
+  /*! \brief Update the buffer by removing the first value in the queue,
+    and adding a new one corresponding to the next control step.
+    \param[in] t: The new time to be add.
+    \return false if a problem occured, true otherwise.
+  */
+  bool UpdateOneStep(double t, double &ZMPValue, double &CoMValue,
+                     double &CoMSpeedValue);
 
-    /*! \brief Overloading method of SimplePlugin */
-    virtual void CallMethod(std::string &Method,
-                            std::istringstream &astrm);
+  /*! \brief Overloading method of SimplePlugin */
+  virtual void CallMethod(std::string &Method, std::istringstream &astrm);
 
-    /*! \brief Default destructor */
-    ~FilteringAnalyticalTrajectoryByPreviewControl();
+  /*! \brief Default destructor */
+  ~FilteringAnalyticalTrajectoryByPreviewControl();
 
-  private:
+private:
+  /*! \brief The trajectory used for filtering. */
+  AnalyticalZMPCOGTrajectory *m_AnalyticalZMPCOGTrajectory;
 
-    /*! \brief The trajectory used for filtering. */
-    AnalyticalZMPCOGTrajectory * m_AnalyticalZMPCOGTrajectory;
+  /*! \brief Buffer of information for filtering. */
+  std::vector<double> m_DataBuffer;
 
-    /*! \brief Buffer of information for filtering. */
-    std::vector<double> m_DataBuffer;
+  /*! \brief Local index of the buffer.
+    -1 means that it was not yet correctly initialized.
+  */
+  int m_LocalBufferIndex;
 
-    /*! \brief Local index of the buffer.
-      -1 means that it was not yet correctly initialized.
-    */
-    int m_LocalBufferIndex;
+  /*! \brief Pointer to the preview control object used to
+    filter. */
+  PreviewControl *m_PreviewControl;
 
-    /*! \brief Pointer to the preview control object used to
-      filter. */
-    PreviewControl *  m_PreviewControl;
+  /*! \brief State of the CoM */
+  Eigen::MatrixXd m_ComState;
 
-    /*! \brief State of the CoM */
-    Eigen::MatrixXd m_ComState;
+  /*! \brief Starting time of the filter. */
+  double m_StartingTime;
 
-    /*! \brief Starting time of the filter. */
-    double m_StartingTime;
+  /*! \brief Duration of the filtering. */
+  double m_Duration;
 
-    /*! \brief Duration of the filtering. */
-    double m_Duration;
+  /*! \brief Preview control time. */
+  double m_PreviewControlTime;
 
-    /*! \brief Preview control time. */
-    double m_PreviewControlTime;
+  /*! \brief Sampling period. */
+  double m_SamplingPeriod;
 
-    /*! \brief Sampling period. */
-    double m_SamplingPeriod;
+  /*! \brief Single support time. */
+  double m_Tsingle;
 
-    /*! \brief Single support time. */
-    double m_Tsingle;
+  /*! \brief Current ZMP value of the preview control. */
+  double m_ZMPPCValue;
 
-    /*! \brief Current ZMP value of the preview control. */
-    double m_ZMPPCValue;
-
-    /*! \brief Resizing the data buffer depending of the sampling period and
-      preview control time. */
-    void Resize();
-  };
-}
+  /*! \brief Resizing the data buffer depending of the sampling period and
+    preview control time. */
+  void Resize();
+};
+} // namespace PatternGeneratorJRL
 #endif /* _FILTERING_ANALYTICAL_TRAJECTORY_BY_PREVIEW_CONTROL_H_ */

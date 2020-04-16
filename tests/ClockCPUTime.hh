@@ -24,119 +24,115 @@
 /* \file Class to measure CPU computation time  */
 
 #ifndef _CLOCK_CPUTIME_PATTERN_GERENATOR_UTESTING_H_
-# define _CLOCK_CPUTIME_PATTERN_GERENATOR_UTESTING_H_
+#define _CLOCK_CPUTIME_PATTERN_GERENATOR_UTESTING_H_
 
-# include "portability/gettimeofday.hh"
+#include "portability/gettimeofday.hh"
 
 /* System includes */
 #ifdef UNIX
-# include <stdlib.h>
+#include <stdlib.h>
 #endif /*UNIX*/
 
 #ifdef WIN32
-# include <Windows.h>
+#include <Windows.h>
 #endif /*WIN32*/
 
-#include <time.h>
 #include <ostream>
+#include <time.h>
 #include <vector>
 
 #include "CommonTools.hh"
 
 namespace PatternGeneratorJRL {
 
-  namespace TestSuite {
+namespace TestSuite {
 
-    /*! \brief Clock class for computation timing */
-    class ClockCPUTime
-    {
-    public:
-      ClockCPUTime();
-      ~ClockCPUTime();
+/*! \brief Clock class for computation timing */
+class ClockCPUTime {
+public:
+  ClockCPUTime();
+  ~ClockCPUTime();
 
-      /*! \name Measure starting date */
-      void startingDate();
+  /*! \name Measure starting date */
+  void startingDate();
 
-      /*! \name Methods related to off-line trajectories generation
-       @{ */
-      void startPlanning();
-      void endPlanning();
-      /*! @} */
+  /*! \name Methods related to off-line trajectories generation
+   @{ */
+  void startPlanning();
+  void endPlanning();
+  /*! @} */
 
-      /*! \name Methods related to on-line trajectories generation
-	@{ */
-      void startOneIteration();
-      void stopOneIteration();
-      /*! \brief Returns the date at which startOneIteration was called. */
-      double getStartOneIteration();
-      /*! @} */
+  /*! \name Methods related to on-line trajectories generation
+    @{ */
+  void startOneIteration();
+  void stopOneIteration();
+  /*! \brief Returns the date at which startOneIteration was called. */
+  double getStartOneIteration();
+  /*! @} */
 
-      /*! \name Methods related to on-line modification
-	@{ */
-      void startModification();
-      void stopModification();
-      /*! @} */
+  /*! \name Methods related to on-line modification
+    @{ */
+  void startModification();
+  void stopModification();
+  /*! @} */
 
+  /*! \name Update data buffer regarding time statistics. */
+  void fillInStatistics();
 
-      /*! \name Update data buffer regarding time statistics. */
-      void fillInStatistics();
+  /*! \brief Write buffers of timestamps and time consumtion
+    in file aFileName */
+  void writeBuffer(std::string &aFileName);
 
-      /*! \brief Write buffers of timestamps and time consumtion
-	in file aFileName */
-      void writeBuffer(std::string &aFileName);
+  /*! \brief Display mean time, max time, and nb of modifications. */
+  void displayStatistics(std::ostream &os, OneStep &aStep);
 
-      /*! \brief Display mean time, max time, and nb of modifications. */
-      void displayStatistics(std::ostream &os,
-			     OneStep &aStep);
+  /*! \brief Reset all counters */
+  void Reset();
 
-      /*! \brief Reset all counters */
-      void Reset();
+private:
+  /*! \brief Date at the measurement started,
+    i.e. the global reference */
+  struct timeval m_startingtime;
 
-    private:
+  /*! \brief Date at which current computation started */
+  struct timeval m_begin;
 
-      /*! \brief Date at the measurement started,
-	i.e. the global reference */
-      struct timeval m_startingtime;
+  /*! \brief The time spend in planning. */
+  double m_totaltimeinplanning;
 
-      /*! \brief Date at which current computation started */
-      struct timeval m_begin;
+  /*! \brief Current total time spend in one iteration. */
+  double m_currenttime;
 
-      /*! \brief The time spend in planning. */
-      double m_totaltimeinplanning;
+  /*! \brief Total time spend in handling iterations. */
+  double m_totaltime;
 
-      /*! \brief Current total time spend in one iteration. */
-      double m_currenttime;
+  /*! \brief The time spend in handling modification. */
+  double m_modificationtime;
 
-      /*! \brief Total time spend in handling iterations. */
-      double m_totaltime;
+  /*! \brief Total time spend in handling modification during the test. */
+  double m_totalmodificationtime;
 
-      /*! \brief The time spend in handling modification. */
-      double m_modificationtime;
+  /*! \brief Number of modification done. */
+  unsigned long int m_nbofmodifs;
 
-      /*! \brief Total time spend in handling modification during the test. */
-      double m_totalmodificationtime;
+  /*! \brief Maximum time spend in one iteration */
+  double m_maxtime;
 
-      /*! \brief Number of modification done. */
-      unsigned long int m_nbofmodifs;
+  /*! \brief Current position of the circular buffer. */
+  unsigned long int m_TimeProfileIndex;
 
-      /*! \brief Maximum time spend in one iteration */
-      double m_maxtime;
+  /*! \brief Limit of the circular buffer. */
+  unsigned long int m_TimeProfileUpperLimit;
 
-      /*! \brief Current position of the circular buffer. */
-      unsigned long int m_TimeProfileIndex;
+  /*! \brief The circular buffer for time consumption. */
+  std::vector<double> m_TimeProfile;
 
-      /*! \brief Limit of the circular buffer. */
-      unsigned long int m_TimeProfileUpperLimit;
+  /*! \brief The circular buffer for time stamps. */
+  std::vector<double> m_TimeProfileTS;
 
-      /*! \brief The circular buffer for time consumption. */
-      std::vector<double> m_TimeProfile;
-
-      /*! \brief The circular buffer for time stamps. */
-      std::vector<double> m_TimeProfileTS;
-
-      /*! \brief Nb of iteration really computed */
-      unsigned long int m_NbOfItToCompute;
-    };
-  }
-}
+  /*! \brief Nb of iteration really computed */
+  unsigned long int m_NbOfItToCompute;
+};
+} // namespace TestSuite
+} // namespace PatternGeneratorJRL
 #endif /* _CLOCK_CPUTIME_PATTERN_GERENATOR_UTESTING_H_ */

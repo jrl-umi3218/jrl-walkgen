@@ -28,267 +28,249 @@
 #ifndef _ANALYTICAL_COG_H_
 #define _ANALYTICAL_COG_H_
 
-#include <vector>
 #include <iostream>
-
+#include <vector>
 
 #include <Mathematics/Polynome.hh>
 
+namespace PatternGeneratorJRL {
 
-namespace PatternGeneratorJRL
-{
+/*! AnalyticalZMPCOGTrajectory represents the ZMP and the COG trajectories
+  based on the following formula:
 
-  /*! AnalyticalZMPCOGTrajectory represents the ZMP and the COG trajectories
-    based on the following formula:
+*/
+class AnalyticalZMPCOGTrajectory {
+
+public:
+  /*! Constructor */
+  AnalyticalZMPCOGTrajectory(int lNbOfIntervals = 0);
+
+  /*! Destructor */
+  ~AnalyticalZMPCOGTrajectory();
+
+  /*! Compute the current value according
+    to time.
+    @param t: the time,
+    @param r: the result,
+    @return Returns true if the function has been
+    computed, false otherwise.
+  */
+  bool ComputeCOM(double t, double &r);
+
+  /*! Compute the current CoM speed value according
+    to time.
+    @param t: the time,
+    @param r: the result,
+    @return Returns true if the function has been
+    computed, false otherwise.
+  */
+  bool ComputeCOMSpeed(double t, double &r);
+
+  /*! Compute the current value according
+    to time and the index of the interval.
+    To be efficient this method does not have
+    any boundary check.
+    @param t: the time,
+    @param i: the numero of the interval
+    @param r: the result,
+    @return Returns true if the function has been
+    computed, false otherwise.
+  */
+  bool ComputeCOM(double t, double &r, int i);
+
+  /*! Compute the current speed according
+    to time and the index of the interval.
+    To be efficient this method does not have
+    any boundary check.
+    @param t: the time,
+    @param i: the numero of the interval
+    @param r: the result,
+    @return Returns true if the function has been
+    computed, false otherwise.
+  */
+  bool ComputeCOMSpeed(double t, double &r, int i);
+
+  /*! Compute the current acceleration according
+    to time and the index of the interval.
+    To be efficient this method does not have
+    any boundary check.
+    @param t: the time,
+    @param i: the numero of the interval
+    @param r: the result,
+    @return Returns true if the function has been
+    computed, false otherwise.
+  */
+  bool ComputeCOMAcceleration(double t, double &r, int j);
+
+  /*! Compute the current value according
+    to time.
+    @param t: the time,
+    @param r: the result,
+    @return Returns true if the function has been
+    computed, false otherwise.
+  */
+  bool ComputeZMP(double t, double &r);
+
+  /*! Compute the current ZMP speed value according
+    to time.
+    @param t: the time,
+    @param r: the result,
+    @return Returns true if the function has been
+    computed, false otherwise.
+  */
+  bool ComputeZMPSpeed(double t, double &r);
+
+  /*! Compute the current value according
+    to time.
+    @param t: the time,
+    @param i: the numero of the interval
+    @param r: the result,
+    @return Returns true if the function has been
+    computed, false otherwise.
+  */
+  bool ComputeZMP(double t, double &r, int i);
+
+  /*! \name Setter and Getter@{ */
+
+  /*! \brief Set the number of Intervals for this
+    trajectory. */
+  void SetNumberOfIntervals(unsigned int lNbOfIntervals);
+
+  /*! \brief Set the coefficients for the sinuse and cosinues
+    function. */
+  void SetCoGHyperbolicCoefficients(std::vector<double> &lV,
+                                    std::vector<double> &lW);
+
+  /*! \brief Set the starting point and the height variation. */
+  void SetStartingTimeIntervalsAndHeightVariation(std::vector<double> &lDeltaTj,
+                                                  std::vector<double> &lomegaj);
+
+  /*! \brief Set the degree of each polynomials for the CoG
+    Remark: the size of the vector of degrees should match the number
+    of intervals.
+  */
+  void SetPolynomialDegrees(std::vector<unsigned int> &lPolynomialDegree);
+
+  /*! \brief Get the degree of each polynomials for the CoG.
+   */
+  void GetPolynomialDegrees(std::vector<unsigned int> &lPolynomialDegree) const;
+
+  /*! \brief Set the number of Intervals for this
+    trajectory. */
+  void GetNumberOfIntervals(unsigned int &lNbOfIntervals) const;
+
+  /*! \brief Get the coefficients for the sinuse and cosinues
+    function. */
+  void GetHyperbolicCoefficients(std::vector<double> &lV,
+                                 std::vector<double> &lW) const;
+
+  /*! \brief Get the starting point and the height variation. */
+  void GetStartingPointAndHeightVariation(std::vector<double> &lTj,
+                                          std::vector<double> &lomegaj);
+
+  /*! \brief Get the polynomial at interval j for the CoG
+    Remark: The call to this function assume that the
+    method SetPolynomialDegree has been call beforehand.
 
   */
-  class  AnalyticalZMPCOGTrajectory
-  {
+  bool GetFromListOfCOGPolynomials(unsigned int j, Polynome *&aPoly) const;
 
-  public:
+  /*! Get the polynomial at interval j for the ZMP
+    Remark: The call to this function assume that the
+    method SetPolynomialDegree has been call beforehand.
+  */
+  bool GetFromListOfZMPPolynomials(unsigned int j, Polynome *&aPoly) const;
 
-    /*! Constructor */
-    AnalyticalZMPCOGTrajectory(int lNbOfIntervals=0);
+  /*! \brief Transfert the coefficients from the COG trajectory
+    to the ZMP for all intervals.
+    @param lCOMZ: Profile of the height CoM for each interval.
+    @param lZMPZ: Profile of the height ZMP for each interval.
+  */
+  void
+  TransfertCoefficientsFromCOGTrajectoryToZMPOne(std::vector<double> &lCOMZ,
+                                                 std::vector<double> &lZMPZ);
 
-    /*! Destructor */
-    ~AnalyticalZMPCOGTrajectory();
+  /*! \brief Transfert the coefficients from the COG trajectory to the ZMP.
+    @param IntervalIndex: Number of the interval.
+    @param lCOMZ: Value of the CoM height for this interval.
+    @param lZMPZ: Value of the ZMP height for this interval.
+  */
+  void TransfertOneIntervalCoefficientsFromCOGTrajectoryToZMPOne(
+      unsigned int IntervalIndex, double &lCOMZ, double &lZMPZ);
 
-    /*! Compute the current value according
-      to time.
-      @param t: the time,
-      @param r: the result,
-      @return Returns true if the function has been
-      computed, false otherwise.
-    */
-    bool ComputeCOM(double t,double &r);
+  /*! Build the coefficients of a third order COG polynomial according
+    to  the OmegaC and the value of the ZMP at the beginning and the end
+    of the interval, and assuming that the speed is set to zero.  */
+  void Building3rdOrderPolynomial(unsigned int anIntervalj, double pjTjm1,
+                                  double pjTj);
 
-    /*! Compute the current CoM speed value according
-      to time.
-      @param t: the time,
-      @param r: the result,
-      @return Returns true if the function has been
-      computed, false otherwise.
-    */
-    bool ComputeCOMSpeed(double t,double &r);
+  /*@} */
 
-    /*! Compute the current value according
-      to time and the index of the interval.
-      To be efficient this method does not have
-      any boundary check.
-      @param t: the time,
-      @param i: the numero of the interval
-      @param r: the result,
-      @return Returns true if the function has been
-      computed, false otherwise.
-    */
-    bool ComputeCOM(double t,double &r, int i);
+  /*! \brief Returns the maximal fluctuation for the first segment of this
+    trajectory. */
+  double FluctuationMaximal();
 
-    /*! Compute the current speed according
-      to time and the index of the interval.
-      To be efficient this method does not have
-      any boundary check.
-      @param t: the time,
-      @param i: the numero of the interval
-      @param r: the result,
-      @return Returns true if the function has been
-      computed, false otherwise.
-    */
-    bool ComputeCOMSpeed(double t,double &r, int i);
+  friend std::ostream &operator<<(std::ostream &os,
+                                  const AnalyticalZMPCOGTrajectory &obj);
 
-    /*! Compute the current acceleration according
-      to time and the index of the interval.
-      To be efficient this method does not have
-      any boundary check.
-      @param t: the time,
-      @param i: the numero of the interval
-      @param r: the result,
-      @return Returns true if the function has been
-      computed, false otherwise.
-    */
-    bool ComputeCOMAcceleration(double t, double &r, int j);
+  /*! \brief Absolute Time reference of this trajectory. */
+  double GetAbsoluteTimeReference() const { return m_AbsoluteTimeReference; }
 
-    /*! Compute the current value according
-      to time.
-      @param t: the time,
-      @param r: the result,
-      @return Returns true if the function has been
-      computed, false otherwise.
-    */
-    bool ComputeZMP(double t,double &r);
+  /*! \brief Set Absolute time reference of this trajectory */
+  void SetAbsoluteTimeReference(double anAbsoluteTimeReference) {
+    m_AbsoluteTimeReference = anAbsoluteTimeReference;
+  }
 
-    /*! Compute the current ZMP speed value according
-      to time.
-      @param t: the time,
-      @param r: the result,
-      @return Returns true if the function has been
-      computed, false otherwise.
-    */
-    bool ComputeZMPSpeed(double t,double &r);
+  /*! \brief Get the index of the interval according to the time. */
+  bool GetIntervalIndexFromTime(double t, unsigned int &j);
 
-    /*! Compute the current value according
-      to time.
-      @param t: the time,
-      @param i: the numero of the interval
-      @param r: the result,
-      @return Returns true if the function has been
-      computed, false otherwise.
-    */
-    bool ComputeZMP(double t,double &r, int i);
+  /*! \brief Get the index of the interval according to the time,
+    and the previous value of the interval. */
+  bool GetIntervalIndexFromTime(double t, unsigned int &j,
+                                unsigned int &prev_j);
 
-    /*! \name Setter and Getter@{ */
+protected:
+  /*! Number of intervals */
+  int m_NbOfIntervals;
 
-    /*! \brief Set the number of Intervals for this
-      trajectory. */
-    void SetNumberOfIntervals(unsigned int lNbOfIntervals);
+  /*! List of coefficients for the hyperbolics
+    cosine function*/
+  std::vector<double> m_V;
 
+  /*! List of coefficients for the hyperbolics
+    sine function*/
+  std::vector<double> m_W;
 
-    /*! \brief Set the coefficients for the sinuse and cosinues
-      function. */
-    void SetCoGHyperbolicCoefficients(std::vector<double> &lV,
-                                      std::vector<double> &lW);
+  /*! List of temporal starting point. */
+  std::vector<double> m_DeltaTj;
 
-    /*! \brief Set the starting point and the height variation. */
-    void SetStartingTimeIntervalsAndHeightVariation
-    (std::vector<double> &lDeltaTj,
-     std::vector<double> &lomegaj);
+  /*! List of omega, i.e. height variation along
+    the trajectory. */
+  std::vector<double> m_omegaj;
 
-    /*! \brief Set the degree of each polynomials for the CoG
-      Remark: the size of the vector of degrees should match the number
-      of intervals.
-    */
-    void SetPolynomialDegrees(std::vector<unsigned int> &lPolynomialDegree);
+  /*! List of reference time for the interval. */
+  std::vector<double> m_RefTime;
 
-    /*! \brief Get the degree of each polynomials for the CoG.
-     */
-    void GetPolynomialDegrees
-    (std::vector<unsigned int> &lPolynomialDegree) const;
+  /*! List of polynomial degrees for the CoM*/
+  std::vector<unsigned int> m_PolynomialDegree;
 
-    /*! \brief Set the number of Intervals for this
-      trajectory. */
-    void GetNumberOfIntervals(unsigned int &lNbOfIntervals) const;
+  /*! List of polynomials for the COG */
+  std::vector<Polynome *> m_ListOfCOGPolynomials;
 
-    /*! \brief Get the coefficients for the sinuse and cosinues
-      function. */
-    void GetHyperbolicCoefficients(std::vector<double> &lV,
-                                   std::vector<double> &lW) const;
+  /*! List of polynomials for the ZMP */
+  std::vector<Polynome *> m_ListOfZMPPolynomials;
 
-    /*! \brief Get the starting point and the height variation. */
-    void GetStartingPointAndHeightVariation(std::vector<double> &lTj,
-                                            std::vector<double> &lomegaj);
+  /*! Intern method to free the polynomials */
+  void FreePolynomes();
 
-    /*! \brief Get the polynomial at interval j for the CoG
-      Remark: The call to this function assume that the
-      method SetPolynomialDegree has been call beforehand.
+  /*! Store the absolute time reference */
+  double m_AbsoluteTimeReference;
 
-    */
-    bool GetFromListOfCOGPolynomials(unsigned int j, Polynome * & aPoly ) const;
+  /* \brien Sensitivity to numerical noise. */
+  double m_Sensitivity;
+};
 
-    /*! Get the polynomial at interval j for the ZMP
-      Remark: The call to this function assume that the
-      method SetPolynomialDegree has been call beforehand.
-    */
-    bool GetFromListOfZMPPolynomials(unsigned int j, Polynome * & aPoly ) const;
-
-    /*! \brief Transfert the coefficients from the COG trajectory 
-      to the ZMP for all intervals.
-      @param lCOMZ: Profile of the height CoM for each interval.
-      @param lZMPZ: Profile of the height ZMP for each interval.
-    */
-    void TransfertCoefficientsFromCOGTrajectoryToZMPOne
-    (std::vector<double> &lCOMZ,
-     std::vector<double> &lZMPZ);
-
-    /*! \brief Transfert the coefficients from the COG trajectory to the ZMP.
-      @param IntervalIndex: Number of the interval.
-      @param lCOMZ: Value of the CoM height for this interval.
-      @param lZMPZ: Value of the ZMP height for this interval.
-    */
-    void TransfertOneIntervalCoefficientsFromCOGTrajectoryToZMPOne
-    (
-     unsigned int IntervalIndex,
-     double &lCOMZ,
-     double &lZMPZ);
-    
-
-    /*! Build the coefficients of a third order COG polynomial according
-      to  the OmegaC and the value of the ZMP at the beginning and the end
-      of the interval, and assuming that the speed is set to zero.  */
-    void Building3rdOrderPolynomial(unsigned int anIntervalj,
-                                    double pjTjm1,
-                                    double pjTj);
-
-    /*@} */
-
-    /*! \brief Returns the maximal fluctuation for the first segment of this
-      trajectory. */
-    double FluctuationMaximal();
-
-    friend std::ostream& operator <<(std::ostream &os,
-                                     const AnalyticalZMPCOGTrajectory &obj);
-
-    /*! \brief Absolute Time reference of this trajectory. */
-    double  GetAbsoluteTimeReference() const
-    {
-      return m_AbsoluteTimeReference;
-    }
-
-    /*! \brief Set Absolute time reference of this trajectory */
-    void SetAbsoluteTimeReference(double anAbsoluteTimeReference)
-    {
-      m_AbsoluteTimeReference = anAbsoluteTimeReference;
-    }
-
-    /*! \brief Get the index of the interval according to the time. */
-    bool GetIntervalIndexFromTime(double t, unsigned int &j);
-
-    /*! \brief Get the index of the interval according to the time,
-      and the previous value of the interval. */
-    bool GetIntervalIndexFromTime(double t, unsigned int &j,
-                                  unsigned int &prev_j);
-
-  protected:
-
-    /*! Number of intervals */
-    int m_NbOfIntervals;
-
-    /*! List of coefficients for the hyperbolics
-      cosine function*/
-    std::vector<double> m_V;
-
-    /*! List of coefficients for the hyperbolics
-      sine function*/
-    std::vector<double> m_W;
-
-    /*! List of temporal starting point. */
-    std::vector<double> m_DeltaTj;
-
-    /*! List of omega, i.e. height variation along
-      the trajectory. */
-    std::vector<double> m_omegaj;
-
-    /*! List of reference time for the interval. */
-    std::vector<double> m_RefTime;
-
-    /*! List of polynomial degrees for the CoM*/
-    std::vector<unsigned int> m_PolynomialDegree;
-
-    /*! List of polynomials for the COG */
-    std::vector<Polynome *> m_ListOfCOGPolynomials;
-
-    /*! List of polynomials for the ZMP */
-    std::vector<Polynome *> m_ListOfZMPPolynomials;
-
-    /*! Intern method to free the polynomials */
-    void FreePolynomes();
-
-    /*! Store the absolute time reference */
-    double m_AbsoluteTimeReference;
-
-    /* \brien Sensitivity to numerical noise. */
-    double m_Sensitivity;
-  };
-
-  std::ostream& operator <<(std::ostream &os,
-                            const AnalyticalZMPCOGTrajectory &obj);
-}
+std::ostream &operator<<(std::ostream &os,
+                         const AnalyticalZMPCOGTrajectory &obj);
+} // namespace PatternGeneratorJRL
 #endif /* _ANALYTICAL_COG_H_ */

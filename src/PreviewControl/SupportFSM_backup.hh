@@ -22,7 +22,8 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/* This object provides the finite state machine to determine the support parameters. */
+/* This object provides the finite state machine to determine the support
+ * parameters. */
 
 #ifndef _SUPPORT_FSM_
 #define _SUPPORT_FSM_
@@ -30,41 +31,37 @@
 #include <jrl/walkgen/pgtypes.hh>
 #include <privatepgtypes.hh>
 
-namespace PatternGeneratorJRL
-{
-  class  SupportFSM
-  {
-  public:
-    /*! Constructor */
-    SupportFSM(const double &SamplingPeriod);
+namespace PatternGeneratorJRL {
+class SupportFSM {
+public:
+  /*! Constructor */
+  SupportFSM(const double &SamplingPeriod);
 
-    /*! Destructor */
-    ~SupportFSM();
+  /*! Destructor */
+  ~SupportFSM();
 
-    /*! \brief Initialize the previewed state. */
-    void setSupportState(const double &Time, const int &pi,
-                         SupportState_t & Support, const ReferenceAbsoluteVelocity & RefVel);
+  /*! \brief Initialize the previewed state. */
+  void setSupportState(const double &Time, const int &pi,
+                       SupportState_t &Support,
+                       const ReferenceAbsoluteVelocity &RefVel);
 
-    ///*! \brief Numerical precision */
-    double m_eps;
+  ///*! \brief Numerical precision */
+  double m_eps;
 
-    /*! \brief constants for the durations in the support phases */
-    double m_DSDuration, m_SSPeriod, m_DSSSDuration;
+  /*! \brief constants for the durations in the support phases */
+  double m_DSDuration, m_SSPeriod, m_DSSSDuration;
 
-    //Number of steps done before DS
-    unsigned int m_NbOfStepsSSDS;
+  // Number of steps done before DS
+  unsigned int m_NbOfStepsSSDS;
 
-  private:
+private:
+  /*! \Brief Sampling duration */
+  double m_T;
 
-    /*! \Brief Sampling duration */
-    double m_T;
+  bool m_ReferenceGiven;
 
-
-    bool m_ReferenceGiven;
-
-    int m_FullDebug;
-
-  };
-}
+  int m_FullDebug;
+};
+} // namespace PatternGeneratorJRL
 
 #endif /* _SUPPORT_FSM_ */

@@ -22,22 +22,22 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 #ifdef UNIX
-#include <sys/time.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #endif /*UNIX*/
 
 #ifdef WIN32
-#include <Windows.h>
 #include "portability/gettimeofday.hh"
+#include <Windows.h>
 #endif /*WIN32*/
 
-#include <time.h>
-#include <sstream>
 #include <fstream>
+#include <sstream>
 #include <string>
+#include <time.h>
 
-#include <jrl/walkgen/patterngeneratorinterface.hh>
 #include "ClockCPUTime.hh"
+#include <jrl/walkgen/patterngeneratorinterface.hh>
 
 #ifndef _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_
 #define _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_
@@ -46,15 +46,16 @@ namespace PatternGeneratorJRL {
 namespace TestSuite {
 double filterprecision(double adb);
 
-void getOptions(int argc, char *argv[], std::string &urdfFullPath, std::string &srdfFullPath,
-                unsigned int &);  // TestProfil)
+void getOptions(int argc, char *argv[], std::string &urdfFullPath,
+                std::string &srdfFullPath,
+                unsigned int &); // TestProfil)
 
 void CommonInitialization(PatternGeneratorJRL::PatternGeneratorInterface &aPGI);
 
 /*! \brief Structure to handle information related
   to one step of each algorithm m_*/
 class OneStep {
- public:
+public:
   COMState m_finalCOMPosition;
   FootAbsolutePosition m_LeftFootPosition;
   FootAbsolutePosition m_RightFootPosition;
@@ -77,7 +78,8 @@ class OneStep {
   OneStep();
 
   /// Filling m_DebugVector
-  void fillInDebugVectorFoot(FootAbsolutePosition &aFootAbsolutePosition, size_t &index);
+  void fillInDebugVectorFoot(FootAbsolutePosition &aFootAbsolutePosition,
+                             size_t &index);
 
   /// Filling documentation vector
   void fillInDebugVectorDoc();
@@ -94,6 +96,6 @@ class OneStep {
   /// Writes down the description vector.
   void writeDescriptionFile();
 };
-}  // namespace TestSuite
-}  // namespace PatternGeneratorJRL
+} // namespace TestSuite
+} // namespace PatternGeneratorJRL
 #endif /* _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_*/

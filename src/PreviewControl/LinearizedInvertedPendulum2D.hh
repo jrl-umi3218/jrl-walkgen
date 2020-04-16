@@ -26,10 +26,8 @@
 /* \doc This object simulate a 2D Linearized Inverted Pendulum
    with a control at the jerk level. */
 
-
 #ifndef _LINEAR_INVERTED_PENDULUM_2D_H_
 #define _LINEAR_INVERTED_PENDULUM_2D_H_
-
 
 /*! STL includes */
 #include <deque>
@@ -39,137 +37,121 @@
 #include <jrl/walkgen/pgtypes.hh>
 #include <privatepgtypes.hh>
 
-namespace PatternGeneratorJRL
-{
-  class  LinearizedInvertedPendulum2D
-  {
-  public:
-    /*! Constructor */
-    LinearizedInvertedPendulum2D();
+namespace PatternGeneratorJRL {
+class LinearizedInvertedPendulum2D {
+public:
+  /*! Constructor */
+  LinearizedInvertedPendulum2D();
 
-    /*! Destructor */
-    ~LinearizedInvertedPendulum2D();
+  /*! Destructor */
+  ~LinearizedInvertedPendulum2D();
 
-    /*! \brief Initialize the system.
-      \return 0 if the initialization is fine,
-      -1 if the control period is not initialized,
-      -2 if the Com height is not initialized.
-    */
-    int InitializeSystem();
+  /*! \brief Initialize the system.
+    \return 0 if the initialization is fine,
+    -1 if the control period is not initialized,
+    -2 if the Com height is not initialized.
+  */
+  int InitializeSystem();
 
-    /*! \brief Interpolation during a simulation period with control parameters.
-      \param[out]: NewFinalZMPPositions: queue of ZMP positions interpolated.
-      \param[out]: COMStates: queue of COM positions interpolated.
-      \param[in]: ZMPRefPositions: Reference positions of ZMP 
-      (Kajita's heuristic every 5 ms).
-      \param[in]: CurrentPosition: index of the current position of 
-      the ZMP reference
-      (this allow to propagate some parameters define by a heuristic 
-      to the CoM positions).
-      \param[in]: CX: command parameter in the forward direction.
-      \param[in]: CY: command parameter in the perpendicular direction.
-    */
-    int Interpolation(std::deque<COMState> &COMStates,
-                      std::deque<ZMPPosition> &ZMPRefPositions,
-                      int CurrentPosition,
-                      double CX, double CY);
+  /*! \brief Interpolation during a simulation period with control parameters.
+    \param[out]: NewFinalZMPPositions: queue of ZMP positions interpolated.
+    \param[out]: COMStates: queue of COM positions interpolated.
+    \param[in]: ZMPRefPositions: Reference positions of ZMP
+    (Kajita's heuristic every 5 ms).
+    \param[in]: CurrentPosition: index of the current position of
+    the ZMP reference
+    (this allow to propagate some parameters define by a heuristic
+    to the CoM positions).
+    \param[in]: CX: command parameter in the forward direction.
+    \param[in]: CY: command parameter in the perpendicular direction.
+  */
+  int Interpolation(std::deque<COMState> &COMStates,
+                    std::deque<ZMPPosition> &ZMPRefPositions,
+                    int CurrentPosition, double CX, double CY);
 
+  /*! \brief Simulate one iteration of the LIPM
+    \param[in] CX: control value in the forward direction.
+    \param[in] CY: control value in the left-right direction.
+    \return 0 if the object has been properly initialized -1, otherwise.
+  */
+  com_t OneIteration(double CX, double CY);
 
-    /*! \brief Simulate one iteration of the LIPM
-      \param[in] CX: control value in the forward direction.
-      \param[in] CY: control value in the left-right direction.
-      \return 0 if the object has been properly initialized -1, otherwise.
-    */
-    com_t OneIteration(double CX, double CY);
+private:
+  /*! \name Internal parameters.
+    @{
+  */
+  /*! \brief Control period */
+  double m_T;
 
-  private:
+  /*! \brief Height of the com. */
+  double m_ComHeight;
 
-    /*! \name Internal parameters.
-      @{
-    */
-    /*! \brief Control period */
-    double m_T;
+  /*! \brief Interval for interpolation */
+  int m_InterpolationInterval;
 
-    /*! \brief Height of the com. */
-    double m_ComHeight;
+  /*! \brief Interval for robot control */
+  double m_SamplingPeriod;
 
-    /*! \brief Interval for interpolation */
-    int m_InterpolationInterval;
+  /*! @}*/
+  /* !  Matrices for the dynamical system.
+     @{
+  */
+  /* ! Matrix regarding the state of the CoM (pos, velocity, acceleration) */
+  Eigen::MatrixXd m_A;
+  /* ! Vector for the command */
+  Eigen::MatrixXd m_B;
+  /* ! Vector for the ZMP. */
+  Eigen::MatrixXd m_C;
 
-    /*! \brief Interval for robot control */
-    double m_SamplingPeriod;
+  /*! \brief State of the LIPM at the \f$k\f$ eme iteration
+    \f$ x_k = [ c_x \dot{c}_x \ddot{c}_x c_y \dot{c}_y \ddot{c}_y\f$ */
+  Eigen::VectorXd m_xk;
 
-    /*! @}*/
-    /* !  Matrices for the dynamical system.
-       @{
-    */
-    /* ! Matrix regarding the state of the CoM (pos, velocity, acceleration) */
-    Eigen::MatrixXd m_A;
-    /* ! Vector for the command */
-    Eigen::MatrixXd m_B;
-    /* ! Vector for the ZMP. */
-    Eigen::MatrixXd m_C;
+  com_t m_CoM;
 
-    /*! \brief State of the LIPM at the \f$k\f$ eme iteration
-      \f$ x_k = [ c_x \dot{c}_x \ddot{c}_x c_y \dot{c}_y \ddot{c}_y\f$ */
-    Eigen::VectorXd m_xk;
+  /* ! \brief Vector of ZMP  */
+  Eigen::VectorXd m_zk;
 
-    com_t m_CoM;
+  /* ! @} */
 
-    /* ! \brief Vector of ZMP  */
-    Eigen::VectorXd m_zk;
+public:
+  /*! \name Getter and setter of variables
+    @{
+  */
+  /*! Getter for the CoM height */
+  const double &GetComHeight() const;
 
-    /* ! @} */
+  /*! Setter for the CoM height */
+  void SetComHeight(const double &);
 
-  public:
+  /*! Getter for the simulation period specifically*/
+  const double &GetSimulationControlPeriod() const;
 
-    /*! \name Getter and setter of variables
-      @{
-    */
-    /*! Getter for the CoM height */
-    const double & GetComHeight() const;
+  /*! Setter for the simulation period specifically*/
+  void SetSimulationControlPeriod(const double &);
 
-    /*! Setter for the CoM height */
-    void SetComHeight(const double &);
+  /*! Getter for the control period of the robot (for interpolation) . */
+  const double &GetRobotControlPeriod();
 
-    /*! Getter for the simulation period specifically*/
-    const double & GetSimulationControlPeriod() const;
+  /*! Setter for the control period of the robot (for interpolation) . */
+  void SetRobotControlPeriod(const double &);
 
-    /*! Setter for the simulation period specifically*/
-    void SetSimulationControlPeriod(const double &);
+  /// \brief Accessor
+  inline const com_t operator()() const { return m_CoM; };
 
-    /*! Getter for the control period of the robot (for interpolation) . */
-    const double & GetRobotControlPeriod();
+  /// \brief Accessor
+  inline void operator()(com_t CoM) { m_CoM = CoM; };
 
-    /*! Setter for the control period of the robot (for interpolation) . */
-    void SetRobotControlPeriod(const double &);
+  /*! Get state. */
+  void GetState(Eigen::VectorXd &lxk);
+  COMState GetState();
 
-    /// \brief Accessor
-    inline const com_t operator ()() const
-    {
-      return m_CoM;
-    };
+  inline com_t getState() { return m_CoM; }
 
-    /// \brief Accessor
-    inline void operator ()( com_t CoM )
-    {
-      m_CoM = CoM;
-    };
-
-    /*! Get state. */
-    void GetState(Eigen::VectorXd &lxk);
-    COMState GetState();
-
-    inline com_t getState()
-    {
-      return m_CoM ;
-    }
-
-    /*! Set state. */
-    void setState(com_t aCoM);
-    void setState(COMState &aCoM);
-    /*! @} */
-
-  };
-}
+  /*! Set state. */
+  void setState(com_t aCoM);
+  void setState(COMState &aCoM);
+  /*! @} */
+};
+} // namespace PatternGeneratorJRL
 #endif /* _LINEAR_INVERTED_PENDULUM_2D_H_ */
