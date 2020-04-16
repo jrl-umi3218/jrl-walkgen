@@ -116,10 +116,14 @@ void getOptions(int argc, char *argv[], string &urdfFullPath,
                 string &srdfFullPath,
                 unsigned int &) // TestProfil)
 {
-  urdfFullPath = URDF_FULL_PATH;
-  srdfFullPath = SRDF_FULL_PATH;
-  ODEBUG(urdfFullPath);
-  ODEBUG(srdfFullPath);
+  std::cout << "Nb of entries: " << argc << std::endl;
+  if (argc != 3) {
+    urdfFullPath = URDF_FULL_PATH;
+    srdfFullPath = SRDF_FULL_PATH;
+  } else {
+    urdfFullPath = argv[1];
+    srdfFullPath = argv[2];
+  }
 }
 
 OneStep::OneStep() {
