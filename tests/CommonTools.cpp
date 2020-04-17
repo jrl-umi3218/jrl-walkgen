@@ -263,17 +263,24 @@ void OneStep::fillInDebugFile() {
   /// Store data
   fillInDebugVector();
 
-  /// Write description file if this is the first iteration
-  if (m_NbOfIt == 0) {
-    writeDescriptionFile();
-  }
-
-  /// Create file
   ofstream aof;
+  
+  /// Create filename
   string aFileName;
   assert(!m_TestName.empty());
   aFileName = m_TestName;
   aFileName += "TestFGPI.dat";
+
+  if (m_NbOfIt == 0) {
+    /// Write description file if this is the first iteration
+    writeDescriptionFile();
+    
+    /// Erase the file if we start.
+    aof.open(aFileName.c_str(), ofstream::out);
+    aof.close();
+  }
+
+  /// Open file additively
   aof.open(aFileName.c_str(), ofstream::app);
   aof.precision(8);
   aof.setf(ios::scientific, ios::floatfield);
