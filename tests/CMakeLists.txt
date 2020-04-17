@@ -188,6 +188,7 @@ ADD_JRL_WALKGEN_EXE(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
 ################
 
 # Disabled as the test fail : random results oscillating around mean behaviour
+CONFIG_FILES_CMAKE(TestNaveau2015Online${BITS}TestFGPI.datref)
 ADD_JRL_WALKGEN_EXE(TestNaveau2015Online TestNaveau2015.cpp)
 #ADD_JRL_WALKGEN_EXE(TestNaveau2015OnlineSimple TestNaveau2015.cpp)
 
