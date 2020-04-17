@@ -37,8 +37,10 @@ using namespace PatternGeneratorJRL;
 
 CoMAndFootOnlyStrategy::CoMAndFootOnlyStrategy(
     SimplePluginManager *aSimplePluginManager)
-    : GlobalStrategyManager(aSimplePluginManager) {
-  m_BufferSizeLimit = 0;
+    : GlobalStrategyManager(aSimplePluginManager),
+      m_NbOfHitBottom(0),
+      m_BufferSizeLimit(0)
+{
 }
 
 CoMAndFootOnlyStrategy::~CoMAndFootOnlyStrategy() {}

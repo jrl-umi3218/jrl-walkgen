@@ -39,7 +39,6 @@
 
 #include <PreviewControl/PreviewControl.hh>
 #include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.hh>
-#include <jrl/walkgen/configJRLWPG.hh>
 
 #include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.hh>
