@@ -32,7 +32,6 @@ ADD_PROJECT_DEPENDENCY(pinocchio REQUIRED PKG_CONFIG_REQUIRES pinocchio)
 
 IF(BUILD_TESTING)
   ADD_REQUIRED_DEPENDENCY("talos_data >= 1.2.1")
-  #ADD_OPTIONAL_DEPENDENCY("hrp2_14_description >= 1.0.2")
 ENDIF(BUILD_TESTING)
 
 # Handle OS specificities
