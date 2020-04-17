@@ -81,9 +81,15 @@ TARGET_LINK_LIBRARIES(TestRiccatiEquation ${LAPACK_LIBRARIES} ${PROJECT_NAME})
 ################################################
 MATH(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
 MACRO(ADD_JRL_WALKGEN_TEST test_arg test_file_name)
+  # Create file name
   SET(test_name "${test_arg}${BITS}")
+  # Create configuration file name
   CONFIG_FILES_CMAKE(${test_name}TestFGPI.datref)
-  ADD_UNIT_TEST(${test_name} ${test_name})
+  # Add unit test
+  ADD_UNIT_TEST(${test_name} ${test_file_name})
+  # Add library to the executable
+  TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME} ${PROJECT_NAME}-test
+    pinocchio::pinocchio)
 ENDMACRO(ADD_JRL_WALKGEN_TEST)
 #################################################
 MACRO(ADD_JRL_WALKGEN_EXE test_arg test_file_name)
@@ -157,24 +163,13 @@ ENDMACRO(ADD_JRL_WALKGEN_EXE)
 
 ## These test is disabled for now as it fails.
 ## FIXME: fix the test and/or the implementation
-CONFIG_FILES_CMAKE(TestKajita2003StraightWalking${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestKajita2003Circle${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq1${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq2${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestKajita2003WalkingOnSpot${BITS}TestFGPI.datref)
-ADD_JRL_WALKGEN_EXE(TestKajita2003StraightWalking TestKajita2003.cpp)
-ADD_JRL_WALKGEN_EXE(TestKajita2003Circle          TestKajita2003.cpp)
-ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
-ADD_JRL_WALKGEN_EXE(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
-ADD_JRL_WALKGEN_EXE(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
-
-#IF(BUILD_TESTING)
-#  ADD_JRL_WALKGEN_TEST(TestKajita2003StraightWalking TestKajita2003.cpp)
-#  ADD_JRL_WALKGEN_TEST(TestKajita2003Circle          TestKajita2003.cpp)
-#  ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
-#  ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
-#  ADD_JRL_WALKGEN_TEST(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
-#ENDIF(BUILD_TESTING)
+IF(BUILD_TESTING)
+  ADD_JRL_WALKGEN_TEST(TestKajita2003StraightWalking TestKajita2003.cpp)
+  ADD_JRL_WALKGEN_TEST(TestKajita2003Circle          TestKajita2003.cpp)
+  ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
+  ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
+  ADD_JRL_WALKGEN_TEST(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
+ENDIF(BUILD_TESTING)
 
 ##########################
 ## Read Novela Data 2011 #
@@ -188,8 +183,10 @@ ADD_JRL_WALKGEN_EXE(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
 ################
 
 # Disabled as the test fail : random results oscillating around mean behaviour
-CONFIG_FILES_CMAKE(TestNaveau2015Online${BITS}TestFGPI.datref)
-ADD_JRL_WALKGEN_EXE(TestNaveau2015Online TestNaveau2015.cpp)
+IF(BUILD_TESTING)
+  ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
+ENDIF(BUILD_TESTING)
+
 #ADD_JRL_WALKGEN_EXE(TestNaveau2015OnlineSimple TestNaveau2015.cpp)
 
 #####################
