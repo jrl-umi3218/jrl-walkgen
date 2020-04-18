@@ -185,6 +185,7 @@ ENDIF(BUILD_TESTING)
 # Disabled as the test fail : random results oscillating around mean behaviour
 IF(BUILD_TESTING)
   ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
+  SET_TESTS_PROPERTIES("TestNaveau2015Online${BITS}" PROPERTIES TIMEOUT 7200)
 ENDIF(BUILD_TESTING)
 
 #ADD_JRL_WALKGEN_EXE(TestNaveau2015OnlineSimple TestNaveau2015.cpp)
