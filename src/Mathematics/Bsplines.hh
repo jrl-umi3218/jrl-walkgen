@@ -79,7 +79,7 @@ protected:
   std::vector<double> m_derivative_control_points;
   std::vector<double> m_sec_derivative_control_points;
 
-  std::vector<std::vector<double>> m_basis_functions;
+  std::vector<std::vector<double> > m_basis_functions;
   std::vector<double> m_basis_functions_derivative;
   std::vector<double> m_basis_functions_sec_derivative;
 

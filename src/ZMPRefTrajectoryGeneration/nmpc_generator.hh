@@ -278,8 +278,8 @@ private:
 
   // Obstacle constraint
   unsigned nc_obs_;
-  std::vector<std::vector<Eigen::MatrixXd>> Hobs_;
-  std::vector<std::vector<Eigen::VectorXd>> Aobs_;
+  std::vector<std::vector<Eigen::MatrixXd> > Hobs_;
+  std::vector<std::vector<Eigen::VectorXd> > Aobs_;
   std::vector<Eigen::VectorXd> UBobs_;
   std::vector<Circle> obstacles_;
   Eigen::VectorXd qp_J_obs_i_;

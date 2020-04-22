@@ -97,7 +97,7 @@ void readData(vector<COMState> &comPos_, vector<FootAbsolutePosition> &rf_,
               vector<FootAbsolutePosition> &lf_,
               vector<HandAbsolutePosition> &rh_,
               vector<HandAbsolutePosition> &lh_, vector<ZMPPosition> &zmp_) {
-  vector<vector<double>> data_;
+  vector<vector<double> > data_;
   data_.clear();
   std::string astateFile =
       "/home/mnaveau/devel/ros_unstable/src/jrl/jrl-walkgen/_build-RELEASE/"

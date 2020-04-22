@@ -103,7 +103,7 @@ public:
     os << "<===============================================================>"
        << endl;
     os << "Computing the ZMPMB" << endl;
-    vector<vector<double>> zmpmb(comPos.size(), vector<double>(2));
+    vector<vector<double> > zmpmb(comPos.size(), vector<double>(2));
     for (unsigned int i = 0; i < comPos.size(); ++i) {
       dynamicfilter_->ComputeZMPMB(samplingPeriod, comPos[i], lfFoot[i],
                                    rfFoot[i], zmpmb[i], stage0, i);

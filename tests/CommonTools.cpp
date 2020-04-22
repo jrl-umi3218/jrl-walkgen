@@ -264,7 +264,7 @@ void OneStep::fillInDebugFile() {
   fillInDebugVector();
 
   ofstream aof;
-  
+
   /// Create filename
   string aFileName;
   assert(!m_TestName.empty());
@@ -274,7 +274,7 @@ void OneStep::fillInDebugFile() {
   if (m_NbOfIt == 0) {
     /// Write description file if this is the first iteration
     writeDescriptionFile();
-    
+
     /// Erase the file if we start.
     aof.open(aFileName.c_str(), ofstream::out);
     aof.close();
