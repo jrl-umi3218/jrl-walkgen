@@ -290,7 +290,7 @@ void GenerateMotionFromKineoWorks::ComputeUpperBodyPosition(
   //! For each way-point of the path
   for (unsigned int IdWayPoint = 1; IdWayPoint < m_Path.size(); IdWayPoint++) {
     int CountTarget = -1;
-    double lX = 0.0, lY = 0.0, lZ = 0.0, dist = 1000000.0;
+    double lX = 0.0, lY=0.0, lZ=0.0, dist = 1000000.0;
 
     //! The references are specific to the current hybrid model.
     lX = m_Path[IdWayPoint].Joints[6];
@@ -300,12 +300,10 @@ void GenerateMotionFromKineoWorks::ComputeUpperBodyPosition(
     //! Find the closest (X,Y,Z) position in the remaining
     // part of the CoM buffer.
     for (unsigned int i = count; i < m_COMBuffer.size(); i++) {
-      double ldist = (lX - m_COMBuffer[i].x[0]) * (lX - m_COMBuffer[i].x[0])
-          /*+
-            (lY - m_COMBuffer[i].y[0])*(lY-m_COMBuffer[i].y[0]) +
-            (lZ - m_COMBuffer[i].z[0])*(lZ-m_COMBuffer[i].z[0]) */
-          ;
-
+      double ldist = (lX - m_COMBuffer[i].x[0]) * (lX - m_COMBuffer[i].x[0]) +
+                     (lY - m_COMBuffer[i].y[0])*(lY-m_COMBuffer[i].y[0]) +
+                     (lZ - m_COMBuffer[i].z[0])*(lZ-m_COMBuffer[i].z[0]);
+      
       if (ldist < dist) {
         dist = ldist;
         CountTarget = i;

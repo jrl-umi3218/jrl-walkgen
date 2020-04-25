@@ -339,16 +339,17 @@ int PLDPSolver::BackwardSubstitution() {
   // LL^t v2 = v1 <-> L y = v1 with L^t v2 = y
   // y solved with first phase.
   // So now we are looking for v2.
-  unsigned int SizeOfL = m_ActivatedConstraints.size();
+  auto SizeOfL = m_ActivatedConstraints.size();
   if (SizeOfL == 0)
     return 0;
 
   ODEBUG("BackwardSubstitution " << m_ItNb);
-  for (int i = SizeOfL - 1; i >= 0; i--) {
+  
+  for(auto i = SizeOfL - 1;; i--) {
     double tmp = 0.0;
     m_v2[i] = m_y[i];
-    for (int k = i + 1; k < (int)SizeOfL; k++) {
-      if (k == (int)SizeOfL - 1)
+    for (auto k = i + 1; k < SizeOfL; k++) {
+      if (k == SizeOfL - 1)
         tmp = m_v2[i];
 
       m_v2[i] -= m_L[k * m_NbMaxOfConstraints + i] * m_v2[k];
@@ -359,6 +360,7 @@ int PLDPSolver::BackwardSubstitution() {
     ODEBUG("BS: m_L[i*m_NbMaxOfConstraints+i]:"
            << m_L[i * m_NbMaxOfConstraints + i] << " " << m_y[i]);
     ODEBUG("m_v2[" << i << " ] = " << m_v2[i] << " " << tmp);
+    if (i==0) break;
   }
   return 0;
 }
@@ -789,7 +791,7 @@ int PLDPSolver::SolveProblem(
       struct timeval current;
       gettimeofday(&current, 0);
       double r = (double)(current.tv_sec - begin.tv_sec) +
-                 0.000001 * (current.tv_usec - begin.tv_usec);
+                 0.000001 * (double)(current.tv_usec - begin.tv_usec);
       if (r > m_AmountOfLimitedComputationTime) {
         ContinueAlgo = false;
       }

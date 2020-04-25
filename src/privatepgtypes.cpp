@@ -221,7 +221,7 @@ void linear_inequality_t::clear() {
   Dc_vec.setZero();
 }
 
-void linear_inequality_t::resize(int NbRows, int NbCols, bool Preserve) {
+void linear_inequality_t::resize(int NbRows, int NbCols, bool ) {
 
   D.X_mat.resize(NbRows, NbCols);
   D.Y_mat.resize(NbRows, NbCols);

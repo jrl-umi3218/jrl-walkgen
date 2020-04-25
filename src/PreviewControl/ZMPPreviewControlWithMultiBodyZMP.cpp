@@ -277,7 +277,6 @@ COMState ZMPPreviewControlWithMultiBodyZMP::GetLastCOMFromFirstStage() {
 
 int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(
     COMState &finalCOMState) {
-  double Deltazmpx2, Deltazmpy2;
   // Inverse Kinematics variables.
 
   COMState aCOMState = m_FIFOCOMStates[0];
@@ -286,7 +285,8 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(
   LeftFootPosition = m_FIFOLeftFootPosition[0];
   RightFootPosition = m_FIFORightFootPosition[0];
 
-#if 0
+  double Deltazmpx2, Deltazmpy2;
+    
   // Preview control on delta ZMP.
   if ((m_StageStrategy == ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY) ||
       (m_StageStrategy == ZMPCOM_TRAJECTORY_FULL)) {
@@ -309,7 +309,6 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(
       aCOMState.y[i] += m_Deltay(i, 0);
     }
   }
-#endif
 
   ODEBUG2("Delta :" << m_Deltax(0, 0) << " " << m_Deltay(0, 0) << " "
                     << aCOMState.x[0] << " " << aCOMState.y[0]);
@@ -452,7 +451,7 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(
 }
 
 int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(
-    deque<ZMPPosition> &ZMPRefPositions, deque<COMState> &COMStates,
+    deque<ZMPPosition> &ZMPRefPositions, deque<COMState> &,
     deque<FootAbsolutePosition> &LeftFootPositions,
     deque<FootAbsolutePosition> &RightFootPositions) {
   ODEBUG6("Beginning of Setup 0 ", "DebugData.txt");

@@ -198,7 +198,6 @@ void GeneratorVelRef::initialize_matrices() {
   initialize_matrices(IneqCoM);
 
   IntermedQPMat::state_variant_t &State = IntermedData_->State();
-  bool Preserve = true;
   State.VcshiftX.resize(N_);
   State.VcshiftX.setZero();
   State.VcshiftY.resize(N_);

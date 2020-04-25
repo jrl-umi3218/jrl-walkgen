@@ -362,7 +362,8 @@ void StepOverPlanner::DoubleSupportFeasibility() {
   Eigen::Vector3d ToTheHip;
   Eigen::Matrix<double, 6, 1> LeftLegAngles;
   Eigen::Matrix<double, 6, 1> RightLegAngles;
-
+  LeftLegAngles.Zero();
+  RightLegAngles.Zero();
   Eigen::Vector3d AnkleBeforeObst;
   Eigen::Vector3d AnkleAfterObst;
   Eigen::Vector3d TempCOMState;
@@ -778,8 +779,8 @@ void StepOverPlanner::PolyPlannerFirstStep(
   double StepLenght;
   double Omega1, Omega2, OmegaImpact;
   double xOffset;
-  double Point1X, Point1Y = 0.0, Point1Z;
-  double Point2X, Point2Y = 0.0, Point2Z;
+  double Point1X, Point1Z;
+  double Point2X, Point2Z;
   double Point3Z;
 
   StepTime = aStepOverFootBuffer[m_StartDoubleSupp].time -
@@ -801,12 +802,10 @@ void StepOverPlanner::PolyPlannerFirstStep(
 
   Point1X = StepLenght - m_heelToAnkle - m_ObstacleParameters.d - xOffset -
             m_tipToAnkle * cos(Omega1 * M_PI / 180.0);
-  Point1Y = 0.00;
   Point1Z = m_ObstacleParameters.h - m_tipToAnkle * sin(Omega1 * M_PI / 180.0);
 
   Point2X = StepLenght - m_heelToAnkle + xOffset +
             m_heelToAnkle * cos(Omega2 * M_PI / 180.0);
-  Point2Y = 0.00;
   Point2Z = m_ObstacleParameters.h - m_tipToAnkle * sin(Omega2 * M_PI / 180.0);
 
   Point3Z = Point1Z + 0.04;
@@ -842,12 +841,11 @@ void StepOverPlanner::PolyPlannerFirstStep(
   ZfootSpeedBound(0) = 0.0;
   ZfootSpeedBound(1) = 0.0;
 
-  int NumberIntermediate = 0, NumberIntermediate2 = 0, Counter = 0,
+  int NumberIntermediate = 0, Counter = 0,
       CounterTemp = 0;
   double IntermediateTimeStep;
 
   NumberIntermediate = 10;
-  NumberIntermediate2 = 20;
 
   ZfootPos.resize(2 + 3 * NumberIntermediate);
   TimeIntervalsZ.resize(2 + 3 * NumberIntermediate);
@@ -1101,8 +1099,8 @@ void StepOverPlanner::PolyPlannerSecondStep(
   double StepLenght;
   double Omega1, Omega2, OmegaImpact;
   double xOffset;
-  double Point1X, Point1Y, Point1Z;
-  double Point2X, Point2Y, Point2Z;
+  double Point1X, Point1Z;
+  double Point2X, Point2Z;
   double Point3Z;
 
   StepTime = aStepOverFootBuffer[m_EndStepOver].time -
@@ -1118,12 +1116,10 @@ void StepOverPlanner::PolyPlannerSecondStep(
 
   Point1X = m_StepOverStepLenght - m_heelToAnkle - m_ObstacleParameters.d -
             xOffset - m_tipToAnkle * cos(Omega1 * M_PI / 180.0);
-  Point1Y = 0.0;
   Point1Z = m_ObstacleParameters.h + m_tipToAnkle * sin(Omega1 * M_PI / 180.0);
 
   Point2X = m_StepOverStepLenght - m_heelToAnkle + xOffset +
             m_heelToAnkle * cos(Omega2 * M_PI / 180.0);
-  Point2Y = 0.0;
   Point2Z = Point1Z;
   // m_ObstacleParameters.h+0.04;//-m_tipToAnkle*sin(Omega2*M_PI/180.0);
 
@@ -1687,8 +1683,6 @@ void StepOverPlanner::CreateBufferFirstPreview(
 
 void StepOverPlanner::m_SetObstacleParameters(istringstream &strm) {
 
-  bool ReadObstacleParameters = false;
-
   ODEBUG("I am reading the obstacle parameters"
          << " ");
 
@@ -1738,7 +1732,6 @@ void StepOverPlanner::m_SetObstacleParameters(istringstream &strm) {
     if (!strm.eof()) {
       bool lObstacleDetected;
       strm >> lObstacleDetected;
-      ReadObstacleParameters = true;
       break;
     } else {
       cout << "Not enough inputs for completion of "

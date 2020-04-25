@@ -114,7 +114,7 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm) {
   stringbuf *pbuf;
   pbuf = istrm.rdbuf();
 
-  int size = pbuf->in_avail();
+  auto size = pbuf->in_avail();
   char aBuffer[65636];
   assert(size < 65635);
 
