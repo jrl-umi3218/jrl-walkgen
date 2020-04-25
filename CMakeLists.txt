@@ -13,6 +13,7 @@ SET(PROJECT_URL "https://github.com/${PROJECT_ORG}/${PROJECT_NAME}")
 OPTION(USE_LSSOL "Do you want to use the solver lssol?" OFF)
 OPTION(USE_QUADPROG "Do you want to use the solver eigen-quadprog?" ON)
 OPTION(SUFFIX_SO_VERSION "Suffix library name with its version" ON)
+OPTION(FULL_BUILD_TESTING "Complete and long testing" OFF)
 
 # Project configuration
 SET(PROJECT_USE_CMAKE_EXPORT TRUE)

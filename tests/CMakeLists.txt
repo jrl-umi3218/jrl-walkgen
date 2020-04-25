@@ -167,8 +167,11 @@ IF(BUILD_TESTING)
   ADD_JRL_WALKGEN_TEST(TestKajita2003StraightWalking TestKajita2003.cpp)
   ADD_JRL_WALKGEN_TEST(TestKajita2003Circle          TestKajita2003.cpp)
   ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
-  ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
   ADD_JRL_WALKGEN_TEST(TestKajita2003WalkingOnSpot   TestKajita2003.cpp)
+
+  IF(FULL_BUILD_TESTING)
+    ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
+  ENDIF(FULL_BUILD_TESTING)
 ENDIF(BUILD_TESTING)
 
 ##########################
@@ -184,11 +187,13 @@ ENDIF(BUILD_TESTING)
 
 # Disabled as the test fail : random results oscillating around mean behaviour
 IF(BUILD_TESTING)
-  ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
-  SET_TESTS_PROPERTIES("TestNaveau2015Online${BITS}" PROPERTIES TIMEOUT 7200)
+  ADD_JRL_WALKGEN_TEST(TestNaveau2015OnlineSimple TestNaveau2015.cpp)
+  IF (FULL_BUILD_TESTING)
+    ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
+    SET_TESTS_PROPERTIES("TestNaveau2015Online${BITS}" PROPERTIES TIMEOUT 7200)
+  ENDIF(FULL_BUILD_TESTING)
 ENDIF(BUILD_TESTING)
 
-#ADD_JRL_WALKGEN_EXE(TestNaveau2015OnlineSimple TestNaveau2015.cpp)
 
 #####################
 # Add user examples #
