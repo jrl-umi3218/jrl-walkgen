@@ -170,10 +170,10 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(
   if (StageOfTheAlgorithm == 0) {
     /* Update the current configuration vector */
     m_PinocchioRobot->currentRPYConfiguration(CurrentConfiguration);
-
+    
     /* Update the current velocity vector */
     m_PinocchioRobot->currentRPYVelocity(CurrentVelocity);
-
+    
     /* Update the current acceleration vector */
     m_PinocchioRobot->currentRPYAcceleration(CurrentAcceleration);
   }
@@ -201,9 +201,11 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(
                     << aRightFAP.x << " " << aRightFAP.y << " " << aRightFAP.z,
                 "1ststage.dat");
 
+  int StageOfTheAlgorithm=0;
   CallToComAndFootRealization(acompos, aLeftFAP, aRightFAP,
                               CurrentConfiguration, CurrentVelocity,
-                              CurrentAcceleration, m_NumberOfIterations, 0);
+                              CurrentAcceleration, m_NumberOfIterations,
+                              StageOfTheAlgorithm);
 
   if (m_StageStrategy != ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     EvaluateMultiBodyZMP(-1);
@@ -222,9 +224,11 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(
       "2ndStage.dat");
 
   if (m_StageStrategy != ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY) {
+    int StageOfTheAlgorithm=1;
     CallToComAndFootRealization(
         refandfinalCOMState, aLeftFAP, aRightFAP, CurrentConfiguration,
-        CurrentVelocity, CurrentAcceleration, m_NumberOfIterations - m_NL, 1);
+        CurrentVelocity, CurrentAcceleration, m_NumberOfIterations - m_NL,
+                                StageOfTheAlgorithm);
   }
 
   // Here it is assumed that the 4x4 CoM matrix
@@ -557,10 +561,12 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(
                     << aRightFAP.x << " " << aRightFAP.y << " " << aRightFAP.z,
                 "ZMPPCWMZOGSOC.dat");
 
+  int StageOfTheAlgorithm=0;
   CallToComAndFootRealization(
-      m_FIFOCOMStates[localindex], m_FIFORightFootPosition[localindex],
-      m_FIFOLeftFootPosition[localindex], CurrentConfiguration, CurrentVelocity,
-      CurrentAcceleration, m_NumberOfIterations, 0);
+      m_FIFOCOMStates[localindex], m_FIFOLeftFootPosition[localindex],
+      m_FIFORightFootPosition[localindex], CurrentConfiguration, CurrentVelocity,
+      CurrentAcceleration, m_NumberOfIterations,
+      StageOfTheAlgorithm);
 
   EvaluateMultiBodyZMP(localindex);
 
