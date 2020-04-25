@@ -339,16 +339,17 @@ int PLDPSolver::BackwardSubstitution() {
   // LL^t v2 = v1 <-> L y = v1 with L^t v2 = y
   // y solved with first phase.
   // So now we are looking for v2.
-  auto SizeOfL = m_ActivatedConstraints.size();
+  std::vector<unsigned int>::size_type SizeOfL = m_ActivatedConstraints.size();
   if (SizeOfL == 0)
     return 0;
 
   ODEBUG("BackwardSubstitution " << m_ItNb);
-  
-  for(auto i = SizeOfL - 1;; i--) {
+
+  for (std::vector<unsigned int>::size_type i = SizeOfL - 1;; i--) {
     double tmp = 0.0;
     m_v2[i] = m_y[i];
-    for (auto k = i + 1; k < SizeOfL; k++) {
+    for (std::vector<unsigned int>::size_type k = i + 1;
+         k < SizeOfL; k++) {
       if (k == SizeOfL - 1)
         tmp = m_v2[i];
 

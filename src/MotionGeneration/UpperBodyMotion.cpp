@@ -93,8 +93,8 @@ void UpperBodyMotion::ReadDataFile(string aFileName,
 
   std::ifstream aif;
 
-  auto NumberRows = UpperBodyAngles.rows();
-  auto NumberColumns = UpperBodyAngles.cols();
+  Eigen::MatrixXd::Index NumberRows = UpperBodyAngles.rows();
+  Eigen::MatrixXd::Index NumberColumns = UpperBodyAngles.cols();
 
   double r;
 
@@ -114,8 +114,8 @@ void UpperBodyMotion::ReadDataFile(string aFileName,
 void UpperBodyMotion::WriteDataFile(string aFileName,
                                     Eigen::MatrixXd &UpperBodyAngles) {
   ofstream aof;
-  auto NumberRows = UpperBodyAngles.rows();
-  auto NumberColumns = UpperBodyAngles.cols();
+  Eigen::MatrixXd::Index NumberRows = UpperBodyAngles.rows();
+  Eigen::MatrixXd::Index NumberColumns = UpperBodyAngles.cols();
 
   aof.open(aFileName.c_str(), ofstream::out);
   if (aof.is_open()) {
