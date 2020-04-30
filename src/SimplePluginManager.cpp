@@ -114,12 +114,12 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm) {
   stringbuf *pbuf;
   pbuf = istrm.rdbuf();
 
-  int size = pbuf->in_avail();
+  std::streamsize size = pbuf->in_avail();
   char aBuffer[65636];
   assert(size < 65635);
 
   memset(aBuffer, 0, size + 1);
-  for (int i = 0; i < size; i++)
+  for (std::streamsize i = 0; i < size; i++)
     aBuffer[i] = (char)pbuf->sbumpc();
   ODEBUG5(aBuffer, "PgDebug.txt");
 

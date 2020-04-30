@@ -46,7 +46,8 @@ Clock::Clock() {
 
   struct timeval startingtime;
   gettimeofday(&startingtime, 0);
-  m_StartingTime = startingtime.tv_sec + 0.000001 * startingtime.tv_usec;
+  m_StartingTime =
+      (double)startingtime.tv_sec + 0.000001 * (double)startingtime.tv_usec;
 }
 
 Clock::~Clock() {}
@@ -58,22 +59,24 @@ void Clock::Reset() {
 
   struct timeval startingtime;
   gettimeofday(&startingtime, 0);
-  m_StartingTime = startingtime.tv_sec + 0.000001 * startingtime.tv_usec;
+  m_StartingTime =
+      (double)startingtime.tv_sec + 0.000001 * (double)startingtime.tv_usec;
 }
 
 void Clock::StartTiming() { gettimeofday(&m_BeginTimeStamp, 0); }
 
 void Clock::StopTiming() {
   gettimeofday(&m_EndTimeStamp, 0);
-  double ltime = m_EndTimeStamp.tv_sec - m_BeginTimeStamp.tv_sec +
-                 0.000001 * (m_EndTimeStamp.tv_usec - m_BeginTimeStamp.tv_usec);
+  double ltime =
+      (double)m_EndTimeStamp.tv_sec - (double)m_BeginTimeStamp.tv_sec +
+      0.000001 * (double)(m_EndTimeStamp.tv_usec - m_BeginTimeStamp.tv_usec);
 
   m_MaximumTime = m_MaximumTime < ltime ? ltime : m_MaximumTime;
   m_TotalTime += ltime;
 
   m_DataBuffer[(m_NbOfIterations * 2) % 3000000] =
-      m_BeginTimeStamp.tv_sec + 0.000001 * m_BeginTimeStamp.tv_usec -
-      m_StartingTime;
+      (double)m_BeginTimeStamp.tv_sec +
+      0.000001 * (double)m_BeginTimeStamp.tv_usec - m_StartingTime;
   m_DataBuffer[(m_NbOfIterations * 2 + 1) % 3000000] = ltime;
 }
 

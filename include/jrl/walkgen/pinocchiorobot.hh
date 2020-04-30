@@ -42,6 +42,10 @@ struct PinocchioRobotFoot_t {
   double soleHeight; // x axis
   Eigen::Vector3d anklePosition;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  inline PinocchioRobotFoot_t()
+      : associatedAnkle(0), soleDepth(0.0), soleWidth(0.0), soleHeight(0.0),
+        anklePosition(0.0, 0.0, 0.0) {}
 };
 typedef PinocchioRobotFoot_t PRFoot;
 

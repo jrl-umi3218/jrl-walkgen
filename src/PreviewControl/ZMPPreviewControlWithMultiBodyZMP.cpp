@@ -201,9 +201,10 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(
                     << aRightFAP.x << " " << aRightFAP.y << " " << aRightFAP.z,
                 "1ststage.dat");
 
-  CallToComAndFootRealization(acompos, aLeftFAP, aRightFAP,
-                              CurrentConfiguration, CurrentVelocity,
-                              CurrentAcceleration, m_NumberOfIterations, 0);
+  int StageOfTheAlgorithm = 0;
+  CallToComAndFootRealization(
+      acompos, aLeftFAP, aRightFAP, CurrentConfiguration, CurrentVelocity,
+      CurrentAcceleration, m_NumberOfIterations, StageOfTheAlgorithm);
 
   if (m_StageStrategy != ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     EvaluateMultiBodyZMP(-1);
@@ -222,9 +223,11 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(
       "2ndStage.dat");
 
   if (m_StageStrategy != ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY) {
+    int StageOfTheAlgorithm = 1;
     CallToComAndFootRealization(
         refandfinalCOMState, aLeftFAP, aRightFAP, CurrentConfiguration,
-        CurrentVelocity, CurrentAcceleration, m_NumberOfIterations - m_NL, 1);
+        CurrentVelocity, CurrentAcceleration, m_NumberOfIterations - m_NL,
+        StageOfTheAlgorithm);
   }
 
   // Here it is assumed that the 4x4 CoM matrix
@@ -277,7 +280,6 @@ COMState ZMPPreviewControlWithMultiBodyZMP::GetLastCOMFromFirstStage() {
 
 int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(
     COMState &finalCOMState) {
-  double Deltazmpx2, Deltazmpy2;
   // Inverse Kinematics variables.
 
   COMState aCOMState = m_FIFOCOMStates[0];
@@ -286,17 +288,18 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(
   LeftFootPosition = m_FIFOLeftFootPosition[0];
   RightFootPosition = m_FIFORightFootPosition[0];
 
-#if 0
+  double Deltazmpx2, Deltazmpy2;
+
   // Preview control on delta ZMP.
   if ((m_StageStrategy == ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY) ||
       (m_StageStrategy == ZMPCOM_TRAJECTORY_FULL)) {
     ODEBUG2(m_FIFODeltaZMPPositions[0].px << " "
-            << m_FIFODeltaZMPPositions[0].py);
+                                          << m_FIFODeltaZMPPositions[0].py);
 
     ODEBUG("Second Stage Size of FIFODeltaZMPPositions: "
-            << m_FIFODeltaZMPPositions.size() << " " << m_Deltax << " "
-            << m_Deltay << " " << m_sxDeltazmp << " " << m_syDeltazmp << " "
-            << Deltazmpx2 << " " << Deltazmpy2);
+           << m_FIFODeltaZMPPositions.size() << " " << m_Deltax << " "
+           << m_Deltay << " " << m_sxDeltazmp << " " << m_syDeltazmp << " "
+           << Deltazmpx2 << " " << Deltazmpy2);
 
     m_PC->OneIterationOfPreview(m_Deltax, m_Deltay, m_sxDeltazmp, m_syDeltazmp,
                                 m_FIFODeltaZMPPositions, 0, Deltazmpx2,
@@ -309,7 +312,6 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(
       aCOMState.y[i] += m_Deltay(i, 0);
     }
   }
-#endif
 
   ODEBUG2("Delta :" << m_Deltax(0, 0) << " " << m_Deltay(0, 0) << " "
                     << aCOMState.x[0] << " " << aCOMState.y[0]);
@@ -452,7 +454,7 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(
 }
 
 int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(
-    deque<ZMPPosition> &ZMPRefPositions, deque<COMState> &COMStates,
+    deque<ZMPPosition> &ZMPRefPositions, deque<COMState> &,
     deque<FootAbsolutePosition> &LeftFootPositions,
     deque<FootAbsolutePosition> &RightFootPositions) {
   ODEBUG6("Beginning of Setup 0 ", "DebugData.txt");
@@ -558,10 +560,12 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(
                     << aRightFAP.x << " " << aRightFAP.y << " " << aRightFAP.z,
                 "ZMPPCWMZOGSOC.dat");
 
+  int StageOfTheAlgorithm = 0;
   CallToComAndFootRealization(
-      m_FIFOCOMStates[localindex], m_FIFORightFootPosition[localindex],
-      m_FIFOLeftFootPosition[localindex], CurrentConfiguration, CurrentVelocity,
-      CurrentAcceleration, m_NumberOfIterations, 0);
+      m_FIFOCOMStates[localindex], m_FIFOLeftFootPosition[localindex],
+      m_FIFORightFootPosition[localindex], CurrentConfiguration,
+      CurrentVelocity, CurrentAcceleration, m_NumberOfIterations,
+      StageOfTheAlgorithm);
 
   EvaluateMultiBodyZMP(localindex);
 

@@ -300,11 +300,9 @@ void GenerateMotionFromKineoWorks::ComputeUpperBodyPosition(
     //! Find the closest (X,Y,Z) position in the remaining
     // part of the CoM buffer.
     for (unsigned int i = count; i < m_COMBuffer.size(); i++) {
-      double ldist = (lX - m_COMBuffer[i].x[0]) * (lX - m_COMBuffer[i].x[0])
-          /*+
-            (lY - m_COMBuffer[i].y[0])*(lY-m_COMBuffer[i].y[0]) +
-            (lZ - m_COMBuffer[i].z[0])*(lZ-m_COMBuffer[i].z[0]) */
-          ;
+      double ldist = (lX - m_COMBuffer[i].x[0]) * (lX - m_COMBuffer[i].x[0]) +
+                     (lY - m_COMBuffer[i].y[0]) * (lY - m_COMBuffer[i].y[0]) +
+                     (lZ - m_COMBuffer[i].z[0]) * (lZ - m_COMBuffer[i].z[0]);
 
       if (ldist < dist) {
         dist = ldist;

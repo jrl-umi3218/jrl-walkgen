@@ -52,11 +52,8 @@ int CoMAndFootOnlyStrategy::InitInterObjects(
 int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(
     FootAbsolutePosition &LeftFootPosition,
     FootAbsolutePosition &RightFootPosition, Eigen::VectorXd &ZMPRefPos,
-    COMState &finalCOMPosition,
-    Eigen::VectorXd &, // CurrentConfiguration,
-    Eigen::VectorXd &, // CurrentVelocity,
-    Eigen::VectorXd &) // CurrentAcceleration)
-{
+    COMState &finalCOMPosition, Eigen::VectorXd &CurrentConfiguration,
+    Eigen::VectorXd &CurrentVelocity, Eigen::VectorXd &CurrentAcceleration) {
   ODEBUG("Begin OneGlobalStepOfControl "
          << m_LeftFootPositions->size() << " " << m_RightFootPositions->size()
          << " " << m_COMBuffer->size() << " " << m_ZMPPositions->size());
@@ -86,6 +83,18 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(
     std::cerr << "Problem on the COM queue: empty" << std::endl;
     return -4;
   }
+
+  CurrentConfiguration[3] = finalCOMPosition.roll[0];
+  CurrentConfiguration[4] = finalCOMPosition.pitch[0];
+  CurrentConfiguration[5] = finalCOMPosition.yaw[0];
+
+  CurrentVelocity[3] = finalCOMPosition.roll[1];
+  CurrentVelocity[4] = finalCOMPosition.pitch[1];
+  CurrentVelocity[5] = finalCOMPosition.yaw[1];
+
+  CurrentAcceleration[3] = finalCOMPosition.roll[2];
+  CurrentAcceleration[4] = finalCOMPosition.pitch[2];
+  CurrentAcceleration[5] = finalCOMPosition.yaw[2];
 
   if (m_ZMPPositions->size() > 0) {
     ZMPPosition aZMPPosition = (*m_ZMPPositions)[0];

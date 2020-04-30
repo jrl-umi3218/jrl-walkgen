@@ -394,18 +394,14 @@ doublereal *eps1;
   /* System generated locals */
   integer c_dim1, c_offset, a_dim1, a_offset, i__1;
 
-  /* Builtin functions */
-  /*    integer s_wsfe(), do_fio(), e_wsfe(); */
-
   /* Local variables */
   static doublereal diag;
   /* extern int ql0002_(); */
   static integer nact, info;
   static doublereal zero;
-  static integer i, j, idiag, maxit;
+  static integer i, j, maxit;
   static doublereal qpeps;
   static integer in, mn, lw;
-  static doublereal ten;
   static logical lql;
   static integer inw1, inw2;
 
@@ -450,7 +446,6 @@ doublereal *eps1;
     lql = TRUE_;
   }
   zero = 0.;
-  ten = 10.;
   maxit = (*m + *n) * 40;
   qpeps = cmache_1.eps;
   inw1 = 1;
@@ -496,18 +491,6 @@ L20:
   if (info == 2) {
     goto L90;
   }
-  idiag = 0;
-  if (diag > zero && diag < 1e3) {
-    idiag = (integer)diag;
-  }
-  /*
-    if (*iprint > 0 && idiag > 0) {
-    io___16.ciunit = *iout;
-    s_wsfe(&io___16);
-    do_fio(&c__1, (char *)&idiag, (ftnlen)sizeof(integer));
-    e_wsfe();
-    }
-  */
   if (info < 0) {
     goto L70;
   }
@@ -658,14 +641,14 @@ integer *lw;
   static doublereal ga, gb;
   static integer ia, id;
   static doublereal fdiffa;
-  static integer ii, il, kk, jl, ip, ir, nm, is, iu, iw, ju, ix, iz, nu, iy;
+  static integer ii, il, kk, jl, ir, nm, is, iu, iw, ju, ix, iz, nu, iy;
 
   static doublereal parinc, parnew;
   static integer ira, irb, iwa;
   static doublereal one;
   static integer iwd, iza;
   static doublereal res;
-  static integer ipp, iwr, iws;
+  static integer iwr, iws;
   static doublereal sum;
   static integer iww, iwx, iwy;
   static doublereal two;
@@ -1082,8 +1065,6 @@ L250:
 
 L280:
   ir = iwr;
-  ip = iww + 1;
-  ipp = iww + *n;
   il = iws + 1;
   iu = iws + *nact;
   i__2 = iu;
@@ -1829,8 +1810,6 @@ L770:
   /*     CALCULATE THE NEXT CONSTRAINT TO DROP. */
 
 L775:
-  ip = iww + 1;
-  ipp = iww + *nact;
   kdrop = 0;
   if (*nact == 0) {
     goto L791;
