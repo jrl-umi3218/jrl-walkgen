@@ -52,11 +52,8 @@ int CoMAndFootOnlyStrategy::InitInterObjects(
 int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(
     FootAbsolutePosition &LeftFootPosition,
     FootAbsolutePosition &RightFootPosition, Eigen::VectorXd &ZMPRefPos,
-    COMState &finalCOMPosition,
-    Eigen::VectorXd & CurrentConfiguration,
-    Eigen::VectorXd & CurrentVelocity,
-    Eigen::VectorXd & CurrentAcceleration)
-{
+    COMState &finalCOMPosition, Eigen::VectorXd &CurrentConfiguration,
+    Eigen::VectorXd &CurrentVelocity, Eigen::VectorXd &CurrentAcceleration) {
   ODEBUG("Begin OneGlobalStepOfControl "
          << m_LeftFootPositions->size() << " " << m_RightFootPositions->size()
          << " " << m_COMBuffer->size() << " " << m_ZMPPositions->size());

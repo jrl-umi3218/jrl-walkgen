@@ -841,8 +841,7 @@ void StepOverPlanner::PolyPlannerFirstStep(
   ZfootSpeedBound(0) = 0.0;
   ZfootSpeedBound(1) = 0.0;
 
-  int NumberIntermediate = 0, Counter = 0,
-      CounterTemp = 0;
+  int NumberIntermediate = 0, Counter = 0, CounterTemp = 0;
   double IntermediateTimeStep;
 
   NumberIntermediate = 10;
