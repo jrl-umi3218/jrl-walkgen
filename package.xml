@@ -11,8 +11,10 @@
   <author>Olivier Stasse</author>
 
   <build_depend>roscpp</build_depend>
+  <build_depend>talos_data</build_depend>
 
   <exec_depend>roscpp</exec_depend>
+  <exec_depend>talos_data</exec_depend>
 
   <buildtool_depend>catkin</buildtool_depend>
 
