@@ -2,8 +2,8 @@ jrl-walkgen
 ===========
 
 [![Building Status](https://travis-ci.org/stack-of-tasks/jrl-walkgen.svg?branch=master)](https://travis-ci.org/stack-of-tasks/jrl-walkgen)
-[![Pipeline status](https://gepgitlab.laas.fr/stack-of-tasks/jrl-walkgen/badges/master/pipeline.svg)](https://gepgitlab.laas.fr/stack-of-tasks/jrl-walkgen/commits/master)
-[![Coverage report](https://gepgitlab.laas.fr/stack-of-tasks/jrl-walkgen/badges/master/coverage.svg?job=doc-coverage)](http://projects.laas.fr/gepetto/doc/stack-of-tasks/jrl-walkgen/master/coverage/)
+[![Pipeline status](https://gitlab.laas.fr/stack-of-tasks/jrl-walkgen/badges/master/pipeline.svg)](https://gitlab.laas.fr/stack-of-tasks/jrl-walkgen/commits/master)
+[![Coverage report](https://gitlab.laas.fr/stack-of-tasks/jrl-walkgen/badges/master/coverage.svg?job=doc-coverage)](http://projects.laas.fr/gepetto/doc/stack-of-tasks/jrl-walkgen/master/coverage/)
 
 This software provides a pattern generator for biped robots.
 
