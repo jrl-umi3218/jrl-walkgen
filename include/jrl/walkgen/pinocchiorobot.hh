@@ -201,9 +201,9 @@ public:
   inline Eigen::VectorXd &currentRPYAcceleration() { return m_arpy; }
   inline Eigen::VectorXd &currentTau() { return m_tau; }
 
-  inline unsigned numberDof() { return m_robotModel->nq; }
+  inline unsigned numberDof() { return (unsigned)m_robotModel->nq; }
 
-  inline unsigned numberVelDof() { return m_robotModel->nv; }
+  inline unsigned numberVelDof() { return (unsigned)m_robotModel->nv; }
 
   inline void zeroMomentumPoint(Eigen::Vector3d &zmp) {
     m_externalForces = m_robotData->liMi[1].act(m_robotData->f[1]);

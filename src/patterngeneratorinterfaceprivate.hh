@@ -258,6 +258,9 @@ public:
                                   FootAbsolutePosition &RightFootPosition,
                                   ZMPPosition &ZMPRefPos,
                                   COMPosition &COMRefPos);
+
+
+  bool RunOneStepOfTheControlLoop(ControlLoopOneStepArgs &aControlLoopStepArgs);
   /*! @} */
 
   /*! Set the current joint values of the robot.

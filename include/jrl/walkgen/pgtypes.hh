@@ -60,6 +60,7 @@ struct WALK_GEN_JRL_EXPORT COMPosition_s {
   struct COMPosition_s &operator=(const COMState_s &aCS);
 };
 
+
 inline std::ostream &operator<<(std::ostream &os, const COMPosition_s &aCp) {
   for (size_t i = 0; i < 3; ++i) {
     os << "x[" << i << "] " << aCp.x[i] << " y[" << i << "] " << aCp.y[i]
@@ -269,6 +270,17 @@ inline std::ostream &operator<<(std::ostream &os, const Circle_t &circle) {
   os << "x_0 " << circle.x_0 << " y_0 " << circle.y_0 << " R " << circle.r;
   return os;
 }
+
+struct ControlLoopOneStepArgs {
+  Eigen::VectorXd CurrentConfiguration;
+  Eigen::VectorXd CurrentVelocity;
+  Eigen::VectorXd CurrentAcceleration;
+  Eigen::VectorXd ZMPTarget;
+  COMState finalCOMState;
+  FootAbsolutePosition LeftFootPosition;
+  FootAbsolutePosition RightFootPosition;
+  Eigen::VectorXd Momentum;
+};
 
 } // namespace PatternGeneratorJRL
 #endif
