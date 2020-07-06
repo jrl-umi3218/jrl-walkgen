@@ -47,7 +47,7 @@ void DumpReferencesObjects::setAnklePositions(
   m_AnklePositionLeft = AnklePositionLeft;
 }
 void DumpReferencesObjects::prepareFile(ofstream &aof, string &prefix,
-                                        struct OneStep &anOneStep) {
+                                        OneStep &anOneStep) {
   string aFileName;
   aFileName = prefix;
   aFileName += ".dat";
@@ -88,7 +88,7 @@ void DumpReferencesObjects::fillFileWithSubsamplingAndClose(
 }
 
 void DumpReferencesObjects::fillInTests(
-    std::string &aTestName, struct OneStep &anOneStep,
+    std::string &aTestName, OneStep &anOneStep,
     Eigen::VectorXd &aCurrentConfiguration) {
   if (m_InternalFormat == 0)
     fillInTestsFormat1(aTestName, anOneStep, aCurrentConfiguration);
@@ -97,7 +97,7 @@ void DumpReferencesObjects::fillInTests(
 }
 
 void DumpReferencesObjects::fillInTestsFormat1(
-    std::string &aTestName, struct OneStep &anOneStep,
+    std::string &aTestName, OneStep &anOneStep,
     Eigen::VectorXd &aCurrentConfiguration)
 
 {
@@ -273,7 +273,7 @@ void DumpReferencesObjects::fillInTestsFormat1(
 }
 
 void DumpReferencesObjects::fillInTestsFormat2(
-    std::string &aTestName, struct OneStep &anOneStep,
+    std::string &aTestName, OneStep &anOneStep,
     Eigen::VectorXd &aCurrentConfiguration)
 
 {

@@ -168,7 +168,9 @@ PatternGeneratorInterfacePrivate::PatternGeneratorInterfacePrivate(
 }
 
 void PatternGeneratorInterfacePrivate::AllowFPE() {
+#ifndef __APPLE_CC__
   feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
+#endif
 }
 
 void PatternGeneratorInterfacePrivate::RegisterPluginMethods() {

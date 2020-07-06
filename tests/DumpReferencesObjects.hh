@@ -14,10 +14,10 @@ public:
   std::ofstream &aof;
   double dt;
   double nb_subsampling;
-  struct OneStep &anOneStep;
+  OneStep &anOneStep;
 
   FillingFileArgs_t(std::ofstream &laof, double ldt, double lnb_subsampling,
-                    struct OneStep &lOneStep)
+                    OneStep &lOneStep)
       : aof(laof), dt(ldt), nb_subsampling(lnb_subsampling),
         anOneStep(lOneStep){};
 };
@@ -30,23 +30,23 @@ public:
   void setAnklePositions(Eigen::Vector3d &AnklePositionRight,
                          Eigen::Vector3d &AnklePositionLeft);
   virtual void prepareFile(std::ofstream &aof, std::string &prefix,
-                           struct OneStep &anOneStep);
+                           OneStep &anOneStep);
   /// Fill-in tests
   /// \param[in] aTestName: Prefix of the test (typically algorithm name)
   /// \param[in] anOneStep: One iteration of the algorithm
   /// \param[in] aCurrentConfiguration: A configuration vector in
   /// RPY + motor angle format.
   /// This method is a front end for fillInTestFormat1 and fillInTestFormat2
-  virtual void fillInTests(std::string &aTestName, struct OneStep &anOneStep,
+  virtual void fillInTests(std::string &aTestName, OneStep &anOneStep,
                            Eigen::VectorXd &aCurrentConfiguration);
 
   ///
   virtual void fillInTestsFormat1(std::string &aTestName,
-                                  struct OneStep &anOneStep,
+                                  OneStep &anOneStep,
                                   Eigen::VectorXd &aCurrentConfiguration);
 
   virtual void fillInTestsFormat2(std::string &aTestName,
-                                  struct OneStep &anOneStep,
+                                  OneStep &anOneStep,
                                   Eigen::VectorXd &aCurrentConfiguration);
 
   virtual void

@@ -56,7 +56,9 @@ namespace TestSuite {
 TestObject::TestObject(int argc, char *argv[], string &aTestName,
                        int lPGIInterface) {
   // Generates a signal when a NaN occurs.
+#ifndef __APPLE_CC__
   feenableexcept(FE_INVALID | FE_OVERFLOW);
+#endif
 
   m_TestName = aTestName;
   m_OneStep.m_TestName = m_TestName;
