@@ -4,7 +4,4 @@ INPUT                  = @CMAKE_SOURCE_DIR@/include \
 		         @CMAKE_SOURCE_DIR@/doc/additionalHeader
 IMAGE_PATH             = @CMAKE_SOURCE_DIR@/doc/pictures
 
-TAGFILES               = \
-"@ABSTRACT_ROBOT_DYNAMICS_DOXYGENDOCDIR@/abstract-robot-dynamics.doxytag = @ABSTRACT_ROBOT_DYNAMICS_DOXYGENDOCDIR@" \
-"@JRL_MAL_DOXYGENDOCDIR@/jrl-mal.doxytag = @JRL_MAL_DOXYGENDOCDIR@" \
-"@JRL_DYNAMICS_DOXYGENDOCDIR@/jrl-dynamics.doxytag = @JRL_DYNAMICS_DOXYGENDOCDIR@"
+TAGFILES               =
