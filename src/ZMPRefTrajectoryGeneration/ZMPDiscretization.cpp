@@ -1111,7 +1111,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(
   LeftFootAbsolutePosition.time = RightFootAbsolutePosition.time =
       m_CurrentTime;
 
-  LeftFootAbsolutePosition.stepType = RightFootAbsolutePosition.stepType = 0;
+  LeftFootAbsolutePosition.stepType = RightFootAbsolutePosition.stepType = 10;
 
   FinalLeftFootAbsolutePositions.push_back(LeftFootAbsolutePosition);
   FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePosition);
@@ -1147,7 +1147,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(
     LeftFootAbsolutePosition.time = RightFootAbsolutePosition.time =
         m_CurrentTime;
 
-    LeftFootAbsolutePosition.stepType = RightFootAbsolutePosition.stepType = 0;
+    LeftFootAbsolutePosition.stepType = RightFootAbsolutePosition.stepType = 10;
 
     FinalLeftFootAbsolutePositions.push_back(LeftFootAbsolutePosition);
     FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePosition);
@@ -1194,7 +1194,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(
     LeftFootAbsolutePosition.time = RightFootAbsolutePosition.time =
         m_CurrentTime;
 
-    LeftFootAbsolutePosition.stepType = RightFootAbsolutePosition.stepType = 0;
+    LeftFootAbsolutePosition.stepType = RightFootAbsolutePosition.stepType = 10;
 
     FinalLeftFootAbsolutePositions.push_back(LeftFootAbsolutePosition);
     FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePosition);
