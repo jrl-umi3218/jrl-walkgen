@@ -259,7 +259,6 @@ public:
                                   ZMPPosition &ZMPRefPos,
                                   COMPosition &COMRefPos);
 
-
   bool RunOneStepOfTheControlLoop(ControlLoopOneStepArgs &aControlLoopStepArgs);
   /*! @} */
 

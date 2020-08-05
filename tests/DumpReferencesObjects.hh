@@ -41,12 +41,10 @@ public:
                            Eigen::VectorXd &aCurrentConfiguration);
 
   ///
-  virtual void fillInTestsFormat1(std::string &aTestName,
-                                  OneStep &anOneStep,
+  virtual void fillInTestsFormat1(std::string &aTestName, OneStep &anOneStep,
                                   Eigen::VectorXd &aCurrentConfiguration);
 
-  virtual void fillInTestsFormat2(std::string &aTestName,
-                                  OneStep &anOneStep,
+  virtual void fillInTestsFormat2(std::string &aTestName, OneStep &anOneStep,
                                   Eigen::VectorXd &aCurrentConfiguration);
 
   virtual void
@@ -68,7 +66,7 @@ public:
       m_prevRightAnkledOrientation, m_prevRightAnkleddOrientation;
 
   std::vector<double> m_prevZMPlocal, m_prevZMPlocalF2, m_prevZMPRef,
-    m_prevTorquesF2, m_prevPhase;
+      m_prevTorquesF2, m_prevPhase;
 
   Eigen::Vector3d m_AnklePositionRight, m_AnklePositionLeft;
   /// Add time or not in the dump file

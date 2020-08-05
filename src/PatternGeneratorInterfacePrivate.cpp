@@ -1212,17 +1212,15 @@ bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(
 }
 
 bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(
-      ControlLoopOneStepArgs &aControlLoopOneStepArgs) {
+    ControlLoopOneStepArgs &aControlLoopOneStepArgs) {
 
-   return RunOneStepOfTheControlLoop(
-       aControlLoopOneStepArgs.CurrentConfiguration,
-       aControlLoopOneStepArgs.CurrentVelocity,
-       aControlLoopOneStepArgs.CurrentAcceleration,
-       aControlLoopOneStepArgs.ZMPTarget,
-       aControlLoopOneStepArgs.finalCOMState,
-       aControlLoopOneStepArgs.LeftFootPosition,
-       aControlLoopOneStepArgs.RightFootPosition);
-
+  return RunOneStepOfTheControlLoop(
+      aControlLoopOneStepArgs.CurrentConfiguration,
+      aControlLoopOneStepArgs.CurrentVelocity,
+      aControlLoopOneStepArgs.CurrentAcceleration,
+      aControlLoopOneStepArgs.ZMPTarget, aControlLoopOneStepArgs.finalCOMState,
+      aControlLoopOneStepArgs.LeftFootPosition,
+      aControlLoopOneStepArgs.RightFootPosition);
 }
 
 bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(

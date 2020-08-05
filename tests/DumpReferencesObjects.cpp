@@ -410,18 +410,16 @@ void DumpReferencesObjects::fillInTestsFormat2(
   prepareFile(aof, prefix, anOneStep);
   vec_db.resize(3);
   vec_db[0] = 0;
-  if (anOneStep.m_LeftFootPosition.stepType==-1)
+  if (anOneStep.m_LeftFootPosition.stepType == -1)
     vec_db[0] = 1.0;
-  else if (anOneStep.m_RightFootPosition.stepType==-1)
-    vec_db[0] =-1.0;
+  else if (anOneStep.m_RightFootPosition.stepType == -1)
+    vec_db[0] = -1.0;
 
   vec_db[1] = 0;
   vec_db[2] = 0;
-  if (m_prevPhase.size()!=3)
+  if (m_prevPhase.size() != 3)
     m_prevPhase.resize(3);
-  aof.unsetf(std::ios::floatfield );
+  aof.unsetf(std::ios::floatfield);
   aof.precision(1);
-  fillFileWithSubsamplingAndClose(aSetOfFillingFileArgs, vec_db,
-                                  m_prevPhase);
-
+  fillFileWithSubsamplingAndClose(aSetOfFillingFileArgs, vec_db, m_prevPhase);
 }

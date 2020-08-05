@@ -194,12 +194,10 @@ public:
                              ZMPPosition &ZMPRefPos,
                              COMPosition &COMRefPos) = 0;
 
-
   /*! \brief Rune One Step of the global control loop
    */
-  virtual bool
-  RunOneStepOfTheControlLoop(
-      ControlLoopOneStepArgs &aControlLoopOneStepArgs) =0;
+  virtual bool RunOneStepOfTheControlLoop(
+      ControlLoopOneStepArgs &aControlLoopOneStepArgs) = 0;
   /*! @} */
 
   /*! Set the current joint values of the robot.

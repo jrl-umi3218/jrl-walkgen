@@ -60,7 +60,6 @@ struct WALK_GEN_JRL_EXPORT COMPosition_s {
   struct COMPosition_s &operator=(const COMState_s &aCS);
 };
 
-
 inline std::ostream &operator<<(std::ostream &os, const COMPosition_s &aCp) {
   for (size_t i = 0; i < 3; ++i) {
     os << "x[" << i << "] " << aCp.x[i] << " y[" << i << "] " << aCp.y[i]
